@@ -52,7 +52,8 @@ export default function Layout() {
         <div className="topbar-inner">
           <Link to="/" className="logo">un<span>c</span></Link>
           <nav className="nav">
-            <NavLink to="/" end className={tabbed}>{t('Browse')}</NavLink>
+            {user && <NavLink to="/" end className={tabbed}>{t('Home')}</NavLink>}
+            <NavLink to={user ? '/browse' : '/'} end className={tabbed}>{t('Browse')}</NavLink>
             {user && <NavLink to="/my-requests" className={tabbed}>{t('My requests')}</NavLink>}
             {user && (
               <NavLink to="/messages" className={tabbed}>

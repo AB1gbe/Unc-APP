@@ -272,3 +272,8 @@ span.chip { cursor: default; }
   .container { padding-inline: 1.25rem; }
   .grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Progress bar (profile checklist on the home page) */
+.progress { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; margin: .6rem 0; }
+.progress span { display: block; height: 100%; background: var(--ok); border-radius: inherit; transition: width .3s; }
+a.chip { text-decoration: none; display: inline-flex; align-items: center; }

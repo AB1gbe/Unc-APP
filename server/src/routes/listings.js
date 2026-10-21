@@ -6,7 +6,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import { LISTING_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
-import { requireAuth, requireVerified } from '../middleware/auth.js';
+import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
 
 export function listingView(row, images = []) {
@@ -80,6 +80,22 @@ export function listingRoutes(db) {
       page,
       hasMore: rows.length > pageSize,
     });
+  });
+
+  // "Requests you could help with" on the member's home page: open
+  // requests in their interests (all categories if they chose none), not
+  // their own, not ones they already answered; same city first, newest first.
+  r.get('/for-you', requireAuth, (req, res) => {
+    const interests = parseInterests(req.user.interests).filter((c) => CATEGORIES.includes(c));
+    const rows = db.prepare(`
+      ${BASE_SELECT}
+      WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ?
+        AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id AND c.vendor_id = ?)
+        ${interests.length ? `AND l.category IN (${interests.map(() => '?').join(', ')})` : ''}
+      ORDER BY (lower(l.city) = lower(COALESCE(?, ''))) DESC, l.created_at DESC, l.id DESC
+      LIMIT 6
+    `).all(req.user.id, req.user.id, ...interests, req.user.city);
+    res.json({ listings: rows.map(withImages), basedOnInterests: interests.length > 0 });
   });
 
   // The logged-in buyer's own requests, any status.

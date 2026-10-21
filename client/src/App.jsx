@@ -3,6 +3,8 @@ import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import { RequireAdmin, RequireAuth, RequireVerified } from './components/ui.jsx';
 import Browse from './pages/Browse.jsx';
+import Home from './pages/Home.jsx';
+import { useAuth } from './auth.jsx';
 import ListingDetail from './pages/ListingDetail.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -25,11 +27,18 @@ const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
 const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
 
+// Members land on their personal home; visitors see the request list.
+function HomeOrBrowse() {
+  const { user } = useAuth();
+  return user ? <Home /> : <Browse />;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Browse />} />
+        <Route index element={<HomeOrBrowse />} />
+        <Route path="browse" element={<Browse />} />
         <Route path="requests/new" element={<RequireAuth><RequireVerified action="post"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="requests/:id" element={<ListingDetail />} />
         <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit"><NewListing /></RequireVerified></RequireAuth>} />
