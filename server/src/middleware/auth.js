@@ -76,5 +76,6 @@ export function publicMe(u) {
     bio: u.bio,
     interests: parseInterests(u.interests),
     onboarded: Boolean(u.onboarded_at),
+    emailOffers: u.email_offers !== 0,
   };
 }

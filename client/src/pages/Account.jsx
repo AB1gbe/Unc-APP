@@ -36,6 +36,7 @@ export default function Account() {
         <p className="muted small">{t('This is what other members see when they look at your name.')}</p>
         <ProfileEditor />
       </div>
+      <EmailSettings />
       <PushSettings />
       <ChangePassword />
       <div className="card row spread">
@@ -91,3 +92,41 @@ function ChangePassword() {
     </form>
   );
 }
+
+// "Email me about new offers" (on by default). Saves as soon as it's ticked.
+function EmailSettings() {
+  const { user, setUser } = useAuth();
+  // Shown at once; put back if saving fails. (Waiting for the server made
+  // the tick jump back until it answered.)
+  const [checked, setChecked] = useState(user.emailOffers);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  async function change(e) {
+    const emailOffers = e.target.checked;
+    setChecked(emailOffers);
+    setBusy(true);
+    setError(null);
+    try {
+      setUser((await api('/auth/me', { method: 'PATCH', body: { emailOffers } })).user);
+    } catch (err) {
+      setChecked(!emailOffers);
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="card">
+      <h2>{t('Email notifications')}</h2>
+      <ErrorBox error={error} />
+      <label className="toggle-row">
+        <input type="checkbox" checked={checked} disabled={busy} onChange={change} />
+        <span>
+          {t('Email me when a seller makes an offer on my request')}
+          <span className="hint" style={{ display: 'block' }}>{tj('Sent to {email}. Replies and deals stay in the app.', { email: <span className="ltr">{user.email}</span> })}</span>
+        </span>
+      </label>
+    </div>
+  );
+}
+

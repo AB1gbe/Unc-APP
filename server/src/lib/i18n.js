@@ -75,6 +75,7 @@ const AR = {
   'Choose up to 8 interests from the list.': 'اختر حتى 8 اهتمامات من القائمة.',
   "You can't save your own request.": 'لا يمكنك حفظ طلبك أنت.',
   'This browser sent an invalid notification subscription.': 'أرسل هذا المتصفح اشتراك إشعارات غير صالح.',
+  'emailOffers must be true or false.': 'قيمة رسائل العروض يجب أن تكون true أو false.',
   'Notifications are not turned on for any of your devices yet.': 'الإشعارات غير مفعّلة على أي من أجهزتك بعد.',
   'banned must be true or false.': 'قيمة الحظر يجب أن تكون true أو false.',
   'Please enter a valid email address.': 'يُرجى إدخال بريد إلكتروني صحيح.',

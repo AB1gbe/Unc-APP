@@ -6,12 +6,23 @@ import { config } from '../config.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// Member-written text (names, titles, messages) keeps its own direction
+// inside the email. Email apps don't reliably support dir="auto" or <bdi>,
+// so the direction is worked out here from the first letter: Arabic → rtl.
+export const textDir = (s) => {
+  const m = String(s).match(/[A-Za-z\u00C0-\u024F]|[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/);
+  return m && !/[A-Za-z\u00C0-\u024F]/.test(m[0]) ? 'rtl' : 'ltr';
+};
+const member = (s) => `<span dir="${textDir(s)}">${esc(s)}</span>`;
+// Plain text and subject lines: Unicode "isolate" marks do the same job.
+const iso = (s) => `\u2068${s}\u2069`;
+
 const FOOTER = {
   en: "You received this because of activity on your Unc account. If this wasn't you, you can ignore this email.",
   ar: 'وصلتك هذه الرسالة بسبب نشاط على حسابك في Unc. إن لم تكن أنت، يمكنك تجاهلها.',
 };
 
-function layout(lang, title, bodyHtml) {
+function layout(lang, title, bodyHtml, footer = FOOTER[lang]) {
   const rtl = lang === 'ar';
   const dir = rtl ? 'rtl' : 'ltr';
   return `<!doctype html><html lang="${lang}" dir="${dir}"><body dir="${dir}" style="margin:0;background:#f6f7f9;font-family:Tahoma,Arial,Helvetica,sans-serif;color:#16181d">
@@ -20,7 +31,7 @@ function layout(lang, title, bodyHtml) {
 <div dir="ltr" style="font-size:22px;font-weight:800;text-align:${rtl ? 'right' : 'left'}">un<span style="color:#2f6fed">c</span></div>
 <h1 style="font-size:20px;margin:16px 0 8px">${esc(title)}</h1>
 ${bodyHtml}
-<p style="color:#5d6573;font-size:12px;margin-top:24px">${FOOTER[lang]}</p>
+<p style="color:#5d6573;font-size:12px;margin-top:24px">${footer}</p>
 </td></tr></table></td></tr></table></body></html>`;
 }
 
@@ -89,3 +100,35 @@ export function passwordChangedEmail(language) {
 <p><b>Wasn't you?</b> <a href="${esc(resetUrl)}">Reset your password now</a>.</p>`),
   };
 }
+
+// To the buyer when a seller makes an offer on their request (session 17).
+// Only sent while the buyer's "Email me about new offers" switch is on;
+// the footer says where to turn it off.
+export function newOfferEmail({ sellerName, title, message, offerPrice, currency, conversationId }, language) {
+  const lang = pick(language);
+  const url = `${config.appUrl}/messages/${conversationId}`;
+  const settingsUrl = `${config.appUrl}/account`;
+  const price = offerPrice == null ? null : new Intl.NumberFormat(lang === 'ar' ? 'ar-BH-u-nu-latn' : 'en-US', {
+    style: 'currency', currency, currencyDisplay: lang === 'ar' ? 'code' : 'symbol', maximumFractionDigits: 0,
+  }).format(offerPrice);
+  const snippet = message.length > 300 ? `${message.slice(0, 300)}…` : message;
+  const quote = `<blockquote dir="${textDir(snippet)}" style="margin:16px 0;padding:12px 16px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap;text-align:${textDir(snippet) === 'rtl' ? 'right' : 'left'}">${esc(snippet)}</blockquote>`;
+  const button = (label) => `<p style="margin:20px 0"><a href="${esc(url)}" style="background:#2f6fed;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">${label}</a></p>`;
+  if (lang === 'ar') {
+    return {
+      subject: `عرض جديد على «${iso(title)}»`,
+      text: `قدّم ${iso(sellerName)} عرضاً على طلبك «${iso(title)}»${price ? ` بسعر ${price}` : ''}:\n\n${snippet}\n\nاطّلع على العرض ورُدّ عليه: ${url}\n\nلإيقاف رسائل العروض الجديدة: ${settingsUrl}`,
+      html: layout(lang, 'عرض جديد على طلبك', `<p>قدّم <b>${member(sellerName)}</b> عرضاً على طلبك «${member(title)}»${price ? ` بسعر <b>${esc(price)}</b>` : ''}:</p>
+${quote}
+${button('اطّلع على العرض')}`, `وصلتك هذه الرسالة لأنك نشرت هذا الطلب في Unc. <a href="${esc(settingsUrl)}">أوقف رسائل العروض الجديدة</a> من صفحة حسابك.`),
+    };
+  }
+  return {
+    subject: `New offer on “${iso(title)}”`,
+    text: `${iso(sellerName)} made an offer on your request “${iso(title)}”${price ? ` for ${price}` : ''}:\n\n${snippet}\n\nSee the offer and reply: ${url}\n\nTo stop new-offer emails: ${settingsUrl}`,
+    html: layout(lang, 'New offer on your request', `<p><b>${member(sellerName)}</b> made an offer on your request “${member(title)}”${price ? ` for <b>${esc(price)}</b>` : ''}:</p>
+${quote}
+${button('See the offer')}`, `You received this because you posted this request on Unc. <a href="${esc(settingsUrl)}">Turn off new-offer emails</a> in your account.`),
+  };
+}
+

@@ -490,4 +490,8 @@ export default {
   'Turn off': 'إيقاف',
   'Sent. It should appear in a few seconds.': 'تم الإرسال. سيظهر خلال ثوانٍ.',
   "Couldn't turn on notifications in this browser. Private/incognito windows can't get them; otherwise check your connection and try again.": 'تعذّر تفعيل الإشعارات في هذا المتصفح. النوافذ الخاصة (التصفح المتخفي) لا تستقبلها؛ وإلا فتحقق من اتصالك وحاول مرة أخرى.',
+  // Email notifications (session 17)
+  'Email notifications': 'إشعارات البريد الإلكتروني',
+  'Email me when a seller makes an offer on my request': 'راسلني عندما يقدّم بائع عرضاً على طلبي',
+  'Sent to {email}. Replies and deals stay in the app.': 'تُرسل إلى {email}. الردود والصفقات تبقى داخل التطبيق.',
 };
