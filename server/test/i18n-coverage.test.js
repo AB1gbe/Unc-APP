@@ -60,3 +60,12 @@ test('every tn() plural has Arabic forms (at least "other"), each keeping the pl
   }
   assert.deepEqual(problems, [], `\n${problems.join('\n')}\n`);
 });
+
+test('ar.js has no duplicate keys (a second copy would silently win)', () => {
+  const text = fs.readFileSync(path.join(clientSrc, 'locales/ar.js'), 'utf8');
+  const keys = [...text.matchAll(/^\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|([A-Za-z_]\w*))\s*:/gm)]
+    .map((m) => unescape(m[1] ?? m[2] ?? m[3]))
+    .filter((k) => !['zero', 'one', 'two', 'few', 'many', 'other'].includes(k));
+  const dupes = keys.filter((k, i) => keys.indexOf(k) !== i);
+  assert.deepEqual(dupes, []);
+});

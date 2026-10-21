@@ -5,6 +5,7 @@ import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
+import { t } from '../i18n.jsx';
 
 const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '' };
 
@@ -59,53 +60,53 @@ export default function NewListing() {
 
   return (
     <form className="narrow card" onSubmit={submit}>
-      <h1>{editing ? 'Edit your request' : 'What are you looking for?'}</h1>
-      <p className="muted">Be specific — sellers will contact you privately about this request.</p>
+      <h1>{editing ? t('Edit your request') : t('What are you looking for?')}</h1>
+      <p className="muted">{t('Be specific — sellers will contact you privately about this request.')}</p>
       <ErrorBox error={error} />
       <div className="field">
-        <label htmlFor="title">Title</label>
-        <input id="title" required minLength={5} maxLength={100} placeholder="e.g. Looking for an iPhone 15, 128GB, any colour" value={form.title} onChange={set('title')} />
+        <label htmlFor="title">{t('Title')}</label>
+        <input id="title" required minLength={5} maxLength={100} placeholder={t('e.g. Looking for an iPhone 15, 128GB, any colour')} dir="auto" value={form.title} onChange={set('title')} />
       </div>
       <div className="field">
-        <label htmlFor="category">Category</label>
+        <label htmlFor="category">{t('Category')}</label>
         <select id="category" required value={form.category} onChange={set('category')}>
-          <option value="" disabled>Choose a category</option>
-          {categories.map((c) => <option key={c}>{c}</option>)}
+          <option value="" disabled>{t('Choose a category')}</option>
+          {categories.map((c) => <option key={c} value={c}>{t(c)}</option>)}
         </select>
       </div>
       <div className="field">
-        <label htmlFor="description">Details</label>
-        <textarea id="description" required minLength={10} maxLength={3000} placeholder="Condition, model, size, colour, must-haves, deal-breakers…" value={form.description} onChange={set('description')} />
+        <label htmlFor="description">{t('Details')}</label>
+        <textarea id="description" required minLength={10} maxLength={3000} placeholder={t('Condition, model, size, colour, must-haves, deal-breakers…')} dir="auto" value={form.description} onChange={set('description')} />
       </div>
       <div className="field">
-        <label>Budget <span className="muted">(optional)</span></label>
+        <label>{t('Budget')} <span className="muted">{t('(optional)')}</span></label>
         <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr 110px' }}>
-          <input type="number" min="0" placeholder="Min" value={form.budgetMin} onChange={set('budgetMin')} aria-label="Minimum budget" />
-          <input type="number" min="0" placeholder="Max" value={form.budgetMax} onChange={set('budgetMax')} aria-label="Maximum budget" />
-          <select value={form.currency} onChange={set('currency')} aria-label="Currency">
+          <input type="number" min="0" placeholder={t('Min')} value={form.budgetMin} onChange={set('budgetMin')} aria-label={t('Minimum budget')} />
+          <input type="number" min="0" placeholder={t('Max')} value={form.budgetMax} onChange={set('budgetMax')} aria-label={t('Maximum budget')} />
+          <select value={form.currency} onChange={set('currency')} aria-label={t('Currency')}>
             {currencies.map((c) => <option key={c}>{c}</option>)}
           </select>
         </div>
       </div>
       <div className="field-row">
         <div className="field">
-          <label htmlFor="city">City</label>
+          <label htmlFor="city">{t('City')}</label>
           <input id="city" required value={form.city} onChange={set('city')} />
         </div>
         <div className="field">
-          <label htmlFor="neededBy">Needed by <span className="muted">(optional)</span></label>
+          <label htmlFor="neededBy">{t('Needed by')} <span className="muted">{t('(optional)')}</span></label>
           <input id="neededBy" type="date" value={form.neededBy} onChange={set('neededBy')} />
         </div>
       </div>
       {!editing && (
         <div className="field">
-          <label htmlFor="images">Reference photos <span className="muted">(optional, up to 3)</span></label>
+          <label htmlFor="images">{t('Reference photos')} <span className="muted">{t('(optional, up to 3)')}</span></label>
           <input id="images" type="file" multiple accept="image/jpeg,image/png,image/webp"
             onChange={(e) => setImages([...e.target.files].slice(0, 3))} />
-          <div className="hint">A photo of what you want helps sellers understand.</div>
+          <div className="hint">{t('A photo of what you want helps sellers understand.')}</div>
         </div>
       )}
-      <button className="btn block" disabled={busy}>{busy ? 'Saving…' : editing ? 'Save changes' : 'Post request'}</button>
+      <button className="btn block" disabled={busy}>{busy ? t('Saving…') : editing ? t('Save changes') : t('Post request')}</button>
     </form>
   );
 }

@@ -37,6 +37,10 @@
 [dir="rtl"] .flip { display: inline-block; transform: scaleX(-1); }
 /* Emails, codes and numbers stay left-to-right inside Arabic text. */
 .ltr { direction: ltr; unicode-bidi: isolate; }
+/* Emails, passwords, codes and numbers are typed left-to-right even on an
+   Arabic page; keep them right-aligned so they sit under their label. */
+[dir="rtl"] input[type="email"], [dir="rtl"] input[type="password"],
+[dir="rtl"] input[type="number"], [dir="rtl"] input[inputmode="numeric"] { direction: ltr; text-align: right; }
 .lang-switch { font-weight: 600; }
 body { margin: 0; background: var(--bg); }
 a { color: var(--brand); text-decoration: none; }

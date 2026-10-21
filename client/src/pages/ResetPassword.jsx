@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, Loading } from '../components/ui.jsx';
+import { t } from '../i18n.jsx';
 
 export default function ResetPassword() {
   const token = useSearchParams()[0].get('token') || '';
@@ -24,13 +25,13 @@ export default function ResetPassword() {
 
   async function submit(e) {
     e.preventDefault();
-    if (password !== confirm) return setError(new Error('The two passwords do not match.'));
+    if (password !== confirm) return setError(new Error(t('The two passwords do not match.')));
     setBusy(true);
     setError(null);
     try {
       await api('/auth/reset-password', { method: 'POST', body: { token, password } });
       setUser(null); // every session was ended by the server
-      navigate('/login', { replace: true, state: { notice: 'Password changed. Log in with your new password.' } });
+      navigate('/login', { replace: true, state: { notice: t('Password changed. Log in with your new password.') } });
     } catch (err) {
       if (err.body?.code === 'RESET_INVALID') setValid(false);
       setError(err);
@@ -43,28 +44,28 @@ export default function ResetPassword() {
   if (!valid) {
     return (
       <div className="narrow card">
-        <h1>This link has expired</h1>
-        <p className="muted">Reset links work once and only for 30 minutes. Request a new one.</p>
-        <Link className="btn block" to="/forgot-password">Send a new link</Link>
+        <h1>{t('This link has expired')}</h1>
+        <p className="muted">{t('Reset links work once and only for 30 minutes. Request a new one.')}</p>
+        <Link className="btn block" to="/forgot-password">{t('Send a new link')}</Link>
       </div>
     );
   }
 
   return (
     <form className="narrow card" onSubmit={submit}>
-      <h1>Choose a new password</h1>
-      <p className="muted small">You'll be logged out on all devices.</p>
+      <h1>{t('Choose a new password')}</h1>
+      <p className="muted small">{t("You'll be logged out on all devices.")}</p>
       <ErrorBox error={error} />
       <div className="field">
-        <label htmlFor="password">New password</label>
+        <label htmlFor="password">{t('New password')}</label>
         <input id="password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-        <div className="hint">At least 8 characters, with letters and numbers.</div>
+        <div className="hint">{t('At least 8 characters, with letters and numbers.')}</div>
       </div>
       <div className="field">
-        <label htmlFor="confirm">Repeat new password</label>
+        <label htmlFor="confirm">{t('Repeat new password')}</label>
         <input id="confirm" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
       </div>
-      <button className="btn block" disabled={busy}>{busy ? 'Saving…' : 'Save new password'}</button>
+      <button className="btn block" disabled={busy}>{busy ? t('Saving…') : t('Save new password')}</button>
     </form>
   );
 }

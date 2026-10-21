@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox } from '../components/ui.jsx';
+import { t, tj } from '../i18n.jsx';
 
 export default function VerifyEmail() {
   const { user, setUser } = useAuth();
@@ -34,7 +35,7 @@ export default function VerifyEmail() {
       const r = await api('/auth/resend-code', { method: 'POST' });
       setDevCode(r.devCode);
       setEmailFailed(false);
-      setNotice('A new code is on its way.');
+      setNotice(t('A new code is on its way.'));
     } catch (err) {
       setError(err);
     }
@@ -44,22 +45,22 @@ export default function VerifyEmail() {
     <div className="narrow">
       <Steps current={1} />
       <div className="card">
-        <h1>Check your email</h1>
-        <p className="muted">We sent a 6-digit code to <b>{user.email}</b>. Check your spam folder if it's not there in a minute.</p>
-        {devCode && <div className="alert info small">Development mode: your code is <b>{devCode}</b> (also printed in the server console).</div>}
-        {emailFailed && <div className="alert warn">We couldn't send the email just now. Press “Send a new code” below.</div>}
+        <h1>{t('Check your email')}</h1>
+        <p className="muted">{tj("We sent a 6-digit code to {email}. Check your spam folder if it's not there in a minute.", { email: <b className="ltr">{user.email}</b> })}</p>
+        {devCode && <div className="alert info small">{tj('Development mode: your code is {code} (also printed in the server console).', { code: <b className="ltr">{devCode}</b> })}</div>}
+        {emailFailed && <div className="alert warn">{t("We couldn't send the email just now. Press “Send a new code” below.")}</div>}
         {notice && <div className="alert ok">{notice}</div>}
         <ErrorBox error={error} />
         <form onSubmit={submit}>
           <div className="field">
-            <label htmlFor="code">Verification code</label>
+            <label htmlFor="code">{t('Verification code')}</label>
             <input id="code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} required value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} style={{ fontSize: '1.4rem', letterSpacing: '.4em', textAlign: 'center' }} />
           </div>
-          <button className="btn block">Confirm email</button>
+          <button className="btn block">{t('Confirm email')}</button>
         </form>
         <p className="small center" style={{ marginTop: '1rem' }}>
-          Didn't get it? <button className="linkish" onClick={resend}>Send a new code</button>
+          {tj("Didn't get it? {link}", { link: <button className="linkish" onClick={resend}>{t('Send a new code')}</button> })}
         </p>
       </div>
     </div>
@@ -68,7 +69,7 @@ export default function VerifyEmail() {
 
 // The 3-step progress bar shown during onboarding.
 export function Steps({ current }) {
-  const steps = [['Account', 'Created'], ['Email', 'Confirm address'], ['Identity', 'Verify (KYC)']];
+  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Identity'), t('Verify (KYC)')]];
   return (
     <div className="steps">
       {steps.map(([title, sub], i) => (
