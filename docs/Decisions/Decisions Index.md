@@ -38,5 +38,6 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 029 | [[ADR-029 Hide my activity]] | Hide online status only; clear and stop storing the last visit; off by default; Account card | hide everything, hide but keep storing, WhatsApp-style fair-play rule |
 | 030 | [[ADR-030 Shop pages]] | Business profile = shop page; cover, area + map link, structured hours with "Open now"; no contact fields and a guard on public text | separate shop page, phone/website fields, embedded map, free-text hours |
 | 031 | [[ADR-031 Happening near you]] | Finds (anonymous, city + category), new requests, new shops, daily offers count; own city first; never invented; time indexes | named finds, request titles, map distance, live updates, filler activity |
+| 032 | [[ADR-032 Favourite sellers]] | ♥ = heads-up when you post in their categories (🔔 + push), answered via the request; verified sellers; public count only | direct messages, all favourites, names public |
 
 Template for new ADRs: copy any ADR and keep the same headings.

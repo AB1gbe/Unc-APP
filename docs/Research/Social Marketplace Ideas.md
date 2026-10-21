@@ -47,7 +47,7 @@ Asked in [[2026-10-21 Session 19]]. These are ideas only: nothing is built yet. 
 |---|---|---|
 | **Share a request to WhatsApp / Instagram / X** | A button, plus a nice preview card (the request's photo, title and budget) when the link is pasted | S–M |
 | **Invite a shop to your request** | "Know a shop that might have it? Send them this request" → a WhatsApp link that opens the request. The contact still happens through the request. | S |
-| **Favourite sellers** | ♥ a seller you liked. When you post a new request in their category, they get notified first ("A past customer is looking for…"). They still answer through that request. | M |
+| ✅ **Favourite sellers** (built in session 28) | ♥ a seller you liked. When you post a new request in their category, they get notified first ("A past customer is looking for…"). They still answer through that request. | M |
 
 ## 6. Community around places and interests
 | Idea | What it looks like | Effort |

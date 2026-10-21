@@ -3,7 +3,7 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20), 15 = `users.hide_activity` (session 22), 16 = `users.cover` + `shop_area` + `shop_hours` (session 24), 17 = feed indexes `idx_deals_created`, `idx_conversations_created`, `idx_users_new_shops` (partial: business accounts) (session 26). `PRAGMA user_version` = 17 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20), 15 = `users.hide_activity` (session 22), 16 = `users.cover` + `shop_area` + `shop_hours` (session 24), 17 = feed indexes `idx_deals_created`, `idx_conversations_created`, `idx_users_new_shops` (partial: business accounts) (session 26), 18 = `favourites` (session 28). `PRAGMA user_version` = 18 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
@@ -40,6 +40,7 @@ users ─┬─< sessions
 | `push_subscriptions` | user_id, endpoint (UNIQUE), p256dh, auth, created_at | One row per phone/computer that turned on push notifications. `endpoint` is the push service's address for that device; `p256dh`/`auth` encrypt the message so only that device can read it. Cascade on user delete. Migration 10, session 15 |
 | `listing_views` | listing_id, user_id, first_seen_at | `PRIMARY KEY(listing_id, user_id)`: each logged-in member counted once per request (never the buyer). Drives "👀 N people looked at it" (`viewCount`, owner only). Both cascade. Migration 13, session 20 |
 | `stories` | deal_id, author_id, body (5–280 chars), image?, created_at, hidden_at | "Found it" stories. `UNIQUE(deal_id, author_id)`: buyer and seller may each share one per deal. `image` = random filename in `uploads/stories/` (**public**). `hidden_at` = hidden by an admin. Both cascade. Migration 14, session 20 |
+| `favourites` | user_id, seller_id, created_at | `PRIMARY KEY(user_id, seller_id)` (my favourites), `idx_favourites_seller` (count on profiles); both cascade. Migration 18, session 28 |
 | `reports` | reporter_id, listing_id?, conversation_id?, reason, status | |
 | `audit_log` | actor_id, action, target, meta (JSON) | KYC decisions, file views, bans, etc. |
 

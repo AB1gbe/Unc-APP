@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 27)
+updated: 2026-10-21 (session 28)
 ---
 # Unc — Project Vault
 
@@ -57,6 +57,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 29 - Hide my activity]]
 - [[Step 30 - Shop pages]]
 - [[Step 31 - Happening near you]]
+- [[Step 32 - Favourite sellers]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -75,7 +76,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 27)
+## Status (2026-10-21, after session 28)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -101,6 +102,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | "Hide when I'm online" privacy setting | ✅ done — in `main` since session 23 |
 | Shop pages for business accounts (cover, area, opening hours, no contact details) | ✅ done — in `main` since session 25 → [[Shop Pages]] |
 | "Happening near you" feed | ✅ done — in `main` since session 27 → [[Social Touches]] |
-| API tests | ✅ 121 passing |
+| Favourite sellers (heads-up on new requests) | ✅ done — on branch (session 28) → [[Social Touches]] |
+| API tests | ✅ 124 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

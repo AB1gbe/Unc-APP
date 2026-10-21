@@ -39,6 +39,7 @@ tags: [roadmap]
 - [x] The recommended first five, built in session 20 → [[Social Touches]].
 - [x] Shop pages (session 24) → [[Shop Pages]].
 - [x] "Happening near you" feed (session 26) → [[Social Touches#6. "Happening near you" (session 26)]].
+- [x] Favourite sellers (session 28) → [[Social Touches#7. Favourite sellers (session 28)]].
 - [ ] More from [[Social Marketplace Ideas]]: reactions, typing indicator, favourite sellers, city pages, "Me too".
 - [x] "Hide when I'm online" switch (session 22) → [[ADR-029 Hide my activity]].
 

@@ -133,3 +133,12 @@ Only when the built website exists (`client/dist`, or `CLIENT_DIST`). Every non-
 |---|---|---|---|
 | GET | `/api/feed` | — | `{city, items: [{kind, at, city, near, category?, listing?{id,title}, shop?{id,displayName}, count?}]}`, at most 8, from the last 7 days. The member's city comes first (`near`). Kinds: `found` (anonymous: city + category only), `request` (open, not your own), `shop` (new verified business), `offers-today` (2+ new conversations on requests in your city in 24 h). Private people are never named; banned members are left out. Works logged out (no `near`). |
 
+## Favourite sellers — `server/src/routes/favourites.js` (session 28)
+| Method | Path | Gate | Notes |
+|---|---|---|---|
+| PUT | `/api/members/:id/favourite` | A | ♥ a verified, non-banned member → `{favourite:true}`; twice is fine; yourself → 400; unknown/unverified → 404 |
+| DELETE | `/api/members/:id/favourite` | A | → `{favourite:false}` |
+| GET | `/api/favourites` | A | my favourite sellers `{sellers:[{id, displayName, avatarUrl, accountType, city}]}` |
+
+Also: `GET /api/members/:id` → `member.favouriteCount` (everyone) and `member.favourite` (logged in). `GET /api/conversations/:id` → `conversation.otherFavourite`. `POST /api/listings` calls `tellFavourites()`: each favourite seller whose interests include the category (or who chose none) gets the notification kind `favourite-request` and a push.
+

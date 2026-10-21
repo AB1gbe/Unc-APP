@@ -87,6 +87,19 @@ The five "recommended first" ideas from [[Social Marketplace Ideas]], all built 
 - Visitors see it as "Happening on Unc" on the landing page, without the city ordering.
 - Never: names of private people, closed requests, banned members, or invented activity.
 
+## 7. Favourite sellers (session 28)
+**Why:** [[ADR-032 Favourite sellers]] · **Build:** [[Step 32 - Favourite sellers]]
+**Where:** `server/src/routes/favourites.js`, `client/src/components/FavouriteButton.jsx`, the Saved page, `Notifications.jsx`
+
+| ♡ Favourite on a shop page (phone) | What the seller gets |
+|---|---|
+| ![[s28-favourite-button.png]] | ![[s28-favourite-notification.png]] |
+
+- **♡ Favourite** on any verified seller's profile. After a deal, the buyer also sees **♡ Add {name} to favourite sellers** in the "Deal done" box.
+- When you post a new request, your favourite sellers who deal in that category (their interests include it, or they chose none) get a 🔔 notification. If they turned phone notifications on, they also get a push: "Mona, who favourited you, is looking for 'iPhone 15 case'. Make an offer?" It opens the request, and they answer **through the request**, like everyone else.
+- Your favourites are listed on the **Saved** page.
+- Profiles show "♥ 12 members favourited this seller": a count, never names.
+
 ## Tests
-- `npm test`: `feed.test.js` (2, session 26), `offer-responses.test.js` (3), `activity.test.js` (3), `previews.test.js` (2), `stories-badges.test.js` (3), `seasons.test.js` (2), and index checks in `performance.test.js`.
+- `npm test`: `favourites.test.js` (3, session 28), `feed.test.js` (2, session 26), `offer-responses.test.js` (3), `activity.test.js` (3), `previews.test.js` (2), `stories-badges.test.js` (3), `seasons.test.js` (2), and index checks in `performance.test.js`.
 - `e2e/smoke.mjs` now covers all five features.
