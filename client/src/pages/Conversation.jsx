@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, budget, money, toDate } from '../api.js';
-import { Avatar, ErrorBox, KycBadge, Loading } from '../components/ui.jsx';
+import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
 import { ReportLink } from './ListingDetail.jsx';
 import { usePolling } from '../hooks.js';
 
@@ -89,15 +89,17 @@ export default function Conversation() {
           <div className="row">
             <Avatar name={conv.other.displayName} />
             <div style={{ flex: 1 }}>
-              <b>{conv.other.displayName}</b>{' '}
+              <Link to={`/members/${conv.other.id}`}><b>{conv.other.displayName}</b></Link>{' '}
               {conv.other.accountType === 'business' && <span className="badge grey">Business</span>}{' '}
-              <KycBadge status={conv.other.verified ? 'approved' : 'unverified'} />
+              <KycBadge status={conv.other.verified ? 'approved' : 'unverified'} />{' '}
+              <RatingBadge rating={conv.other.rating} />
               <div className="small muted">
                 About: <Link to={`/requests/${l.id}`}><b>{l.title}</b></Link> · {budget(l)} · {l.city}
               </div>
             </div>
           </div>
         </div>
+        {conv.deal && <DealBanner conv={conv} onRated={load} />}
         <div className="chat-body" ref={bodyRef}>
           {messages.map((m) => (
             <div key={m.id} className={`bubble ${m.mine ? 'mine' : ''}`}>
@@ -126,5 +128,59 @@ export default function Conversation() {
       </div>
       <ReportLink conversationId={conv.id} />
     </div>
+  );
+}
+
+// Shown at the top of the conversation the buyer marked as "the deal".
+function DealBanner({ conv, onRated }) {
+  const { deal, other } = conv;
+  const [stars, setStars] = useState(0);
+  const [comment, setComment] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const role = conv.myRole === 'buyer' ? 'seller' : 'buyer';
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`/deals/${deal.id}/rating`, { method: 'POST', body: { stars, comment: comment || undefined } });
+      await onRated();
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (deal.myRating) {
+    return (
+      <div className="deal-banner small">
+        🤝 <b>Deal done.</b> You rated {other.displayName} <Stars value={deal.myRating.stars} />
+        {deal.theirRating ? (
+          <> · They rated you <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> “{deal.theirRating.comment}”</>}</>
+        ) : (
+          <span className="muted"> · {deal.otherHasRated ? 'They rated you too.' : `Waiting for ${other.displayName} to rate you.`} Ratings show on profiles once you've both rated (or after 14 days).</span>
+        )}
+      </div>
+    );
+  }
+  if (!deal.canRate) {
+    return <div className="deal-banner small">🤝 <b>Deal done.</b> <span className="muted">The 30-day rating window has closed.</span></div>;
+  }
+  return (
+    <form className="deal-banner" onSubmit={submit}>
+      <p style={{ margin: 0 }}>🤝 <b>Deal done!</b> How was {other.displayName} as a {role}?</p>
+      {deal.otherHasRated && <p className="small muted" style={{ margin: 0 }}>{other.displayName} has already rated you — rate them to see it.</p>}
+      <ErrorBox error={error} />
+      <StarInput value={stars} onChange={setStars} />
+      <div className="row" style={{ gap: '.5rem', alignItems: 'flex-end' }}>
+        <textarea placeholder="Optional: a few words for other members (shown on their profile)" maxLength={500} value={comment}
+          onChange={(e) => setComment(e.target.value)} style={{ flex: 1, minHeight: 44, height: 44 }} />
+        <button className="btn" disabled={!stars || busy}>{busy ? 'Saving…' : 'Submit rating'}</button>
+      </div>
+      <p className="hint" style={{ margin: 0 }}>Ratings are hidden until you've both rated, so nobody can retaliate. You can't change it later.</p>
+    </form>
   );
 }

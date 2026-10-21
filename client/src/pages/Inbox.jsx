@@ -56,6 +56,7 @@ export default function Inbox() {
                       {c.myRole === 'buyer' ? 'Offer from seller' : 'Your offer'} · {c.lastMessage}
                     </div>
                   </div>
+                  {c.needsRating && <span className="badge warn">★ Rate</span>}
                   {c.unread > 0 && <span className="unread-dot">{c.unread}</span>}
                 </Link>
               ))}
