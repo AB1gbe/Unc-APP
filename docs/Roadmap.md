@@ -11,7 +11,7 @@ tags: [roadmap]
 - [ ] Decide on automated KYC provider → [[KYC Verification#Adding an automated provider]]
 
 ## Next features
-- [ ] Ratings & reviews after a request is fulfilled (only between the buyer and the vendor they chose)
+- [x] Ratings & reviews after a request is fulfilled → [[Ratings]] *(session 09)*
 - [ ] Photos in chat messages
 - [ ] Email/push notification when a new offer arrives
 - [ ] Saved searches for vendors ("notify me of new Electronics requests in Austin")

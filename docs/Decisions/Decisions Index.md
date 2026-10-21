@@ -21,5 +21,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 012 | [[ADR-012 Password reset design]] | Single-use emailed link, 30 min | 6-digit code, security questions, SMS, admin reset |
 | 013 | [[ADR-013 Performance]] | Measure; indexes + query rewrite, gzip, long caching, lazy pages, pause hidden polling | in-memory caches, counter columns, Brotli, preact, FTS |
 | 014 | [[ADR-014 Rate limiting]] | Per-action limiters + `TRUST_PROXY` | shared limiter, per-email limits, hosted bot protection |
+| 015 | [[ADR-015 Ratings]] | Deal-based, two-way, blind 1–5 stars | anyone rates, one-way, thumbs, visible at once, editable |
+| 016 | [[ADR-016 Live preview while building]] | Auto-pull on the owner's PC (`npm run live`) | public tunnel, screenshots only, deploy every step |
 
 Template for new ADRs: copy any ADR and keep the same headings.

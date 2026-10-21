@@ -24,6 +24,8 @@ date: 2026-10-21
 - `performance.test.js` (6 tests, session 05): see [[ADR-013 Performance]].
 - `review-fixes.test.js` (13 tests, session 05): one per bug in [[Mistakes and Fixes]] M24–M35; each verified to fail on the old code.
 
-Total: **51 tests**.
+- `ratings.test.js` (12 tests, session 09): see [[Ratings#Tests]].
+
+Total: **63 tests**.
 
 Run: `npm test` (API) · `npm run e2e` (browser, see [[Step 12 - End-to-end check]]).

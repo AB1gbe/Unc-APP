@@ -44,7 +44,7 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 | GET | `/api/listings/:id` | — | non-open visible to owner, vendors with a conversation on it, admins; banned buyer's → 404 (except admins); adds `myConversationId` for vendors |
 | POST | `/api/listings` | V | multipart: `title, description, category, budgetMin?, budgetMax?, currency?, city, neededBy?` + up to 3 `images` |
 | PATCH | `/api/listings/:id` | V owner | JSON, open only |
-| POST | `/api/listings/:id/status` | A owner | `status: open/fulfilled/closed` |
+| POST | `/api/listings/:id/status` | A owner | `status: open/fulfilled/closed`, optional `conversationId` with `fulfilled` = record the deal. 409 if changing a deal that was already rated |
 
 ## Conversations — `server/src/routes/conversations.js`
 | Method | Path | Gate | Notes |
@@ -56,6 +56,14 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 | GET | `/api/conversations/:id?after=<msgId>` | A participant | messages (only newer than `after`); marks other side's as read. Outsiders → 404 |
 | POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` (vendor only). 409 if request not open or the other member is suspended |
 | POST | `/api/reports` | A | `reason, listingId? / conversationId?` |
+
+## Ratings & profiles — `server/src/routes/ratings.js` (session 09)
+| Method | Path | Gate | Notes |
+|---|---|---|---|
+| POST | `/api/deals/:id/rating` | A, deal participant | `stars` 1–5, `comment?` (≤500). 404 for outsiders, 409 if already rated or after 30 days |
+| GET | `/api/members/:id` | — | verified, non-banned members only: `{member: {displayName, accountType, memberSince, deals, rating}, reviews}` — no email/city, no contact |
+
+Conversation objects also carry `other.rating`, `deal` and `needsRating`; request details carry `buyer.rating` (+ `dealConversationId` for the owner).
 
 ## Admin — `server/src/routes/admin.js` (all ADM)
 | Method | Path | Notes |
