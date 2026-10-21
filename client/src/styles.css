@@ -325,7 +325,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .skeleton { display: grid; gap: .6rem; padding: .25rem 0; }
 .sk-line, .sk-photo { background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%); background-size: 200% 100%; border-radius: 6px; animation: sk-shine 1.2s ease-in-out infinite; }
 .sk-line { height: .9rem; width: 100%; }
-.sk-photo { height: 140px; margin: -1rem -1rem .25rem; border-radius: 12px 12px 0 0; }
+.sk-photo { height: 140px; margin: -1.25rem -1.25rem .25rem; border-radius: var(--radius) var(--radius) 0 0; }
+@media (max-width: 759px) { .sk-photo { margin: -1rem -1rem .25rem; } }
 @keyframes sk-shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .toast { position: fixed; inset-inline: 0; margin-inline: auto; bottom: calc(1.25rem + var(--tabbar-h, 0px)); width: max-content; max-width: calc(100vw - 32px); background: #16181d; color: #fff; padding: .75rem 1.1rem; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 60; font-weight: 600; animation: toast-in .25s ease-out; pointer-events: none; }
 @keyframes toast-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -353,7 +354,9 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* ===== Stories and badges (session 20) ===== */
 .story { margin: 0; display: grid; gap: .6rem; align-content: start; }
-.story-photo { width: calc(100% + 2rem); margin: -1rem -1rem 0; height: 180px; object-fit: cover; border-radius: 12px 12px 0 0; }
+/* Edge to edge like .card-photo: the card has 1.25rem padding (1rem on phones). */
+.story-photo { width: calc(100% + 2.5rem); max-width: none; margin: -1.25rem -1.25rem 0; height: 180px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; }
+@media (max-width: 759px) { .story-photo { width: calc(100% + 2rem); margin: -1rem -1rem 0; } }
 .story blockquote { margin: 0; font-size: 1.05rem; line-height: 1.45; }
 .story figcaption { gap: .5rem; flex-wrap: nowrap; }
 .story-form { display: grid; gap: .5rem; margin-top: .75rem; padding-top: .75rem; border-top: 1px dashed var(--border); }
