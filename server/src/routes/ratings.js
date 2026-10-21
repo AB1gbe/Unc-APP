@@ -83,6 +83,8 @@ export function ratingRoutes(db) {
         activity: req.user ? activity.summaryFor(m.id) : undefined,
         badges: badgesFor(m.id),
         ...shopFields(m),
+        favouriteCount: db.prepare('SELECT COUNT(*) AS n FROM favourites WHERE seller_id = ?').get(m.id).n,
+        favourite: req.user ? Boolean(db.prepare('SELECT 1 FROM favourites WHERE user_id = ? AND seller_id = ?').get(req.user.id, m.id)) : undefined,
       },
       stories: storiesAbout(db, m.id),
       openRequests,

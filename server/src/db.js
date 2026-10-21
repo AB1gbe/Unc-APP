@@ -296,6 +296,16 @@ const MIGRATIONS = [
   CREATE INDEX idx_conversations_created ON conversations(created_at);
   CREATE INDEX idx_users_new_shops ON users(created_at) WHERE account_type = 'business';
   `,
+  // 18: favourite sellers (session 28). user_id ♥s seller_id.
+  `
+  CREATE TABLE favourites (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    seller_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, seller_id)
+  );
+  CREATE INDEX idx_favourites_seller ON favourites(seller_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

@@ -85,6 +85,7 @@ const AR = {
   "Please don't add phone numbers, links, emails or @handles here. Buyers contact you through their requests.": 'من فضلك لا تضف أرقام هواتف أو روابط أو بريداً إلكترونياً أو معرّفات @ هنا. يتواصل معك المشترون عبر طلباتهم.',
   'Only business accounts have a shop page.': 'صفحة المتجر متاحة للحسابات التجارية فقط.',
   'Opening hours are not valid. Use a time like 09:00 for each open day.': 'ساعات العمل غير صالحة. استخدم وقتاً مثل 09:00 لكل يوم عمل.',
+  "You can't favourite yourself.": 'لا يمكنك إضافة نفسك إلى المفضلة.',
   'hideActivity must be true or false.': 'قيمة إخفاء النشاط يجب أن تكون true أو false.',
   'emailOffers must be true or false.': 'قيمة رسائل العروض يجب أن تكون true أو false.',
   'Notifications are not turned on for any of your devices yet.': 'الإشعارات غير مفعّلة على أي من أجهزتك بعد.',

@@ -40,6 +40,10 @@ const TEXT = {
     en: { title: 'New offer', body: (v) => `${v.actor} made an offer on “${v.title}”` },
     ar: { title: 'عرض جديد', body: (v) => `قدّم ${v.actor} عرضاً على «${v.title}»` },
   },
+  'favourite-request': {
+    en: { title: 'A customer is looking for something', body: (v) => `${v.actor}, who favourited you, is looking for “${v.title}”` },
+    ar: { title: 'أحد عملائك يبحث عن شيء', body: (v) => `${v.actor} الذي أضافك للمفضلة يبحث عن «${v.title}»` },
+  },
   test: {
     en: { title: 'Unc', body: () => 'Notifications are on. You will get one for every new offer.' },
     ar: { title: 'Unc', body: () => 'الإشعارات مفعّلة. سيصلك إشعار مع كل عرض جديد.' },

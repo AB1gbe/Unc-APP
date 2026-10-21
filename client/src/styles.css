@@ -401,3 +401,6 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .feed-icon { flex-shrink: 0; }
 .feed-text { flex: 1; min-width: 0; }
 .feed-time { white-space: nowrap; }
+
+/* ♡ Favourite seller (session 28) */
+.fav-btn.on { color: #e0245e; border-color: #e0245e; }
