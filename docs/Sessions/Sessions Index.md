@@ -27,3 +27,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 18]] | Pull request #5 (email for new offers) merged into `main` |
 | 2026-10-21 | [[2026-10-21 Session 19]] | Ideas to make Unc feel like a social marketplace (research note, no code) |
 | 2026-10-21 | [[2026-10-21 Session 20]] | Feels human: greetings and celebrations, offer cards, "Active now", share with previews, stories and badges |
+| 2026-10-21 | [[2026-10-21 Session 21]] | Pull request #6 (the five social touches) merged into `main` |
