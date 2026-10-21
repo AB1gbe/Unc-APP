@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { ago, toDate } from '../api.js';
 import { Avatar, ErrorBox, KycBadge, Loading, Stars } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
+import { formatDate, t, tj, tn } from '../i18n.jsx';
 
 export default function MemberProfile() {
   const { id } = useParams();
@@ -19,12 +20,12 @@ export default function MemberProfile() {
         <div className="row">
           <Avatar name={m.displayName} />
           <div style={{ flex: 1 }}>
-            <h1 style={{ margin: 0 }}>{m.displayName}</h1>
+            <h1 dir="auto" style={{ margin: 0 }}>{m.displayName}</h1>
             <div className="meta">
               <KycBadge status="approved" />
-              {m.accountType === 'business' && <span className="badge grey">Business</span>}
-              <span>Member since {toDate(m.memberSince).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</span>
-              <span>{m.deals} {m.deals === 1 ? 'deal' : 'deals'}</span>
+              {m.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}
+              <span>{t('Member since {date}', { date: formatDate(toDate(m.memberSince), { month: 'long', year: 'numeric' }) })}</span>
+              <span>{tn(m.deals, '{n} deal', '{n} deals')}</span>
             </div>
           </div>
           <div className="center">
@@ -32,24 +33,24 @@ export default function MemberProfile() {
               <>
                 <div style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1 }}>{m.rating.average.toFixed(1)}</div>
                 <Stars value={m.rating.average} />
-                <div className="muted small">{m.rating.count} {m.rating.count === 1 ? 'rating' : 'ratings'}</div>
+                <div className="muted small">{tn(m.rating.count, '{n} rating', '{n} ratings')}</div>
               </>
-            ) : <span className="muted small">No ratings yet</span>}
+            ) : <span className="muted small">{t('No ratings yet')}</span>}
           </div>
         </div>
       </div>
       <div className="card">
-        <h2>Reviews</h2>
+        <h2>{t('Reviews')}</h2>
         {reviews.length === 0 ? (
-          <p className="muted">No reviews yet. Reviews appear after completed deals.</p>
+          <p className="muted">{t('No reviews yet. Reviews appear after completed deals.')}</p>
         ) : reviews.map((r, i) => (
           <div key={i} className="review">
             <div className="row spread">
-              <span><Stars value={r.stars} /> <b>{r.from.displayName}</b> <span className="muted small">· as {r.role === 'vendor' ? 'seller' : 'buyer'}</span></span>
+              <span><Stars value={r.stars} /> <b><bdi>{r.from.displayName}</bdi></b> <span className="muted small">· {r.role === 'vendor' ? t('as seller') : t('as buyer')}</span></span>
               <span className="muted small">{ago(r.createdAt)}</span>
             </div>
-            {r.comment && <p style={{ margin: '.3rem 0 0' }}>{r.comment}</p>}
-            <div className="muted small">Deal: {r.listingTitle}</div>
+            {r.comment && <p dir="auto" style={{ margin: '.3rem 0 0' }}>{r.comment}</p>}
+            <div className="muted small">{tj('Deal: {title}', { title: <bdi>{r.listingTitle}</bdi> })}</div>
           </div>
         ))}
       </div>

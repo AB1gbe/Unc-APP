@@ -13,3 +13,9 @@ export const REJECT_REASONS = {
 };
 
 export const reasonText = (note) => REJECT_REASONS[note]?.() ?? note;
+
+// Labels for values stored in English in the database, for the admin pages.
+export const KYC_STATUS = { pending: () => t('pending'), approved: () => t('approved'), rejected: () => t('rejected') };
+export const ID_TYPE = { passport: () => t('Passport'), national_id: () => t('National ID card'), drivers_license: () => t("Driver's license") };
+export const ACCOUNT_TYPE = { individual: () => t('Individual'), business: () => t('Business') };
+export const label = (map, value) => map[value]?.() ?? value;

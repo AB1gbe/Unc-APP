@@ -4,7 +4,7 @@ import { getLang, locale, t } from './i18n.jsx';
 // and throws an Error with the server's message when something fails.
 export class ApiError extends Error {
   constructor(status, body) {
-    super(body?.error || `Request failed (${status})`);
+    super(body?.error || t('Request failed ({status})', { status }));
     this.status = status;
     this.body = body || {};
   }
@@ -19,7 +19,13 @@ export async function api(path, { method = 'GET', body, form } = {}) {
     opts.headers['Content-Type'] = 'application/json';
     opts.body = JSON.stringify(body);
   }
-  const res = await fetch(`/api${path}`, opts);
+  let res;
+  try {
+    res = await fetch(`/api${path}`, opts);
+  } catch {
+    // Offline or server down: the browser's own message is English-only.
+    throw new ApiError(0, { error: t('Could not reach the server. Check your connection and try again.') });
+  }
   const data = res.headers.get('content-type')?.includes('json') ? await res.json() : null;
   if (!res.ok) throw new ApiError(res.status, data);
   return data;

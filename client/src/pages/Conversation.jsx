@@ -6,6 +6,7 @@ import { api, budget, money, toDate } from '../api.js';
 import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
 import { ReportLink } from './ListingDetail.jsx';
 import { usePolling } from '../hooks.js';
+import { formatDateTime, t, tj } from '../i18n.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -83,18 +84,18 @@ export default function Conversation() {
 
   return (
     <div className="narrow" style={{ maxWidth: 760 }}>
-      <p className="small"><Link to="/messages">← All messages</Link></p>
+      <p className="small"><Link to="/messages"><span className="flip">←</span> {t('All messages')}</Link></p>
       <div className="card chat">
         <div className="chat-head">
           <div className="row">
             <Avatar name={conv.other.displayName} />
             <div style={{ flex: 1 }}>
-              <Link to={`/members/${conv.other.id}`}><b>{conv.other.displayName}</b></Link>{' '}
-              {conv.other.accountType === 'business' && <span className="badge grey">Business</span>}{' '}
+              <Link to={`/members/${conv.other.id}`}><b><bdi>{conv.other.displayName}</bdi></b></Link>{' '}
+              {conv.other.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}{' '}
               <KycBadge status={conv.other.verified ? 'approved' : 'unverified'} />{' '}
               <RatingBadge rating={conv.other.rating} />
               <div className="small muted">
-                About: <Link to={`/requests/${l.id}`}><b>{l.title}</b></Link> · {budget(l)} · {l.city}
+                {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <bdi>{l.city}</bdi>
               </div>
             </div>
           </div>
@@ -103,26 +104,26 @@ export default function Conversation() {
         <div className="chat-body" ref={bodyRef}>
           {messages.map((m) => (
             <div key={m.id} className={`bubble ${m.mine ? 'mine' : ''}`}>
-              {m.offerPrice !== null && <div className="offer">💰 Offer: {money(m.offerPrice, l.currency)}</div>}
-              {m.body}
-              <div className="time">{toDate(m.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}{m.mine && m.readAt ? ' · Seen' : ''}</div>
+              {m.offerPrice !== null && <div className="offer">💰 {t('Offer: {price}', { price: money(m.offerPrice, l.currency) })}</div>}
+              <div dir="auto">{m.body}</div>
+              <div className="time">{formatDateTime(toDate(m.createdAt), { dateStyle: 'short', timeStyle: 'short' })}{m.mine && m.readAt ? ` · ${t('Seen')}` : ''}</div>
             </div>
           ))}
         </div>
         {(error || pollError) && <div style={{ padding: '0 1rem' }}><ErrorBox error={error || pollError} /></div>}
         {conv.readOnly ? (
           <div className="chat-form muted small" style={{ justifyContent: 'center' }}>
-            This request is {l.status}. The conversation is read-only.
+            {l.status === 'fulfilled' ? t('This request has been fulfilled. The conversation is read-only.') : t('This request is closed. The conversation is read-only.')}
           </div>
         ) : (
           <form className="chat-form" onSubmit={send}>
-            <textarea placeholder={`Message about "${l.title}"…`} value={text} maxLength={2000}
+            <textarea placeholder={t('Message about “{title}”…', { title: l.title })} dir="auto" value={text} maxLength={2000}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) send(e); }} />
             {conv.myRole === 'vendor' && (
-              <input type="number" min="0" placeholder="Price" value={offer} onChange={(e) => setOffer(e.target.value)} aria-label="Offer price" />
+              <input type="number" min="0" placeholder={t('Price')} value={offer} onChange={(e) => setOffer(e.target.value)} aria-label={t('Offer price')} />
             )}
-            <button className="btn" disabled={sending || !text.trim()}>Send</button>
+            <button className="btn" disabled={sending || !text.trim()}>{t('Send')}</button>
           </form>
         )}
       </div>
@@ -138,7 +139,6 @@ function DealBanner({ conv, onRated }) {
   const [comment, setComment] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
-  const role = conv.myRole === 'buyer' ? 'seller' : 'buyer';
 
   async function submit(e) {
     e.preventDefault();
@@ -157,30 +157,32 @@ function DealBanner({ conv, onRated }) {
   if (deal.myRating) {
     return (
       <div className="deal-banner small">
-        🤝 <b>Deal done.</b> You rated {other.displayName} <Stars value={deal.myRating.stars} />
+        🤝 <b>{t('Deal done.')}</b> {tj('You rated {name}', { name: <bdi>{other.displayName}</bdi> })} <Stars value={deal.myRating.stars} />
         {deal.theirRating ? (
-          <> · They rated you <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> “{deal.theirRating.comment}”</>}</>
+          <> · {t('They rated you')} <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> “<bdi>{deal.theirRating.comment}</bdi>”</>}</>
         ) : (
-          <span className="muted"> · {deal.otherHasRated ? 'They rated you too.' : `Waiting for ${other.displayName} to rate you.`} Ratings show on profiles once you've both rated (or after 14 days).</span>
+          <span className="muted"> · {deal.otherHasRated ? t('They rated you too.') : tj('Waiting for {name} to rate you.', { name: <bdi>{other.displayName}</bdi> })} {t("Ratings show on profiles once you've both rated (or after 14 days).")}</span>
         )}
       </div>
     );
   }
   if (!deal.canRate) {
-    return <div className="deal-banner small">🤝 <b>Deal done.</b> <span className="muted">The 30-day rating window has closed.</span></div>;
+    return <div className="deal-banner small">🤝 <b>{t('Deal done.')}</b> <span className="muted">{t('The 30-day rating window has closed.')}</span></div>;
   }
   return (
     <form className="deal-banner" onSubmit={submit}>
-      <p style={{ margin: 0 }}>🤝 <b>Deal done!</b> How was {other.displayName} as a {role}?</p>
-      {deal.otherHasRated && <p className="small muted" style={{ margin: 0 }}>{other.displayName} has already rated you — rate them to see it.</p>}
+      <p style={{ margin: 0 }}>🤝 <b>{t('Deal done!')}</b> {conv.myRole === 'buyer'
+        ? tj('How was {name} as a seller?', { name: <bdi>{other.displayName}</bdi> })
+        : tj('How was {name} as a buyer?', { name: <bdi>{other.displayName}</bdi> })}</p>
+      {deal.otherHasRated && <p className="small muted" style={{ margin: 0 }}>{tj('{name} has already rated you — rate them to see it.', { name: <bdi>{other.displayName}</bdi> })}</p>}
       <ErrorBox error={error} />
       <StarInput value={stars} onChange={setStars} />
       <div className="row" style={{ gap: '.5rem', alignItems: 'flex-end' }}>
-        <textarea placeholder="Optional: a few words for other members (shown on their profile)" maxLength={500} value={comment}
+        <textarea placeholder={t('Optional: a few words for other members (shown on their profile)')} dir="auto" maxLength={500} value={comment}
           onChange={(e) => setComment(e.target.value)} style={{ flex: 1, minHeight: 44, height: 44 }} />
-        <button className="btn" disabled={!stars || busy}>{busy ? 'Saving…' : 'Submit rating'}</button>
+        <button className="btn" disabled={!stars || busy}>{busy ? t('Saving…') : t('Submit rating')}</button>
       </div>
-      <p className="hint" style={{ margin: 0 }}>Ratings are hidden until you've both rated, so nobody can retaliate. You can't change it later.</p>
+      <p className="hint" style={{ margin: 0 }}>{t("Ratings are hidden until you've both rated, so nobody can retaliate. You can't change it later.")}</p>
     </form>
   );
 }
