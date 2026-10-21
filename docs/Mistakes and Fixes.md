@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 09)
+updated: 2026-10-21 (session 12)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 39 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39). All fixed.
+**Totals so far:** 47 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -49,6 +49,14 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M37 | Test | A test hard-coded the database version, so adding migration 4 broke it | 09 |
 | M38 | Script | `push` showed `ocs/Roadmap.md` instead of `docs/Roadmap.md` | [[2026-10-21 Session 10]] |
 | M39 | Script | `push` froze at its second question | 10 |
+| M40 | Script | Translation helper wrote `../i18n.jsx` instead of `../../` for admin pages → build failed | [[2026-10-21 Session 12]] |
+| M41 | Dev env | `pkill` in the same command as starting the server — repeat of M13 | 12 |
+| M42 | Arabic | Admin's default language "English" switched an Arabic browser to English | 12 |
+| M43 | Arabic | Empty chat box showed its hint text with quote marks out of place | 12 |
+| M44 | Arabic | Curly quotes around comments came out reversed | 12 |
+| M45 | Arabic | Prices showed as "$US 300" | 12 |
+| M46 | Arabic | English titles on Arabic pages had punctuation thrown to the wrong end | 12 |
+| M47 | Test | A test looked for exactly `<html>`; emails now start `<html lang=…>` | 12 |
 
 ---
 
@@ -264,3 +272,42 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause (two steps):** first, each question opened its own reader, and the first reader swallowed all the input. Second, even with one shared reader, Node's `readline` `question()` drops lines that arrive *before* the question is asked — so pasted answers vanished and the script waited forever.
 - **Fix:** one reader that **queues** every incoming line; each question takes the next queued answer (or waits). Re-tested with all answers piped in at once, and with each step under a 30-second time limit so a freeze shows as a failure, not a hang.
 - **Lesson:** test interactive scripts with input supplied all at once, not only by hand — and always put a timeout on automated runs of anything that can wait for input.
+
+## M40
+**Build failed: `Could not resolve '../i18n.jsx' in src/pages/admin/KycReview.jsx`**
+- **Cause:** my throw-away translation helper chose `../` or `../../` by looking for "/admin/" in the file path, but I ran it from inside the admin folder with bare file names, so it never saw "/admin/".
+- **Fix:** corrected both imports to `../../i18n.jsx`. The build caught it before anything was pushed.
+- **Lesson:** helpers that guess paths should use the real file location (absolute path), not the string they were given.
+
+## M41
+**`pkill` killed its own shell again (exit 144)** — same cause as [[Mistakes and Fixes#M13]]: stop and start were in one command line. Fixed by running them separately. The rule is now also in `CLAUDE.md`. Lesson stands: **stop in its own call, always**.
+
+## M42
+**Logging in as admin on an Arabic browser switched the site to English**
+- **Found by:** the Arabic browser test (`npm run e2e:ar`) flagging English text on the admin pages.
+- **Cause:** migration 5 first gave every account `language = 'en'` by default. The new "sync with the member's saved language" rule then treated that default as a real choice.
+- **Fix:** the column is **NULL until someone actually chooses** (sign-up language, or pressing the button while logged in). NULL → English emails, and the website keeps the browser's language. The migration had not been pushed or run outside tests, so it was corrected in place. Test added.
+- **Lesson:** a default value is not a user choice; store "no answer" as empty.
+
+## M43
+**Arabic chat box: grey hint text with « » in the wrong places**
+- **Cause:** I had put `dir="auto"` on input boxes. An *empty* box with `dir="auto"` is left-to-right, so its Arabic hint text was laid out backwards.
+- **Fix:** no `dir="auto"` on inputs/textareas; they follow the page. Display elements keep it.
+
+## M44
+**Rating comments shown as ”text“ (reversed quotes) in Arabic**
+- **Fix:** the quote marks are part of a translation: `tj('“{text}”', …)` → Arabic `«{text}»`.
+
+## M45
+**Prices displayed as "$US 300 – $US 400"**
+- **Cause:** in Arabic the number formatter writes "300 US$"; the loose "$" is direction-neutral and gets reordered next to the other price.
+- **Fix:** Arabic shows the currency code: "300 USD" (`currencyDisplay: 'code'`).
+
+## M46
+**English titles on the Arabic home page: ".possible", "2 controllers" broken around**
+- **Cause:** member-written English text inherited the page's right-to-left direction.
+- **Fix:** `dir="auto"` on titles, descriptions and messages, and `<bdi>` around names, cities and inline titles — each piece of member text takes its own direction.
+
+## M47
+**Old test `registration emails a verification code` failed after emails got `lang`/`dir`**
+- **Cause:** it checked for exactly `<html>`. **Fix:** check `/<html[\s>]/` ("is an HTML email"). Same lesson as [[Mistakes and Fixes#M37]]: test the meaning, not the exact text.

@@ -3,7 +3,7 @@ tags: [architecture, api]
 ---
 # API Reference
 
-All JSON (gzip-compressed when larger than 1 KB). Upload mistakes → 400/413, unreadable JSON → 400. Errors: `{ "error": "message", "field"?: "...", "code"?: "..." }`. Auth = session cookie.
+All JSON (gzip-compressed when larger than 1 KB). Send `Accept-Language: ar` to get error messages in Arabic (the website always sends its current language). Upload mistakes → 400/413, unreadable JSON → 400. Errors: `{ "error": "message", "field"?: "...", "code"?: "..." }`. Auth = session cookie.
 Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **ADM** admin.
 
 ## Meta
@@ -19,6 +19,7 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 | POST | `/api/auth/login` | — | `email, password` → `{user}` + cookie |
 | POST | `/api/auth/logout` | — | clears session |
 | GET | `/api/auth/me` | — | `{user}` or `{user:null}` |
+| PUT | `/api/auth/language` | A | `language: en/ar` — saves the member's language (emails use it). Session 12 |
 | PATCH | `/api/auth/me` | A | `displayName, city?` |
 | POST | `/api/auth/verify-email` | A | `code` (6 digits). 5 wrong tries → 429 |
 | POST | `/api/auth/resend-code` | A | `{ok, devCode?}` |

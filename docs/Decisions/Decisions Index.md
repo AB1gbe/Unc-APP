@@ -23,5 +23,6 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 014 | [[ADR-014 Rate limiting]] | Per-action limiters + `TRUST_PROXY` | shared limiter, per-email limits, hosted bot protection |
 | 015 | [[ADR-015 Ratings]] | Deal-based, two-way, blind 1–5 stars | anyone rates, one-way, thumbs, visible at once, editable |
 | 016 | [[ADR-016 Live preview while building]] | Auto-pull on the owner's PC (`npm run live`) | public tunnel, screenshots only, deploy every step |
+| 017 | [[ADR-017 Arabic and RTL]] | Custom `t()` keyed by English, `dir=rtl` + logical CSS, server translates by `Accept-Language`, Western digits | i18next, FormatJS, ID keys, Arabic-Indic digits, separate RTL CSS |
 
 Template for new ADRs: copy any ADR and keep the same headings.

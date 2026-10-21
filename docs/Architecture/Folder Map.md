@@ -15,6 +15,7 @@ Unc-APP/
 ├── .gitattributes        Keeps .cmd files with Windows line endings
 ├── scripts/git-helper.mjs  The pull/push logic (session 10)
 ├── scripts/live-sync.mjs  `npm run live` / `npm run sync`: auto-pull pushed changes (session 09)
+├── e2e/arabic.mjs        `npm run e2e:ar`: Arabic journey + RTL/overflow/English-leak checks (session 12)
 ├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored)
 ├── server/
 │   ├── package.json        Server deps + scripts
@@ -32,7 +33,8 @@ Unc-APP/
 │   │   │   ├── validate.js     Input validators (str, int, email, isoDate, password, ageOn…)
 │   │   │   ├── uploads.js      Multer in-memory uploads, magic-byte sniffing, saveFiles() (all-or-nothing)
 │   │   │   ├── mailer.js       sendMail()/trySendMail(): console | memory | smtp (nodemailer) | resend
-│   │   │   ├── emails.js       Text + HTML of every email (code, reset link, password changed)
+│   │   │   ├── emails.js       Text + HTML of every email, English + Arabic (session 12)
+│   │   │   ├── i18n.js         Server messages in Arabic, readable field names (session 12)
 │   │   │   ├── categories.js   CATEGORIES + CURRENCIES lists
 │   │   │   └── ratings.js      Rating rules: windows, blind visibility, summaries (session 09)
 │   │   ├── middleware/auth.js  loadUser, requireAuth, requireVerified, requireAdmin, publicMe
@@ -54,7 +56,9 @@ Unc-APP/
 │       ├── mail-transports.test.js
 │       ├── performance.test.js     (session 05)
 │       ├── review-fixes.test.js    (session 05: one test per bug M24–M35)
-│       └── ratings.test.js         (session 09)
+│       ├── ratings.test.js         (session 09)
+│       ├── i18n-coverage.test.js   every UI text has Arabic (session 12)
+│       └── arabic.test.js          Arabic errors, language, emails (session 12)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into
@@ -64,6 +68,9 @@ Unc-APP/
         ├── App.jsx         All page routes + guards
         ├── api.js          api() fetch wrapper, money/budget/date helpers
         ├── auth.jsx        AuthProvider, useAuth(), isVerified()
+        ├── i18n.jsx        t(), tj(), tn(), LanguageProvider, date helpers (session 12)
+        ├── locales/ar.js   All Arabic text, keyed by the English
+        ├── kycReasons.js   English-stored values (reasons, statuses) shown translated
         ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
         ├── styles.css      The whole design system
         ├── components/

@@ -11,7 +11,7 @@ tags: [roadmap]
 - [ ] Decide on automated KYC provider → [[KYC Verification#Adding an automated provider]]
 
 ## For a Bahrain launch (from [[Bahrain Market Research]])
-- [ ] Arabic interface with right-to-left layout (plus English)
+- [x] Arabic interface with right-to-left layout (plus English) → [[Arabic and RTL]] *(session 12)*
 - [ ] BHD currency (3 decimals)
 - [ ] BenefitPay payments/deposits via a licensed payment provider
 - [ ] Identity via eKey for Business (ask Beyon Connect about eligibility) — document + selfie service until then

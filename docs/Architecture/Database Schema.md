@@ -3,7 +3,7 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09). `PRAGMA user_version` = 4 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12). `PRAGMA user_version` = 5 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
@@ -20,7 +20,7 @@ users ─┬─< sessions
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `users` | email (unique), password_hash, display_name, account_type `individual/business`, role `user/admin`, email_verified_at, **kyc_status** `unverified/pending/approved/rejected`, banned_at | `kyc_status` is the fast flag every gate checks |
+| `users` | language `en/ar/NULL` (session 12, NULL = no preference), email (unique), password_hash, display_name, account_type `individual/business`, role `user/admin`, email_verified_at, **kyc_status** `unverified/pending/approved/rejected`, banned_at | `kyc_status` is the fast flag every gate checks |
 | `sessions` | token_hash (PK), user_id, expires_at | Only SHA-256 of the cookie token |
 | `password_resets` | token_hash (PK), user_id, expires_at, used_at | Only SHA-256 of the emailed token; 30 min; single use. Added in migration 2 (session 02) |
 | `email_codes` | user_id (PK), code_hash, expires_at, attempts | 6-digit code, peppered hash, 15 min, 5 tries |
