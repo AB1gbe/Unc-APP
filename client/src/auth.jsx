@@ -1,6 +1,7 @@
 // Keeps "who is logged in" in one place so every page can read it.
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { api } from './api.js';
+import { disablePush } from './push.js';
 
 const AuthContext = createContext(null);
 
@@ -21,6 +22,8 @@ export function AuthProvider({ children }) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const logout = async () => {
+    // Stop this phone's notifications first (needs the session to tell the server).
+    await disablePush().catch(() => {});
     await api('/auth/logout', { method: 'POST' });
     setUser(null);
   };

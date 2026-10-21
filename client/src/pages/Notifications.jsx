@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ago } from '../api.js';
 import { Avatar, ErrorBox, Loading } from '../components/ui.jsx';
+import PushSettings from '../components/PushSettings.jsx';
 import { useApi } from '../hooks.js';
 import { t, tj } from '../i18n.jsx';
 
@@ -37,6 +38,7 @@ export default function Notifications() {
   return (
     <div className="narrow" style={{ maxWidth: 760 }}>
       <h1>{t('Notifications')}</h1>
+      <PushSettings hideWhenOn />
       <ErrorBox error={error} />
       {loading ? <Loading /> : data?.notifications.length === 0 ? (
         <div className="card empty">{t('Nothing yet. Offers, deals, ratings and identity check results will show up here.')}</div>

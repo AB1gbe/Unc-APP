@@ -87,6 +87,16 @@ Request objects (session 13) carry `photos: [{id, url}]` (use `id` to delete one
 
 Created by `notify()` in `server/src/lib/notify.js`: `offer` (new conversation on my request), `deal` (buyer picked my offer; removed if the deal is undone), `rating` (someone rated me), `kyc_approved` / `kyc_rejected`. New chat messages are **not** notifications (the Messages badge covers them).
 
+## Push (phone notifications) — `server/src/routes/push.js` (session 15)
+| Method | Path | Gate | Notes |
+|---|---|---|---|
+| GET | `/api/push/key` | — | `{publicKey}`: the server's public VAPID key (the browser needs it to subscribe) |
+| POST | `/api/push/subscribe` | A | body = the browser's `subscription.toJSON()`: `{endpoint (https), keys: {p256dh, auth}}` → 201. Same endpoint again = updated / moved to this member. Max 10 devices per member (oldest dropped). |
+| POST | `/api/push/unsubscribe` | A | `{endpoint}`: removes this device (also called on log out) |
+| POST | `/api/push/test` | A | sends "Notifications are on" to all my devices → `{sent}`; 409 if none |
+
+Sent by `pushTo()` in `server/src/lib/push.js`. Today only on a **new offer** (`POST /api/listings/:id/contact`, after the transaction), to the buyer, in their language. Push service answers 404/410 → that device is deleted.
+
 ## Admin — `server/src/routes/admin.js` (all ADM)
 | Method | Path | Notes |
 |---|---|---|

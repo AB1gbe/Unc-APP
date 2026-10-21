@@ -42,7 +42,8 @@ Unc-APP/
 │   │   │   ├── i18n.js         Server messages in Arabic, readable field names (session 12)
 │   │   │   ├── categories.js   CATEGORIES + CURRENCIES lists
 │   │   │   ├── ratings.js      Rating rules: windows, blind visibility, summaries (session 09)
-│   │   │   └── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*) (session 13)
+│   │   │   ├── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*) (session 13)
+│   │   │   └── push.js         pushTo(): phone notifications via Web Push; VAPID keys (session 15)
 │   │   ├── middleware/auth.js  loadUser, requireAuth, requireVerified, requireAdmin, publicMe
 │   │   ├── kyc/
 │   │   │   ├── index.js        getProvider(), applyDecision()
@@ -54,6 +55,7 @@ Unc-APP/
 │   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/* (incl. private chat photos), /api/reports
 │   │       ├── ratings.js       /api/deals/:id/rating, /api/members/:id (session 09)
 │   │       ├── notifications.js /api/notifications/* (session 13)
+│   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
 │   │       └── admin.js         /api/admin/*
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage)
@@ -70,12 +72,14 @@ Unc-APP/
 │       ├── home.test.js            /api/listings/for-you (session 13)
 │       ├── photos.test.js          request photos + private chat photos (session 13)
 │       ├── saved.test.js           saved requests (session 13)
-│       └── notifications.test.js   🔔 notifications (session 13)
+│       ├── notifications.test.js   🔔 notifications (session 13)
+│       └── push.test.js            phone push for new offers, fake push service (session 15)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
     ├── public/
     │   ├── manifest.webmanifest  "Add to Home Screen" (PWA) name, colours, icons (session 13)
+    │   ├── sw.js           Service worker: shows push notifications, opens the conversation on tap (session 15)
     │   └── icons/          icon-192, icon-512, icon-512-maskable, apple-touch-icon (made by scripts/make-icons.mjs)
     ├── vite.config.js      Dev server :5173 + proxy to :4000
     └── src/
@@ -86,12 +90,14 @@ Unc-APP/
         ├── i18n.jsx        t(), tj(), tn(), LanguageProvider, date helpers (session 12)
         ├── locales/ar.js   All Arabic text, keyed by the English
         ├── kycReasons.js   English-stored values (reasons, statuses) shown translated
+        ├── push.js         pushSupport(), enablePush(), disablePush() for this device (session 15)
         ├── images.js       shrinkImage(): resizes photos in the browser before upload (session 13)
         ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
         ├── styles.css      The whole design system
         ├── components/
         │   ├── Layout.jsx  Top bar + unread badges (messages, 🔔) + page outlet
         │   ├── TabBar.jsx  Bottom tab bar on phones/tablets (under 900 px, members only) (session 13)
+        │   ├── PushSettings.jsx   "Notifications on this phone" card: turn on, test, turn off (session 15)
         │   ├── ProfileEditor.jsx  Photo, name, city, bio, interests — Account page + Welcome (session 13)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
         │   ├── Lightbox.jsx       Full-screen photo viewer: swipe, arrow keys, Esc (session 13)

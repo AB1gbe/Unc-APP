@@ -5,6 +5,7 @@ import { useAuth } from '../auth.jsx';
 import { Avatar, ErrorBox, KycBadge } from '../components/ui.jsx';
 import ProfileEditor from '../components/ProfileEditor.jsx';
 import { formatDate, t, tj } from '../i18n.jsx';
+import PushSettings from '../components/PushSettings.jsx';
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -35,6 +36,7 @@ export default function Account() {
         <p className="muted small">{t('This is what other members see when they look at your name.')}</p>
         <ProfileEditor />
       </div>
+      <PushSettings />
       <ChangePassword />
       <div className="card row spread">
         <span className="muted small">{tj('Signed in as {email}', { email: <span className="ltr">{user.email}</span> })}</span>

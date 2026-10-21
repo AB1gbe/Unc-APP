@@ -3,7 +3,7 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13). `PRAGMA user_version` = 9 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15). `PRAGMA user_version` = 10 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
@@ -35,6 +35,7 @@ users ─┬─< sessions
 | `ratings` | deal_id, rater_id, ratee_id, stars 1–5, comment, created_at | `UNIQUE(deal_id, rater_id)`; visibility rule in `lib/ratings.js`. Session 09 |
 | `saved_listings` | user_id, listing_id, created_at | `PRIMARY KEY(user_id, listing_id)`; both `ON DELETE CASCADE`. The "♡ Save" list. Migration 8, session 13 |
 | `notifications` | user_id, kind, actor_id?, listing_id?, conversation_id?, created_at, read_at | kind = `offer/deal/rating/kyc_approved/kyc_rejected` (`KINDS` in `lib/notify.js`). No text stored: the app writes the wording from `kind`, in the reader's language. `actor_id` → `ON DELETE SET NULL`, the rest cascade. Migration 9, session 13 |
+| `push_subscriptions` | user_id, endpoint (UNIQUE), p256dh, auth, created_at | One row per phone/computer that turned on push notifications. `endpoint` is the push service's address for that device; `p256dh`/`auth` encrypt the message so only that device can read it. Cascade on user delete. Migration 10, session 15 |
 | `reports` | reporter_id, listing_id?, conversation_id?, reason, status | |
 | `audit_log` | actor_id, action, target, meta (JSON) | KYC decisions, file views, bans, etc. |
 
@@ -62,6 +63,7 @@ Why: [[ADR-013 Performance]].
 | `idx_saved_listing (listing_id)` | cascade/lookups by request (the primary key already covers "my saved list") |
 | `idx_notifications_user (user_id, id)` | the 🔔 list, newest first |
 | `idx_notifications_unread (user_id) WHERE read_at IS NULL` | the 🔔 unread badge (partial: only unread rows) |
+| `idx_push_user (user_id)` | finding a member's devices when an offer arrives (session 15) |
 Checked in `server/test/performance.test.js`.
 
 ## Housekeeping

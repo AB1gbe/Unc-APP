@@ -65,4 +65,13 @@ export const config = {
     resendApiKey: process.env.RESEND_API_KEY,
   },
   maxUploadBytes: 5 * 1024 * 1024,
+  // Web Push (phone notifications). Keys are generated automatically when
+  // these are empty; see docs/Features/Push Notifications.md. Apple only
+  // accepts a real contact: an https:// address or mailto: with a real email.
+  push: {
+    publicKey: process.env.VAPID_PUBLIC_KEY,
+    privateKey: process.env.VAPID_PRIVATE_KEY,
+    subject: process.env.VAPID_SUBJECT
+      || (/^https:\/\//.test(process.env.APP_URL || '') ? process.env.APP_URL.replace(/\/+$/, '') : 'mailto:admin@unc.local'),
+  },
 };

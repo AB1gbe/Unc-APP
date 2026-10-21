@@ -226,6 +226,19 @@ const MIGRATIONS = [
   CREATE INDEX idx_notifications_user ON notifications(user_id, id);
   CREATE INDEX idx_notifications_unread ON notifications(user_id) WHERE read_at IS NULL;
   `,
+  // 10: phone/computer push notifications (session 15) - one row per device
+  // that said yes. See server/src/lib/push.js.
+  `
+  CREATE TABLE push_subscriptions (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    endpoint   TEXT NOT NULL UNIQUE,
+    p256dh     TEXT NOT NULL,
+    auth       TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX idx_push_user ON push_subscriptions(user_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
