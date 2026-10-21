@@ -17,3 +17,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 08]] | Merged pull request #1 into `main` (merge commit) |
 | 2026-10-21 | [[2026-10-21 Session 09]] | Ratings after a deal (blind, two-way, profiles) + live preview (`npm run live`) |
 | 2026-10-21 | [[2026-10-21 Session 10]] | One-word `pull` / `push`; Bahrain market research |
+| 2026-10-21 | [[2026-10-21 Session 11]] | Pull request #2 (ratings, live sync, pull/push, Bahrain research) merged into `main` |

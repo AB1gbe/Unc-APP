@@ -72,7 +72,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Real email (SMTP or Resend) | ✅ done — needs your provider details in `.env` |
 | Performance (indexes, gzip, caching, lazy pages) | ✅ done — see [[ADR-013 Performance]] |
 | Code review: 15 bugs | ✅ all fixed, each with a test |
-| Ratings after a deal (blind, two-way) + member profiles | ✅ done — on branch, not yet in `main` |
+| Ratings after a deal (blind, two-way) + member profiles | ✅ done — in `main` since session 11 |
 | Live preview while building (`npm run live`) | ✅ done |
 | One-word `pull` / `push` | ✅ done |
 | API tests | ✅ 63 passing |
