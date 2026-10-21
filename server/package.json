@@ -1,0 +1,27 @@
+{
+  "name": "unc-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env --watch src/index.js",
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/index.js",
+    "seed": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/seed.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\"",
+    "mail:test": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/mail-test.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.2",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "multer": "^2.4.0",
+    "nodemailer": "^10.1.7"
+  },
+  "devDependencies": {
+    "smtp-server": "^3.20.2",
+    "supertest": "^7.3.1"
+  }
+}
