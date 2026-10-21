@@ -15,7 +15,9 @@ import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
 import { canStillRate, ratingQueries } from '../lib/ratings.js';
-import { avatarUrl } from '../lib/uploads.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { CHAT_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -108,14 +110,23 @@ export function conversationRoutes(db) {
     return c;
   }
 
-  function insertMessage(convId, senderId, body, offerPrice) {
-    db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price) VALUES (?, ?, ?, ?)')
-      .run(convId, senderId, body, offerPrice);
+  function insertMessage(convId, senderId, body, offerPrice, image = null) {
+    db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, image) VALUES (?, ?, ?, ?, ?)')
+      .run(convId, senderId, body, offerPrice, image);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
+  // One optional photo per message (multipart field "image"). JSON requests
+  // pass straight through multer untouched.
+  const chatUpload = memoryUpload(1);
+  const messageView = (m, convId, meId) => ({
+    id: m.id, mine: m.sender_id === meId, body: m.body, offerPrice: m.offer_price,
+    imageUrl: m.image ? `/api/conversations/${convId}/images/${m.image}` : null,
+    createdAt: m.created_at, readAt: m.read_at,
+  });
+
   // ---- Start a conversation ABOUT A LISTING (vendor -> buyer) ----
-  r.post('/listings/:id/contact', requireVerified, (req, res) => {
+  r.post('/listings/:id/contact', requireVerified, chatUpload.single('image'), (req, res) => {
     const listing = db.prepare(`
       SELECT l.*, u.banned_at AS buyer_banned_at FROM listings l JOIN users u ON u.id = l.buyer_id WHERE l.id = ?
     `).get(Number(req.params.id));
@@ -131,14 +142,21 @@ export function conversationRoutes(db) {
     const body = v.str(req.body, 'message', { min: 2, max: 2000 });
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
 
-    const convId = tx(db, () => {
-      const info = db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)')
-        .run(listing.id, listing.buyer_id, req.user.id);
-      const id = Number(info.lastInsertRowid);
-      insertMessage(id, req.user.id, body, offerPrice);
-      audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
-      return id;
-    });
+    const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
+    let convId;
+    try {
+      convId = tx(db, () => {
+        const info = db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)')
+          .run(listing.id, listing.buyer_id, req.user.id);
+        const id = Number(info.lastInsertRowid);
+        insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
+        audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
+        return id;
+      });
+    } catch (err) {
+      photo?.discard();
+      throw err;
+    }
     res.status(201).json({ conversation: view(getConv.get(convId), req.user) });
   });
 
@@ -181,7 +199,7 @@ export function conversationRoutes(db) {
     const c = participantConv(req);
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
-      SELECT id, sender_id, body, offer_price, created_at, read_at FROM messages
+      SELECT id, sender_id, body, offer_price, image, created_at, read_at FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
     // Opening the conversation marks the other side's messages as read.
@@ -192,28 +210,41 @@ export function conversationRoutes(db) {
     }
     res.json({
       conversation: view(c, req.user),
-      messages: messages.map((m) => ({
-        id: m.id, mine: m.sender_id === req.user.id, body: m.body, offerPrice: m.offer_price,
-        createdAt: m.created_at, readAt: m.read_at,
-      })),
+      messages: messages.map((m) => messageView(m, c.id, req.user.id)),
     });
   });
 
-  r.post('/conversations/:id/messages', requireVerified, (req, res) => {
+  r.post('/conversations/:id/messages', requireVerified, chatUpload.single('image'), (req, res) => {
     const c = participantConv(req);
     if (c.listing_status !== 'open') {
       throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
     }
     const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
     if (otherBanned) throw new HttpError(409, 'This member\'s account has been suspended, so you can\'t message them.');
-    const body = v.str(req.body, 'message', { min: 1, max: 2000 });
+    // Text is optional when a photo is attached.
+    const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(req.file) }) ?? '';
     // Only the vendor can attach a price offer.
     const offerPrice = c.vendor_id === req.user.id ? v.int(req.body, 'offerPrice', { optional: true }) : null;
-    insertMessage(c.id, req.user.id, body, offerPrice);
+    const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
+    try {
+      insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
+    } catch (err) {
+      photo?.discard();
+      throw err;
+    }
     const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
-    res.status(201).json({
-      message: { id: m.id, mine: true, body: m.body, offerPrice: m.offer_price, createdAt: m.created_at, readAt: null },
-    });
+    res.status(201).json({ message: messageView(m, c.id, req.user.id) });
+  });
+
+  // Chat photos: only for the two people in the conversation, and only
+  // files that really belong to a message in THIS conversation.
+  r.get('/conversations/:id/images/:file', requireAuth, (req, res) => {
+    const c = participantConv(req);
+    const owned = db.prepare('SELECT 1 FROM messages WHERE conversation_id = ? AND image = ?').get(c.id, req.params.file);
+    const full = path.join(CHAT_DIR(), path.basename(req.params.file));
+    if (!owned || !fs.existsSync(full)) throw notFound('File not found');
+    res.set('Cache-Control', 'private, max-age=31536000, immutable');
+    res.sendFile(full);
   });
 
   // ---- Reporting (safety) ----

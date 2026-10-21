@@ -6,6 +6,8 @@ import { api, budget, money, toDate } from '../api.js';
 import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
 import { ReportLink } from './ListingDetail.jsx';
 import { usePolling } from '../hooks.js';
+import Lightbox from '../components/Lightbox.jsx';
+import { shrinkImage } from '../images.js';
 import { formatDateTime, t, tj } from '../i18n.jsx';
 
 export default function Conversation() {
@@ -17,6 +19,8 @@ export default function Conversation() {
   const [text, setText] = useState('');
   const [offer, setOffer] = useState('');
   const [sending, setSending] = useState(false);
+  const [photo, setPhoto] = useState(null);        // photo to send (already shrunk)
+  const [viewing, setViewing] = useState(null);    // photo URL open full-screen
   const lastId = useRef(0);
   const currentId = useRef(id);
   const bodyRef = useRef(null);
@@ -62,15 +66,18 @@ export default function Conversation() {
     e.preventDefault();
     // Enter can be pressed again (or held down) while a send is in progress;
     // the button is disabled but the keyboard shortcut isn't.
-    if (!text.trim() || sending) return;
+    if ((!text.trim() && !photo) || sending) return;
     setSending(true);
     setError(null);
     try {
-      await api(`/conversations/${id}/messages`, {
-        method: 'POST', body: { message: text, offerPrice: offer === '' ? undefined : Number(offer) },
-      });
+      const fd = new FormData();
+      if (text.trim()) fd.append('message', text);
+      if (offer !== '') fd.append('offerPrice', offer);
+      if (photo) fd.append('image', photo);
+      await api(`/conversations/${id}/messages`, { method: 'POST', form: fd });
       setText('');
       setOffer('');
+      setPhoto(null);
       await load();
     } catch (err) {
       setError(err);
@@ -105,7 +112,12 @@ export default function Conversation() {
           {messages.map((m) => (
             <div key={m.id} className={`bubble ${m.mine ? 'mine' : ''}`}>
               {m.offerPrice !== null && <div className="offer">💰 {t('Offer: {price}', { price: money(m.offerPrice, l.currency) })}</div>}
-              <div dir="auto">{m.body}</div>
+              {m.imageUrl && (
+                <button type="button" className="bubble-photo" onClick={() => setViewing(m.imageUrl)} aria-label={t('Open photo')}>
+                  <img src={m.imageUrl} alt="" loading="lazy" />
+                </button>
+              )}
+              {m.body && <div dir="auto">{m.body}</div>}
               <div className="time">{formatDateTime(toDate(m.createdAt), { dateStyle: 'short', timeStyle: 'short' })}{m.mine && m.readAt ? ` · ${t('Seen')}` : ''}</div>
             </div>
           ))}
@@ -116,18 +128,27 @@ export default function Conversation() {
             {l.status === 'fulfilled' ? t('This request has been fulfilled. The conversation is read-only.') : t('This request is closed. The conversation is read-only.')}
           </div>
         ) : (
+          <>
+          {photo && <PhotoPreview file={photo} onRemove={() => setPhoto(null)} />}
           <form className="chat-form" onSubmit={send}>
+            <label className="attach" title={t('Add a photo')} aria-label={t('Add a photo')}>
+              📷
+              <input type="file" accept="image/jpeg,image/png,image/webp" hidden
+                onChange={async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(await shrinkImage(f)); }} />
+            </label>
             <textarea placeholder={t('Message about “{title}”…', { title: l.title })} value={text} maxLength={2000}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) send(e); }} />
             {conv.myRole === 'vendor' && (
               <input type="number" min="0" placeholder={t('Price')} value={offer} onChange={(e) => setOffer(e.target.value)} aria-label={t('Offer price')} />
             )}
-            <button className="btn" disabled={sending || !text.trim()}>{t('Send')}</button>
+            <button className="btn" disabled={sending || (!text.trim() && !photo)}>{t('Send')}</button>
           </form>
+          </>
         )}
       </div>
       <ReportLink conversationId={conv.id} />
+      {viewing && <Lightbox photos={[viewing]} onClose={() => setViewing(null)} />}
     </div>
   );
 }
@@ -184,5 +205,17 @@ function DealBanner({ conv, onRated }) {
       </div>
       <p className="hint" style={{ margin: 0 }}>{t("Ratings are hidden until you've both rated, so nobody can retaliate. You can't change it later.")}</p>
     </form>
+  );
+}
+
+// The photo waiting to be sent, with a ✕ to drop it.
+function PhotoPreview({ file, onRemove }) {
+  const [url] = useState(() => URL.createObjectURL(file));
+  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+  return (
+    <div className="attach-preview">
+      <img src={url} alt="" />
+      <button type="button" className="thumb-x" onClick={onRemove} aria-label={t('Remove')}>✕</button>
+    </div>
   );
 }

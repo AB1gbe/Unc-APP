@@ -6,6 +6,7 @@ import { useAuth } from '../auth.jsx';
 import { ErrorBox, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
+import PhotoPicker from '../components/PhotoPicker.jsx';
 
 const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '' };
 
@@ -16,7 +17,8 @@ export default function NewListing() {
   const { categories, currencies } = useMeta();
   const navigate = useNavigate();
   const [form, setForm] = useState({ ...EMPTY, city: user.city || '' });
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]);     // new photos to upload
+  const [existing, setExisting] = useState([]); // photos already on the request (editing)
   const [loaded, setLoaded] = useState(!editing);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -29,9 +31,21 @@ export default function NewListing() {
         title: l.title, description: l.description, category: l.category, budgetMin: l.budgetMin ?? '',
         budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '',
       });
+      setExisting(l.photos ?? []);
       setLoaded(true);
     }).catch(setError);
   }, [editing, id]);
+
+  // Removing a photo that's already saved happens straight away.
+  async function removeExisting(photoId) {
+    if (!window.confirm(t('Remove this photo?'))) return;
+    try {
+      const { listing } = await api(`/listings/${id}/images/${photoId}`, { method: 'DELETE' });
+      setExisting(listing.photos);
+    } catch (err) {
+      setError(err);
+    }
+  }
 
   async function submit(e) {
     e.preventDefault();
@@ -41,6 +55,11 @@ export default function NewListing() {
       let listing;
       if (editing) {
         ({ listing } = await api(`/listings/${id}`, { method: 'PATCH', body: form }));
+        if (images.length) {
+          const fd = new FormData();
+          images.forEach((f) => fd.append('images', f));
+          ({ listing } = await api(`/listings/${id}/images`, { method: 'POST', form: fd }));
+        }
       } else {
         const fd = new FormData();
         Object.entries(form).forEach(([k, v]) => v !== '' && fd.append(k, v));
@@ -98,14 +117,21 @@ export default function NewListing() {
           <input id="neededBy" type="date" value={form.neededBy} onChange={set('neededBy')} />
         </div>
       </div>
-      {!editing && (
-        <div className="field">
-          <label htmlFor="images">{t('Reference photos')} <span className="muted">{t('(optional, up to 3)')}</span></label>
-          <input id="images" type="file" multiple accept="image/jpeg,image/png,image/webp"
-            onChange={(e) => setImages([...e.target.files].slice(0, 3))} />
-          <div className="hint">{t('A photo of what you want helps sellers understand.')}</div>
-        </div>
-      )}
+      <div className="field">
+        <label htmlFor="images">{t('Reference photos')} <span className="muted">{t('(optional, up to 6)')}</span></label>
+        {existing.length > 0 && (
+          <div className="thumbs">
+            {existing.map((p) => (
+              <div key={p.id} className="thumb">
+                <img src={p.url} alt="" />
+                <button type="button" className="thumb-x" aria-label={t('Remove')} onClick={() => removeExisting(p.id)}>✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+        <PhotoPicker id="images" files={images} onChange={setImages} max={6} existing={existing.length} />
+        <div className="hint">{t('A photo of what you want helps sellers understand.')}</div>
+      </div>
       <button className="btn block" disabled={busy}>{busy ? t('Saving…') : editing ? t('Save changes') : t('Post request')}</button>
     </form>
   );

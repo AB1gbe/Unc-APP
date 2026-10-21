@@ -1,5 +1,7 @@
 // "Listings" are REQUESTS posted by buyers: "I want X". Vendors browse them
 // and reach out about a specific one (see conversations.js).
+import fs from 'node:fs';
+import path from 'node:path';
 import { Router } from 'express';
 import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
@@ -9,6 +11,9 @@ import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
 
+export const MAX_PHOTOS = 6;
+
+// images: [{ id, file }] in display order
 export function listingView(row, images = []) {
   return {
     id: row.id,
@@ -24,7 +29,8 @@ export function listingView(row, images = []) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     buyer: { id: row.buyer_id, displayName: row.buyer_name, accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
-    images: images.map((f) => `/uploads/listings/${f}`),
+    images: images.map((i) => `/uploads/listings/${i.file}`),
+    photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}` })),
     offerCount: row.offer_count ?? undefined,
   };
 }
@@ -37,9 +43,9 @@ const BASE_SELECT = `
 
 export function listingRoutes(db) {
   const r = Router();
-  const upload = memoryUpload(3);
-  const imagesFor = db.prepare('SELECT file FROM listing_images WHERE listing_id = ? ORDER BY id');
-  const withImages = (row) => listingView(row, imagesFor.all(row.id).map((i) => i.file));
+  const upload = memoryUpload(MAX_PHOTOS);
+  const imagesFor = db.prepare('SELECT id, file FROM listing_images WHERE listing_id = ? ORDER BY id');
+  const withImages = (row) => listingView(row, imagesFor.all(row.id));
   const ratings = ratingQueries(db);
 
   // The full single-request view: adds the buyer's rating and, for the
@@ -124,7 +130,7 @@ export function listingRoutes(db) {
     res.json({ listing });
   });
 
-  r.post('/', requireVerified, upload.array('images', 3), (req, res) => {
+  r.post('/', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
     const data = readListingBody(req.body);
     // All photos are checked before anything is saved, and the listing +
     // photo rows are written in one transaction: a bad photo means nothing
@@ -166,6 +172,37 @@ export function listingRoutes(db) {
 
   // Mark as fulfilled / closed / reopen. Once not open, all its
   // conversations become read-only.
+  // Add photos to an open request (owner only), up to MAX_PHOTOS in total.
+  r.post('/:id/images', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
+    const row = ownListing(db, req);
+    if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
+    const files = req.files || [];
+    if (!files.length) throw new HttpError(400, 'Please upload images.', { field: 'images' });
+    const have = db.prepare('SELECT COUNT(*) AS n FROM listing_images WHERE listing_id = ?').get(row.id).n;
+    if (have + files.length > MAX_PHOTOS) {
+      throw new HttpError(400, `A request can have at most ${MAX_PHOTOS} photos.`, { field: 'images' });
+    }
+    const photos = saveFiles(LISTING_DIR(), files.map((file) => ({ file })));
+    try {
+      tx(db, () => {
+        for (const name of photos.names) db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(row.id, name);
+      });
+    } catch (err) {
+      photos.discard();
+      throw err;
+    }
+    res.status(201).json({ listing: detailView(row.id, req.user) });
+  });
+
+  r.delete('/:id/images/:imageId', requireAuth, (req, res) => {
+    const row = ownListing(db, req);
+    const img = db.prepare('SELECT * FROM listing_images WHERE id = ? AND listing_id = ?').get(Number(req.params.imageId), row.id);
+    if (!img) throw notFound('File not found');
+    db.prepare('DELETE FROM listing_images WHERE id = ?').run(img.id);
+    fs.rmSync(path.join(LISTING_DIR(), img.file), { force: true });
+    res.json({ listing: detailView(row.id, req.user) });
+  });
+
   // When marking "fulfilled" the buyer may say which conversation the deal
   // came from (conversationId). That records a DEAL, which both sides can
   // then rate. Leave it out if they found the item elsewhere.

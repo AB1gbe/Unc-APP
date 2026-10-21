@@ -93,6 +93,7 @@ function ReportRow({ report: r, onDone }) {
           {thread.messages.map((m) => (
             <p key={m.id} className="small">
               <b>{m.sender_id === thread.conversation.buyer_id ? t('Buyer:') : t('Vendor:')}</b> <bdi>{m.body}</bdi>
+              {m.imageUrl && <> <a href={m.imageUrl} target="_blank" rel="noreferrer">{t('📷 Photo')}</a></>}
               {m.offer_price !== null && ` [${t('offer {price}', { price: m.offer_price })}]`}
             </p>
           ))}

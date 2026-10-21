@@ -196,6 +196,11 @@ const MIGRATIONS = [
   ALTER TABLE users ADD COLUMN interests TEXT NOT NULL DEFAULT '[]';
   ALTER TABLE users ADD COLUMN onboarded_at TEXT;
   `,
+  // 7: a photo in a chat message (session 13). PRIVATE: stored in
+  // uploads/chat and only served to the two people in the conversation.
+  `
+  ALTER TABLE messages ADD COLUMN image TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

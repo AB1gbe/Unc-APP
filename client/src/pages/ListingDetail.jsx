@@ -5,11 +5,14 @@ import { useAuth, isVerified } from '../auth.jsx';
 import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj } from '../i18n.jsx';
+import Lightbox from '../components/Lightbox.jsx';
+import PhotoPicker from '../components/PhotoPicker.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const { data, error, loading, reload } = useApi(`/listings/${id}`);
+  const [viewing, setViewing] = useState(null); // index of the photo open full-screen
 
   if (loading) return <Loading />;
   if (error) return <ErrorBox error={error} />;
@@ -32,8 +35,15 @@ export default function ListingDetail() {
         </div>
         <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{l.description}</p>
         {l.images.length > 0 && (
-          <div className="thumbs">{l.images.map((src) => <a key={src} href={src} target="_blank" rel="noreferrer"><img src={src} alt={t('Reference photo')} /></a>)}</div>
+          <div className="gallery">
+            {l.images.map((src, i) => (
+              <button type="button" key={src} onClick={() => setViewing(i)} aria-label={t('Photo {n} of {total}', { n: i + 1, total: l.images.length })}>
+                <img src={src} alt={t('Reference photo')} loading="lazy" />
+              </button>
+            ))}
+          </div>
         )}
+        {viewing !== null && <Lightbox photos={l.images} start={viewing} onClose={() => setViewing(null)} />}
         <hr style={{ border: 0, borderTop: '1px solid var(--border)', margin: '1rem 0' }} />
         <div className="row">
           <Avatar name={l.buyer.displayName} src={l.buyer.avatarUrl} />
@@ -57,6 +67,7 @@ function OfferPanel({ listing }) {
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
+  const [photos, setPhotos] = useState([]); // optional photo of the item (max 1)
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -77,9 +88,11 @@ function OfferPanel({ listing }) {
     setBusy(true);
     setError(null);
     try {
-      const { conversation } = await api(`/listings/${listing.id}/contact`, {
-        method: 'POST', body: { message, offerPrice: offerPrice === '' ? undefined : Number(offerPrice) },
-      });
+      const fd = new FormData();
+      fd.append('message', message);
+      if (offerPrice !== '') fd.append('offerPrice', offerPrice);
+      if (photos[0]) fd.append('image', photos[0]);
+      const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
       navigate(`/messages/${conversation.id}`);
     } catch (err) {
       if (err.body?.conversationId) return navigate(`/messages/${err.body.conversationId}`);
@@ -101,6 +114,10 @@ function OfferPanel({ listing }) {
       <div className="field">
         <label htmlFor="message">{t('Message')}</label>
         <textarea id="message" required maxLength={2000} placeholder={t('Describe what you have: condition, photos available, when you can deliver…')} value={message} onChange={(e) => setMessage(e.target.value)} />
+      </div>
+      <div className="field">
+        <label>{t('Photo of your item')} <span className="muted">{t('(optional)')}</span></label>
+        <PhotoPicker id="offerPhoto" files={photos} onChange={setPhotos} max={1} />
       </div>
       <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send offer')}</button>
       <p className="hint">{t('Never pay or ask for payment outside a method you trust. Report anything suspicious.')}</p>

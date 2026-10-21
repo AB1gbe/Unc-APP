@@ -46,6 +46,9 @@ export function Avatar({ name, src, size = 40 }) {
 export function ListingCard({ listing }) {
   return (
     <Link className="card" to={`/requests/${listing.id}`}>
+      {listing.images?.[0] && (
+        <div className="card-photo"><img src={listing.images[0]} alt="" loading="lazy" /></div>
+      )}
       <div className="row spread" style={{ marginBottom: '.4rem' }}>
         <span className="badge">{t(listing.category)}</span>
         <span className="price">{budget(listing)}</span>

@@ -94,6 +94,8 @@ await vendor.waitForSelector('.card h3');
 await shot(vendor, '09-browse');
 await vendor.goto(listingUrl);
 await vendor.fill('#offerPrice', '380'); await vendor.fill('#message', 'Hi! I have a PS5 disc edition with 2 controllers, boxed, 6 months old.');
+await vendor.setInputFiles('#offerPhoto', face); // photo of the item with the offer
+await vendor.waitForSelector('.thumb img');
 await shot(vendor, '10-make-offer');
 await vendor.click('button:has-text("Send offer")');
 await vendor.waitForURL('**/messages/*');
@@ -105,8 +107,17 @@ await shot(buyer, '11-buyer-inbox');
 await buyer.click('.inbox-item');
 await buyer.waitForSelector('.bubble');
 await buyer.fill('.chat-form textarea', 'Sounds great — can you do $350 if I pick up today?');
-await buyer.click('.chat-form button');
+await buyer.setInputFiles('.chat-form input[type=file]', img); // buyer sends a photo too
+await buyer.waitForSelector('.attach-preview img');
+await buyer.click('.chat-form button.btn');
 await vendor.waitForSelector('text=can you do $350', { timeout: 8000 });
+await vendor.waitForSelector('.bubble.mine .bubble-photo img'); // vendor's own offer photo
+// open a photo full-screen and close it again
+await vendor.click('.bubble.mine .bubble-photo');
+await vendor.waitForSelector('.lightbox img');
+await shot(vendor, '12b-photo-viewer');
+await vendor.keyboard.press('Escape');
+await vendor.waitForSelector('.lightbox', { state: 'detached' });
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
 

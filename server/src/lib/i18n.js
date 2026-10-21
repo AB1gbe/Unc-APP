@@ -108,6 +108,7 @@ const PATTERNS = [
     ? `${field(l, f)}: يجب أن يكون صورة JPG أو PNG أو WEBP${pdf ? ' أو ملف PDF' : ''}.`
     : `${field(l, f)} must be a JPG, PNG or WEBP image${pdf ? ' or a PDF' : ''}.`)],
   [/^You must be at least (\d+) years old\.$/, (l, n) => (l === 'ar' ? `يجب أن يكون عمرك ${n} عامًا على الأقل.` : `You must be at least ${n} years old.`)],
+  [/^A request can have at most (\d+) photos\.$/, (l, n) => (l === 'ar' ? `يمكن أن يحتوي الطلب على ${n} صور كحد أقصى.` : `A request can have at most ${n} photos.`)],
   [/^Ratings can only be left within (\d+) days of the deal\.$/, (l, n) => (l === 'ar' ? `لا يمكن التقييم إلا خلال ${n} يومًا من الصفقة.` : `Ratings can only be left within ${n} days of the deal.`)],
 ];
 

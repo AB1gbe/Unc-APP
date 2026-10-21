@@ -42,6 +42,11 @@ function handleError(err, req, res, _next) {
   }
   // Errors from Express/body-parser/multer that are safe to show (bad JSON,
   // cut-off upload...) carry `expose` and a 4xx status.
+  // A missing file from express.static (e.g. a deleted photo) is a plain
+  // 404, not a server error - its error object has status 404 but no
+  // "expose" flag, so check it first.
+  const status = err?.status ?? err?.statusCode;
+  if (status === 404) return res.status(404).json({ error: 'Not found' });
   if (err?.expose && err.status >= 400 && err.status < 500) {
     return res.status(err.status).json({ error: err.status === 400 ? 'The request could not be read. Please try again.' : err.message });
   }

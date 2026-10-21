@@ -11,6 +11,7 @@ import { HttpError } from './http.js';
 export const KYC_DIR = () => path.join(config.uploadDir, 'kyc');         // private
 export const LISTING_DIR = () => path.join(config.uploadDir, 'listings'); // public
 export const AVATAR_DIR = () => path.join(config.uploadDir, 'avatars');   // public (profile photos)
+export const CHAT_DIR = () => path.join(config.uploadDir, 'chat');        // PRIVATE (photos in conversations)
 
 export const avatarUrl = (file) => (file ? `/uploads/avatars/${file}` : null);
 

@@ -1,4 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Router } from 'express';
+import { CHAT_DIR } from '../lib/uploads.js';
 import { audit } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
@@ -91,9 +94,21 @@ export function adminRoutes(db) {
       SELECT c.*, b.display_name AS buyer_name, b.email AS buyer_email, vu.display_name AS vendor_name, vu.email AS vendor_email
       FROM conversations c JOIN users b ON b.id = c.buyer_id JOIN users vu ON vu.id = c.vendor_id WHERE c.id = ?
     `).get(rep.conversation_id);
-    const messages = db.prepare('SELECT id, sender_id, body, offer_price, created_at FROM messages WHERE conversation_id = ? ORDER BY id').all(rep.conversation_id);
+    const messages = db.prepare('SELECT id, sender_id, body, offer_price, image, created_at FROM messages WHERE conversation_id = ? ORDER BY id').all(rep.conversation_id)
+      .map((m) => ({ ...m, image: undefined, imageUrl: m.image ? `/api/admin/reports/${rep.id}/images/${m.image}` : null }));
     audit(db, req.user.id, 'report.conversation_viewed', `report:${rep.id}`);
     res.json({ conversation: conv, messages });
+  });
+
+  // Photos in a reported conversation (admins, via the report only; logged).
+  r.get('/reports/:id/images/:file', (req, res) => {
+    const rep = db.prepare('SELECT * FROM reports WHERE id = ?').get(Number(req.params.id));
+    const owned = rep?.conversation_id && db.prepare('SELECT 1 FROM messages WHERE conversation_id = ? AND image = ?').get(rep.conversation_id, req.params.file);
+    const full = path.join(CHAT_DIR(), path.basename(req.params.file));
+    if (!owned || !fs.existsSync(full)) throw notFound('File not found');
+    audit(db, req.user.id, 'report.image_viewed', `report:${rep.id}`, { file: req.params.file });
+    res.set('Cache-Control', 'no-store');
+    res.sendFile(full);
   });
 
   r.post('/reports/:id/resolve', (req, res) => {
