@@ -5,7 +5,7 @@ tags: [architecture, api]
 
 All JSON (gzip-compressed when larger than 1 KB). Send `Accept-Language: ar` to get error messages in Arabic (the website always sends its current language). Upload mistakes → 400/413, unreadable JSON → 400. Errors: `{ "error": "message", "field"?: "...", "code"?: "..." }`. Auth = session cookie.
 Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **ADM** admin.
-Files: `/uploads/listings/*` and `/uploads/avatars/*` are public static files; `uploads/kyc` and `uploads/chat` are **never** static — only through the checked routes below.
+Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (session 20) are public static files; `uploads/kyc` and `uploads/chat` are **never** static — only through the checked routes below.
 
 ## Meta
 | Method | Path | Gate | Notes |
@@ -49,8 +49,8 @@ Files: `/uploads/listings/*` and `/uploads/avatars/*` are public static files; `
 | GET | `/api/listings/saved` | A | my saved requests that are still open, newest saved first (≤100). Session 13 |
 | PUT | `/api/listings/:id/save` | A | save → `{saved:true}`; 404 if not open, 400 for your own request. Session 13 |
 | DELETE | `/api/listings/:id/save` | A | unsave → `{saved:false}`. Session 13 |
-| GET | `/api/listings/mine` | A | all statuses |
-| GET | `/api/listings/:id` | — | non-open visible to owner, vendors with a conversation on it, admins; banned buyer's → 404 (except admins); adds `myConversationId` and `saved` for logged-in non-owners |
+| GET | `/api/listings/mine` | A | all statuses; each row has `viewCount` (session 20) |
+| GET | `/api/listings/:id` | — | non-open visible to owner, vendors with a conversation on it, admins; banned buyer's → 404 (except admins); adds `myConversationId` and `saved` for logged-in non-owners. Session 20: `buyer.badges` (everyone), `buyer.activity` (logged-in only), `viewCount` (owner only); a logged-in non-owner opening it is counted once in `listing_views` |
 | POST | `/api/listings` | V | multipart: `title, description, category, budgetMin?, budgetMax?, currency?, city, neededBy?` + up to 6 `images` |
 | PATCH | `/api/listings/:id` | V owner | JSON, open only |
 | POST | `/api/listings/:id/images` | V owner | **multipart** `images`, open only, at most 6 in total → `201 {listing}`. Session 13 |
@@ -61,22 +61,33 @@ Files: `/uploads/listings/*` and `/uploads/avatars/*` are public static files; `
 | Method | Path | Gate | Notes |
 |---|---|---|---|
 | POST | `/api/listings/:id/contact` | V, not owner | `message, offerPrice?` (JSON, or multipart with optional file `image`) → **the only way to start a conversation**. 409 + `conversationId` if exists |
-| GET | `/api/conversations` | A | my inbox with `lastMessage`, `unread`, `myRole` |
+| GET | `/api/conversations` | A | my inbox with `lastMessage`, `lastKind`, `lastPrice` (session 20), `unread`, `myRole` |
 | GET | `/api/conversations/unread-count` | A | `{unread}` |
 | GET | `/api/listings/:id/conversations` | A owner | offers on my request |
-| GET | `/api/conversations/:id?after=<msgId>` | A participant | messages (only newer than `after`), each with `imageUrl` or null; marks other side's as read. Outsiders → 404 |
+| GET | `/api/conversations/:id?after=<msgId>` | A participant | messages (only newer than `after`), each with `imageUrl` or null, `kind` (`accept/decline/null`) and `replyTo` (session 20); marks other side's as read. `conversation` also has `otherActivity` and `otherBadges` (session 20). Outsiders → 404 |
 | GET | `/api/conversations/:id/images/:file` | A participant | streams a chat photo — **private**: only the two participants, and only a file that belongs to a message in this conversation (else 404). Session 13 |
-| POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` (vendor only); multipart with optional file `image` (then `message` may be empty). 409 if request not open or the other member is suspended |
+| POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` — either side may send a price (seller's offer or buyer's counter-offer, session 20; before that vendor only); multipart with optional file `image`. `message` may be empty when a photo or a price is sent. 409 if request not open or the other member is suspended |
+| POST | `/api/conversations/:id/messages/:messageId/respond` | V participant | `action: accept/decline` → `201 {message}` (a `kind` message with `replyTo`). Only the other side's **newest** price, only once: 400 no price / own price, 409 newer price exists, already answered, request not open or other member suspended. Audited `offer.accept/decline`. Session 20 |
 | POST | `/api/reports` | A | `reason, listingId? / conversationId?` |
 
 ## Ratings & profiles — `server/src/routes/ratings.js` (session 09)
 | Method | Path | Gate | Notes |
 |---|---|---|---|
 | POST | `/api/deals/:id/rating` | A, deal participant | `stars` 1–5, `comment?` (≤500). 404 for outsiders, 409 if already rated or after 30 days |
-| GET | `/api/members/:id` | — | verified, non-banned members only: `{member: {id, displayName, accountType, memberSince, avatarUrl, bio, city, interests, deals, rating}, openRequests (≤6), reviews}` — no email, no contact (city/bio/photo added in session 13) |
+| GET | `/api/members/:id` | — | verified, non-banned members only: `{member: {id, displayName, accountType, memberSince, avatarUrl, bio, city, interests, deals, rating, activity, badges}, stories (≤6), openRequests (≤6), reviews}` — no email, no contact (city/bio/photo added in session 13; `activity` (logged-in only), `badges`, `stories` in session 20) |
 
-Conversation objects also carry `other.rating`, `other.avatarUrl`, `deal` and `needsRating`; request details carry `buyer.rating` (+ `dealConversationId` for the owner).
+Conversation objects also carry `other.rating`, `other.avatarUrl`, `deal` (with `myStory: true/false`, session 20) and `needsRating`; request details carry `buyer.rating` (+ `dealConversationId` for the owner).
 Request objects (session 13) carry `photos: [{id, url}]` (use `id` to delete one), `buyer.avatarUrl`, and still the old `images: [url]` list. Reviews carry `from.avatarUrl`.
+
+Session 20 shapes: `activity` = `{lastSeenAt, replyTime}` with `replyTime` = `hour/hours/day/days/null` (median over the member's 50 newest conversations, needs at least 3) — `server/src/lib/activity.js`. `badges` = list of `fast`, `top-finder`, `trusted`, `new` — rules in `server/src/lib/badges.js`.
+
+## Stories — `server/src/routes/stories.js` (session 20)
+| Method | Path | Gate | Notes |
+|---|---|---|---|
+| GET | `/api/stories` | — | newest 12 visible stories → `{stories: [{id, body, imageUrl, createdAt, author: {id, displayName, avatarUrl}, other: {id, displayName}, listingTitle}]}`. Hidden stories and stories involving a banned member are left out |
+| POST | `/api/deals/:id/story` | A, deal participant | **multipart**: `story` (5–280 chars) + optional file `image` → `201 {ok}`. 404 for outsiders, 409 if I already shared one for this deal |
+| DELETE | `/api/stories/:id` | A author | deletes my story and its photo → `{ok}`; 404 otherwise |
+| POST | `/api/admin/stories/:id/hide` | ADM | sets `hidden_at`, audited `story.hidden` → `{ok}` |
 
 ## Notifications — `server/src/routes/notifications.js` (session 13)
 | Method | Path | Gate | Notes |
@@ -110,3 +121,6 @@ Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buye
 | GET | `/api/admin/reports/:id/images/:file` | a photo from the reported conversation only; logged (`report.image_viewed`), `no-store`. Session 13 |
 | POST | `/api/admin/reports/:id/resolve` | |
 | POST | `/api/admin/users/:id/ban` | `banned: true/false` (real boolean, else 400); ban kills sessions |
+
+## Pages / link previews — `server/src/app.js` + `server/src/lib/previews.js` (session 20)
+Only when the built website exists (`client/dist`, or `CLIENT_DIST`). Every non-API, non-upload `GET` returns `index.html` (`Cache-Control: no-cache`) with Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`, `og:locale`, `twitter:card`) inserted before `</head>`, so WhatsApp, X, iMessage… show a card. `/requests/:id` for an **open** request whose buyer isn't banned gets its title (also in `<title>`), price, city and first photo, in the buyer's language; every other page gets the general Unc card and `/icons/icon-512.png`. `og:url` / `og:image` are built from `APP_URL`.

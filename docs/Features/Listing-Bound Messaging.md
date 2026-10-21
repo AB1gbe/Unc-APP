@@ -30,7 +30,9 @@ tags: [feature, messaging]
 | Buyer's request page lists offers + close buttons | ![[08-request-owner-view.png]] |
 
 ## Offers
-The first message can carry an `offerPrice`; vendors can send new prices in later messages. Shown as "💰 Offer: $380" in the bubble. Buyers can't attach prices (they're not offering).
+The first message can carry an `offerPrice`. Since session 20, **both sides** can put a price on a later message (the buyer's is a counter-offer), and the text can be empty when there's a price.
+Prices show as cards. The other side's **newest** price can be answered once with **Accept** or **Not for me**, or countered. Answers are messages with `kind` = `accept` or `decline` and `reply_to` pointing at the price.
+Accepting doesn't close the request; the buyer still confirms with "I found it!". Details: [[Social Touches#2. Offer cards: Accept / Counter / Not for me, and quick replies]].
 
 ## Read receipts & unread
 Opening a conversation sets `read_at` on the other side's messages. Your own messages show "· Seen" once read. Header badge = total unread (see [[Mistakes and Fixes#M11]]).

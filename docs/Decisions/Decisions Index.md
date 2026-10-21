@@ -30,5 +30,10 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 021 | [[ADR-021 Saved requests and notifications]] | Saved list on the server; 🔔 for offer/deal/rating/identity only, polled every 15 s | browser storage, notify every message, WebSockets |
 | 022 | [[ADR-022 Push notifications]] | Web Push (`web-push`), auto-generated VAPID keys, new offers only, name + title on the lock screen, off on log out | native app, SMS, email, WhatsApp, every event |
 | 023 | [[ADR-023 Email for new offers]] | On by default with a switch in Account; one email per offer with details; sent without waiting; explicit text direction | opt-in, digest, every message, link-free unsubscribe, dir=auto |
+| 024 | [[ADR-024 Warm wording and celebrations]] | Own confetti (no library), respects reduced motion, seasons from the Umm al-Qura calendar, grey placeholders | library, date table, spinner |
+| 025 | [[ADR-025 Offer answers in the chat]] | Accept/decline = a marked message for the newest price only; either side can counter; quick replies fill the box | accept closes the request, offers table, send immediately |
+| 026 | [[ADR-026 Activity and privacy]] | "Active now" for members only, rough times, median reply time (3+), distinct views shown to the buyer only | public activity, exact times, average, "who viewed you" |
+| 027 | [[ADR-027 Link previews]] | Server adds Open Graph tags per request (buyer's language, first photo); phone share sheet or WhatsApp/Copy | SSR, prerender service, generated images |
+| 028 | [[ADR-028 Stories and badges]] | Opt-in story per side per deal, author delete, admin hide; badges computed from deals/ratings/reply time | anyone posts, pre-approval, paid or hand-picked badges |
 
 Template for new ADRs: copy any ADR and keep the same headings.

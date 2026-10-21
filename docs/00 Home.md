@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 18)
+updated: 2026-10-21 (session 20)
 ---
 # Unc — Project Vault
 
@@ -49,10 +49,15 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 21 - Saved requests and notifications]]
 - [[Step 22 - Push notifications]]
 - [[Step 23 - Email for new offers]]
+- [[Step 24 - Warm wording and celebrations]]
+- [[Step 25 - Offer cards and quick replies]]
+- [[Step 26 - Activity and views]]
+- [[Step 27 - Share and link previews]]
+- [[Step 28 - Stories and badges]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -67,7 +72,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 18)
+## Status (2026-10-21, after session 20)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -89,6 +94,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Saved requests (♡) and notifications (🔔) | ✅ done — in `main` since session 14 |
 | Email to the buyer for every new offer (switch in Account) | ✅ done — in `main` since session 18 |
 | Push notifications to the phone for new offers | ✅ done — in `main` since session 16; real-phone test still to do → [[Push Notifications]] |
-| API tests | ✅ 101 passing |
+| Feels human: greetings and celebrations, offer cards, "Active now", share with previews, stories and badges | ✅ done — on branch (session 20) → [[Social Touches]] |
+| API tests | ✅ 114 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

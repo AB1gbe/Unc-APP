@@ -36,7 +36,9 @@ tags: [roadmap]
 - [ ] Push for more events (deal, rating, identity result), with a per-kind on/off — [[ADR-022 Push notifications]]
 
 ## Making it feel social and human (ideas, session 19)
-- [ ] Pick from [[Social Marketplace Ideas]]. Recommended first: human wording + celebrations, offer cards with Accept/Counter, "active now" + reply time, share to WhatsApp, success stories + badges.
+- [x] The recommended first five, built in session 20 → [[Social Touches]].
+- [ ] More from [[Social Marketplace Ideas]]: shop pages, "Happening near you" feed, reactions, typing indicator, favourite sellers, city pages, "Me too".
+- [ ] "Hide my activity" switch before a public launch ([[ADR-026 Activity and privacy]]).
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]

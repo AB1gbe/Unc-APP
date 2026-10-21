@@ -15,7 +15,7 @@ Unc-APP/
 ├── .gitattributes        Keeps .cmd files with Windows line endings
 ├── scripts/git-helper.mjs  The pull/push logic (session 10)
 ├── scripts/live-sync.mjs  `npm run live` / `npm run sync`: auto-pull pushed changes (session 09)
-├── e2e/arabic.mjs        `npm run e2e:ar`: Arabic journey + RTL/overflow/English-leak checks (session 12)
+├── e2e/arabic.mjs        `npm run e2e:ar`: Arabic journey + RTL/overflow/English-leak checks (session 12); skips member text in <bdi> / dir="auto" (session 20)
 ├── e2e/devices.mjs       `npm run e2e:devices`: 5 screen sizes × English/Arabic — no sideways scroll, touch targets ≥ 40 px (session 13)
 ├── scripts/make-icons.mjs  Draws the app icons into client/public/icons/ (`node scripts/make-icons.mjs`, session 13)
 ├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored)
@@ -23,10 +23,11 @@ Unc-APP/
 │   ├── package.json        Server deps + scripts
 │   ├── data/               (created at runtime, git-ignored) database + uploads/
 │   │                         uploads/listings (public), uploads/avatars (public, session 13),
+│   │                         uploads/stories (public, session 20),
 │   │                         uploads/kyc (PRIVATE), uploads/chat (PRIVATE, session 13)
 │   ├── src/
 │   │   ├── index.js        Starts the server (opens DB, ensures admin, listen)
-│   │   ├── app.js          Builds the Express app: security headers, routes, static files
+│   │   ├── app.js          Builds the Express app: security headers, routes, static files, pages with link previews (session 20)
 │   │   ├── config.js       All settings from environment variables
 │   │   ├── db.js           SQLite connection, MIGRATIONS list, tx() and audit() helpers
 │   │   ├── seed.js         ensureAdmin() + demo data (npm run seed)
@@ -36,15 +37,18 @@ Unc-APP/
 │   │   │   ├── http.js         HttpError + JSON error handler
 │   │   │   ├── validate.js     Input validators (str, int, email, isoDate, password, ageOn…)
 │   │   │   ├── uploads.js      Multer in-memory uploads, magic-byte sniffing, saveFiles() (all-or-nothing),
-│   │   │   │                     KYC_DIR / LISTING_DIR / AVATAR_DIR / CHAT_DIR, avatarUrl()
+│   │   │   │                     KYC_DIR / LISTING_DIR / AVATAR_DIR / CHAT_DIR / STORY_DIR, avatarUrl()
 │   │   │   ├── mailer.js       sendMail()/trySendMail(): console | memory | smtp (nodemailer) | resend
 │   │   │   ├── emails.js       Text + HTML of every email, English + Arabic (session 12)
 │   │   │   ├── i18n.js         Server messages in Arabic, readable field names (session 12)
 │   │   │   ├── categories.js   CATEGORIES + CURRENCIES lists
 │   │   │   ├── ratings.js      Rating rules: windows, blind visibility, summaries (session 09)
 │   │   │   ├── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*) (session 13)
-│   │   │   └── push.js         pushTo(): phone notifications via Web Push; VAPID keys (session 15)
-│   │   ├── middleware/auth.js  loadUser, requireAuth, requireVerified, requireAdmin, publicMe
+│   │   │   ├── push.js         pushTo(): phone notifications via Web Push; VAPID keys (session 15)
+│   │   │   ├── activity.js     "Active now" (last_seen_at) + usual reply time (session 20)
+│   │   │   ├── badges.js       Earned badges: fast, top-finder, trusted, new (session 20)
+│   │   │   └── previews.js     Open Graph link-preview tags written into index.html (session 20)
+│   │   ├── middleware/auth.js  loadUser (also updates last_seen_at, at most once a minute — session 20), requireAuth, requireVerified, requireAdmin, publicMe
 │   │   ├── kyc/
 │   │   │   ├── index.js        getProvider(), applyDecision()
 │   │   │   └── providers/      manual.js (+ README on adding Stripe/Persona…)
@@ -52,10 +56,11 @@ Unc-APP/
 │   │       ├── auth.js          /api/auth/* (incl. forgot/reset/change password, profile, avatar, onboarded)
 │   │       ├── kyc.js           /api/kyc (submit + status), sendKycFile()
 │   │       ├── listings.js      /api/listings/* (incl. for-you, saved, photos)
-│   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/* (incl. private chat photos), /api/reports
+│   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/* (incl. private chat photos, accept/decline a price), /api/reports
 │   │       ├── ratings.js       /api/deals/:id/rating, /api/members/:id (session 09)
 │   │       ├── notifications.js /api/notifications/* (session 13)
 │   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
+│   │       ├── stories.js       /api/stories, /api/deals/:id/story, /api/admin/stories/:id/hide (session 20)
 │   │       └── admin.js         /api/admin/*
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage)
@@ -74,7 +79,12 @@ Unc-APP/
 │       ├── saved.test.js           saved requests (session 13)
 │       ├── notifications.test.js   🔔 notifications (session 13)
 │       ├── push.test.js            phone push for new offers, fake push service (session 15)
-│       └── offer-email.test.js     new-offer email, Arabic, on/off switch, text direction (session 17)
+│       ├── offer-email.test.js     new-offer email, Arabic, on/off switch, text direction (session 17)
+│       ├── offer-responses.test.js accept / decline a price, buyer counter-offers (session 20)
+│       ├── activity.test.js        "Active now", reply time, "Seen by N people" (session 20)
+│       ├── previews.test.js        link-preview tags on request pages (session 20)
+│       ├── stories-badges.test.js  "Found it" stories + earned badges (session 20)
+│       └── seasons.test.js         home greeting + seasonal line (client/src/seasons.js) (session 20)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -93,6 +103,7 @@ Unc-APP/
         ├── kycReasons.js   English-stored values (reasons, statuses) shown translated
         ├── push.js         pushSupport(), enablePush(), disablePush() for this device (session 15)
         ├── images.js       shrinkImage(): resizes photos in the browser before upload (session 13)
+        ├── seasons.js      partOfDay(), season(), hijri(): home greeting + seasonal line (session 20)
         ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
         ├── styles.css      The whole design system
         ├── components/
@@ -102,7 +113,10 @@ Unc-APP/
         │   ├── ProfileEditor.jsx  Photo, name, city, bio, interests — Account page + Welcome (session 13)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
         │   ├── Lightbox.jsx       Full-screen photo viewer: swipe, arrow keys, Esc (session 13)
-        │   └── ui.jsx      ErrorBox, Loading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards
+        │   ├── Celebrate.jsx      celebrate(): toast + confetti; <Celebrations/> sits in Layout (session 20)
+        │   ├── ShareButton.jsx    "↗ Share" a request: phone share sheet, or WhatsApp / Copy link (session 20)
+        │   ├── Stories.jsx        StoryCard, StoriesStrip, StoryForm — "Found it" stories (session 20)
+        │   └── ui.jsx      ErrorBox, Loading (skeleton) + CardsLoading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards, Activity, Badges (session 20)
         └── pages/
             ├── Browse.jsx          Visitors' home + /browse: hero, search, request grid, paging
             ├── Home.jsx            Members' home: needs attention, my requests, saved, requests for you (session 13)
@@ -113,7 +127,7 @@ Unc-APP/
             ├── NewListing.jsx      Post + edit a request
             ├── MyListings.jsx
             ├── Inbox.jsx           Conversations grouped by request, tabs received/sent
-            ├── Conversation.jsx    Chat with polling + photos
+            ├── Conversation.jsx    Chat with polling + photos; OfferCard, AnswerLine, QuickReplies, StoryForm in the deal banner (session 20)
             ├── Login.jsx  Register.jsx  VerifyEmail.jsx (+ Steps bar)  Verification.jsx (KYC)
             ├── ForgotPassword.jsx  ResetPassword.jsx
             ├── Account.jsx (profile + change password)  NotFound.jsx

@@ -58,6 +58,7 @@ Asked in [[2026-10-21 Session 19]]. These are ideas only: nothing is built yet. 
 | ⚠️ **Following members** | Following a member to see their new requests. It doesn't allow messaging, but it moves toward a social network: **needs the owner's decision.** | M |
 
 ## Recommended first five (most "human" for the least work)
+> ✅ All five were built in [[2026-10-21 Session 20]] → [[Social Touches]].
 1. **Human wording + celebrations + loading placeholders** (all of section 1): one pass over the app, about 1–2 days.
 2. **Offer cards with Accept / Counter + quick replies**: makes the main moment of the app feel like a conversation.
 3. **"Active now", reply time and "seen by sellers"**: shows there are people on the other side.

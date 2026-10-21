@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 18)
+updated: 2026-10-21 (session 20)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 64 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64). All fixed.
+**Totals so far:** 71 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -74,6 +74,13 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M62 | Dev env | Re-ran the browser test on the same database → sign-up failed | 17 |
 | M63 | Test | Tests broke on invisible direction marks; the "fails on old code" check stashed too much | 17 |
 | M64 | Reporting | Told the owner "105 tests pass"; it was 101 | [[2026-10-21 Session 18]] |
+| M65 | Script | Rename helper changed a page but stopped before its Arabic key (unquoted `fulfilled:`) | [[2026-10-21 Session 20]] |
+| M66 | i18n | Greeting texts built from a lookup were invisible to the translation test | 20 |
+| M67 | Self-review | The new message bubble could have blocked taps on buttons under it | 20 |
+| M68 | Client | A buyer saw "Active now" about themselves on their own request | 20 |
+| M69 | Test | Arabic check flagged English *stories and names* written by members | 20 |
+| M70 | Dev env | Re-ran the Arabic test on a used database (repeat of M62) | 20 |
+| M71 | Design | Story photo stopped short of the card's edge | 20 |
 
 ---
 
@@ -429,4 +436,44 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause:** the number was written from memory instead of copied from the last `npm test` output (`# pass 101`).
 - **Fix:** corrected to the owner in session 18; the vault notes (session 17 log, Home, CLAUDE.md) already said 101.
 - **Lesson:** copy numbers from the command output, never from memory.
+
+## M65
+**A wording change was half-applied: the page said `t('found')` but `ar.js` still had `fulfilled:`**
+- **Cause:** the small rename script edited the page first and only then looked for the Arabic line. That line was written without quotes (`fulfilled: 'تمّ'`), so the script stopped with an error after already changing the page.
+- **Fix:** fixed the `ar.js` line by hand and ran the remaining renames. The coverage test passed.
+- **Lesson:** a script that edits several files should check everything first and change nothing until all checks pass.
+
+## M66
+**Greetings would not have been checked for Arabic**
+- **Cause:** the first version picked the text from an object of plain strings and passed it to `tj(variable)`. The translation test only finds literal `t('…')` / `tj('…')` calls, so a missing Arabic greeting would have slipped through.
+- **Fix:** each greeting is written as its own literal `tj('Good morning, {name}', v)`.
+- **Lesson:** never pass a variable as the first argument of `t()`, `tj()` or `tn()`.
+
+## M67
+**The new message bubble ("toast") could have covered the chat's Send button**
+- **Found by:** self-review before running the tests. The toast sits at the bottom centre, above everything.
+- **Fix:** `pointer-events: none` on `.toast`, so taps go through it.
+
+## M68
+**"🟢 Active now" shown to a buyer about themselves on their own request**
+- **Found by:** the phone screenshot from the all-devices test.
+- **Fix:** `{!isOwner && <Activity … />}` in `ListingDetail.jsx`. The chat and profile were fine: in a chat the other person is always someone else, and on profiles seeing it is harmless.
+
+## M69
+**The Arabic browser test failed on English words, but they were a member's story and names**
+- **Cause:** the check counted all visible text. Stories from the English run appear on the visitors' landing page, so their English text counted as untranslated UI.
+- **Fix:** the check now skips text inside `<bdi>` or `dir="auto"` (member text, by the project's own rule) and still checks everything else.
+- **Lesson:** a test that checks "the app speaks Arabic" must tell apart what the app says and what members say.
+
+## M70
+**`npm run e2e:ar` timed out at sign-up after the M69 fix**
+- **Cause:** it was re-run against the same running server, where its accounts already existed. This is the same slip as [[Mistakes and Fixes#M62]].
+- **Fix:** restarted the server on a fresh data folder, then ran `e2e` and `e2e:ar` → both OK.
+- **Lesson (again):** a fresh `DATA_DIR` for every journey run.
+
+## M71
+**Story photos left a gap on the right of the card**
+- **Found by:** looking at the Home screenshot.
+- **Cause:** the global `img { max-width: 100% }` rule capped the photo's width, and the negative margins used 1 rem where cards have 1.25 rem padding. The loading placeholder had the same margin problem.
+- **Fix:** `max-width: none` with 1.25 rem margins (1 rem on phones), like `.card-photo`.
 

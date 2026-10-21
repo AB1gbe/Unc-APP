@@ -1,6 +1,6 @@
 ---
 tags: [setup, config]
-updated: 2026-10-21 (session 02)
+updated: 2026-10-21 (session 20)
 ---
 # Environment Variables
 
@@ -20,12 +20,13 @@ All settings live in `server/src/config.js`. Each reads an environment variable 
 | `PORT` | `4000` | Port the API listens on. |
 | `DATA_DIR` | `server/data` | Database + uploads. **Back this up.** |
 | `DB_FILE` | `$DATA_DIR/unc.sqlite` | Database file path. |
+| `CLIENT_DIST` | `client/dist` | **Optional — leave unset.** Folder of the built website (`npm run build`) that `npm start` serves. Tests point it at a small stand-in `index.html`. Session 20. |
 | `SECRET_PEPPER` | `dev-only-pepper-change-me` | Secret mixed into ID-number and email-code hashes. **Required in production.** Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Never change after launch. |
 | `ADMIN_EMAIL` | `admin@unc.local` | Admin created on first start. |
 | `ADMIN_PASSWORD` | `ChangeMe123!` | Its password (only used when first created). **Change in production.** |
 | `TRUST_PROXY` | `0` | Number of proxies in front of the app. **0 locally; 1 on Render/Railway/Fly or behind one nginx.** Needed so rate limits see each visitor's real IP. See [[ADR-014 Rate limiting]]. |
 | `KYC_PROVIDER` | `manual` | See [[KYC Verification]]. |
-| `APP_URL` | `http://localhost:5173` | Public website address, used to build links in emails (password reset). Production: `https://yourdomain.com`. If you run `npm start` locally, use `http://localhost:4000`. |
+| `APP_URL` | `http://localhost:5173` | Public website address, used to build links in emails (password reset) and, since session 20, the link-preview card (`og:url`, `og:image`) WhatsApp & co. show for a pasted link. Production: **must** be the public `https://yourdomain.com`, or previews show no picture. If you run `npm start` locally, use `http://localhost:4000`. |
 | `MAIL_TRANSPORT` | `console` | `console` (print), `smtp`, or `resend`. Production refuses to start with `console`. See [[Email Sending]]. |
 | `MAIL_FROM` | `Unc <no-reply@unc.local>` | Sender shown in emails. Must be an address/domain your provider has verified. |
 | `SMTP_HOST` | — | e.g. `smtp.resend.com`, `smtp.gmail.com` |
