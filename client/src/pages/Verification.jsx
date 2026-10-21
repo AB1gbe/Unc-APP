@@ -15,11 +15,19 @@ const ID_TYPES = [
 
 export default function Verification() {
   const { user, setUser } = useAuth();
-  const { data, loading, reload } = useApi('/kyc');
+  const { data, error, loading, reload } = useApi('/kyc');
   const [showForm, setShowForm] = useState(false);
 
   if (!user.emailVerified) return <Navigate to="/verify-email" replace />;
   if (loading) return <Loading />;
+  if (error) {
+    return (
+      <div className="narrow">
+        <ErrorBox error={error} />
+        <button className="btn secondary" onClick={reload}>Try again</button>
+      </div>
+    );
+  }
 
   const status = data.kycStatus;
   const sub = data.submission;

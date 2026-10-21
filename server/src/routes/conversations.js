@@ -22,12 +22,31 @@ export function conversationRoutes(db) {
     SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
            l.budget_min, l.budget_max, l.currency,
            b.display_name AS buyer_name, b.account_type AS buyer_type,
-           vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc
+           vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc,
+           b.banned_at AS buyer_banned_at, vu.banned_at AS vendor_banned_at
     FROM conversations c
     JOIN listings l ON l.id = c.listing_id
     JOIN users b ON b.id = c.buyer_id
     JOIN users vu ON vu.id = c.vendor_id
     WHERE c.id = ?
+  `);
+
+  const unreadCount = db.prepare(`
+    SELECT COUNT(*) AS n FROM messages m
+    WHERE m.read_at IS NULL AND m.sender_id <> ?
+      AND m.conversation_id IN (
+        SELECT id FROM conversations WHERE buyer_id = ?
+        UNION ALL
+        SELECT id FROM conversations WHERE vendor_id = ?
+      )
+  `);
+
+  const hasUnread = db.prepare(`
+    SELECT 1 FROM messages WHERE conversation_id = ? AND sender_id <> ? AND read_at IS NULL LIMIT 1
+  `);
+  const markRead = db.prepare(`
+    UPDATE messages SET read_at = datetime('now')
+    WHERE conversation_id = ? AND sender_id <> ? AND read_at IS NULL
   `);
 
   function view(c, me) {
@@ -68,8 +87,10 @@ export function conversationRoutes(db) {
 
   // ---- Start a conversation ABOUT A LISTING (vendor -> buyer) ----
   r.post('/listings/:id/contact', requireVerified, (req, res) => {
-    const listing = db.prepare('SELECT * FROM listings WHERE id = ?').get(Number(req.params.id));
-    if (!listing) throw notFound('Request not found.');
+    const listing = db.prepare(`
+      SELECT l.*, u.banned_at AS buyer_banned_at FROM listings l JOIN users u ON u.id = l.buyer_id WHERE l.id = ?
+    `).get(Number(req.params.id));
+    if (!listing || listing.buyer_banned_at) throw notFound('Request not found.');
     if (listing.status !== 'open') throw new HttpError(409, 'This request is no longer accepting offers.');
     if (listing.buyer_id === req.user.id) throw new HttpError(403, 'You cannot make an offer on your own request.');
 
@@ -105,17 +126,17 @@ export function conversationRoutes(db) {
       JOIN listings l ON l.id = c.listing_id
       JOIN users b ON b.id = c.buyer_id
       JOIN users vu ON vu.id = c.vendor_id
-      WHERE c.buyer_id = ? OR c.vendor_id = ?
+      WHERE c.id IN (SELECT id FROM conversations WHERE buyer_id = ? UNION ALL SELECT id FROM conversations WHERE vendor_id = ?)
       ORDER BY c.last_message_at DESC, c.id DESC
     `).all(req.user.id, req.user.id, req.user.id);
     res.json({ conversations: rows.map((c) => view(c, req.user)) });
   });
 
   r.get('/conversations/unread-count', requireAuth, (req, res) => {
-    const { n } = db.prepare(`
-      SELECT COUNT(*) AS n FROM messages m JOIN conversations c ON c.id = m.conversation_id
-      WHERE (c.buyer_id = ? OR c.vendor_id = ?) AND m.sender_id <> ? AND m.read_at IS NULL
-    `).get(req.user.id, req.user.id, req.user.id);
+    // Written as two index lookups (my conversations as buyer + as vendor)
+    // feeding the small "unread messages" index, instead of an OR that
+    // forces SQLite to read every message.
+    const { n } = unreadCount.get(req.user.id, req.user.id, req.user.id);
     res.json({ unread: n });
   });
 
@@ -135,10 +156,11 @@ export function conversationRoutes(db) {
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
     // Opening the conversation marks the other side's messages as read.
-    db.prepare(`
-      UPDATE messages SET read_at = datetime('now')
-      WHERE conversation_id = ? AND sender_id <> ? AND read_at IS NULL
-    `).run(c.id, req.user.id);
+    // Check first (cheap, uses the small unread index) so the 4-second polls
+    // don't start a database write when there is nothing to mark.
+    if (hasUnread.get(c.id, req.user.id)) {
+      markRead.run(c.id, req.user.id);
+    }
     res.json({
       conversation: view(c, req.user),
       messages: messages.map((m) => ({
@@ -153,6 +175,8 @@ export function conversationRoutes(db) {
     if (c.listing_status !== 'open') {
       throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
     }
+    const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
+    if (otherBanned) throw new HttpError(409, 'This member\'s account has been suspended, so you can\'t message them.');
     const body = v.str(req.body, 'message', { min: 1, max: 2000 });
     // Only the vendor can attach a price offer.
     const offerPrice = c.vendor_id === req.user.id ? v.int(req.body, 'offerPrice', { optional: true }) : null;

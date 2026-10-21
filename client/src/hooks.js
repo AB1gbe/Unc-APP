@@ -26,3 +26,29 @@ export function useMeta() {
   }, []);
   return meta;
 }
+
+// Runs `fn` now and then every `ms` milliseconds, but only while the browser
+// tab is visible. Hidden tabs stop polling; coming back runs `fn` at once.
+// Saves server work and phone battery.
+export function usePolling(fn, ms, enabled = true) {
+  useEffect(() => {
+    if (!enabled) return undefined;
+    let timer = null;
+    const start = () => {
+      if (timer) return;
+      fn();
+      timer = setInterval(fn, ms);
+    };
+    const stop = () => {
+      clearInterval(timer);
+      timer = null;
+    };
+    const onVisibility = () => (document.hidden ? stop() : start());
+    if (!document.hidden) start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [fn, ms, enabled]);
+}

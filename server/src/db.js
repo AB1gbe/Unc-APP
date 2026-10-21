@@ -142,13 +142,31 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_password_resets_user ON password_resets(user_id);
   `,
+  // 3: indexes for the queries that run most often (measured in session 05:
+  // the unread counter scanned every message on every poll)
+  `
+  CREATE INDEX idx_conversations_buyer  ON conversations(buyer_id, last_message_at);
+  CREATE INDEX idx_conversations_vendor ON conversations(vendor_id, last_message_at);
+  CREATE INDEX idx_listings_buyer       ON listings(buyer_id, created_at);
+  CREATE INDEX idx_listing_images       ON listing_images(listing_id);
+  -- Only unread messages are in this index, so it stays tiny.
+  CREATE INDEX idx_messages_unread      ON messages(conversation_id, sender_id) WHERE read_at IS NULL;
+  CREATE INDEX idx_sessions_user        ON sessions(user_id);
+  `,
 ];
 
 export function openDb(file = config.dbFile) {
   if (file !== ':memory:') fs.mkdirSync(path.dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
   db.exec('PRAGMA foreign_keys = ON;');
-  if (file !== ':memory:') db.exec('PRAGMA journal_mode = WAL;');
+  // Wait up to 5 s instead of failing with "database is locked" when another
+  // process (e.g. `npm run seed`) is writing at the same moment.
+  db.exec('PRAGMA busy_timeout = 5000;');
+  if (file !== ':memory:') {
+    db.exec('PRAGMA journal_mode = WAL;');
+    // Safe with WAL (no corruption on crash) and much faster writes than FULL.
+    db.exec('PRAGMA synchronous = NORMAL;');
+  }
   migrate(db);
   return db;
 }
@@ -179,6 +197,16 @@ export function tx(db, fn) {
     db.exec('ROLLBACK');
     throw err;
   }
+}
+
+// Deletes logins and reset links that can no longer be used. Called on
+// start-up and then every hour (see index.js).
+export function cleanupExpired(db) {
+  const now = "datetime('now')";
+  const sessions = db.prepare(`DELETE FROM sessions WHERE expires_at <= ${now}`).run().changes;
+  const resets = db.prepare(`DELETE FROM password_resets WHERE expires_at <= ${now} OR used_at IS NOT NULL`).run().changes;
+  const codes = db.prepare(`DELETE FROM email_codes WHERE expires_at <= ${now}`).run().changes;
+  return { sessions, resets, codes };
 }
 
 export function audit(db, actorId, action, target, meta) {

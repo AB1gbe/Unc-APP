@@ -5,7 +5,7 @@ import { config } from '../config.js';
 import { audit, tx } from '../db.js';
 import { pepperedHash } from '../lib/crypto.js';
 import { HttpError } from '../lib/http.js';
-import { KYC_DIR, memoryUpload, saveFile } from '../lib/uploads.js';
+import { KYC_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, publicMe } from '../middleware/auth.js';
 import { getProvider, applyDecision } from '../kyc/index.js';
@@ -82,27 +82,41 @@ export function kycRoutes(db) {
     `).get(idHash, user.id);
     if (clash) throw new HttpError(409, 'This ID document is already linked to another account.');
 
-    const dir = KYC_DIR();
-    const stored = {
-      front: saveFile(front, dir, { allowPdf: false }),
-      back: back ? saveFile(back, dir) : null,
-      selfie: saveFile(selfie, dir),
-      bizDoc: bizDoc ? saveFile(bizDoc, dir, { allowPdf: true }) : null,
-    };
+    // Every file is checked before any is written, and they are deleted again
+    // if saving the submission fails - no orphaned ID photos on disk.
+    const saved = saveFiles(KYC_DIR(), [
+      { file: front },
+      back ? { file: back } : null,
+      { file: selfie },
+      bizDoc ? { file: bizDoc, allowPdf: true } : null,
+    ]);
+    const [frontName, backName, selfieName, bizName] = saved.names;
 
     const provider = getProvider();
-    const subId = tx(db, () => {
-      const info = db.prepare(`
-        INSERT INTO kyc_submissions
-          (user_id, provider, legal_name, date_of_birth, country, id_type, id_number_last4, id_number_hash,
-           business_name, business_reg_number, doc_front, doc_back, selfie, business_doc)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(user.id, provider.name, legalName, dateOfBirth, country, idType, idNumber.slice(-4), idHash,
-        businessName, businessRegNumber, stored.front, stored.back, stored.selfie, stored.bizDoc);
-      db.prepare(`UPDATE users SET kyc_status = 'pending' WHERE id = ?`).run(user.id);
-      audit(db, user.id, 'kyc.submitted', `kyc_submission:${info.lastInsertRowid}`);
-      return Number(info.lastInsertRowid);
-    });
+    let subId;
+    try {
+      subId = tx(db, () => {
+        // Atomic "only if not already pending/approved": two uploads sent at the
+        // same time (two tabs, a retry on a slow phone) can't both get through,
+        // because req.user was read before the slow upload finished.
+        const claimed = db.prepare(`
+          UPDATE users SET kyc_status = 'pending' WHERE id = ? AND kyc_status IN ('unverified', 'rejected')
+        `).run(user.id);
+        if (!claimed.changes) throw new HttpError(409, 'Your verification is already being reviewed.');
+        const info = db.prepare(`
+          INSERT INTO kyc_submissions
+            (user_id, provider, legal_name, date_of_birth, country, id_type, id_number_last4, id_number_hash,
+             business_name, business_reg_number, doc_front, doc_back, selfie, business_doc)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(user.id, provider.name, legalName, dateOfBirth, country, idType, idNumber.slice(-4), idHash,
+          businessName, businessRegNumber, frontName, backName, selfieName, bizName);
+        audit(db, user.id, 'kyc.submitted', `kyc_submission:${info.lastInsertRowid}`);
+        return Number(info.lastInsertRowid);
+      });
+    } catch (err) {
+      saved.discard();
+      throw err;
+    }
 
     const result = await provider.start({ id: subId });
     if (result.status !== 'pending') applyDecision(db, subId, result.status, result.note);

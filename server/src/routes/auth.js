@@ -14,14 +14,27 @@ const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 export function authRoutes(db) {
   const r = Router();
 
-  // Slow down password guessing. Disabled in tests so tests run fast.
-  const limiter = rateLimit({
+  // Slow down guessing and spam. Each action has its OWN counter per visitor
+  // (IP address), so e.g. opening a reset link doesn't use up login attempts.
+  // Behind a hosting proxy, set TRUST_PROXY so each visitor gets their own
+  // IP instead of all sharing the proxy's (see config.js). Off in tests.
+  const limit = (max) => rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: config.isTest ? 10_000 : 20,
+    limit: config.isTest ? 10_000 : max,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     message: { error: 'Too many attempts. Please wait a few minutes.' },
   });
+  const limits = {
+    register: limit(10),
+    login: limit(20),
+    verifyEmail: limit(20),
+    resendCode: limit(5),
+    forgot: limit(5),
+    resetCheck: limit(30),
+    reset: limit(10),
+    changePassword: limit(10),
+  };
 
   function startSession(res, userId) {
     const token = randomToken();
@@ -54,7 +67,7 @@ export function authRoutes(db) {
   const showDevCode = !config.isProd && ['console', 'memory'].includes(config.mail.transport);
   const devExtra = (code) => (showDevCode ? { devCode: code } : {});
 
-  r.post('/register', limiter, async (req, res) => {
+  r.post('/register', limits.register, async (req, res) => {
     const email = v.email(req.body);
     const password = v.password(req.body);
     const displayName = v.str(req.body, 'displayName', { min: 2, max: 60 });
@@ -64,9 +77,20 @@ export function authRoutes(db) {
     if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
       throw new HttpError(409, 'An account with this email already exists.', { field: 'email' });
     }
-    const info = db.prepare(`
-      INSERT INTO users (email, password_hash, display_name, account_type, city) VALUES (?, ?, ?, ?, ?)
-    `).run(email, await hashPassword(password), displayName, accountType, city);
+    const hash = await hashPassword(password);
+    let info;
+    try {
+      info = db.prepare(`
+        INSERT INTO users (email, password_hash, display_name, account_type, city) VALUES (?, ?, ?, ?, ?)
+      `).run(email, hash, displayName, accountType, city);
+    } catch (err) {
+      // Two sign-ups with the same email at the same moment: the check above
+      // passed for both, the database's UNIQUE rule stops the second.
+      if (/UNIQUE constraint failed: users\.email/.test(err.message)) {
+        throw new HttpError(409, 'An account with this email already exists.', { field: 'email' });
+      }
+      throw err;
+    }
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
     const code = issueEmailCode(user);
     startSession(res, user.id);
@@ -75,7 +99,7 @@ export function authRoutes(db) {
     res.status(201).json({ user: publicMe(user), emailSent, ...devExtra(code) });
   });
 
-  r.post('/login', limiter, async (req, res) => {
+  r.post('/login', limits.login, async (req, res) => {
     const email = v.email(req.body);
     const password = v.str(req.body, 'password', { max: 200 });
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
@@ -99,7 +123,7 @@ export function authRoutes(db) {
     res.json({ user: publicMe(req.user) });
   });
 
-  r.post('/verify-email', limiter, requireAuth, (req, res) => {
+  r.post('/verify-email', limits.verifyEmail, requireAuth, (req, res) => {
     if (req.user.email_verified_at) return res.json({ user: publicMe(req.user) });
     const code = v.str(req.body, 'code', { min: 6, max: 6 });
     const row = db.prepare('SELECT * FROM email_codes WHERE user_id = ?').get(req.user.id);
@@ -116,7 +140,7 @@ export function authRoutes(db) {
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 
-  r.post('/resend-code', limiter, requireAuth, async (req, res) => {
+  r.post('/resend-code', limits.resendCode, requireAuth, async (req, res) => {
     if (req.user.email_verified_at) throw new HttpError(400, 'Email is already verified.');
     const code = issueEmailCode(req.user);
     if (!(await trySendMail({ to: req.user.email, ...verificationCodeEmail(code) }))) {
@@ -128,7 +152,7 @@ export function authRoutes(db) {
   // ---- Password reset (logged out) ----
   // Step 1: ask for a link. ALWAYS answers the same way, whether or not the
   // email has an account, so nobody can use this to discover members.
-  r.post('/forgot-password', limiter, async (req, res) => {
+  r.post('/forgot-password', limits.forgot, async (req, res) => {
     const email = v.email(req.body);
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
     if (user && !user.banned_at) {
@@ -154,20 +178,28 @@ export function authRoutes(db) {
   }
 
   // Lets the reset page say "link expired" before the user types a password.
-  r.post('/reset-password/check', limiter, (req, res) => {
+  r.post('/reset-password/check', limits.resetCheck, (req, res) => {
     findResetToken(v.str(req.body, 'token', { max: 200 }));
     res.json({ ok: true });
   });
 
   // Step 2: set the new password with the token from the email.
-  r.post('/reset-password', limiter, async (req, res) => {
+  r.post('/reset-password', limits.reset, async (req, res) => {
     const row = findResetToken(v.str(req.body, 'token', { max: 200 }));
     const password = v.password(req.body);
     const hash = await hashPassword(password);
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(row.user_id);
     tx(db, () => {
+      // Claim the link atomically. Two clicks at once both passed the check
+      // above (hashing takes time); only one can flip used_at here.
+      const claimed = db.prepare(`
+        UPDATE password_resets SET used_at = datetime('now')
+        WHERE token_hash = ? AND used_at IS NULL AND expires_at > datetime('now')
+      `).run(row.token_hash);
+      if (!claimed.changes || user.banned_at) {
+        throw new HttpError(400, 'This reset link is invalid or has expired. Please request a new one.', { code: 'RESET_INVALID' });
+      }
       db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hash, user.id);
-      db.prepare(`UPDATE password_resets SET used_at = datetime('now') WHERE token_hash = ?`).run(row.token_hash);
       // Log out everywhere: whoever had the old password loses access.
       db.prepare('DELETE FROM sessions WHERE user_id = ?').run(user.id);
       // They clicked a link sent to their inbox, which proves they own it.
@@ -179,7 +211,7 @@ export function authRoutes(db) {
   });
 
   // ---- Change password (logged in) ----
-  r.post('/change-password', limiter, requireAuth, async (req, res) => {
+  r.post('/change-password', limits.changePassword, requireAuth, async (req, res) => {
     const current = v.str(req.body, 'currentPassword', { max: 200 });
     const password = v.password(req.body);
     if (!(await verifyPassword(current, req.user.password_hash))) {

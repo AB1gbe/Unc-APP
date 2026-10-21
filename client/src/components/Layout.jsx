@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
+import { Loading } from './ui.jsx';
+import { usePolling } from '../hooks.js';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -9,17 +11,24 @@ export default function Layout() {
   const [unread, setUnread] = useState(0);
   const { pathname } = useLocation();
 
-  // Poll the unread count so the Messages tab shows a dot. Also re-check on
-  // every page change, so opening a conversation clears it straight away.
+  // Unread count for the Messages tab: polled every 15 s while the tab is
+  // visible, re-checked on every page change, and right after a
+  // conversation marks messages read (the 'unc:read' event).
+  const loggedIn = Boolean(user);
+  const refreshUnread = useCallback(() => {
+    api('/conversations/unread-count').then((d) => setUnread(d.unread)).catch(() => {});
+  }, []);
+  usePolling(refreshUnread, 15000, loggedIn);
   useEffect(() => {
-    if (!user) return undefined;
-    let alive = true;
-    const tick = () => api('/conversations/unread-count').then((d) => alive && setUnread(d.unread)).catch(() => {});
-    tick();
-    const t = setInterval(tick, 15000);
-    window.addEventListener('unc:read', tick); // fired by Conversation.jsx after marking messages read
-    return () => { alive = false; clearInterval(t); window.removeEventListener('unc:read', tick); };
-  }, [user, pathname]);
+    if (loggedIn) refreshUnread();
+  }, [loggedIn, pathname, refreshUnread]);
+  useEffect(() => {
+    window.addEventListener('unc:read', refreshUnread);
+    return () => window.removeEventListener('unc:read', refreshUnread);
+  }, [refreshUnread]);
+  useEffect(() => {
+    if (!loggedIn) setUnread(0);
+  }, [loggedIn]);
 
   return (
     <>
@@ -56,7 +65,9 @@ export default function Layout() {
         </div>
       )}
       <main className="container">
-        <Outlet />
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
       </main>
     </>
   );

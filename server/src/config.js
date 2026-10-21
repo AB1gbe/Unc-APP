@@ -28,6 +28,10 @@ export const config = {
   isProd,
   isTest,
   port: Number(process.env.PORT || 4000),
+  // How many proxies sit in front of the app (Render/Railway/Fly/nginx: 1).
+  // Needed so rate limits see each visitor's real IP. Leave 0 when the app
+  // is reached directly (local development).
+  trustProxy: /^\d+$/.test(process.env.TRUST_PROXY || '') ? Number(process.env.TRUST_PROXY) : (process.env.TRUST_PROXY || 0),
   dataDir,
   dbFile: process.env.DB_FILE || path.join(dataDir, 'unc.sqlite'),
   uploadDir: path.join(dataDir, 'uploads'),

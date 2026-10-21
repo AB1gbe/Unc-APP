@@ -1,9 +1,9 @@
 // "Listings" are REQUESTS posted by buyers: "I want X". Vendors browse them
 // and reach out about a specific one (see conversations.js).
 import { Router } from 'express';
-import { audit } from '../db.js';
+import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
-import { LISTING_DIR, memoryUpload, saveFile } from '../lib/uploads.js';
+import { LISTING_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
@@ -29,7 +29,7 @@ export function listingView(row, images = []) {
 }
 
 const BASE_SELECT = `
-  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type,
+  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.banned_at IS NOT NULL AS buyer_banned,
          (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count
   FROM listings l JOIN users u ON u.id = l.buyer_id
 `;
@@ -57,7 +57,8 @@ export function listingRoutes(db) {
       where.push('l.city LIKE ?');
       params.push(`%${String(req.query.city).slice(0, 80)}%`);
     }
-    const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+    // Capped so absurd page numbers can't overflow the OFFSET.
+    const page = Math.min(10_000, Math.max(1, Number.parseInt(req.query.page, 10) || 1));
     const pageSize = 20;
     const rows = db.prepare(`${BASE_SELECT} WHERE ${where.join(' AND ')} ORDER BY l.created_at DESC, l.id DESC LIMIT ? OFFSET ?`)
       .all(...params, pageSize + 1, (page - 1) * pageSize);
@@ -76,10 +77,15 @@ export function listingRoutes(db) {
 
   r.get('/:id', (req, res) => {
     const row = db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(Number(req.params.id));
-    // Closed/fulfilled requests stay visible to the owner but not the public.
-    if (!row || (row.status !== 'open' && row.buyer_id !== req.user?.id && req.user?.role !== 'admin')) {
-      throw notFound('This request does not exist or is no longer open.');
-    }
+    const me = req.user;
+    const isAdmin = me?.role === 'admin';
+    const isOwner = row && me?.id === row.buyer_id;
+    // Vendors who talked to the buyer about it may still open it after it closes.
+    const isParticipant = row && me && db.prepare('SELECT 1 FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, me.id);
+    const hidden = !row
+      || (row.buyer_banned && !isAdmin)                                  // banned buyer: gone for everyone
+      || (row.status !== 'open' && !isOwner && !isParticipant && !isAdmin); // closed: owner, its vendors, admins
+    if (hidden) throw notFound('This request does not exist or is no longer open.');
     const listing = withImages(row);
     // Tell a vendor whether they've already reached out about this one.
     if (req.user && req.user.id !== row.buyer_id) {
@@ -91,16 +97,29 @@ export function listingRoutes(db) {
 
   r.post('/', requireVerified, upload.array('images', 3), (req, res) => {
     const data = readListingBody(req.body);
-    const info = db.prepare(`
-      INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(req.user.id, data.title, data.description, data.category, data.budgetMin, data.budgetMax,
-      data.currency, data.city, data.neededBy);
-    const id = Number(info.lastInsertRowid);
-    for (const file of req.files || []) {
-      db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(id, saveFile(file, LISTING_DIR()));
+    // All photos are checked before anything is saved, and the listing +
+    // photo rows are written in one transaction: a bad photo means nothing
+    // is created (no half-made listing that a retry would duplicate).
+    const photos = saveFiles(LISTING_DIR(), (req.files || []).map((file) => ({ file })));
+    let id;
+    try {
+      id = tx(db, () => {
+        const info = db.prepare(`
+          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(req.user.id, data.title, data.description, data.category, data.budgetMin, data.budgetMax,
+          data.currency, data.city, data.neededBy);
+        const newId = Number(info.lastInsertRowid);
+        for (const name of photos.names) {
+          db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(newId, name);
+        }
+        audit(db, req.user.id, 'listing.created', `listing:${newId}`);
+        return newId;
+      });
+    } catch (err) {
+      photos.discard();
+      throw err;
     }
-    audit(db, req.user.id, 'listing.created', `listing:${id}`);
     res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)) });
   });
 

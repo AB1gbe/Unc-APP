@@ -5,22 +5,28 @@ import { Link, useParams } from 'react-router-dom';
 import { api, budget, money, toDate } from '../api.js';
 import { Avatar, ErrorBox, KycBadge, Loading } from '../components/ui.jsx';
 import { ReportLink } from './ListingDetail.jsx';
+import { usePolling } from '../hooks.js';
 
 export default function Conversation() {
   const { id } = useParams();
   const [conv, setConv] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null);         // from sending
+  const [pollError, setPollError] = useState(null); // from loading; clears when a poll works
   const [text, setText] = useState('');
   const [offer, setOffer] = useState('');
   const [sending, setSending] = useState(false);
   const lastId = useRef(0);
+  const currentId = useRef(id);
   const bodyRef = useRef(null);
 
   const load = useCallback(async () => {
     try {
       const r = await api(`/conversations/${id}?after=${lastId.current}`);
+      // The user may have switched to another conversation while this was loading.
+      if (currentId.current !== id) return;
       setConv(r.conversation);
+      setPollError(null);
       if (r.messages.some((m) => !m.mine)) window.dispatchEvent(new Event('unc:read'));
       if (r.messages.length) {
         lastId.current = Math.max(lastId.current, r.messages.at(-1).id);
@@ -31,17 +37,21 @@ export default function Conversation() {
         });
       }
     } catch (err) {
-      setError(err);
+      if (currentId.current === id) setPollError(err);
     }
   }, [id]);
 
+  // Opening another conversation: start from an empty list. (Declared before
+  // usePolling so it runs first.)
   useEffect(() => {
+    currentId.current = id;
     lastId.current = 0;
     setMessages([]);
-    load();
-    const t = setInterval(load, 4000);
-    return () => clearInterval(t);
-  }, [load]);
+    setConv(null);
+    setError(null);
+    setPollError(null);
+  }, [id]);
+  usePolling(load, 4000);
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
@@ -49,7 +59,9 @@ export default function Conversation() {
 
   async function send(e) {
     e.preventDefault();
-    if (!text.trim()) return;
+    // Enter can be pressed again (or held down) while a send is in progress;
+    // the button is disabled but the keyboard shortcut isn't.
+    if (!text.trim() || sending) return;
     setSending(true);
     setError(null);
     try {
@@ -66,7 +78,7 @@ export default function Conversation() {
     }
   }
 
-  if (!conv) return error ? <ErrorBox error={error} /> : <Loading />;
+  if (!conv) return pollError ? <ErrorBox error={pollError} /> : <Loading />;
   const l = conv.listing;
 
   return (
@@ -95,7 +107,7 @@ export default function Conversation() {
             </div>
           ))}
         </div>
-        {error && <div style={{ padding: '0 1rem' }}><ErrorBox error={error} /></div>}
+        {(error || pollError) && <div style={{ padding: '0 1rem' }}><ErrorBox error={error || pollError} /></div>}
         {conv.readOnly ? (
           <div className="chat-form muted small" style={{ justifyContent: 'center' }}>
             This request is {l.status}. The conversation is read-only.

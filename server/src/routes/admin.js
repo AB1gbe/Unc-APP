@@ -106,7 +106,10 @@ export function adminRoutes(db) {
   r.post('/users/:id/ban', (req, res) => {
     const id = Number(req.params.id);
     if (id === req.user.id) throw new HttpError(400, 'You cannot ban yourself.');
-    const banned = Boolean(req.body?.banned ?? true);
+    // Only a real true/false is accepted ("false" as text must not ban).
+    const raw = req.body?.banned ?? true;
+    if (typeof raw !== 'boolean') throw new HttpError(400, 'banned must be true or false.', { field: 'banned' });
+    const banned = raw;
     const info = db.prepare(`UPDATE users SET banned_at = ${banned ? "datetime('now')" : 'NULL'} WHERE id = ?`).run(id);
     if (!info.changes) throw notFound();
     if (banned) db.prepare('DELETE FROM sessions WHERE user_id = ?').run(id);

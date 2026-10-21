@@ -1,22 +1,27 @@
+import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import { RequireAdmin, RequireAuth, RequireVerified } from './components/ui.jsx';
 import Browse from './pages/Browse.jsx';
 import ListingDetail from './pages/ListingDetail.jsx';
-import NewListing from './pages/NewListing.jsx';
-import MyListings from './pages/MyListings.jsx';
-import Inbox from './pages/Inbox.jsx';
-import Conversation from './pages/Conversation.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
-import ResetPassword from './pages/ResetPassword.jsx';
-import VerifyEmail from './pages/VerifyEmail.jsx';
-import Verification from './pages/Verification.jsx';
-import Account from './pages/Account.jsx';
-import AdminHome from './pages/admin/AdminHome.jsx';
-import KycReview from './pages/admin/KycReview.jsx';
 import NotFound from './pages/NotFound.jsx';
+
+// Pages most visitors never open (admin, chat, forms) are split into their
+// own files and only downloaded when first visited. The loading fallback is
+// in Layout.jsx so the header stays visible meanwhile.
+const NewListing = lazy(() => import('./pages/NewListing.jsx'));
+const MyListings = lazy(() => import('./pages/MyListings.jsx'));
+const Inbox = lazy(() => import('./pages/Inbox.jsx'));
+const Conversation = lazy(() => import('./pages/Conversation.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
+const Verification = lazy(() => import('./pages/Verification.jsx'));
+const Account = lazy(() => import('./pages/Account.jsx'));
+const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
+const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
 
 export default function App() {
   return (

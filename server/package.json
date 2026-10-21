@@ -12,6 +12,7 @@
     "mail:test": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/mail-test.js"
   },
   "dependencies": {
+    "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",
     "express": "^5.3.0",
     "express-rate-limit": "^8.7.1",

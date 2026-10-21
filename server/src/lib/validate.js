@@ -46,7 +46,10 @@ export function email(body, field = 'email') {
 export function isoDate(body, field, { optional = false } = {}) {
   const value = str(body, field, { max: 10, optional });
   if (value === null) return null;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(value))) {
+  // Round-trip through a real date so impossible days (2026-02-31) fail:
+  // JavaScript would silently turn them into March 3.
+  const parsed = new Date(`${value}T00:00:00Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
     throw new HttpError(400, `${field} must be a date like 2026-01-31.`, { field });
   }
   return value;

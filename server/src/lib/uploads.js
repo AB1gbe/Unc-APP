@@ -32,15 +32,34 @@ export function memoryUpload(maxFiles) {
   });
 }
 
-export function saveFile(file, dir, { allowPdf = false } = {}) {
-  const kind = sniff(file.buffer);
-  if (!kind || (kind.ext === '.pdf' && !allowPdf)) {
-    throw new HttpError(400, `"${file.fieldname}" must be a JPG, PNG or WEBP image${allowPdf ? ' or a PDF' : ''}.`);
+// Checks EVERY file first and only then writes them, so a bad second file
+// can't leave the first one orphaned on disk. Returns the new names plus
+// discard(), which deletes them again if the database step fails.
+//   items: [{ file, allowPdf? }, ...]  (null/undefined entries are skipped)
+export function saveFiles(dir, items) {
+  for (const item of items) {
+    if (!item) continue;
+    const kind = sniff(item.file.buffer);
+    if (!kind || (kind.ext === '.pdf' && !item.allowPdf)) {
+      throw new HttpError(400, `"${item.file.fieldname}" must be a JPG, PNG or WEBP image${item.allowPdf ? ' or a PDF' : ''}.`, { field: item.file.fieldname });
+    }
+    item.ext = kind.ext;
   }
   fs.mkdirSync(dir, { recursive: true });
-  const name = randomToken(18) + kind.ext;
-  fs.writeFileSync(path.join(dir, name), file.buffer);
-  return name;
+  const written = [];
+  const names = items.map((item) => {
+    if (!item) return null;
+    const name = randomToken(18) + item.ext;
+    fs.writeFileSync(path.join(dir, name), item.file.buffer);
+    written.push(name);
+    return name;
+  });
+  return {
+    names,
+    discard() {
+      for (const name of written) fs.rmSync(path.join(dir, name), { force: true });
+    },
+  };
 }
 
 export function mimeFor(filename) {

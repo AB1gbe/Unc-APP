@@ -21,7 +21,12 @@ export function applyDecision(db, submissionId, decision, note, reviewerId = nul
       UPDATE kyc_submissions SET status = ?, review_note = ?, reviewer_id = ?, reviewed_at = datetime('now')
       WHERE id = ?
     `).run(decision, note ?? null, reviewerId, submissionId);
-    db.prepare('UPDATE users SET kyc_status = ? WHERE id = ?').run(decision, sub.user_id);
+    // Only the user's NEWEST submission decides their status, so reviewing an
+    // older leftover submission can't undo a newer decision.
+    const latest = db.prepare('SELECT MAX(id) AS id FROM kyc_submissions WHERE user_id = ?').get(sub.user_id).id;
+    if (latest === submissionId) {
+      db.prepare('UPDATE users SET kyc_status = ? WHERE id = ?').run(decision, sub.user_id);
+    }
     audit(db, reviewerId, `kyc.${decision}`, `kyc_submission:${submissionId}`, { userId: sub.user_id, note });
     return sub;
   });
