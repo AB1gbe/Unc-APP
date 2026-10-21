@@ -243,6 +243,13 @@ const MIGRATIONS = [
   `
   ALTER TABLE users ADD COLUMN email_offers INTEGER NOT NULL DEFAULT 1;
   `,
+  // 12: answering a price in the chat (session 20). kind = NULL (normal
+  // message), 'accept' or 'decline'; reply_to = the price message answered.
+  `
+  ALTER TABLE messages ADD COLUMN kind TEXT CHECK (kind IN ('accept', 'decline'));
+  ALTER TABLE messages ADD COLUMN reply_to INTEGER REFERENCES messages(id) ON DELETE CASCADE;
+  CREATE INDEX idx_messages_reply ON messages(reply_to) WHERE reply_to IS NOT NULL;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

@@ -2,7 +2,7 @@
 // is always obvious what each chat is about.
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ago } from '../api.js';
+import { ago, money } from '../api.js';
 import { Avatar, ErrorBox, Loading, statusLabel } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { t } from '../i18n.jsx';
@@ -54,7 +54,7 @@ export default function Inbox() {
                       <span className="muted small">{ago(c.lastMessageAt)}</span>
                     </div>
                     <div className="muted small" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {c.myRole === 'buyer' ? t('Offer from seller') : t('Your offer')} · <bdi>{c.lastMessage || t('📷 Photo')}</bdi>
+                      {c.myRole === 'buyer' ? t('Offer from seller') : t('Your offer')} · <bdi>{c.lastKind === 'accept' ? t('🤝 Offer accepted') : c.lastKind === 'decline' ? t('Offer declined') : c.lastMessage || (c.lastPrice != null ? `💰 ${money(c.lastPrice, c.listing.currency)}` : t('📷 Photo'))}</bdi>
                     </div>
                   </div>
                   {c.needsRating && <span className="badge warn">{t('★ Rate')}</span>}

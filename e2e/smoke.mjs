@@ -119,6 +119,9 @@ await buyer.waitForSelector('.inbox-item');
 await shot(buyer, '11-buyer-inbox');
 await buyer.click('.inbox-item');
 await buyer.waitForSelector('.bubble');
+// A quick-reply chip fills the message box.
+await buyer.click('.quick-replies .chip:has-text("Where can we meet?")');
+if ((await buyer.inputValue('.chat-form textarea')) !== 'Where can we meet?') throw new Error('quick reply did not fill the box');
 await buyer.fill('.chat-form textarea', 'Sounds great — can you do $350 if I pick up today?');
 await buyer.setInputFiles('.chat-form input[type=file]', img); // buyer sends a photo too
 await buyer.waitForSelector('.attach-preview img');
@@ -133,6 +136,17 @@ await vendor.keyboard.press('Escape');
 await vendor.waitForSelector('.lightbox', { state: 'detached' });
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
+
+// Offer cards: the buyer counters with $350, the seller accepts it.
+await buyer.click('.offer-actions button:has-text("Counter")');
+await buyer.fill('.offer-actions input', '350');
+await buyer.click('.offer-actions button:has-text("Send")');
+await vendor.waitForSelector('.offer-card:has-text("Counter-offer") button:has-text("Accept")', { timeout: 8000 });
+await vendor.click('.offer-card button:has-text("Accept")');
+await vendor.waitForSelector('.answer-line:has-text("You accepted")');
+await buyer.waitForSelector('.answer-line:has-text("accepted")', { timeout: 8000 });
+await buyer.waitForSelector('text=Got it? Mark the request as found');
+await shot(buyer, '13b-offer-accepted');
 
 // Ratings: buyer marks the request fulfilled, picking this seller -> both rate
 await buyer.goto(listingUrl);

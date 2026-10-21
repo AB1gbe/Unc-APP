@@ -331,3 +331,12 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 @keyframes toast-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 59; }
 @media (prefers-reduced-motion: reduce) { .sk-line, .sk-photo, .toast { animation: none; } }
+
+/* ===== Offer cards, answers, quick replies (session 20) ===== */
+.offer-card { display: grid; gap: .4rem; justify-items: start; margin-bottom: .3rem; }
+.offer-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.bubble.mine .offer-card .badge { background: rgba(255,255,255,.2); color: #fff; }
+.answer-line { align-self: center; text-align: center; font-size: .85rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: .35rem .9rem; max-width: 90%; }
+.answer-line.ok { color: #0a7a3d; border-color: #bfe7cf; background: #effaf3; }
+.quick-replies { display: flex; gap: .4rem; overflow-x: auto; padding: .5rem .75rem 0; scrollbar-width: none; }
+.quick-replies .chip { white-space: nowrap; flex-shrink: 0; }

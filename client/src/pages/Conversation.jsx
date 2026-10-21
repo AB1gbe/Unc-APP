@@ -25,6 +25,7 @@ export default function Conversation() {
   const lastId = useRef(0);
   const currentId = useRef(id);
   const bodyRef = useRef(null);
+  const textRef = useRef(null);
 
   const load = useCallback(async () => {
     try {
@@ -89,6 +90,10 @@ export default function Conversation() {
 
   if (!conv) return pollError ? <ErrorBox error={pollError} /> : <Loading />;
   const l = conv.listing;
+  // Offer cards: only the newest price can be answered, and only once.
+  const newestPriceId = Math.max(0, ...messages.filter((m) => m.offerPrice !== null).map((m) => m.id));
+  const answers = new Map(messages.filter((m) => m.kind).map((m) => [m.replyTo, m.kind]));
+  const priceOf = (id) => { const m = messages.find((x) => x.id === id); return m ? money(m.offerPrice, l.currency) : ''; };
 
   return (
     <div className="narrow" style={{ maxWidth: 760 }}>
@@ -110,9 +115,13 @@ export default function Conversation() {
         </div>
         {conv.deal && <DealBanner conv={conv} onRated={load} />}
         <div className="chat-body" ref={bodyRef}>
-          {messages.map((m) => (
+          {messages.map((m) => m.kind ? (
+            <AnswerLine key={m.id} m={m} conv={conv} price={priceOf(m.replyTo)} />
+          ) : (
             <div key={m.id} className={`bubble ${m.mine ? 'mine' : ''}`}>
-              {m.offerPrice !== null && <div className="offer">💰 {t('Offer: {price}', { price: money(m.offerPrice, l.currency) })}</div>}
+              {m.offerPrice !== null && (
+                <OfferCard m={m} conv={conv} answer={answers.get(m.id)} newest={m.id === newestPriceId} onDone={load} />
+              )}
               {m.imageUrl && (
                 <button type="button" className="bubble-photo" onClick={() => setViewing(m.imageUrl)} aria-label={t('Open photo')}>
                   <img src={m.imageUrl} alt="" loading="lazy" />
@@ -131,13 +140,16 @@ export default function Conversation() {
         ) : (
           <>
           {photo && <PhotoPreview file={photo} onRemove={() => setPhoto(null)} />}
+          {!text && (
+            <QuickReplies role={conv.myRole} onPick={(phrase) => { setText(phrase); textRef.current?.focus(); }} />
+          )}
           <form className="chat-form" onSubmit={send}>
             <label className="attach" title={t('Add a photo')} aria-label={t('Add a photo')}>
               📷
               <input type="file" accept="image/jpeg,image/png,image/webp" hidden
                 onChange={async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(await shrinkImage(f)); }} />
             </label>
-            <textarea placeholder={t('Message about “{title}”…', { title: l.title })} value={text} maxLength={2000}
+            <textarea ref={textRef} placeholder={t('Message about “{title}”…', { title: l.title })} value={text} maxLength={2000}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) send(e); }} />
             {conv.myRole === 'vendor' && (
@@ -221,3 +233,86 @@ function PhotoPreview({ file, onRemove }) {
     </div>
   );
 }
+
+// A price in the chat, as a card. The other side's newest price gets
+// Accept / Counter / Not for me (session 20).
+function OfferCard({ m, conv, answer, newest, onDone }) {
+  const l = conv.listing;
+  const [countering, setCountering] = useState(false);
+  const [counter, setCounter] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const fromSeller = m.mine ? conv.myRole === 'vendor' : conv.myRole === 'buyer';
+  const price = money(m.offerPrice, l.currency);
+  const canAnswer = !m.mine && newest && !answer && !conv.readOnly;
+
+  const run = (fn) => async (e) => {
+    e?.preventDefault();
+    setBusy(true);
+    setError(null);
+    try { await fn(); await onDone(); } catch (err) { setError(err); } finally { setBusy(false); }
+  };
+  const respond = (action) => run(async () => {
+    await api(`/conversations/${conv.id}/messages/${m.id}/respond`, { method: 'POST', body: { action } });
+    if (action === 'accept') celebrate({ text: t('Agreed at {price}! 🤝', { price }), confetti: true });
+  });
+  const sendCounter = run(async () => {
+    await api(`/conversations/${conv.id}/messages`, { method: 'POST', body: { offerPrice: counter } });
+    setCountering(false);
+    setCounter('');
+  });
+
+  return (
+    <div className="offer-card">
+      <div className="offer">{fromSeller ? '💰' : '↩️'} {fromSeller ? t('Offer: {price}', { price }) : t('Counter-offer: {price}', { price })}</div>
+      {answer === 'accept' && <span className="badge ok">{t('✓ Accepted')}</span>}
+      {answer === 'decline' && <span className="badge grey">{t('Declined')}</span>}
+      {!answer && !newest && <span className="small muted">{t('Replaced by a newer price')}</span>}
+      <ErrorBox error={error} />
+      {canAnswer && !countering && (
+        <div className="offer-actions">
+          <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>
+          <button type="button" className="btn sm secondary" disabled={busy} onClick={() => setCountering(true)}>{t('Counter')}</button>
+          <button type="button" className="btn sm secondary" disabled={busy} onClick={respond('decline')}>{t('Not for me')}</button>
+        </div>
+      )}
+      {canAnswer && countering && (
+        <form className="offer-actions" onSubmit={sendCounter}>
+          <input type="number" min="0" required autoFocus value={counter} onChange={(e) => setCounter(e.target.value)}
+            placeholder={t('Your price')} aria-label={t('Your price')} style={{ width: 110 }} />
+          <button className="btn sm" disabled={busy || counter === ''}>{t('Send')}</button>
+          <button type="button" className="btn sm secondary" onClick={() => setCountering(false)}>{t('Cancel')}</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+// "Riverside accepted $380 🤝" in the middle of the chat.
+function AnswerLine({ m, conv, price }) {
+  const name = <bdi>{conv.other.displayName}</bdi>;
+  const accepted = m.kind === 'accept';
+  return (
+    <div className={`answer-line ${accepted ? 'ok' : ''}`} role="note">
+      {accepted
+        ? (m.mine ? t('You accepted {price} 🤝', { price }) : tj('{name} accepted {price} 🤝', { name, price }))
+        : (m.mine ? t('You said no to {price}', { price }) : tj('{name} said no to {price}', { name, price }))}
+      {accepted && conv.myRole === 'buyer' && !conv.readOnly && (
+        <> · <Link to={`/requests/${conv.listing.id}`}>{t('Got it? Mark the request as found')} <span className="flip">→</span></Link></>
+      )}
+    </div>
+  );
+}
+
+// One-tap starters above the message box; they fill the box so you can edit.
+function QuickReplies({ role, onPick }) {
+  const phrases = role === 'buyer'
+    ? [t('Is it still available?'), t('Can you send more photos?'), t('Where can we meet?'), t('Is the price negotiable?')]
+    : [t("Yes, it's still available."), t('I can send more photos.'), t('Where would you like to meet?'), t('I can deliver it.')];
+  return (
+    <div className="quick-replies" aria-label={t('Quick replies')}>
+      {phrases.map((p) => <button key={p} type="button" className="chip" onClick={() => onPick(p)}>{p}</button>)}
+    </div>
+  );
+}
+

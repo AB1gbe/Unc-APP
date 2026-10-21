@@ -100,6 +100,8 @@ export function conversationRoutes(db) {
       createdAt: c.created_at,
       lastMessageAt: c.last_message_at,
       lastMessage: c.last_body ?? undefined,
+      lastKind: c.last_kind ?? undefined,
+      lastPrice: c.last_price ?? undefined,
       unread: c.unread ?? undefined,
     };
   }
@@ -114,9 +116,9 @@ export function conversationRoutes(db) {
     return c;
   }
 
-  function insertMessage(convId, senderId, body, offerPrice, image = null) {
-    db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, image) VALUES (?, ?, ?, ?, ?)')
-      .run(convId, senderId, body, offerPrice, image);
+  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null) {
+    db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .run(convId, senderId, body, offerPrice, image, kind, replyTo);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
@@ -126,6 +128,7 @@ export function conversationRoutes(db) {
   const messageView = (m, convId, meId) => ({
     id: m.id, mine: m.sender_id === meId, body: m.body, offerPrice: m.offer_price,
     imageUrl: m.image ? `/api/conversations/${convId}/images/${m.image}` : null,
+    kind: m.kind ?? null, replyTo: m.reply_to ?? null,
     createdAt: m.created_at, readAt: m.read_at,
   });
 
@@ -185,6 +188,8 @@ export function conversationRoutes(db) {
              b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
              vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
              (SELECT body FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_body,
+             (SELECT kind FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_kind,
+             (SELECT offer_price FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_price,
              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id <> ? AND m.read_at IS NULL) AS unread
       FROM conversations c
       JOIN listings l ON l.id = c.listing_id
@@ -216,7 +221,7 @@ export function conversationRoutes(db) {
     const c = participantConv(req);
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
-      SELECT id, sender_id, body, offer_price, image, created_at, read_at FROM messages
+      SELECT id, sender_id, body, offer_price, image, kind, reply_to, created_at, read_at FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
     // Opening the conversation marks the other side's messages as read.
@@ -238,10 +243,10 @@ export function conversationRoutes(db) {
     }
     const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
     if (otherBanned) throw new HttpError(409, 'This member\'s account has been suspended, so you can\'t message them.');
-    // Text is optional when a photo is attached.
-    const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(req.file) }) ?? '';
-    // Only the vendor can attach a price offer.
-    const offerPrice = c.vendor_id === req.user.id ? v.int(req.body, 'offerPrice', { optional: true }) : null;
+    // Either side can put a price on a message: the seller's offer, or the
+    // buyer's counter-offer (session 20). Text is optional with a photo or a price.
+    const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
+    const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(req.file) || offerPrice != null }) ?? '';
     const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
     try {
       insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
@@ -250,6 +255,28 @@ export function conversationRoutes(db) {
       throw err;
     }
     const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
+    res.status(201).json({ message: messageView(m, c.id, req.user.id) });
+  });
+
+  // Answer the other side's price with one tap: accept or decline
+  // (session 20). Only the newest price in the chat can be answered, once;
+  // a counter-offer is just a new message with a price.
+  r.post('/conversations/:id/messages/:messageId/respond', requireVerified, (req, res) => {
+    const c = participantConv(req);
+    if (c.listing_status !== 'open') throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
+    const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
+    if (otherBanned) throw new HttpError(409, 'This member\'s account has been suspended, so you can\'t message them.');
+    const action = v.oneOf(req.body, 'action', ['accept', 'decline']);
+    const target = db.prepare('SELECT * FROM messages WHERE id = ? AND conversation_id = ?').get(Number(req.params.messageId), c.id);
+    if (!target) throw notFound('Message not found.');
+    if (target.offer_price == null) throw new HttpError(400, 'That message has no price to answer.');
+    if (target.sender_id === req.user.id) throw new HttpError(400, "You can't answer your own price.");
+    const newest = db.prepare('SELECT MAX(id) AS id FROM messages WHERE conversation_id = ? AND offer_price IS NOT NULL').get(c.id).id;
+    if (newest !== target.id) throw new HttpError(409, 'A newer price has been offered since. Answer that one instead.');
+    if (db.prepare('SELECT 1 FROM messages WHERE reply_to = ?').get(target.id)) throw new HttpError(409, 'This price has already been answered.');
+    insertMessage(c.id, req.user.id, '', null, null, action, target.id);
+    const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
+    audit(db, req.user.id, `offer.${action}`, `conversation:${c.id}`, { messageId: target.id, price: target.offer_price });
     res.status(201).json({ message: messageView(m, c.id, req.user.id) });
   });
 
