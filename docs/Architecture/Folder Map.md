@@ -26,7 +26,7 @@ Unc-APP/
 │   │   │   ├── crypto.js       scrypt passwords, tokens, sha256, peppered HMAC, 6-digit codes
 │   │   │   ├── http.js         HttpError + JSON error handler
 │   │   │   ├── validate.js     Input validators (str, int, email, isoDate, password, ageOn…)
-│   │   │   ├── uploads.js      Multer in-memory uploads, magic-byte sniffing, saveFile()
+│   │   │   ├── uploads.js      Multer in-memory uploads, magic-byte sniffing, saveFiles() (all-or-nothing)
 │   │   │   ├── mailer.js       sendMail()/trySendMail(): console | memory | smtp (nodemailer) | resend
 │   │   │   ├── emails.js       Text + HTML of every email (code, reset link, password changed)
 │   │   │   └── categories.js   CATEGORIES + CURRENCIES lists
@@ -45,7 +45,9 @@ Unc-APP/
 │       ├── kyc.test.js
 │       ├── messaging.test.js
 │       ├── password.test.js
-│       └── mail-transports.test.js
+│       ├── mail-transports.test.js
+│       ├── performance.test.js     (session 05)
+│       └── review-fixes.test.js    (session 05: one test per bug M24–M35)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into
@@ -55,7 +57,7 @@ Unc-APP/
         ├── App.jsx         All page routes + guards
         ├── api.js          api() fetch wrapper, money/budget/date helpers
         ├── auth.jsx        AuthProvider, useAuth(), isVerified()
-        ├── hooks.js        useApi(path), useMeta()
+        ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
         ├── styles.css      The whole design system
         ├── components/
         │   ├── Layout.jsx  Top bar + unread badge + page outlet

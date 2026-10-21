@@ -36,8 +36,8 @@ A 3-step progress bar (*Account → Email → Identity*) shows where you are (`S
 2. All fields valid; age ≥ 18 (`ageOn()` in `validate.js`).
 3. Required files present for the chosen ID type / account type.
 4. ID number normalised (spaces/dashes removed, upper-case) → HMAC with `SECRET_PEPPER` of `COUNTRY|type|NUMBER` → if another account has a pending/approved submission with the same hash → **409 "already linked to another account"**.
-5. Each file's **magic bytes** must be JPG/PNG/WEBP (PDF allowed only for business doc). Saved with a random name to `uploads/kyc/`.
-6. In one transaction: insert submission, set `users.kyc_status = 'pending'`, write `audit_log`.
+5. **All** files' magic bytes are checked (JPG/PNG/WEBP; PDF only for the business doc) before **any** is saved; then saved with random names to `uploads/kyc/`, and deleted again if the next step fails.
+6. In one transaction: atomically switch `users.kyc_status` to `pending` **only if** it is `unverified`/`rejected` (else 409 — stops parallel uploads), insert submission, write `audit_log`. An admin decision only changes the user's status when it is about their **newest** submission.
 7. Call the provider's `start()`. Manual provider returns `pending`.
 
 ## What the admin does (Admin → Review)

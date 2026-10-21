@@ -17,5 +17,7 @@ date: 2026-10-21
 - Open conversation polls `GET /api/conversations/:id?after=<lastMessageId>` every **4 s** — only new messages come back, so it's cheap.
 - Header unread badge polls every **15 s**, plus instantly on page change and when a conversation is opened (custom browser event `unc:read`).
 
+**Session 05:** polling now pauses while the browser tab is hidden (`usePolling` in `client/src/hooks.js`), and a chat poll only writes to the database when there is something to mark read. See [[ADR-013 Performance]].
+
 ## Revisit when
 Hundreds of simultaneous chats → switch the conversation page to Server-Sent Events. The `after=` API already fits a push model.

@@ -13,6 +13,7 @@ The app is **one Node process**: the API also serves the built React site. So an
 - [ ] `DATA_DIR` on a **persistent volume**, with backups
 - [ ] `MAIL_TRANSPORT=smtp` or `resend` + `MAIL_FROM` on a domain with SPF/DKIM set up → [[Email Sending]]
 - [ ] `APP_URL=https://yourdomain.com` (otherwise reset links point to localhost)
+- [ ] `TRUST_PROXY=1` on Render/Railway/Fly (otherwise all visitors share one rate limit — [[Mistakes and Fixes#M24 – M35: bugs found by the code review (session 05)|Mistakes and Fixes M24–M35]])
 - [ ] Decide on KYC: keep manual review, or plug in a provider → [[KYC Verification]]
 - [ ] Privacy policy + terms (KYC data is sensitive personal data; GDPR/CCPA apply)
 

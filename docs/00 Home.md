@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 02)
+updated: 2026-10-21 (session 05)
 ---
 # Unc — Project Vault
 
@@ -35,6 +35,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 12 - End-to-end check]]
 - [[Step 13 - Real email sending]]
 - [[Step 14 - Password reset]]
+- [[Step 15 - Performance and hardening]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -53,7 +54,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 02)
+## Status (2026-10-21, after session 05)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -63,6 +64,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Admin: KYC queue, reports, bans | ✅ done |
 | Password reset + change password | ✅ done |
 | Real email (SMTP or Resend) | ✅ done — needs your provider details in `.env` |
-| API tests | ✅ 32 passing |
+| Performance (indexes, gzip, caching, lazy pages) | ✅ done — see [[ADR-013 Performance]] |
+| Code review: 15 bugs | ✅ all fixed, each with a test |
+| API tests | ✅ 51 passing |
 | Browser end-to-end test | ✅ passing |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

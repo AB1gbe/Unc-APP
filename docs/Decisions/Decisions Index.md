@@ -19,5 +19,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 010 | [[ADR-010 Testing]] | node:test + supertest; Playwright smoke | Jest, Vitest, Cypress, manual only |
 | 011 | [[ADR-011 Email delivery]] | SMTP via nodemailer + Resend API option | Provider SDKs, self-hosted mail, SMTP, HTTP API |
 | 012 | [[ADR-012 Password reset design]] | Single-use emailed link, 30 min | 6-digit code, security questions, SMS, admin reset |
+| 013 | [[ADR-013 Performance]] | Measure; indexes + query rewrite, gzip, long caching, lazy pages, pause hidden polling | in-memory caches, counter columns, Brotli, preact, FTS |
+| 014 | [[ADR-014 Rate limiting]] | Per-action limiters + `TRUST_PROXY` | shared limiter, per-email limits, hosted bot protection |
 
 Template for new ADRs: copy any ADR and keep the same headings.

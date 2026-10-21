@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 02)
+updated: 2026-10-21 (session 05)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 16 entries — 5 tooling/setup, 6 app bugs caught before release, 3 dev-environment gotchas, 1 documentation gap found by the owner, 1 false alarm. All fixed.
+**Totals so far:** 35 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -26,6 +26,25 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M14 | Docs | Owner's first run on Windows failed: `ENOENT … package.json` | [[2026-10-21 Session 02]] |
 | M15 | Dev env | Test SMTP catcher imported a package by a guessed internal path | 02 |
 | M16 | False alarm | Garbled "â" in the reset email screenshot | 02 |
+| M17 | Dev env | `pkill -f "PORT=4300"` killed its own shell (3rd time) | [[2026-10-21 Session 05]] |
+| M18 | Dev env | Benchmark script assumed user 1 had conversations | 05 |
+| M19 | Performance | Unread counter read every message on every poll (25 ms) | 05 |
+| M20 | Performance | App JS sent uncompressed and never cached | 05 |
+| M21 | Self-review | Loading fallback would have hidden the header | 05 |
+| M22 | Self-review | Clearing poll errors would also have hidden send errors | 05 |
+| M23 | Test | Parallel-upload test didn't reproduce the race at first | 05 |
+| M24 | Review bug | Rate limit shared by all users behind a proxy | 05 |
+| M25 | Review bug | Parallel KYC uploads → several pending submissions | 05 |
+| M26 | Review bug | Banned buyer's requests/chats still usable | 05 |
+| M27 | Review bug | Bad photo left a half-created listing | 05 |
+| M28 | Review bug | Upload/JSON mistakes returned 500 | 05 |
+| M29 | Review bug | Enter pressed twice sent a message twice | 05 |
+| M30 | Review bug | Simultaneous sign-ups with one email → 500 | 05 |
+| M31 | Review bug | Reset link usable twice if clicked at the same moment | 05 |
+| M32 | Review bug | `banned: "false"` banned the user | 05 |
+| M33 | Review bug | Orphaned ID photos after a failed KYC upload | 05 |
+| M34 | Review bug | Huge page number → 500; impossible dates accepted; blank Verification page on error | 05 |
+| M35 | Review bug | Vendor couldn't open a closed request they had talked about; one failed poll left a permanent error | 05 |
 
 ---
 
@@ -158,3 +177,60 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 - **Cause:** my quick test decoder turned each UTF-8 *byte* of "—" into a separate character. Real email apps decode it correctly — the email itself was fine.
 - **Action anyway:** replaced the raw "—" in the HTML email with the entity `&mdash;`, which survives any charset handling.
 - **Lesson:** when something looks broken, check whether the *viewer* is broken before changing the product — but if a cheap change makes it robust either way, do it.
+
+## M17
+**`pkill -f "PORT=4300"` killed its own shell (exit 144) — third time**
+- **Cause:** same as [[Mistakes and Fixes#M12]]/[[Mistakes and Fixes#M13]]: the pattern text was in the shell's own command line, and I ran two `pkill`s in one command so the first killed the shell before the second ran.
+- **Fix:** run only the self-safe pattern, alone: `pkill -f "node --disable-warning=ExperimentalWarning src/index[.]js"`.
+- **Lesson:** written as a rule now — *one stop command per shell call, always with a `[.]` style pattern*. For you on Windows: just press Ctrl + C.
+
+## M18
+**Benchmark crashed: `Cannot read properties of undefined (reading 'id')`**
+- **Cause:** the throw-away benchmark assumed user #1 had conversations; with the generated data they didn't.
+- **Fix:** pick the busiest user from the data (`GROUP BY … ORDER BY COUNT(*) DESC LIMIT 1`).
+- **Lesson:** benchmarks/tests should ask the data, not assume it.
+
+## M19
+**The unread-message counter read all 200,000 messages on every call (25 ms)**
+- **Found by:** measuring with 5,000 users / 30,000 requests / 20,000 conversations / 200,000 messages.
+- **Why it mattered:** every logged-in browser calls it every 15 s — it is the most frequent query in the app.
+- **Cause:** `WHERE (c.buyer_id = ? OR c.vendor_id = ?)` with **no index** on `buyer_id`/`vendor_id`. SQLite can't use indexes well across an `OR`, so it scanned everything. Inbox and "My requests" had the same missing-index problem.
+- **Fix:** migration 3 (indexes) + rewriting the `OR` as `IN (… WHERE buyer_id = ? UNION ALL … WHERE vendor_id = ?)`, plus a *partial* index containing only unread messages. **25 ms → 1 ms.** Details: [[ADR-013 Performance]].
+- **Lesson:** add an index for every column you filter or join on, and check with `EXPLAIN QUERY PLAN` — `SCAN` on a big table is the warning sign.
+
+## M20
+**316 KB of JavaScript sent uncompressed, with `Cache-Control: max-age=0`**
+- **Cause:** no compression middleware; default static-file settings.
+- **Fix:** `compression` package; build files (which have a hash in their name) cached for a year; `index.html` set to `no-cache`; pages split so most code loads only when needed. First visit 316 KB → **71 KB** transferred; repeat visits download nothing.
+
+## M21
+**Self-review: the page-loading fallback would have hidden the header**
+- I first wrapped all routes in `<Suspense>`; while a page file downloads, everything inside — including the top bar — is replaced by "Loading…". Moved `<Suspense>` inside `Layout.jsx` around `<Outlet/>` only.
+
+## M22
+**Self-review: auto-clearing chat errors would have hidden send errors**
+- To fix "one failed poll leaves a permanent error" I first cleared `error` on every successful poll — that would also erase "this request is closed" 4 s after you tried to send. Split into `error` (sending) and `pollError` (loading).
+
+## M23
+**The parallel-KYC test passed even on the old, buggy code**
+- **Cause:** with tiny test images each upload finished before the next started, so the race never happened.
+- **Fix:** 3 MB test images, so the three uploads really overlap. Verified: test **fails** on the old code, **passes** on the new.
+- **Lesson:** for every bug fix, run the new test against the old code (`git stash push -- server/src`, run, `git stash pop`). A test that can't fail proves nothing.
+
+## M24 – M35: bugs found by the code review (session 05)
+An independent review read every file and reproduced each problem. All fixed; each has a test in `server/test/review-fixes.test.js` that fails on the old code (12 of 13 confirmed directly; M25 after [[Mistakes and Fixes#M23]]).
+
+| # | Symptom | Cause | Fix (file) |
+|---|---|---|---|
+| M24 | On a host like Render, all visitors would share one 20-attempt limit → everyone locked out | No `trust proxy`, so every request seemed to come from the proxy's IP; one limiter shared by all auth actions | `TRUST_PROXY` setting (`config.js`, `app.js`); separate limit per action (`routes/auth.js`) → [[ADR-014 Rate limiting]] |
+| M25 | Uploading KYC from two tabs created 2–3 pending submissions; deciding a stale one overrode an approval | "Already pending?" check used user data read *before* the slow upload finished | Atomic `UPDATE … WHERE kyc_status IN ('unverified','rejected')` inside the transaction; `applyDecision` only changes the user's status for their **newest** submission (`routes/kyc.js`, `kyc/index.js`) |
+| M26 | After banning a buyer, their request still opened by link and vendors could start/continue chats | Ban only checked the logged-in user | Banned buyer's requests → 404 (admins excepted); contact → 404; messages to a suspended member → 409 (`routes/listings.js`, `routes/conversations.js`) |
+| M27 | Good photo + bad photo → error shown, but the listing was created anyway (retry = duplicate) | Rows inserted before all photos were checked, no transaction | `saveFiles()` checks all files first; listing + photos in one `tx()`; files deleted on failure (`lib/uploads.js`, `routes/listings.js`) |
+| M28 | 4 photos, unknown file field, broken JSON → "Something went wrong on our side" (500) | Error handler only knew "file too large" | Map all upload errors to 400/413 and body-parser errors to 400 (`lib/http.js`) |
+| M29 | Pressing Enter twice quickly sent the message twice | Button disabled while sending, keyboard shortcut not | `if (sending) return` (`Conversation.jsx`) |
+| M30 | Two sign-ups with the same email at the same moment → 500 | Check-then-insert race | Catch the UNIQUE error → 409 (`routes/auth.js`) |
+| M31 | A reset link clicked twice at once worked twice | Check and use were separate steps with a slow hash in between | Atomic "claim" `UPDATE … WHERE used_at IS NULL` inside the transaction; also re-checks ban (`routes/auth.js`) |
+| M32 | Unban sent as text `"false"` banned the user | `Boolean("false")` is `true` in JavaScript | Accept only real `true`/`false`, else 400 (`routes/admin.js`) |
+| M33 | Valid ID front + invalid selfie → 400, but the ID photo stayed on disk with no record | Files written one by one before validation finished | `saveFiles()` validates all first; deletes on failure (`routes/kyc.js`) |
+| M34 | `?page=999999999999999999999` → 500; `2026-02-31` accepted (shown as 3 March); Verification page went blank if loading failed | No upper bound; `Date.parse` rolls impossible dates over; error state not rendered | Page capped at 10,000; date round-trip check (`lib/validate.js`); error + "Try again" (`Verification.jsx`) |
+| M35 | Vendor's "About: request" link → "no longer open" after the buyer closed it; one network blip left a red error forever | Closed requests visible to owner/admin only; poll error never cleared | Vendors with a conversation may view it; poll errors clear on next success (`routes/listings.js`, `Conversation.jsx`) |

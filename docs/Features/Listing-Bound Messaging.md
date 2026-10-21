@@ -17,6 +17,9 @@ tags: [feature, messaging]
 | Closed/fulfilled request = read-only | Check on send; UI hides the input |
 | Outsiders can't read | Participant check, returns 404 |
 | Safety | Report button on request + conversation pages; admin reads only reported threads |
+| Suspended members | No new offers on a banned buyer's request (404); no messages to a suspended member (409) |
+| Closed request still viewable by its vendors | So the chat's "About" link keeps working |
+| Polling | Every 4 s, paused while the tab is hidden ([[ADR-013 Performance]]) |
 
 ## The flow on screen
 | | |

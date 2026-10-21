@@ -3,7 +3,7 @@ tags: [architecture, api]
 ---
 # API Reference
 
-All JSON. Errors: `{ "error": "message", "field"?: "...", "code"?: "..." }`. Auth = session cookie.
+All JSON (gzip-compressed when larger than 1 KB). Upload mistakes → 400/413, unreadable JSON → 400. Errors: `{ "error": "message", "field"?: "...", "code"?: "..." }`. Auth = session cookie.
 Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **ADM** admin.
 
 ## Meta
@@ -39,9 +39,9 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 ## Requests — `server/src/routes/listings.js`
 | Method | Path | Gate | Notes |
 |---|---|---|---|
-| GET | `/api/listings?q=&category=&city=&page=` | — | open only, 20/page, `{listings, page, hasMore}` |
+| GET | `/api/listings?q=&category=&city=&page=` | — | open only, 20/page (page capped at 10,000), `{listings, page, hasMore}` |
 | GET | `/api/listings/mine` | A | all statuses |
-| GET | `/api/listings/:id` | — | non-open visible to owner/admin only; adds `myConversationId` for vendors |
+| GET | `/api/listings/:id` | — | non-open visible to owner, vendors with a conversation on it, admins; banned buyer's → 404 (except admins); adds `myConversationId` for vendors |
 | POST | `/api/listings` | V | multipart: `title, description, category, budgetMin?, budgetMax?, currency?, city, neededBy?` + up to 3 `images` |
 | PATCH | `/api/listings/:id` | V owner | JSON, open only |
 | POST | `/api/listings/:id/status` | A owner | `status: open/fulfilled/closed` |
@@ -54,7 +54,7 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 | GET | `/api/conversations/unread-count` | A | `{unread}` |
 | GET | `/api/listings/:id/conversations` | A owner | offers on my request |
 | GET | `/api/conversations/:id?after=<msgId>` | A participant | messages (only newer than `after`); marks other side's as read. Outsiders → 404 |
-| POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` (vendor only). 409 if request not open |
+| POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` (vendor only). 409 if request not open or the other member is suspended |
 | POST | `/api/reports` | A | `reason, listingId? / conversationId?` |
 
 ## Admin — `server/src/routes/admin.js` (all ADM)
@@ -68,4 +68,4 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 | GET | `/api/admin/reports` | open reports |
 | GET | `/api/admin/reports/:id/conversation` | read reported conversation, logged |
 | POST | `/api/admin/reports/:id/resolve` | |
-| POST | `/api/admin/users/:id/ban` | `banned: true/false`; ban kills sessions |
+| POST | `/api/admin/users/:id/ban` | `banned: true/false` (real boolean, else 400); ban kills sessions |

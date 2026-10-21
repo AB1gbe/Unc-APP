@@ -3,7 +3,7 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS` (0: initial schema, 1: `password_resets`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05). `PRAGMA user_version` = 3 on an up-to-date database. Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
@@ -30,6 +30,19 @@ users ─┬─< sessions
 | `messages` | conversation_id, sender_id, body, offer_price, read_at | |
 | `reports` | reporter_id, listing_id?, conversation_id?, reason, status | |
 | `audit_log` | actor_id, action, target, meta (JSON) | KYC decisions, file views, bans, etc. |
+
+## Indexes added in session 05 (migration 3)
+| Index | Speeds up |
+|---|---|
+| `idx_conversations_buyer (buyer_id, last_message_at)` / `idx_conversations_vendor (vendor_id, last_message_at)` | inbox, unread counter |
+| `idx_messages_unread (conversation_id, sender_id) WHERE read_at IS NULL` | unread counter, marking read (partial: only unread rows) |
+| `idx_listings_buyer (buyer_id, created_at)` | My requests |
+| `idx_listing_images (listing_id)` | photos per request |
+| `idx_sessions_user (user_id)` | log out everywhere / bans |
+Why: [[ADR-013 Performance]].
+
+## Housekeeping
+`cleanupExpired(db)` deletes expired sessions, expired email codes and expired/used reset links at start-up and every hour.
 
 ## How migrations work
 - `PRAGMA user_version` stores how many migrations have run.

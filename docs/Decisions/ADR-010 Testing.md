@@ -21,6 +21,9 @@ date: 2026-10-21
 - `mail-transports.test.js` (3 tests, session 02): real SMTP delivery to a local SMTP server, failure reporting, Resend API call.
 - `e2e/smoke.mjs`: full browser journey with two users and an admin.
 
-Total: **32 tests**.
+- `performance.test.js` (6 tests, session 05): see [[ADR-013 Performance]].
+- `review-fixes.test.js` (13 tests, session 05): one per bug in [[Mistakes and Fixes]] M24–M35; each verified to fail on the old code.
+
+Total: **51 tests**.
 
 Run: `npm test` (API) · `npm run e2e` (browser, see [[Step 12 - End-to-end check]]).
