@@ -38,7 +38,8 @@ tags: [roadmap]
 ## Making it feel social and human (ideas, session 19)
 - [x] The recommended first five, built in session 20 → [[Social Touches]].
 - [x] Shop pages (session 24) → [[Shop Pages]].
-- [ ] More from [[Social Marketplace Ideas]]: "Happening near you" feed, reactions, typing indicator, favourite sellers, city pages, "Me too".
+- [x] "Happening near you" feed (session 26) → [[Social Touches#6. "Happening near you" (session 26)]].
+- [ ] More from [[Social Marketplace Ideas]]: reactions, typing indicator, favourite sellers, city pages, "Me too".
 - [x] "Hide when I'm online" switch (session 22) → [[ADR-029 Hide my activity]].
 
 ## Scale-up (only when needed)
