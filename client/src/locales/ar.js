@@ -411,4 +411,8 @@ export default {
   'Members with a photo and a few words get more replies. It takes a minute, and you can change it any time.': 'الأعضاء الذين لديهم صورة ونبذة قصيرة يحصلون على ردود أكثر. يستغرق ذلك دقيقة، ويمكنك تغييره في أي وقت.',
   'Save and continue': 'حفظ ومتابعة',
   'Skip for now': 'تخطَّ الآن',
+  // ---- Phones: bottom tab bar (session 13) ----
+  Main: 'التنقل الرئيسي',
+  Post: 'أضف',
+  'Signed in as {email}': 'مسجّل الدخول باسم {email}',
 };

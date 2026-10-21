@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api, toDate } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { Avatar, ErrorBox, KycBadge } from '../components/ui.jsx';
 import ProfileEditor from '../components/ProfileEditor.jsx';
-import { formatDate, t } from '../i18n.jsx';
+import { formatDate, t, tj } from '../i18n.jsx';
 
 export default function Account() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="narrow stack" style={{ maxWidth: 680 }}>
@@ -34,6 +35,10 @@ export default function Account() {
         <ProfileEditor />
       </div>
       <ChangePassword />
+      <div className="card row spread">
+        <span className="muted small">{tj('Signed in as {email}', { email: <span className="ltr">{user.email}</span> })}</span>
+        <button className="btn secondary" onClick={async () => { await logout(); navigate('/'); }}>{t('Log out')}</button>
+      </div>
     </div>
   );
 }

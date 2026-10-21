@@ -24,7 +24,8 @@
     "live": "concurrently -n api,web,sync -c blue,green,magenta \"npm:dev:server\" \"npm:dev:client\" \"npm:sync\"",
     "pull": "node scripts/git-helper.mjs pull",
     "push": "node scripts/git-helper.mjs push",
-    "e2e:ar": "node e2e/arabic.mjs"
+    "e2e:ar": "node e2e/arabic.mjs",
+    "e2e:devices": "node e2e/devices.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
