@@ -13,8 +13,10 @@ export const LISTING_DIR = () => path.join(config.uploadDir, 'listings'); // pub
 export const AVATAR_DIR = () => path.join(config.uploadDir, 'avatars');   // public (profile photos)
 export const CHAT_DIR = () => path.join(config.uploadDir, 'chat');        // PRIVATE (photos in conversations)
 export const STORY_DIR = () => path.join(config.uploadDir, 'stories');   // public ("Found it" story photos)
+export const COVER_DIR = () => path.join(config.uploadDir, 'covers');    // public (shop cover photos)
 
 export const avatarUrl = (file) => (file ? `/uploads/avatars/${file}` : null);
+export const coverUrl = (file) => (file ? `/uploads/covers/${file}` : null);
 
 const SIGNATURES = [
   { ext: '.jpg', mime: 'image/jpeg', bytes: [0xff, 0xd8, 0xff] },

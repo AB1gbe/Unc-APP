@@ -5,7 +5,7 @@
 //   requireAdmin     -> logged in + admin role
 import { sha256 } from '../lib/crypto.js';
 import { HttpError } from '../lib/http.js';
-import { avatarUrl } from '../lib/uploads.js';
+import { avatarUrl, coverUrl } from '../lib/uploads.js';
 
 export const SESSION_COOKIE = 'unc_session';
 
@@ -66,6 +66,14 @@ export const parseInterests = (json) => {
   }
 };
 
+// Shop page fields (business accounts only; session 24).
+export function shopFields(u) {
+  if (u.account_type !== 'business') return {};
+  let hours = null;
+  try { hours = u.shop_hours ? JSON.parse(u.shop_hours) : null; } catch { /* stored by readShopHours, so always valid */ }
+  return { coverUrl: coverUrl(u.cover), shopArea: u.shop_area, shopHours: hours };
+}
+
 export function publicMe(u) {
   if (!u) return null;
   return {
@@ -85,5 +93,6 @@ export function publicMe(u) {
     onboarded: Boolean(u.onboarded_at),
     emailOffers: u.email_offers !== 0,
     hideActivity: u.hide_activity === 1,
+    ...shopFields(u),
   };
 }

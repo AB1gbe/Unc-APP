@@ -8,6 +8,7 @@ import { useAuth } from '../auth.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
 import { StoryCard } from '../components/Stories.jsx';
+import ShopHours, { OpenNow } from '../components/ShopHours.jsx';
 
 export default function MemberProfile() {
   const { id } = useParams();
@@ -20,8 +21,9 @@ export default function MemberProfile() {
 
   return (
     <div className="narrow stack" style={{ maxWidth: 720 }}>
-      <div className="card">
-        <div className="row">
+      <div className={`card ${m.coverUrl ? 'has-cover' : ''}`}>
+        {m.coverUrl && <img className="shop-cover" src={m.coverUrl} alt="" />}
+        <div className="row profile-head">
           <Avatar name={m.displayName} src={m.avatarUrl} size={96} />
           <div style={{ flex: 1 }}>
             <h1 dir="auto" style={{ margin: 0 }}>{m.displayName}</h1>
@@ -32,10 +34,16 @@ export default function MemberProfile() {
               <span>{tn(m.deals, '{n} deal', '{n} deals')}</span>
             </div>
             <Badges badges={m.badges} />
-            {m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <bdi>{m.city}</bdi></div>}
+            {m.shopArea ? (
+              <div className="muted small" style={{ marginTop: '.3rem' }}>
+                📍 <bdi>{m.shopArea}</bdi> ·{' '}
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.shopArea)}`} target="_blank" rel="noreferrer">{t('Map')} ↗</a>
+              </div>
+            ) : m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <bdi>{m.city}</bdi></div>}
+            {m.shopHours && <div className="small" style={{ marginTop: '.3rem' }}><OpenNow hours={m.shopHours} /></div>}
             <div style={{ marginTop: '.3rem' }}><Activity activity={m.activity} /></div>
           </div>
-          <div className="center">
+          <div className="center profile-rating">
             {m.rating.count ? (
               <>
                 <div style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1 }}>{m.rating.average.toFixed(1)}</div>
@@ -60,6 +68,7 @@ export default function MemberProfile() {
           )}
         </div>
       )}
+      {m.shopHours && <ShopHours hours={m.shopHours} />}
       {openRequests.length > 0 && (
         <div>
           <h2>{t('Looking for right now')}</h2>

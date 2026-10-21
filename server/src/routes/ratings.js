@@ -4,7 +4,7 @@ import { Router } from 'express';
 import { audit } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
-import { parseInterests, requireAuth } from '../middleware/auth.js';
+import { parseInterests, requireAuth, shopFields } from '../middleware/auth.js';
 import { avatarUrl } from '../lib/uploads.js';
 import { RATE_WINDOW_DAYS, VISIBLE, canStillRate, ratingQueries } from '../lib/ratings.js';
 import { notify } from '../lib/notify.js';
@@ -82,6 +82,7 @@ export function ratingRoutes(db) {
         rating: ratings.summaryFor(m.id),
         activity: req.user ? activity.summaryFor(m.id) : undefined,
         badges: badgesFor(m.id),
+        ...shopFields(m),
       },
       stories: storiesAbout(db, m.id),
       openRequests,

@@ -28,10 +28,11 @@ const state = await login.context().storageState();
 const ids = await login.evaluate(async () => {
   const mine = await (await fetch('/api/listings/mine')).json();
   const convs = await (await fetch('/api/conversations')).json();
-  return { listing: mine.listings[0]?.id, conv: convs.conversations[0]?.id };
+  return { listing: mine.listings[0]?.id, conv: convs.conversations[0]?.id, shop: convs.conversations[0]?.other.id };
 });
 if (ids.listing) PAGES.push(`/requests/${ids.listing}`);
 if (ids.conv) PAGES.push(`/messages/${ids.conv}`);
+if (ids.shop) PAGES.push(`/members/${ids.shop}`); // the demo shop's page (cover, hours)
 
 for (const lang of ['en', 'ar']) {
   for (const [width, height, name, touch] of SIZES) {
