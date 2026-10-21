@@ -7,6 +7,7 @@ import { LISTING_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
+import { ratingQueries } from '../lib/ratings.js';
 
 export function listingView(row, images = []) {
   return {
@@ -39,6 +40,18 @@ export function listingRoutes(db) {
   const upload = memoryUpload(3);
   const imagesFor = db.prepare('SELECT file FROM listing_images WHERE listing_id = ? ORDER BY id');
   const withImages = (row) => listingView(row, imagesFor.all(row.id).map((i) => i.file));
+  const ratings = ratingQueries(db);
+
+  // The full single-request view: adds the buyer's rating and, for the
+  // owner, which conversation the deal was made in.
+  function detailView(id, me) {
+    const listing = withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id));
+    listing.buyer.rating = ratings.summaryFor(listing.buyer.id);
+    if (me?.id === listing.buyer.id) {
+      listing.dealConversationId = db.prepare('SELECT conversation_id FROM deals WHERE listing_id = ?').get(id)?.conversation_id ?? null;
+    }
+    return listing;
+  }
 
   // Public browse + search. Only open requests are shown.
   r.get('/', (req, res) => {
@@ -86,7 +99,7 @@ export function listingRoutes(db) {
       || (row.buyer_banned && !isAdmin)                                  // banned buyer: gone for everyone
       || (row.status !== 'open' && !isOwner && !isParticipant && !isAdmin); // closed: owner, its vendors, admins
     if (hidden) throw notFound('This request does not exist or is no longer open.');
-    const listing = withImages(row);
+    const listing = detailView(row.id, me);
     // Tell a vendor whether they've already reached out about this one.
     if (req.user && req.user.id !== row.buyer_id) {
       const conv = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, req.user.id);
@@ -137,12 +150,37 @@ export function listingRoutes(db) {
 
   // Mark as fulfilled / closed / reopen. Once not open, all its
   // conversations become read-only.
+  // When marking "fulfilled" the buyer may say which conversation the deal
+  // came from (conversationId). That records a DEAL, which both sides can
+  // then rate. Leave it out if they found the item elsewhere.
   r.post('/:id/status', requireAuth, (req, res) => {
     const row = ownListing(db, req);
     const status = v.oneOf(req.body, 'status', ['open', 'fulfilled', 'closed']);
-    db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
-    audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);
-    res.json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(row.id)) });
+    const conversationId = status === 'fulfilled' ? v.int(req.body, 'conversationId', { min: 1, optional: true }) : null;
+    const conv = conversationId
+      ? db.prepare('SELECT * FROM conversations WHERE id = ? AND listing_id = ?').get(conversationId, row.id)
+      : null;
+    if (conversationId && !conv) throw new HttpError(400, 'That conversation is not about this request.', { field: 'conversationId' });
+
+    tx(db, () => {
+      const deal = db.prepare('SELECT * FROM deals WHERE listing_id = ?').get(row.id);
+      const keepsDeal = deal && conv && deal.conversation_id === conv.id;
+      if (deal && !keepsDeal) {
+        // Changing or undoing a deal is fine until someone has rated it.
+        if (db.prepare('SELECT 1 FROM ratings WHERE deal_id = ?').get(deal.id)) {
+          throw new HttpError(409, 'This deal has already been rated, so it can no longer be changed.');
+        }
+        db.prepare('DELETE FROM deals WHERE id = ?').run(deal.id);
+      }
+      if (conv && !keepsDeal) {
+        const info = db.prepare('INSERT INTO deals (listing_id, conversation_id, buyer_id, vendor_id) VALUES (?, ?, ?, ?)')
+          .run(row.id, conv.id, conv.buyer_id, conv.vendor_id);
+        audit(db, req.user.id, 'deal.created', `deal:${info.lastInsertRowid}`, { listingId: row.id, vendorId: conv.vendor_id });
+      }
+      db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
+      audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);
+    });
+    res.json({ listing: detailView(row.id, req.user) });
   });
 
   return r;

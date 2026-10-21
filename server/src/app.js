@@ -16,6 +16,7 @@ import { kycRoutes } from './routes/kyc.js';
 import { listingRoutes } from './routes/listings.js';
 import { conversationRoutes } from './routes/conversations.js';
 import { adminRoutes } from './routes/admin.js';
+import { ratingRoutes } from './routes/ratings.js';
 
 export function createApp(db) {
   const app = express();
@@ -40,6 +41,7 @@ export function createApp(db) {
   app.use('/api/kyc', kycRoutes(db));
   app.use('/api/listings', listingRoutes(db));
   app.use('/api', conversationRoutes(db));
+  app.use('/api', ratingRoutes(db));
   app.use('/api/admin', adminRoutes(db));
   app.use('/api', (_req, _res, next) => next(notFound('Unknown API route')));
 
