@@ -23,7 +23,7 @@ tags: [feature, notifications]
 | The other side rated your deal | the rated member | that conversation |
 | Identity approved / not approved | the member | Home / Verification page |
 
-- New offers also reach your **phone** if you turned that on: [[Push Notifications]] (session 15).
+- New offers also reach your **phone** if you turned that on: [[Push Notifications]] (session 15), and your **email** unless you switched it off ([[Email Sending#The new-offer email (session 17)]]).
 - New **messages** are not notifications — the Messages tab has its own count.
 - The 🔔 count is checked every 15 s and on every page change; opening the page marks everything read.
 - Undoing a deal removes its notification. Read notifications older than 90 days are deleted automatically.

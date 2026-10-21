@@ -239,6 +239,10 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_push_user ON push_subscriptions(user_id);
   `,
+  // 11: "email me about new offers" switch (session 17). On by default.
+  `
+  ALTER TABLE users ADD COLUMN email_offers INTEGER NOT NULL DEFAULT 1;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

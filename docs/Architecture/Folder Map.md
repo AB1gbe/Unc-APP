@@ -73,7 +73,8 @@ Unc-APP/
 │       ├── photos.test.js          request photos + private chat photos (session 13)
 │       ├── saved.test.js           saved requests (session 13)
 │       ├── notifications.test.js   🔔 notifications (session 13)
-│       └── push.test.js            phone push for new offers, fake push service (session 15)
+│       ├── push.test.js            phone push for new offers, fake push service (session 15)
+│       └── offer-email.test.js     new-offer email, Arabic, on/off switch, text direction (session 17)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)

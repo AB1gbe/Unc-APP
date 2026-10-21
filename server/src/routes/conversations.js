@@ -20,6 +20,8 @@ import path from 'node:path';
 import { CHAT_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
+import { trySendMail } from '../lib/mailer.js';
+import { newOfferEmail } from '../lib/emails.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -163,6 +165,15 @@ export function conversationRoutes(db) {
     // After the transaction, so a push never announces an offer that was rolled back.
     pushTo(db, listing.buyer_id, 'offer', { actor: req.user.display_name, title: listing.title }, `/messages/${convId}`)
       .catch((err) => console.warn('[push]', err.message));
+    // And an email, unless the buyer switched those off. trySendMail never
+    // throws, and the offer doesn't wait for the email provider.
+    const buyer = db.prepare('SELECT email, language, email_offers FROM users WHERE id = ?').get(listing.buyer_id);
+    if (buyer.email_offers) {
+      trySendMail({ to: buyer.email, ...newOfferEmail({
+        sellerName: req.user.display_name, title: listing.title, message: body,
+        offerPrice, currency: listing.currency, conversationId: convId,
+      }, buyer.language) });
+    }
     res.status(201).json({ conversation: view(getConv.get(convId), req.user) });
   });
 

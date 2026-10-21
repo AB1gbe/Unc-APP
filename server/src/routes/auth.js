@@ -256,6 +256,11 @@ export function authRoutes(db) {
       }
       changes.interests = JSON.stringify(list);
     }
+    if ('emailOffers' in b) {
+      // A real true/false only: the string "false" must not count as yes.
+      if (typeof b.emailOffers !== 'boolean') throw new HttpError(400, 'emailOffers must be true or false.', { field: 'emailOffers' });
+      changes.email_offers = b.emailOffers ? 1 : 0;
+    }
     const cols = Object.keys(changes);
     if (cols.length) {
       db.prepare(`UPDATE users SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(changes), req.user.id);

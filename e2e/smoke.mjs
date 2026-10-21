@@ -163,6 +163,13 @@ await shot(buyer, '25-profile');
 // Account: the phone-notifications card is there (headless Chrome can't
 // subscribe, so it shows the 'blocked' or 'turn on' state).
 await buyer.goto(BASE + '/account'); await buyer.waitForSelector('.push-card h2');
+// New-offer emails: on by default; switching off is saved.
+const emailBox = buyer.locator('.toggle-row input[type=checkbox]');
+if (!(await emailBox.isChecked())) throw new Error('new-offer emails should be on by default');
+await emailBox.uncheck(); await buyer.waitForTimeout(300);
+await buyer.reload(); await buyer.waitForSelector('.toggle-row');
+if (await emailBox.isChecked()) throw new Error('switching off new-offer emails was not saved');
+await emailBox.check(); await buyer.waitForTimeout(300);
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
