@@ -1,4 +1,5 @@
 // Small reusable building blocks used across pages.
+import { useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
 import { budget, ago } from '../api.js';
@@ -96,4 +97,46 @@ export function RequireAdmin({ children }) {
   if (user === undefined) return <Loading />;
   if (user?.role !== 'admin') return <Navigate to="/" replace />;
   return children;
+}
+
+// ---- Ratings ----
+
+// Read-only stars, e.g. <Stars value={4.5} />. Half values round to the
+// nearest whole star for display; the number is shown next to it.
+export function Stars({ value, size = '1rem' }) {
+  const full = Math.round(value || 0);
+  return (
+    <span className="stars" style={{ fontSize: size }} aria-label={`${value} out of 5 stars`} role="img">
+      {[1, 2, 3, 4, 5].map((n) => <span key={n} className={n <= full ? 'on' : ''} aria-hidden>★</span>)}
+    </span>
+  );
+}
+
+// "★ 4.5 (12)" or "No ratings yet". Shown next to member names.
+export function RatingBadge({ rating }) {
+  if (!rating || !rating.count) return <span className="muted small">No ratings yet</span>;
+  return (
+    <span className="rating-badge" title={`${rating.average} out of 5 from ${rating.count} rating${rating.count === 1 ? '' : 's'}`}>
+      <span className="star-on">★</span> {rating.average.toFixed(1)} <span className="muted">({rating.count})</span>
+    </span>
+  );
+}
+
+// Clickable 1-5 star picker for the rating form. Works with mouse, touch
+// and keyboard (they are real radio buttons underneath).
+export function StarInput({ value, onChange, name = 'stars' }) {
+  const [hover, setHover] = useState(0);
+  const labels = ['', 'Bad', 'Poor', 'OK', 'Good', 'Excellent'];
+  const shown = hover || value;
+  return (
+    <div className="star-input" onMouseLeave={() => setHover(0)}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <label key={n} className={n <= shown ? 'on' : ''} onMouseEnter={() => setHover(n)} title={labels[n]}>
+          <input type="radio" name={name} value={n} checked={value === n} onChange={() => onChange(n)} />
+          ★
+        </label>
+      ))}
+      <span className="muted small" style={{ marginLeft: '.5rem' }}>{labels[shown] || 'Choose 1–5 stars'}</span>
+    </div>
+  );
 }

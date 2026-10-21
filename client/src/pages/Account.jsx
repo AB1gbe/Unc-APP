@@ -31,6 +31,7 @@ export default function Account() {
         <div className="row">
           <span>Email: {user.emailVerified ? <span className="badge ok">✓ Confirmed</span> : <Link to="/verify-email">Confirm now</Link>}</span>
           <span>Identity: <KycBadge status={user.kycStatus} /></span>
+          {user.kycStatus === 'approved' && <Link to={`/members/${user.id}`}>View my public profile & ratings →</Link>}
         </div>
         {user.kycStatus !== 'approved' && user.emailVerified && (
           <p style={{ marginTop: '.75rem' }}><Link className="btn sm" to="/verification">Go to verification</Link></p>

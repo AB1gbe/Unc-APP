@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 05)
+updated: 2026-10-21 (session 09)
 ---
 # Unc — Project Vault
 
@@ -18,6 +18,11 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Start here
 - [[01 Project Brief]] — what we're building and the three MUSTs
 - [[Install Prerequisites]] → [[Run the App Locally]] — get it running in ~10 minutes
+- [[Watch Changes Live]] — watch the app update while Claude builds (optional)
+- [[Pull and Push]] — type `pull` or `push` instead of git commands
+
+### Market
+- [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
 - [[Glossary]] — every technical word used here, explained
 
 ### Rebuild it from zero (step by step)
@@ -36,10 +41,11 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 13 - Real email sending]]
 - [[Step 14 - Password reset]]
 - [[Step 15 - Performance and hardening]]
+- [[Step 16 - Ratings]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -54,7 +60,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 05)
+## Status (2026-10-21, after session 09)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -66,6 +72,9 @@ This vault is the complete record of the project: **how** everything was built, 
 | Real email (SMTP or Resend) | ✅ done — needs your provider details in `.env` |
 | Performance (indexes, gzip, caching, lazy pages) | ✅ done — see [[ADR-013 Performance]] |
 | Code review: 15 bugs | ✅ all fixed, each with a test |
-| API tests | ✅ 51 passing |
+| Ratings after a deal (blind, two-way) + member profiles | ✅ done — in `main` since session 11 |
+| Live preview while building (`npm run live`) | ✅ done |
+| One-word `pull` / `push` | ✅ done |
+| API tests | ✅ 63 passing |
 | Browser end-to-end test | ✅ passing |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

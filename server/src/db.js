@@ -153,7 +153,39 @@ const MIGRATIONS = [
   CREATE INDEX idx_messages_unread      ON messages(conversation_id, sender_id) WHERE read_at IS NULL;
   CREATE INDEX idx_sessions_user        ON sessions(user_id);
   `,
+  // 4: deals + ratings (session 09). A deal = the buyer said "I bought it
+  // from this vendor" when marking a request fulfilled. Only deals can be
+  // rated, once per side.
+  `
+  CREATE TABLE deals (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    listing_id      INTEGER NOT NULL UNIQUE REFERENCES listings(id) ON DELETE CASCADE,
+    conversation_id INTEGER NOT NULL UNIQUE REFERENCES conversations(id) ON DELETE CASCADE,
+    buyer_id        INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    vendor_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    CHECK (buyer_id <> vendor_id)
+  );
+  CREATE INDEX idx_deals_buyer  ON deals(buyer_id);
+  CREATE INDEX idx_deals_vendor ON deals(vendor_id);
+
+  CREATE TABLE ratings (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    deal_id    INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+    rater_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ratee_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    stars      INTEGER NOT NULL CHECK (stars BETWEEN 1 AND 5),
+    comment    TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (deal_id, rater_id),
+    CHECK (rater_id <> ratee_id)
+  );
+  CREATE INDEX idx_ratings_ratee ON ratings(ratee_id, created_at);
+  `,
 ];
+
+// How many migrations exist = the user_version of an up-to-date database.
+export const MIGRATION_COUNT = MIGRATIONS.length;
 
 export function openDb(file = config.dbFile) {
   if (file !== ':memory:') fs.mkdirSync(path.dirname(file), { recursive: true });

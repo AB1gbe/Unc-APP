@@ -3,11 +3,12 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05). `PRAGMA user_version` = 3 on an up-to-date database. Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09). `PRAGMA user_version` = 4 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
        ├─< password_resets
+       ├─< deals (buyer/vendor, 1 per listing, 1 per conversation) ─< ratings (≤ 2 per deal)
        ├─< email_codes (1:1)
        ├─< kyc_submissions
        ├─< listings ─┬─< listing_images
@@ -28,6 +29,8 @@ users ─┬─< sessions
 | `listing_images` | listing_id, file | Up to 3, public |
 | `conversations` | listing_id **NOT NULL**, buyer_id, vendor_id, last_message_at | `UNIQUE(listing_id, vendor_id)`, `CHECK(buyer_id <> vendor_id)` |
 | `messages` | conversation_id, sender_id, body, offer_price, read_at | |
+| `deals` | listing_id (unique), conversation_id (unique), buyer_id, vendor_id, created_at | Recorded when the buyer marks a request fulfilled and picks the seller. Session 09 |
+| `ratings` | deal_id, rater_id, ratee_id, stars 1–5, comment, created_at | `UNIQUE(deal_id, rater_id)`; visibility rule in `lib/ratings.js`. Session 09 |
 | `reports` | reporter_id, listing_id?, conversation_id?, reason, status | |
 | `audit_log` | actor_id, action, target, meta (JSON) | KYC decisions, file views, bans, etc. |
 

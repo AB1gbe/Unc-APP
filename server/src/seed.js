@@ -39,6 +39,22 @@ async function seedDemo(db) {
     add.run(buyer, 'Need a solid oak dining table for 6', 'Rectangular, around 180cm. Light scratches are fine.', 'Home & Furniture', 200, 600, 'Austin', null);
     add.run(buyer, 'Someone to assemble IKEA wardrobe', 'PAX wardrobe, 2 doors. This Saturday if possible.', 'Services', 50, 120, 'Austin', null);
   }
+  // One finished, rated deal so profiles and star ratings have something to show.
+  const shop = db.prepare('SELECT id FROM users WHERE email = ?').get('vendor@demo.local').id;
+  if (!db.prepare('SELECT 1 FROM deals WHERE buyer_id = ? AND vendor_id = ?').get(buyer, shop)) {
+    const listingId = Number(db.prepare(`
+      INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, city, status)
+      VALUES (?, 'Wanted: iPhone 13 charger and case', 'Original Apple charger and a clear case.', 'Phones & Tablets', 20, 60, 'Austin', 'fulfilled')
+    `).run(buyer).lastInsertRowid);
+    const convId = Number(db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)').run(listingId, buyer, shop).lastInsertRowid);
+    const msg = db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, read_at) VALUES (?, ?, ?, ?, datetime(\'now\'))');
+    msg.run(convId, shop, 'We have both in stock, boxed.', 45);
+    msg.run(convId, buyer, 'Perfect, I will pick them up today.', null);
+    const dealId = Number(db.prepare('INSERT INTO deals (listing_id, conversation_id, buyer_id, vendor_id) VALUES (?, ?, ?, ?)').run(listingId, convId, buyer, shop).lastInsertRowid);
+    const rate = db.prepare('INSERT INTO ratings (deal_id, rater_id, ratee_id, stars, comment) VALUES (?, ?, ?, ?, ?)');
+    rate.run(dealId, buyer, shop, 5, 'Friendly, fast, and exactly what I asked for.');
+    rate.run(dealId, shop, buyer, 5, 'On time and easy to deal with.');
+  }
   console.log('Demo data ready. Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');
 }
 

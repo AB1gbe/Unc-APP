@@ -20,6 +20,7 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
 const Verification = lazy(() => import('./pages/Verification.jsx'));
 const Account = lazy(() => import('./pages/Account.jsx'));
+const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
 const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
 
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="reset-password" element={<ResetPassword />} />
         <Route path="verify-email" element={<RequireAuth><VerifyEmail /></RequireAuth>} />
         <Route path="verification" element={<RequireAuth><Verification /></RequireAuth>} />
+        <Route path="members/:id" element={<MemberProfile />} />
         <Route path="account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="admin" element={<RequireAdmin><AdminHome /></RequireAdmin>} />
         <Route path="admin/kyc/:id" element={<RequireAdmin><KycReview /></RequireAdmin>} />

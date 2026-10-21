@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { setup } from './helpers.js';
 
 const t = await setup();
-const { cleanupExpired, openDb } = await import('../src/db.js');
+const { cleanupExpired, openDb, MIGRATION_COUNT } = await import('../src/db.js');
 const { db } = t;
 
 test('unread count is correct for buyers and vendors', async () => {
@@ -75,6 +75,7 @@ test('JSON responses are gzip-compressed when the browser accepts it', async () 
 test('fresh databases end on the latest migration', () => {
   const fresh = openDb(':memory:');
   const { user_version: v } = fresh.prepare('PRAGMA user_version').get();
-  assert.equal(v, 3);
+  assert.equal(v, MIGRATION_COUNT);
   assert.ok(fresh.prepare(`SELECT 1 FROM sqlite_master WHERE name = 'idx_messages_unread'`).get());
+  assert.ok(fresh.prepare(`SELECT 1 FROM sqlite_master WHERE name = 'ratings'`).get());
 });

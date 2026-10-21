@@ -14,6 +14,7 @@ import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
+import { canStillRate, ratingQueries } from '../lib/ratings.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -49,8 +50,35 @@ export function conversationRoutes(db) {
     WHERE conversation_id = ? AND sender_id <> ? AND read_at IS NULL
   `);
 
+  const ratings = ratingQueries(db);
+  const dealForConv = db.prepare('SELECT * FROM deals WHERE conversation_id = ?');
+  const ratingBy = db.prepare('SELECT stars, comment, created_at FROM ratings WHERE deal_id = ? AND rater_id = ?');
+
+  // Deal + rating state of a conversation, from my point of view.
+  function dealView(convId, meId) {
+    const d = dealForConv.get(convId);
+    if (!d) return null;
+    const otherId = d.buyer_id === meId ? d.vendor_id : d.buyer_id;
+    const mine = ratingBy.get(d.id, meId);
+    const theirs = ratingBy.get(d.id, otherId);
+    return {
+      id: d.id,
+      createdAt: d.created_at,
+      myRating: mine ? { stars: mine.stars, comment: mine.comment, createdAt: mine.created_at } : null,
+      otherHasRated: Boolean(theirs),
+      // Blind: I only see their rating of me once I've rated too.
+      theirRating: mine && theirs ? { stars: theirs.stars, comment: theirs.comment } : null,
+      canRate: !mine && canStillRate(d.created_at),
+    };
+  }
+
   function view(c, me) {
     const iAmBuyer = c.buyer_id === me.id;
+    const deal = dealView(c.id, me.id);
+    const other = iAmBuyer
+      ? { id: c.vendor_id, displayName: c.vendor_name, accountType: c.vendor_type, verified: c.vendor_kyc === 'approved' }
+      : { id: c.buyer_id, displayName: c.buyer_name, accountType: c.buyer_type, verified: true };
+    other.rating = ratings.summaryFor(other.id);
     return {
       id: c.id,
       listing: {
@@ -58,9 +86,9 @@ export function conversationRoutes(db) {
         budgetMin: c.budget_min, budgetMax: c.budget_max, currency: c.currency,
       },
       myRole: iAmBuyer ? 'buyer' : 'vendor',
-      other: iAmBuyer
-        ? { id: c.vendor_id, displayName: c.vendor_name, accountType: c.vendor_type, verified: c.vendor_kyc === 'approved' }
-        : { id: c.buyer_id, displayName: c.buyer_name, accountType: c.buyer_type, verified: true },
+      other,
+      deal,
+      needsRating: Boolean(deal?.canRate),
       readOnly: c.listing_status !== 'open',
       createdAt: c.created_at,
       lastMessageAt: c.last_message_at,
