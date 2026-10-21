@@ -5,7 +5,7 @@ updated: 2026-10-21 (session 02)
 # Run the App Locally
 
 > ⚠️ Every `npm …` command must be run **inside the project folder** (`Unc-APP`), which you get by cloning. Running it anywhere else gives `ENOENT … package.json` — see [[Mistakes and Fixes#M14]].
-> The code is currently on the branch **`claude/vibrant-edison-r9o798`**. Once it's merged into `main` you can drop the `-b …` part.
+> The code is on the branch **`claude/vibrant-edison-r9o798`**, with a pull request open to merge it into `main` (https://github.com/AB1gbe/Unc-APP/pull/1). **After it's merged**, drop the `-b …` part, and in an existing folder run `git checkout main` then `git pull`.
 
 ## Windows (Command Prompt) — step by step
 1. Press **Start**, type `cmd`, press Enter.
