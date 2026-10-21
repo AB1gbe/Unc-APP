@@ -9,6 +9,8 @@ import Inbox from './pages/Inbox.jsx';
 import Conversation from './pages/Conversation.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 import VerifyEmail from './pages/VerifyEmail.jsx';
 import Verification from './pages/Verification.jsx';
 import Account from './pages/Account.jsx';
@@ -29,6 +31,8 @@ export default function App() {
         <Route path="messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         <Route path="verify-email" element={<RequireAuth><VerifyEmail /></RequireAuth>} />
         <Route path="verification" element={<RequireAuth><Verification /></RequireAuth>} />
         <Route path="account" element={<RequireAuth><Account /></RequireAuth>} />

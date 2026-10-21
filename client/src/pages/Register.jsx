@@ -17,9 +17,9 @@ export default function Register() {
     setBusy(true);
     setError(null);
     try {
-      const { user, devCode } = await api('/auth/register', { method: 'POST', body: form });
+      const { user, devCode, emailSent } = await api('/auth/register', { method: 'POST', body: form });
       setUser(user);
-      navigate('/verify-email', { state: { devCode } });
+      navigate('/verify-email', { state: { devCode, emailFailed: emailSent === false } });
     } catch (err) {
       setError(err);
     } finally {

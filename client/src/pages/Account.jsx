@@ -50,6 +50,53 @@ export default function Account() {
         </div>
         <button className="btn">Save</button>
       </form>
+      <ChangePassword />
     </div>
+  );
+}
+
+function ChangePassword() {
+  const empty = { currentPassword: '', password: '', confirm: '' };
+  const [form, setForm] = useState(empty);
+  const [error, setError] = useState(null);
+  const [done, setDone] = useState(false);
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  async function submit(e) {
+    e.preventDefault();
+    setError(null);
+    setDone(false);
+    if (form.password !== form.confirm) return setError(new Error('The two new passwords do not match.'));
+    try {
+      await api('/auth/change-password', { method: 'POST', body: { currentPassword: form.currentPassword, password: form.password } });
+      setForm(empty);
+      setDone(true);
+    } catch (err) {
+      setError(err);
+    }
+  }
+
+  return (
+    <form className="card" onSubmit={submit}>
+      <h2>Change password</h2>
+      <ErrorBox error={error} />
+      {done && <div className="alert ok">Password changed. Other devices were logged out.</div>}
+      <div className="field">
+        <label htmlFor="currentPassword">Current password</label>
+        <input id="currentPassword" type="password" autoComplete="current-password" required value={form.currentPassword} onChange={set('currentPassword')} />
+      </div>
+      <div className="field-row">
+        <div className="field">
+          <label htmlFor="newPassword">New password</label>
+          <input id="newPassword" type="password" autoComplete="new-password" required minLength={8} value={form.password} onChange={set('password')} />
+        </div>
+        <div className="field">
+          <label htmlFor="confirmPassword">Repeat new password</label>
+          <input id="confirmPassword" type="password" autoComplete="new-password" required value={form.confirm} onChange={set('confirm')} />
+        </div>
+      </div>
+      <p className="small"><Link to="/forgot-password">Forgot your current password?</Link></p>
+      <button className="btn">Change password</button>
+    </form>
   );
 }

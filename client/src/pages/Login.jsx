@@ -7,7 +7,8 @@ import { ErrorBox } from '../components/ui.jsx';
 export default function Login() {
   const { setUser } = useAuth();
   const navigate = useNavigate();
-  const from = useLocation().state?.from || '/';
+  const { state } = useLocation();
+  const from = state?.from || '/';
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -30,6 +31,7 @@ export default function Login() {
   return (
     <div className="narrow card">
       <h1>Welcome back</h1>
+      {state?.notice && <div className="alert ok">{state.notice}</div>}
       <ErrorBox error={error} />
       <form onSubmit={submit}>
         <div className="field">
@@ -37,7 +39,10 @@ export default function Login() {
           <input id="email" type="email" autoComplete="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
         <div className="field">
-          <label htmlFor="password">Password</label>
+          <div className="row spread">
+            <label htmlFor="password">Password</label>
+            <Link to="/forgot-password" className="small">Forgot password?</Link>
+          </div>
           <input id="password" type="password" autoComplete="current-password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         </div>
         <button className="btn block" disabled={busy}>{busy ? 'Logging in…' : 'Log in'}</button>

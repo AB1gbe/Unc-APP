@@ -15,6 +15,15 @@ if (isProd && !process.env.SECRET_PEPPER) {
 
 const dataDir = process.env.DATA_DIR || path.join(serverRoot, 'data');
 
+// How email leaves the server: 'console' (print it, dev only), 'smtp'
+// (any provider: Gmail, Resend, Postmark, SES, Mailgun...) or 'resend'
+// (Resend's HTTP API). See docs/Features/Email Sending.md
+// Tests always use 'memory' so a real .env can never make tests send email.
+const mailTransport = isTest ? 'memory' : process.env.MAIL_TRANSPORT || 'console';
+if (isProd && ['console', 'memory'].includes(mailTransport)) {
+  throw new Error('In production set MAIL_TRANSPORT to smtp or resend so emails are really sent');
+}
+
 export const config = {
   isProd,
   isTest,
@@ -31,5 +40,21 @@ export const config = {
   adminPassword: process.env.ADMIN_PASSWORD || 'ChangeMe123!',
   kycProvider: process.env.KYC_PROVIDER || 'manual',
   minAge: 18,
+  // Public address of the website, used to build links inside emails.
+  appUrl: (process.env.APP_URL || 'http://localhost:5173').replace(/\/+$/, ''),
+  resetTokenMinutes: 30,
+  mail: {
+    transport: mailTransport,
+    from: process.env.MAIL_FROM || 'Unc <no-reply@unc.local>',
+    smtp: {
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      // true = TLS from the first byte (port 465); false = STARTTLS upgrade (port 587)
+      secure: process.env.SMTP_SECURE === 'true',
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    resendApiKey: process.env.RESEND_API_KEY,
+  },
   maxUploadBytes: 5 * 1024 * 1024,
 };

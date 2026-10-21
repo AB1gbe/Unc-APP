@@ -13,6 +13,8 @@ Use Obsidian `[[wikilinks]]`; put images in `docs/attachments/`.
 ## Project facts
 - Reverse marketplace: buyers post requests; verified vendors contact them **only about a specific request**.
 - npm workspaces: `server/` (Express 5, node:sqlite) and `client/` (React 19, Vite 8). Always install from the root with `--workspace`.
-- `npm test` must stay green (21+ tests). Schema changes = append to `MIGRATIONS` in `server/src/db.js`, never edit old entries.
+- `npm test` must stay green (32+ tests). Schema changes = append to `MIGRATIONS` in `server/src/db.js`, never edit old entries.
 - Never add an endpoint or UI that lets users message each other outside a listing's conversation.
 - Never serve `uploads/kyc` statically or return full ID numbers.
+- Email goes through `sendMail`/`trySendMail` in `server/src/lib/mailer.js`; wording lives in `server/src/lib/emails.js`. Never return tokens or codes in API responses outside console/test mode.
+- The owner runs Windows (cmd). Give Windows-friendly commands, and say which folder and branch to be in.
