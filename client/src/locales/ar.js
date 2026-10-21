@@ -532,4 +532,14 @@ export default {
   'I can deliver it.': 'يمكنني توصيله.',
   '🤝 Offer accepted': '🤝 تم قبول العرض',
   'Offer declined': 'تم رفض العرض',
+  // Activity (session 20)
+  'Active now': 'متصل الآن',
+  'Active {time}': 'كان نشطاً {time}',
+  'Usually replies within an hour': 'يردّ عادةً خلال ساعة',
+  'Usually replies within a few hours': 'يردّ عادةً خلال ساعات قليلة',
+  'Usually replies within a day': 'يردّ عادةً خلال يوم',
+  'Usually takes a few days to reply': 'يستغرق عادةً بضعة أيام للرد',
+  'People who looked at it': 'عدد من شاهدوه',
+  'Share it to reach more sellers.': 'شاركه لتصل إلى بائعين أكثر.',
+  '{n} people looked at it': { zero: 'لم يشاهده أحد بعد', one: 'شاهده شخص واحد', two: 'شاهده شخصان', few: 'شاهده {n} أشخاص', many: 'شاهده {n} شخصًا', other: 'شاهده {n} شخص' },
 };

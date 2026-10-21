@@ -14,10 +14,16 @@ export function loadUser(db) {
     SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
     WHERE s.token_hash = ? AND s.expires_at > datetime('now')
   `);
+  const touch = db.prepare(`UPDATE users SET last_seen_at = datetime('now') WHERE id = ?`);
   return (req, _res, next) => {
     const token = req.cookies?.[SESSION_COOKIE];
     req.user = token ? findSession.get(sha256(token)) || null : null;
     req.sessionTokenHash = token ? sha256(token) : null;
+    // "Active now": remember when the member was last here, at most once a
+    // minute, so the 4-second chat polls don't write on every request.
+    if (req.user && (!req.user.last_seen_at || Date.now() - Date.parse(`${req.user.last_seen_at.replace(' ', 'T')}Z`) > 60_000)) {
+      touch.run(req.user.id);
+    }
     next();
   };
 }

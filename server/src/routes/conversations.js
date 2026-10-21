@@ -22,6 +22,7 @@ import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
 import { trySendMail } from '../lib/mailer.js';
 import { newOfferEmail } from '../lib/emails.js';
+import { activityQueries } from '../lib/activity.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -58,6 +59,7 @@ export function conversationRoutes(db) {
   `);
 
   const ratings = ratingQueries(db);
+  const activity = activityQueries(db);
   const dealForConv = db.prepare('SELECT * FROM deals WHERE conversation_id = ?');
   const ratingBy = db.prepare('SELECT stars, comment, created_at FROM ratings WHERE deal_id = ? AND rater_id = ?');
 
@@ -231,7 +233,7 @@ export function conversationRoutes(db) {
       markRead.run(c.id, req.user.id);
     }
     res.json({
-      conversation: view(c, req.user),
+      conversation: { ...view(c, req.user), otherActivity: activity.summaryFor(c.buyer_id === req.user.id ? c.vendor_id : c.buyer_id) },
       messages: messages.map((m) => messageView(m, c.id, req.user.id)),
     });
   });

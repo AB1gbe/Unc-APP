@@ -3,7 +3,7 @@
 // contacted about a specific request.
 import { Link, useParams } from 'react-router-dom';
 import { ago, toDate } from '../api.js';
-import { Avatar, ErrorBox, KycBadge, ListingCard, Loading, Stars } from '../components/ui.jsx';
+import { Activity, Avatar, ErrorBox, KycBadge, ListingCard, Loading, Stars } from '../components/ui.jsx';
 import { useAuth } from '../auth.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
@@ -31,6 +31,7 @@ export default function MemberProfile() {
               <span>{tn(m.deals, '{n} deal', '{n} deals')}</span>
             </div>
             {m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <bdi>{m.city}</bdi></div>}
+            <div style={{ marginTop: '.3rem' }}><Activity activity={m.activity} /></div>
           </div>
           <div className="center">
             {m.rating.count ? (

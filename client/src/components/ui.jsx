@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
-import { budget, ago } from '../api.js';
+import { budget, ago, toDate } from '../api.js';
 import { t, tj, tn } from '../i18n.jsx';
 
 export function ErrorBox({ error }) {
@@ -89,6 +89,7 @@ export function ListingCard({ listing }) {
         <span>📍 <bdi>{listing.city}</bdi></span>
         <span>🕒 {ago(listing.createdAt)}</span>
         {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
+        {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
       </div>
     </Link>
   );
@@ -155,6 +156,31 @@ export function RequireAdmin({ children }) {
   if (user === undefined) return <Loading />;
   if (user?.role !== 'admin') return <Navigate to="/" replace />;
   return children;
+}
+
+// ---- Activity (session 20) ----
+
+const ACTIVE_MS = 5 * 60 * 1000;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const REPLY = {
+  hour: () => t('Usually replies within an hour'),
+  hours: () => t('Usually replies within a few hours'),
+  day: () => t('Usually replies within a day'),
+  days: () => t('Usually takes a few days to reply'),
+};
+
+// "🟢 Active now · Usually replies within an hour". Shows nothing it doesn't
+// know (never online, or not seen for a week).
+export function Activity({ activity }) {
+  if (!activity) return null;
+  const seen = activity.lastSeenAt ? toDate(activity.lastSeenAt).getTime() : 0;
+  const since = Date.now() - seen;
+  const parts = [];
+  if (seen && since < ACTIVE_MS) parts.push(<span key="on" className="active-now">{t('Active now')}</span>);
+  else if (seen && since < WEEK_MS) parts.push(<span key="ago">{t('Active {time}', { time: ago(activity.lastSeenAt) })}</span>);
+  if (activity.replyTime) parts.push(<span key="reply">{REPLY[activity.replyTime]()}</span>);
+  if (!parts.length) return null;
+  return <span className="activity small muted">{parts.reduce((all, p, i) => (i ? [...all, ' · ', p] : [p]), [])}</span>;
 }
 
 // ---- Ratings ----

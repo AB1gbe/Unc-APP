@@ -56,6 +56,15 @@ test('hot queries use indexes, not full table scans', () => {
   assert.match(plan('SELECT * FROM notifications WHERE user_id = 1 ORDER BY id DESC LIMIT 50'), /idx_notifications_user/);
   assert.match(plan('SELECT * FROM saved_listings WHERE user_id = 1'), /PRIMARY KEY|sqlite_autoindex_saved_listings/);
   assert.match(plan('SELECT * FROM push_subscriptions WHERE user_id = 1'), /idx_push_user/);
+  // Session 20: "Seen by N people" and the reply-time query (lib/activity.js).
+  assert.match(plan('SELECT COUNT(*) FROM listing_views WHERE listing_id = 1'), /sqlite_autoindex_listing_views/);
+  const replyPlan = plan(`WITH mine AS (SELECT id FROM (SELECT id FROM conversations WHERE buyer_id = 1 UNION ALL SELECT id FROM conversations WHERE vendor_id = 1) ORDER BY id DESC LIMIT 50),
+    firsts AS (SELECT m.id AS conv, (SELECT MIN(id) FROM messages WHERE conversation_id = m.id AND sender_id <> 1) AS other_first FROM mine m)
+    SELECT 1 FROM firsts f JOIN messages o ON o.id = f.other_first
+    JOIN messages r ON r.id = (SELECT MIN(id) FROM messages WHERE conversation_id = f.conv AND sender_id = 1 AND id > f.other_first)`);
+  assert.match(replyPlan, /idx_conversations_buyer/);
+  assert.match(replyPlan, /idx_conversations_vendor/);
+  assert.doesNotMatch(replyPlan, /SCAN (messages|conversations)\b/);
 });
 
 test('cleanupExpired removes only dead sessions, codes and reset links', async () => {

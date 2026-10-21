@@ -250,6 +250,17 @@ const MIGRATIONS = [
   ALTER TABLE messages ADD COLUMN reply_to INTEGER REFERENCES messages(id) ON DELETE CASCADE;
   CREATE INDEX idx_messages_reply ON messages(reply_to) WHERE reply_to IS NOT NULL;
   `,
+  // 13: activity (session 20): when a member was last seen, and which
+  // members opened a request ("👀 Seen by 7 people", shown to its buyer).
+  `
+  ALTER TABLE users ADD COLUMN last_seen_at TEXT;
+  CREATE TABLE listing_views (
+    listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_seen_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (listing_id, user_id)
+  );
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

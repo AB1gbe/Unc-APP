@@ -340,3 +340,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .answer-line.ok { color: #0a7a3d; border-color: #bfe7cf; background: #effaf3; }
 .quick-replies { display: flex; gap: .4rem; overflow-x: auto; padding: .5rem .75rem 0; scrollbar-width: none; }
 .quick-replies .chip { white-space: nowrap; flex-shrink: 0; }
+
+/* Activity line (session 20) */
+.activity { display: inline-block; }
+.active-now { color: #0a7a3d; font-weight: 600; }
+.active-now::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; margin-inline-end: .35rem; vertical-align: middle; }

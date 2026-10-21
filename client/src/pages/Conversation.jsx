@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, budget, money, toDate } from '../api.js';
-import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
+import { Activity, Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
 import { ReportLink } from './ListingDetail.jsx';
 import { usePolling } from '../hooks.js';
 import Lightbox from '../components/Lightbox.jsx';
@@ -106,7 +106,8 @@ export default function Conversation() {
               <Link to={`/members/${conv.other.id}`}><b><bdi>{conv.other.displayName}</bdi></b></Link>{' '}
               {conv.other.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}{' '}
               <KycBadge status={conv.other.verified ? 'approved' : 'unverified'} />{' '}
-              <RatingBadge rating={conv.other.rating} />
+              <RatingBadge rating={conv.other.rating} />{' '}
+              <Activity activity={conv.otherActivity} />
               <div className="small muted">
                 {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <bdi>{l.city}</bdi>
               </div>

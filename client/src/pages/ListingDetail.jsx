@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Activity, Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
-import { formatDate, t, tj } from '../i18n.jsx';
+import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
@@ -54,6 +54,7 @@ export default function ListingDetail() {
           <div>
             <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status="approved" />
             <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {t('Requested by a verified member')}</span></div>
+            {!isOwner && <Activity activity={l.buyer.activity} />}
           </div>
         </div>
       </article>
@@ -160,6 +161,12 @@ function OwnerPanel({ listing, onChange }) {
     <div className="stack">
       <div className="card">
         <h2>{t('Your request')}</h2>
+        {listing.status === 'open' && (
+          <p className="small muted">
+            👀 {tn(listing.viewCount ?? 0, '{n} person looked at it', '{n} people looked at it')} · 💬 {tn(offers.length, '{n} offer', '{n} offers')}
+            {(listing.viewCount ?? 0) === 0 && <> · {t('Share it to reach more sellers.')}</>}
+          </p>
+        )}
         <ErrorBox error={error} />
         {listing.status === 'open' && !picking && (
           <div className="stack">

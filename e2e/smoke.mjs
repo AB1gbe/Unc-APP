@@ -134,6 +134,7 @@ await vendor.waitForSelector('.lightbox img');
 await shot(vendor, '12b-photo-viewer');
 await vendor.keyboard.press('Escape');
 await vendor.waitForSelector('.lightbox', { state: 'detached' });
+await vendor.waitForSelector('.chat-head .active-now'); // the buyer is online right now
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
 
@@ -150,6 +151,7 @@ await shot(buyer, '13b-offer-accepted');
 
 // Ratings: buyer marks the request fulfilled, picking this seller -> both rate
 await buyer.goto(listingUrl);
+await buyer.waitForSelector('text=1 person looked at it'); // the seller opened it
 await buyer.click('button:has-text("I found it")');
 await buyer.waitForSelector('text=Who did you buy from?');
 await buyer.check('.choice:has-text("Riverside Electronics") input');

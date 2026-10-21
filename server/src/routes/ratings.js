@@ -8,10 +8,12 @@ import { parseInterests, requireAuth } from '../middleware/auth.js';
 import { avatarUrl } from '../lib/uploads.js';
 import { RATE_WINDOW_DAYS, VISIBLE, canStillRate, ratingQueries } from '../lib/ratings.js';
 import { notify } from '../lib/notify.js';
+import { activityQueries } from '../lib/activity.js';
 
 export function ratingRoutes(db) {
   const r = Router();
   const ratings = ratingQueries(db);
+  const activity = activityQueries(db);
 
   r.post('/deals/:id/rating', requireAuth, (req, res) => {
     const deal = db.prepare('SELECT * FROM deals WHERE id = ?').get(Number(req.params.id));
@@ -75,6 +77,7 @@ export function ratingRoutes(db) {
         interests: parseInterests(m.interests),
         deals,
         rating: ratings.summaryFor(m.id),
+        activity: req.user ? activity.summaryFor(m.id) : undefined,
       },
       openRequests,
       reviews: reviews.map((x) => ({
