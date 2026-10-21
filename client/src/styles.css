@@ -28,6 +28,16 @@
   }
 }
 * { box-sizing: border-box; }
+/* Right-to-left: the browser mirrors flex rows, text and "start/end"
+   spacing automatically once <html dir="rtl">. Always use logical
+   properties (margin-inline-start, text-align: start) instead of left/right
+   so both directions work. Arabic gets a little more line height. */
+[dir="rtl"] body { line-height: 1.65; }
+/* Arrows like "←" must point the other way in Arabic. */
+[dir="rtl"] .flip { display: inline-block; transform: scaleX(-1); }
+/* Emails, codes and numbers stay left-to-right inside Arabic text. */
+.ltr { direction: ltr; unicode-bidi: isolate; }
+.lang-switch { font-weight: 600; }
 body { margin: 0; background: var(--bg); }
 a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -42,7 +52,7 @@ p { margin: 0 0 .75rem; }
 .topbar-inner { max-width: 1080px; margin: 0 auto; padding: .7rem 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .logo { font-weight: 800; font-size: 1.3rem; color: var(--text); letter-spacing: -.02em; }
 .logo span { color: var(--brand); }
-.nav { display: flex; gap: .25rem; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.nav { display: flex; gap: .25rem; align-items: center; flex-wrap: wrap; margin-inline-start: auto; }
 .nav a { color: var(--muted); padding: .4rem .7rem; border-radius: 8px; font-weight: 500; }
 .nav a:hover, .nav a.active { background: var(--brand-soft); color: var(--brand); text-decoration: none; }
 /* Buttons inside the nav keep button colours (the .nav a rule above is more specific than .btn). */
@@ -142,7 +152,7 @@ input[type="file"] { padding: .5rem; }
 
 /* ===== Tables (admin) ===== */
 table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: .6rem; border-bottom: 1px solid var(--border); font-size: .9rem; vertical-align: top; }
+th, td { text-align: start; padding: .6rem; border-bottom: 1px solid var(--border); font-size: .9rem; vertical-align: top; }
 th { color: var(--muted); font-weight: 600; }
 .doc-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 .doc-grid figure { margin: 0; }

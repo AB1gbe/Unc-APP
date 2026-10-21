@@ -29,9 +29,9 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Browse />} />
-        <Route path="requests/new" element={<RequireAuth><RequireVerified action="post a request"><NewListing /></RequireVerified></RequireAuth>} />
+        <Route path="requests/new" element={<RequireAuth><RequireVerified action="post"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="requests/:id" element={<ListingDetail />} />
-        <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit a request"><NewListing /></RequireVerified></RequireAuth>} />
+        <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="my-requests" element={<RequireAuth><MyListings /></RequireAuth>} />
         <Route path="messages" element={<RequireAuth><Inbox /></RequireAuth>} />
         <Route path="messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />

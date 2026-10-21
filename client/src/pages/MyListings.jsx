@@ -13,7 +13,7 @@ export default function MyListings() {
         <h1>My requests</h1>
         {isVerified(user) && <Link className="btn" to="/requests/new">+ Post a request</Link>}
       </div>
-      {!isVerified(user) && <VerifyPrompt action="post requests" />}
+      {!isVerified(user) && <VerifyPrompt action="postMany" />}
       <ErrorBox error={error} />
       {loading ? <Loading /> : data?.listings.length === 0 ? (
         <div className="card empty">You haven't posted any requests yet.</div>

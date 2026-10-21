@@ -4,6 +4,7 @@ import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, ListingCard, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
+import { t } from '../i18n.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -36,25 +37,25 @@ export default function Browse() {
     <>
       {!user && (
         <section className="hero">
-          <h1>Tell people what you want. Let them come to you.</h1>
-          <p>Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.</p>
-          <Link className="btn" to="/register">Post your first request</Link>
+          <h1>{t('Tell people what you want. Let them come to you.')}</h1>
+          <p>{t('Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.')}</p>
+          <Link className="btn" to="/register">{t('Post your first request')}</Link>
         </section>
       )}
       <form className="searchbar" onSubmit={search}>
-        <input placeholder="What are people looking for?" value={draft.q} onChange={(e) => setDraft({ ...draft, q: e.target.value })} aria-label="Search" />
-        <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} aria-label="Category">
-          <option value="">All categories</option>
-          {categories.map((c) => <option key={c}>{c}</option>)}
+        <input placeholder={t('What are people looking for?')} value={draft.q} onChange={(e) => setDraft({ ...draft, q: e.target.value })} aria-label={t('Search')} />
+        <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} aria-label={t('Category')}>
+          <option value="">{t('All categories')}</option>
+          {categories.map((c) => <option key={c} value={c}>{t(c)}</option>)}
         </select>
-        <input placeholder="City" value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label="City" />
-        <button className="btn">Search</button>
+        <input placeholder={t('City')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
+        <button className="btn">{t('Search')}</button>
       </form>
       <ErrorBox error={error} />
       {loading ? <Loading /> : result.listings.length === 0 ? (
         <div className="card empty">
-          <p>No open requests match your search.</p>
-          {user && <Link className="btn" to="/requests/new">Post a request</Link>}
+          <p>{t('No open requests match your search.')}</p>
+          {user && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
         </div>
       ) : (
         <div className="grid">
@@ -63,9 +64,9 @@ export default function Browse() {
       )}
       {(page > 1 || result.hasMore) && (
         <div className="row" style={{ justifyContent: 'center', marginTop: '1.5rem' }}>
-          <button className="btn secondary" disabled={page <= 1} onClick={() => goPage(page - 1)}>← Newer</button>
-          <span className="muted">Page {page}</span>
-          <button className="btn secondary" disabled={!result.hasMore} onClick={() => goPage(page + 1)}>Older →</button>
+          <button className="btn secondary" disabled={page <= 1} onClick={() => goPage(page - 1)}><span className="flip">←</span> {t('Newer')}</button>
+          <span className="muted">{t('Page {page}', { page })}</span>
+          <button className="btn secondary" disabled={!result.hasMore} onClick={() => goPage(page + 1)}>{t('Older')} <span className="flip">→</span></button>
         </div>
       )}
     </>

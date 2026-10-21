@@ -1,0 +1,101 @@
+// Arabic translations. Key = the exact English text used in t()/tj()/tn().
+// Plurals: an object with the Arabic forms zero/one/two/few/many/other
+// ({n} is replaced by the number). If you change English text in a page,
+// change the key here too: server/test/i18n-coverage.test.js lists anything
+// missing. Style: Modern Standard Arabic, short and friendly.
+export default {
+  // ---- General ----
+  'Unc — Ask for it. Get offers.': 'Unc — اطلبه، وتصلك العروض',
+  'Loading…': 'جارٍ التحميل…',
+  'Change language': 'تغيير اللغة',
+  'just now': 'الآن',
+  'Up to {amount}': 'حتى {amount}',
+  'From {amount}': 'من {amount}',
+  'Open budget': 'الميزانية مفتوحة',
+  open: 'مفتوح',
+  fulfilled: 'تمّ',
+  closed: 'مغلق',
+
+  // ---- Header ----
+  Browse: 'تصفّح',
+  'My requests': 'طلباتي',
+  Messages: 'الرسائل',
+  Admin: 'الإدارة',
+  Account: 'حسابي',
+  'Log out': 'تسجيل الخروج',
+  'Log in': 'تسجيل الدخول',
+  'Sign up': 'إنشاء حساب',
+  '+ Post a request': '+ أضف طلبًا',
+  'Confirm your email to get started. {link}': 'أكّد بريدك الإلكتروني للبدء. {link}',
+  'Enter code': 'أدخل الرمز',
+
+  // ---- Badges & prompts ----
+  '✓ Verified': '✓ موثَّق',
+  'Verification pending': 'التحقق قيد المراجعة',
+  'Verification rejected': 'تم رفض التحقق',
+  'Not verified': 'غير موثَّق',
+  'post a request': 'نشر طلب',
+  'edit a request': 'تعديل طلب',
+  'contact this buyer': 'التواصل مع هذا المشتري',
+  'post requests': 'نشر الطلبات',
+  '{login} or {register} to {action}.': 'يلزم {login} أو {register} حتى تتمكن من {action}.',
+  'create an account': 'إنشاء حساب',
+  'Please {confirm} to {action}.': 'يُرجى {confirm} حتى تتمكن من {action}.',
+  'confirm your email': 'تأكيد بريدك الإلكتروني',
+  "Your identity check is being reviewed. You can {action} once it's approved.": 'طلب التحقق من هويتك قيد المراجعة. ستتمكن من {action} بعد الموافقة عليه.',
+  'Only verified members can {action}. {verify} — it takes about 2 minutes.': 'فقط الأعضاء الموثَّقون يمكنهم {action}. {verify} — يستغرق ذلك دقيقتين تقريبًا.',
+  'Verify your identity': 'وثّق هويتك',
+
+  // ---- Ratings ----
+  '{value} out of 5 stars': '{value} من 5 نجوم',
+  'No ratings yet': 'لا توجد تقييمات بعد',
+  '{avg} out of 5 from {n} ratings': {
+    zero: '{avg} من 5 — لا تقييمات',
+    one: '{avg} من 5 من تقييم واحد',
+    two: '{avg} من 5 من تقييمين',
+    few: '{avg} من 5 من {n} تقييمات',
+    many: '{avg} من 5 من {n} تقييمًا',
+    other: '{avg} من 5 من {n} تقييم',
+  },
+  Bad: 'سيئ',
+  Poor: 'ضعيف',
+  OK: 'مقبول',
+  Good: 'جيد',
+  Excellent: 'ممتاز',
+  'Choose 1–5 stars': 'اختر من 1 إلى 5 نجوم',
+
+  // ---- Browse ----
+  'Post a request': 'أضف طلبًا',
+  'Tell people what you want. Let them come to you.': 'أخبر الناس بما تريد، ودعهم يأتون إليك.',
+  'Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.':
+    'اطلب أي شيء — هاتفًا مستعملًا، أو كنبة، أو قطعة يصعب إيجادها. وتتواصل معك متاجر ووسطاء موثَّقون بعروضهم بشكل خاص.',
+  'Post your first request': 'أضف طلبك الأول',
+  'What are people looking for?': 'عمّ يبحث الناس؟',
+  Search: 'بحث',
+  Category: 'الفئة',
+  'All categories': 'كل الفئات',
+  City: 'المدينة',
+  'No open requests match your search.': 'لا توجد طلبات مفتوحة تطابق بحثك.',
+  Newer: 'الأحدث',
+  'Page {page}': 'صفحة {page}',
+  Older: 'الأقدم',
+  '{n} offers': { zero: 'لا عروض', one: 'عرض واحد', two: 'عرضان', few: '{n} عروض', many: '{n} عرضًا', other: '{n} عرض' },
+
+  // ---- Categories (values stored in English, shown translated) ----
+  Electronics: 'إلكترونيات',
+  'Phones & Tablets': 'هواتف وأجهزة لوحية',
+  Computers: 'أجهزة كمبيوتر',
+  'Home & Furniture': 'المنزل والأثاث',
+  Appliances: 'أجهزة منزلية',
+  'Vehicles & Parts': 'سيارات وقطع غيار',
+  Fashion: 'أزياء',
+  'Beauty & Health': 'الجمال والصحة',
+  'Sports & Outdoors': 'رياضة وأنشطة خارجية',
+  'Toys & Kids': 'ألعاب وأطفال',
+  'Books & Media': 'كتب ووسائط',
+  'Tools & DIY': 'عُدد وأدوات',
+  Garden: 'الحديقة',
+  Pets: 'حيوانات أليفة',
+  Services: 'خدمات',
+  Other: 'أخرى',
+};

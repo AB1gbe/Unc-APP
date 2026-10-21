@@ -69,7 +69,7 @@ function OfferPanel({ listing }) {
       </div>
     );
   }
-  if (!isVerified(user)) return <div className="card"><h2>Have this?</h2><VerifyPrompt action="contact this buyer" /></div>;
+  if (!isVerified(user)) return <div className="card"><h2>Have this?</h2><VerifyPrompt action="contact" /></div>;
 
   async function submit(e) {
     e.preventDefault();
