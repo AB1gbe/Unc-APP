@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Avatar, ErrorBox, KycBadge, Loading, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 
 export default function ListingDetail() {
@@ -37,8 +37,8 @@ export default function ListingDetail() {
         <div className="row">
           <Avatar name={l.buyer.displayName} />
           <div>
-            <b>{l.buyer.displayName}</b> <KycBadge status="approved" />
-            <div className="muted small">Requested by a verified member</div>
+            <Link to={`/members/${l.buyer.id}`}><b>{l.buyer.displayName}</b></Link> <KycBadge status="approved" />
+            <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· Requested by a verified member</span></div>
           </div>
         </div>
       </article>
@@ -111,16 +111,23 @@ function OfferPanel({ listing }) {
 function OwnerPanel({ listing, onChange }) {
   const { data } = useApi(`/listings/${listing.id}/conversations`);
   const [error, setError] = useState(null);
+  const [picking, setPicking] = useState(false); // "who did you buy from?" step
+  const [dealWith, setDealWith] = useState('');
+  const offers = data?.conversations ?? [];
 
-  async function setStatus(status) {
-    const msg = status === 'open' ? 'Reopen this request?' : `Mark this request as ${status}? Conversations about it will become read-only.`;
-    if (!window.confirm(msg)) return;
+  async function setStatus(status, conversationId) {
+    setError(null);
     try {
-      await api(`/listings/${listing.id}/status`, { method: 'POST', body: { status } });
+      await api(`/listings/${listing.id}/status`, { method: 'POST', body: { status, conversationId } });
+      setPicking(false);
       onChange();
     } catch (err) {
       setError(err);
     }
+  }
+
+  function confirmThen(status, message) {
+    if (window.confirm(message)) setStatus(status);
   }
 
   return (
@@ -128,26 +135,59 @@ function OwnerPanel({ listing, onChange }) {
       <div className="card">
         <h2>Your request</h2>
         <ErrorBox error={error} />
-        {listing.status === 'open' ? (
+        {listing.status === 'open' && !picking && (
           <div className="stack">
             <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>Edit</Link>
-            <button className="btn ok block" onClick={() => setStatus('fulfilled')}>I found it — mark fulfilled</button>
-            <button className="btn secondary block" onClick={() => setStatus('closed')}>Close without buying</button>
+            <button className="btn ok block" onClick={() => setPicking(true)}>I found it — mark fulfilled</button>
+            <button className="btn secondary block" onClick={() => confirmThen('closed', 'Close this request without buying? Conversations about it will become read-only.')}>
+              Close without buying
+            </button>
           </div>
-        ) : (
-          <button className="btn secondary block" onClick={() => setStatus('open')}>Reopen request</button>
+        )}
+        {listing.status === 'open' && picking && (
+          <form onSubmit={(e) => { e.preventDefault(); setStatus('fulfilled', dealWith === 'elsewhere' ? undefined : Number(dealWith)); }}>
+            <p><b>Great! Who did you buy from?</b></p>
+            <p className="muted small">You'll both be able to rate each other. Conversations about this request will become read-only.</p>
+            {offers.map((c) => (
+              <label key={c.id} className="choice">
+                <input type="radio" name="dealWith" value={c.id} checked={dealWith === String(c.id)} onChange={(e) => setDealWith(e.target.value)} required />
+                <Avatar name={c.other.displayName} />
+                <span><b>{c.other.displayName}</b><br /><RatingBadge rating={c.other.rating} /></span>
+              </label>
+            ))}
+            <label className="choice">
+              <input type="radio" name="dealWith" value="elsewhere" checked={dealWith === 'elsewhere'} onChange={(e) => setDealWith(e.target.value)} required />
+              <span>Someone else / not through Unc</span>
+            </label>
+            <div className="row" style={{ marginTop: '.5rem' }}>
+              <button className="btn ok" disabled={!dealWith}>Mark fulfilled</button>
+              <button type="button" className="btn secondary" onClick={() => setPicking(false)}>Cancel</button>
+            </div>
+          </form>
+        )}
+        {listing.status !== 'open' && (
+          <div className="stack">
+            {listing.dealConversationId && (
+              <p>
+                🤝 Bought from <b>{offers.find((c) => c.id === listing.dealConversationId)?.other.displayName ?? 'a seller'}</b>.{' '}
+                <Link to={`/messages/${listing.dealConversationId}`}>Rate them</Link>
+              </p>
+            )}
+            <button className="btn secondary block" onClick={() => confirmThen('open', 'Reopen this request?')}>Reopen request</button>
+          </div>
         )}
       </div>
       <div className="card" style={{ padding: 0 }}>
-        <h2 style={{ padding: '1rem 1rem 0' }}>Offers ({data?.conversations.length ?? 0})</h2>
-        {!data ? <p className="muted" style={{ padding: '1rem' }}>Loading…</p> : data.conversations.length === 0 ? (
+        <h2 style={{ padding: '1rem 1rem 0' }}>Offers ({offers.length})</h2>
+        {!data ? <p className="muted" style={{ padding: '1rem' }}>Loading…</p> : offers.length === 0 ? (
           <p className="muted" style={{ padding: '0 1rem 1rem' }}>No offers yet. Sellers who have what you need will message you here.</p>
-        ) : data.conversations.map((c) => (
+        ) : offers.map((c) => (
           <Link key={c.id} className="inbox-item" to={`/messages/${c.id}`}>
             <Avatar name={c.other.displayName} />
             <div>
               <b>{c.other.displayName}</b> {c.other.accountType === 'business' && <span className="badge grey">Business</span>}
-              <div className="muted small">{ago(c.lastMessageAt)}</div>
+              {c.id === listing.dealConversationId && <span className="badge ok">Deal</span>}
+              <div><RatingBadge rating={c.other.rating} /> <span className="muted small">· {ago(c.lastMessageAt)}</span></div>
             </div>
           </Link>
         ))}

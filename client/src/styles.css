@@ -148,3 +148,20 @@ th { color: var(--muted); font-weight: 600; }
 .doc-grid figure { margin: 0; }
 .doc-grid img { width: 100%; border-radius: 8px; border: 1px solid var(--border); }
 .empty { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
+
+/* ===== Ratings ===== */
+.stars { letter-spacing: .05em; color: var(--border); white-space: nowrap; }
+.stars .on, .star-on { color: #f5a623; }
+.rating-badge { font-size: .875rem; font-weight: 600; white-space: nowrap; }
+.star-input { display: flex; align-items: center; }
+.star-input label { font-size: 2rem; line-height: 1; cursor: pointer; color: var(--border); margin: 0; padding: 0 .1rem; font-weight: 400; transition: transform .1s; }
+.star-input label.on { color: #f5a623; }
+.star-input label:hover { transform: scale(1.15); }
+.star-input input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.star-input label:focus-within { outline: 2px solid var(--brand); border-radius: 4px; }
+.deal-banner { border-bottom: 1px solid var(--border); padding: .9rem 1.25rem; background: var(--ok-soft); }
+.choice { display: flex; gap: .6rem; align-items: center; padding: .6rem .75rem; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; font-weight: 400; margin-bottom: .5rem; }
+.choice:has(input:checked) { border-color: var(--brand); background: var(--brand-soft); }
+.choice input { width: auto; }
+.review { border-top: 1px solid var(--border); padding: .9rem 0; }
+.review:first-child { border-top: 0; }
