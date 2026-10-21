@@ -1,0 +1,111 @@
+// Used for both "post a new request" and "edit my request".
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '../api.js';
+import { useAuth } from '../auth.jsx';
+import { ErrorBox, Loading } from '../components/ui.jsx';
+import { useMeta } from '../hooks.js';
+
+const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '' };
+
+export default function NewListing() {
+  const { id } = useParams();
+  const editing = Boolean(id);
+  const { user } = useAuth();
+  const { categories, currencies } = useMeta();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ ...EMPTY, city: user.city || '' });
+  const [images, setImages] = useState([]);
+  const [loaded, setLoaded] = useState(!editing);
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  useEffect(() => {
+    if (!editing) return;
+    api(`/listings/${id}`).then(({ listing: l }) => {
+      setForm({
+        title: l.title, description: l.description, category: l.category, budgetMin: l.budgetMin ?? '',
+        budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '',
+      });
+      setLoaded(true);
+    }).catch(setError);
+  }, [editing, id]);
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      let listing;
+      if (editing) {
+        ({ listing } = await api(`/listings/${id}`, { method: 'PATCH', body: form }));
+      } else {
+        const fd = new FormData();
+        Object.entries(form).forEach(([k, v]) => v !== '' && fd.append(k, v));
+        images.forEach((f) => fd.append('images', f));
+        ({ listing } = await api('/listings', { method: 'POST', form: fd }));
+      }
+      navigate(`/requests/${listing.id}`);
+    } catch (err) {
+      setError(err);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!loaded) return error ? <ErrorBox error={error} /> : <Loading />;
+
+  return (
+    <form className="narrow card" onSubmit={submit}>
+      <h1>{editing ? 'Edit your request' : 'What are you looking for?'}</h1>
+      <p className="muted">Be specific — sellers will contact you privately about this request.</p>
+      <ErrorBox error={error} />
+      <div className="field">
+        <label htmlFor="title">Title</label>
+        <input id="title" required minLength={5} maxLength={100} placeholder="e.g. Looking for an iPhone 15, 128GB, any colour" value={form.title} onChange={set('title')} />
+      </div>
+      <div className="field">
+        <label htmlFor="category">Category</label>
+        <select id="category" required value={form.category} onChange={set('category')}>
+          <option value="" disabled>Choose a category</option>
+          {categories.map((c) => <option key={c}>{c}</option>)}
+        </select>
+      </div>
+      <div className="field">
+        <label htmlFor="description">Details</label>
+        <textarea id="description" required minLength={10} maxLength={3000} placeholder="Condition, model, size, colour, must-haves, deal-breakers…" value={form.description} onChange={set('description')} />
+      </div>
+      <div className="field">
+        <label>Budget <span className="muted">(optional)</span></label>
+        <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr 110px' }}>
+          <input type="number" min="0" placeholder="Min" value={form.budgetMin} onChange={set('budgetMin')} aria-label="Minimum budget" />
+          <input type="number" min="0" placeholder="Max" value={form.budgetMax} onChange={set('budgetMax')} aria-label="Maximum budget" />
+          <select value={form.currency} onChange={set('currency')} aria-label="Currency">
+            {currencies.map((c) => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="field-row">
+        <div className="field">
+          <label htmlFor="city">City</label>
+          <input id="city" required value={form.city} onChange={set('city')} />
+        </div>
+        <div className="field">
+          <label htmlFor="neededBy">Needed by <span className="muted">(optional)</span></label>
+          <input id="neededBy" type="date" value={form.neededBy} onChange={set('neededBy')} />
+        </div>
+      </div>
+      {!editing && (
+        <div className="field">
+          <label htmlFor="images">Reference photos <span className="muted">(optional, up to 3)</span></label>
+          <input id="images" type="file" multiple accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => setImages([...e.target.files].slice(0, 3))} />
+          <div className="hint">A photo of what you want helps sellers understand.</div>
+        </div>
+      )}
+      <button className="btn block" disabled={busy}>{busy ? 'Saving…' : editing ? 'Save changes' : 'Post request'}</button>
+    </form>
+  );
+}

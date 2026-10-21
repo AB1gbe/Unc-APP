@@ -1,0 +1,27 @@
+{
+  "name": "unc-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Reverse marketplace: buyers post what they want, verified vendors reach out about that specific request.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm run start --workspace server",
+    "seed": "npm run seed --workspace server",
+    "test": "npm test --workspace server",
+    "e2e": "node e2e/smoke.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "playwright": "^1.56.1"
+  }
+}
