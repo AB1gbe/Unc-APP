@@ -12,7 +12,7 @@ export async function ensureAdmin(db) {
     INSERT INTO users (email, password_hash, display_name, account_type, role, email_verified_at, kyc_status)
     VALUES (?, ?, 'Admin', 'individual', 'admin', datetime('now'), 'approved')
   `).run(config.adminEmail, await hashPassword(config.adminPassword));
-  console.log(`Created admin account ${config.adminEmail}`);
+  if (!config.isTest) console.log(`Created admin account ${config.adminEmail}`);
   return Number(info.lastInsertRowid);
 }
 

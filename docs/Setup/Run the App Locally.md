@@ -73,7 +73,7 @@ Copy `.env.example` to `.env` in the project folder (Windows: `copy .env.example
 |---|---|
 | `npm run dev` | API + website with auto-reload |
 | `npm run dev:server` / `npm run dev:client` | Only one of them |
-| `npm test` | Run the 32 API tests |
+| `npm test` | Run the API tests (51 as of session 05 — fewer means you need `git pull`) |
 | `npm run build` | Build the website into `client/dist` |
 | `npm start` | Run the API, which also serves the built website on :4000 |
 | `npm run seed` | Admin + demo data |
