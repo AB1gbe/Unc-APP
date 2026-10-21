@@ -201,6 +201,16 @@ const MIGRATIONS = [
   `
   ALTER TABLE messages ADD COLUMN image TEXT;
   `,
+  // 8: saved requests (session 13) - a member's "♥ save for later" list.
+  `
+  CREATE TABLE saved_listings (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, listing_id)
+  );
+  CREATE INDEX idx_saved_listing ON saved_listings(listing_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

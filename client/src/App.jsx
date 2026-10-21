@@ -23,6 +23,7 @@ const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
 const Verification = lazy(() => import('./pages/Verification.jsx'));
 const Account = lazy(() => import('./pages/Account.jsx'));
 const Welcome = lazy(() => import('./pages/Welcome.jsx'));
+const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
 const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="requests/:id" element={<ListingDetail />} />
         <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="my-requests" element={<RequireAuth><MyListings /></RequireAuth>} />
+        <Route path="saved" element={<RequireAuth><Saved /></RequireAuth>} />
         <Route path="messages" element={<RequireAuth><Inbox /></RequireAuth>} />
         <Route path="messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />
         <Route path="login" element={<Login />} />

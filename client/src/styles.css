@@ -306,3 +306,6 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .lb-next { inset-inline-end: 12px; top: 50%; transform: translateY(-50%); }
 .lb-count { position: absolute; bottom: max(16px, env(safe-area-inset-bottom)); color: #fff; font-size: .9rem; }
 @media (max-width: 759px) { .card-photo { margin: -1rem -1rem .8rem; } }
+
+/* ♡ Save button on a request (session 13) */
+.save-btn.on { color: #e0245e; border-color: #e0245e; }

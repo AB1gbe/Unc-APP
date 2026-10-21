@@ -12,6 +12,7 @@ export default function Home() {
   const convs = useApi('/conversations');
   const mine = useApi('/listings/mine');
   const forYou = useApi('/listings/for-you');
+  const saved = useApi('/listings/saved');
 
   const conversations = convs.data?.conversations ?? [];
   const attention = conversations
@@ -79,6 +80,16 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {saved.data?.listings.length > 0 && (
+        <section>
+          <div className="row spread" style={{ marginBottom: '.6rem' }}>
+            <h2 style={{ margin: 0 }}>{t('♥ Saved for later')}</h2>
+            <Link to="/saved">{t('See all')} <span className="flip">→</span></Link>
+          </div>
+          <div className="grid">{saved.data.listings.slice(0, 3).map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+        </section>
+      )}
 
       <section>
         <div className="row spread" style={{ marginBottom: '.6rem' }}>

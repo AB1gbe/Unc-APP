@@ -104,6 +104,31 @@ export function listingRoutes(db) {
     res.json({ listings: rows.map(withImages), basedOnInterests: interests.length > 0 });
   });
 
+  // The member's saved requests ("♥ Save"), newest saved first. Only ones
+  // that are still open are listed; closed ones stay saved but hidden.
+  r.get('/saved', requireAuth, (req, res) => {
+    const rows = db.prepare(`
+      ${BASE_SELECT} JOIN saved_listings s ON s.listing_id = l.id AND s.user_id = ?
+      WHERE l.status = 'open' AND u.banned_at IS NULL
+      ORDER BY s.created_at DESC, l.id DESC
+      LIMIT 100
+    `).all(req.user.id);
+    res.json({ listings: rows.map(withImages) });
+  });
+
+  r.put('/:id/save', requireAuth, (req, res) => {
+    const row = db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(Number(req.params.id));
+    if (!row || row.buyer_banned || row.status !== 'open') throw notFound('This request does not exist or is no longer open.');
+    if (row.buyer_id === req.user.id) throw new HttpError(400, "You can't save your own request.");
+    db.prepare('INSERT OR IGNORE INTO saved_listings (user_id, listing_id) VALUES (?, ?)').run(req.user.id, row.id);
+    res.json({ saved: true });
+  });
+
+  r.delete('/:id/save', requireAuth, (req, res) => {
+    db.prepare('DELETE FROM saved_listings WHERE user_id = ? AND listing_id = ?').run(req.user.id, Number(req.params.id));
+    res.json({ saved: false });
+  });
+
   // The logged-in buyer's own requests, any status.
   r.get('/mine', requireAuth, (req, res) => {
     const rows = db.prepare(`${BASE_SELECT} WHERE l.buyer_id = ? ORDER BY l.created_at DESC, l.id DESC`).all(req.user.id);
@@ -126,6 +151,7 @@ export function listingRoutes(db) {
     if (req.user && req.user.id !== row.buyer_id) {
       const conv = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, req.user.id);
       listing.myConversationId = conv?.id ?? null;
+      listing.saved = Boolean(db.prepare('SELECT 1 FROM saved_listings WHERE user_id = ? AND listing_id = ?').get(req.user.id, row.id));
     }
     res.json({ listing });
   });

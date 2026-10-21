@@ -93,6 +93,12 @@ await vendor.goto(BASE + '/');
 await vendor.waitForSelector('.card h3');
 await shot(vendor, '09-browse');
 await vendor.goto(listingUrl);
+// Save it for later, see it on the Saved page and the home page, then come back.
+await vendor.click('.save-btn'); await vendor.waitForSelector('.save-btn.on');
+await vendor.goto(BASE + '/saved'); await vendor.waitForSelector('.card h3:has-text("PS5")');
+await shot(vendor, '09b-saved');
+await vendor.goto(BASE + '/'); await vendor.waitForSelector('h2:has-text("Saved for later")');
+await vendor.goto(listingUrl); await vendor.waitForSelector('.save-btn.on');
 await vendor.fill('#offerPrice', '380'); await vendor.fill('#message', 'Hi! I have a PS5 disc edition with 2 controllers, boxed, 6 months old.');
 await vendor.setInputFiles('#offerPhoto', face); // photo of the item with the offer
 await vendor.waitForSelector('.thumb img');

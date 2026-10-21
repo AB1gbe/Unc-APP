@@ -458,4 +458,12 @@ export default {
   'Next photo': 'الصورة التالية',
   Close: 'إغلاق',
   '📷 Photo': '📷 صورة',
+  // Saved requests (session 13)
+  '♡ Save': '♡ حفظ',
+  '♥ Saved': '♥ محفوظ',
+  'Saved requests': 'الطلبات المحفوظة',
+  '♥ Saved requests': '♥ الطلبات المحفوظة',
+  '♥ Saved for later': '♥ محفوظ لوقت لاحق',
+  'Requests you saved to come back to. Closed ones drop off this list.': 'طلبات حفظتها لتعود إليها لاحقاً. الطلبات المغلقة تختفي من هذه القائمة.',
+  'Nothing saved yet. Tap ♡ Save on a request to keep it here.': 'لا يوجد شيء محفوظ بعد. اضغط ♡ حفظ على أي طلب لتجده هنا.',
 };

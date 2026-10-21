@@ -24,7 +24,10 @@ export default function ListingDetail() {
       <article className="card">
         <div className="row spread">
           <span className="badge">{t(l.category)}</span>
-          <StatusBadge status={l.status} />
+          <div className="row" style={{ gap: '.5rem' }}>
+            {user && !isOwner && l.status === 'open' && <SaveButton listing={l} />}
+            <StatusBadge status={l.status} />
+          </div>
         </div>
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
         <p className="price" style={{ fontSize: '1.2rem' }}>{budget(l)}</p>
@@ -211,6 +214,28 @@ function OwnerPanel({ listing, onChange }) {
         ))}
       </div>
     </div>
+  );
+}
+
+// "♡ Save" / "♥ Saved": keeps the request in the member's saved list.
+function SaveButton({ listing }) {
+  const [saved, setSaved] = useState(Boolean(listing.saved));
+  const [busy, setBusy] = useState(false);
+  async function toggle() {
+    setBusy(true);
+    try {
+      await api(`/listings/${listing.id}/save`, { method: saved ? 'DELETE' : 'PUT' });
+      setSaved(!saved);
+    } catch (err) {
+      window.alert(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <button type="button" className={`btn sm secondary save-btn ${saved ? 'on' : ''}`} onClick={toggle} disabled={busy} aria-pressed={saved}>
+      {saved ? t('♥ Saved') : t('♡ Save')}
+    </button>
   );
 }
 

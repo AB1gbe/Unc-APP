@@ -73,6 +73,7 @@ const AR = {
   'This submission was already reviewed.': 'تمت مراجعة هذا الطلب بالفعل.',
   'You cannot ban yourself.': 'لا يمكنك حظر نفسك.',
   'Choose up to 8 interests from the list.': 'اختر حتى 8 اهتمامات من القائمة.',
+  "You can't save your own request.": 'لا يمكنك حفظ طلبك أنت.',
   'banned must be true or false.': 'قيمة الحظر يجب أن تكون true أو false.',
   'Please enter a valid email address.': 'يُرجى إدخال بريد إلكتروني صحيح.',
   'Password needs at least 8 characters with letters and numbers.': 'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتتضمن حروفًا وأرقامًا.',
