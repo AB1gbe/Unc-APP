@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 26)
+updated: 2026-10-21 (session 27)
 ---
 # Unc — Project Vault
 
@@ -75,7 +75,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 26)
+## Status (2026-10-21, after session 27)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -100,7 +100,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Feels human: greetings and celebrations, offer cards, "Active now", share with previews, stories and badges | ✅ done — in `main` since session 21 → [[Social Touches]] |
 | "Hide when I'm online" privacy setting | ✅ done — in `main` since session 23 |
 | Shop pages for business accounts (cover, area, opening hours, no contact details) | ✅ done — in `main` since session 25 → [[Shop Pages]] |
-| "Happening near you" feed | ✅ done — on branch (session 26) → [[Social Touches]] |
+| "Happening near you" feed | ✅ done — in `main` since session 27 → [[Social Touches]] |
 | API tests | ✅ 121 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
