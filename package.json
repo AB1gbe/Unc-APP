@@ -18,7 +18,8 @@
     "start": "npm run start --workspace server",
     "seed": "npm run seed --workspace server",
     "test": "npm test --workspace server",
-    "e2e": "node e2e/smoke.mjs"
+    "e2e": "node e2e/smoke.mjs",
+    "mail:test": "npm run mail:test --workspace server --"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",

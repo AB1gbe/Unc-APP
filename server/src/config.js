@@ -52,7 +52,11 @@ export const config = {
       // true = TLS from the first byte (port 465); false = STARTTLS upgrade (port 587)
       secure: process.env.SMTP_SECURE === 'true',
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      // Google displays App Passwords in groups ("abcd efgh ijkl mnop");
+      // remove the spaces so pasting it as shown still works.
+      pass: process.env.SMTP_HOST === 'smtp.gmail.com'
+        ? process.env.SMTP_PASS?.replace(/\s+/g, '')
+        : process.env.SMTP_PASS,
     },
     resendApiKey: process.env.RESEND_API_KEY,
   },

@@ -21,6 +21,7 @@ Unc-APP/
 │   │   ├── config.js       All settings from environment variables
 │   │   ├── db.js           SQLite connection, MIGRATIONS list, tx() and audit() helpers
 │   │   ├── seed.js         ensureAdmin() + demo data (npm run seed)
+│   │   ├── mail-test.js    Sends one test email (npm run mail:test -- you@example.com)
 │   │   ├── lib/
 │   │   │   ├── crypto.js       scrypt passwords, tokens, sha256, peppered HMAC, 6-digit codes
 │   │   │   ├── http.js         HttpError + JSON error handler

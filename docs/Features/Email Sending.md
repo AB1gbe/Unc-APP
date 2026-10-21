@@ -1,6 +1,6 @@
 ---
 tags: [feature, email]
-updated: 2026-10-21 (session 02)
+updated: 2026-10-21 (session 03)
 ---
 # Email Sending
 
@@ -25,6 +25,48 @@ Each has a plain-text **and** an HTML version (some people/apps only show text).
 | `smtp` | Sent with **nodemailer** to any SMTP server | Production — works with almost every provider |
 | `resend` | Sent with one `fetch` call to Resend's HTTP API | Production, if you use Resend and prefer an API key over SMTP |
 Production (`NODE_ENV=production`) **refuses to start** with `console`, so you can't go live and silently send no emails.
+
+## Quick test with your personal Gmail (no domain needed)
+Best for trying things out on your own computer. Gmail allows roughly 500 emails a day and sends **as your Gmail address** — fine for testing, not for real users. Added in [[2026-10-21 Session 03]].
+
+**1. Turn on 2-Step Verification** (Google requires it for App Passwords)
+Go to https://myaccount.google.com/security → *2-Step Verification* → turn on. Skip if it's already on.
+
+**2. Create an App Password**
+Go to https://myaccount.google.com/apppasswords → name it `Unc` → *Create*. Google shows a 16-letter password like `abcd efgh ijkl mnop`. Copy it. You can paste it with or without the spaces — the app removes them for Gmail.
+> If the page says the setting isn't available: 2-Step Verification is off, or it's a work/school account whose admin disabled App Passwords. Use a personal Gmail.
+> This password gives full access to send from your mailbox. **Never commit it, paste it in a chat, or share screenshots of it.** You can revoke it any time on the same page.
+
+**3. Create `.env`** in the project folder (Windows cmd, inside `Unc-APP`):
+```
+copy .env.example .env
+notepad .env
+```
+Replace the email part so it reads (with **your** Gmail address and App Password):
+```
+APP_URL=http://localhost:5173
+MAIL_TRANSPORT=smtp
+MAIL_FROM=Unc <your.address@gmail.com>
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your.address@gmail.com
+SMTP_PASS=abcd efgh ijkl mnop
+```
+Save and close Notepad. `MAIL_FROM` must be your Gmail address — Gmail replaces any other sender with it anyway.
+
+**4. Send a test email** (no need to start the app):
+```
+npm run mail:test -- your.address@gmail.com
+```
+| You see | Meaning |
+|---|---|
+| `Sent! Check the inbox (and the spam folder).` | Working ✅ |
+| `Transport: console … only printed` | `.env` not found or `MAIL_TRANSPORT` not `smtp`. Make sure the file is named exactly `.env` (Notepad sometimes saves `.env.txt` — in *Save as* pick *All files*) and is inside `Unc-APP`. |
+| `Invalid login: 535 … not accepted` + hint | Wrong address or you used your normal password. Use the App Password. |
+| `ECONNREFUSED` / `ETIMEDOUT` + hint | Network blocks port 587 → set `SMTP_PORT=465` and `SMTP_SECURE=true`. |
+
+**5. Try it in the app:** `npm run dev` → sign up using your Gmail address (or a `+` alias like `your.address+buyer1@gmail.com`, which also lands in your inbox — handy for making several test accounts) → the code arrives by email. Then log out → *Forgot password?* → the reset link arrives too.
 
 ## Set up real email — step by step
 1. **Pick a provider** and create an account. Rough guide (check each provider's current docs and free tier):

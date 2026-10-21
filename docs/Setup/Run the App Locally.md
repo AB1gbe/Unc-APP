@@ -77,6 +77,7 @@ Copy `.env.example` to `.env` in the project folder (Windows: `copy .env.example
 | `npm run build` | Build the website into `client/dist` |
 | `npm start` | Run the API, which also serves the built website on :4000 |
 | `npm run seed` | Admin + demo data |
+| `npm run mail:test -- you@example.com` | Send one test email with your `.env` settings ([[Email Sending]]) |
 | `npm run e2e` | Browser test (needs `npm run build` + `npm start` on a fresh DB) |
 
 ## Reset everything
@@ -92,4 +93,4 @@ Stop the app (Ctrl + C) and delete the `server/data` folder (database + uploads)
 | `EADDRINUSE :4000` | Something already uses port 4000 (often an old copy of the app in another window). Close it, or put `PORT=4001` in `.env`. |
 | Website loads but every action says "Please log in" | You opened `:4000` while running `npm run dev`; use `:5173`, or run `npm run build` first. |
 | Lost the email code / reset link | Click *Send a new code* / request a new link; without real email both are printed in the terminal. |
-| Real emails don't arrive | See troubleshooting in [[Email Sending]]. |
+| Real emails don't arrive | Run `npm run mail:test -- you@example.com` and read the hint. See [[Email Sending]]. |

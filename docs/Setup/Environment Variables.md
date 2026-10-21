@@ -30,7 +30,7 @@ All settings live in `server/src/config.js`. Each reads an environment variable 
 | `SMTP_HOST` | — | e.g. `smtp.resend.com`, `smtp.gmail.com` |
 | `SMTP_PORT` | `587` | 587 (STARTTLS) or 465 (TLS) |
 | `SMTP_SECURE` | `false` | `true` only for port 465 |
-| `SMTP_USER` / `SMTP_PASS` | — | Login from your provider |
+| `SMTP_USER` / `SMTP_PASS` | — | Login from your provider. For `smtp.gmail.com` spaces in `SMTP_PASS` are removed automatically (App Passwords are shown with spaces). |
 | `RESEND_API_KEY` | — | For `MAIL_TRANSPORT=resend` |
 
 ## Other ways to set them

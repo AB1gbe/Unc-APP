@@ -35,9 +35,15 @@ Add `--env-file-if-exists=../.env` to `dev`, `start`, `seed` (not `test`). Creat
 ## 7. Client
 `Register.jsx` passes `emailFailed` to `VerifyEmail.jsx`, which shows a warning and a spam-folder hint.
 
-## 8. Check it
+## 8. Test command — `server/src/mail-test.js` (session 03)
+Prints the transport/host/sender, sends one email to the address given, and on failure prints a hint (wrong login → App Password; can't connect → try 465). Scripts: server `"mail:test": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/mail-test.js"`, root `"mail:test": "npm run mail:test --workspace server --"` (the trailing `--` passes your email address through).
+
+Also in `config.js`: when `SMTP_HOST` is `smtp.gmail.com`, strip whitespace from `SMTP_PASS`.
+
+## 9. Check it
 ```bash
-npm test     # mail-transports.test.js sends through a real local SMTP server
+npm test                              # mail-transports.test.js sends through a real local SMTP server
+npm run mail:test -- you@example.com  # with your .env
 ```
 Then follow [[Email Sending#Set up real email — step by step]] with your provider.
 

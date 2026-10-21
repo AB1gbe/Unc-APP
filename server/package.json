@@ -8,7 +8,8 @@
     "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env --watch src/index.js",
     "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/index.js",
     "seed": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/seed.js",
-    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\""
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\"",
+    "mail:test": "node --disable-warning=ExperimentalWarning --env-file-if-exists=../.env src/mail-test.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
