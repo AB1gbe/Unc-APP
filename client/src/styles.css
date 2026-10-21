@@ -309,3 +309,9 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* ♡ Save button on a request (session 13) */
 .save-btn.on { color: #e0245e; border-color: #e0245e; }
+
+/* 🔔 in the header (session 13); shown on every screen size */
+.nav a.bell { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: .4rem .55rem; }
+.nav a.bell .unread-dot { position: absolute; top: -2px; inset-inline-end: -4px; }
+.inbox-item.unread { background: var(--brand-soft); }
+.new-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--brand); flex-shrink: 0; margin-top: .45rem; }

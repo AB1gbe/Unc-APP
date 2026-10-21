@@ -10,6 +10,7 @@ import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
+import { notify } from '../lib/notify.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -250,11 +251,13 @@ export function listingRoutes(db) {
           throw new HttpError(409, 'This deal has already been rated, so it can no longer be changed.');
         }
         db.prepare('DELETE FROM deals WHERE id = ?').run(deal.id);
+        db.prepare(`DELETE FROM notifications WHERE kind = 'deal' AND conversation_id = ?`).run(deal.conversation_id);
       }
       if (conv && !keepsDeal) {
         const info = db.prepare('INSERT INTO deals (listing_id, conversation_id, buyer_id, vendor_id) VALUES (?, ?, ?, ?)')
           .run(row.id, conv.id, conv.buyer_id, conv.vendor_id);
         audit(db, req.user.id, 'deal.created', `deal:${info.lastInsertRowid}`, { listingId: row.id, vendorId: conv.vendor_id });
+        notify(db, conv.vendor_id, 'deal', { actorId: req.user.id, listingId: row.id, conversationId: conv.id });
       }
       db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
       audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);

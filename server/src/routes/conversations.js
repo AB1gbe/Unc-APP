@@ -18,6 +18,7 @@ import { canStillRate, ratingQueries } from '../lib/ratings.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { CHAT_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { notify } from '../lib/notify.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -151,6 +152,7 @@ export function conversationRoutes(db) {
         const id = Number(info.lastInsertRowid);
         insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
         audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
+        notify(db, listing.buyer_id, 'offer', { actorId: req.user.id, listingId: listing.id, conversationId: id });
         return id;
       });
     } catch (err) {

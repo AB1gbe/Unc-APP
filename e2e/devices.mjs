@@ -15,7 +15,7 @@ const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'screenshots
 fs.mkdirSync(OUT, { recursive: true });
 const BASE = process.env.BASE_URL || 'http://localhost:4000';
 const SIZES = [[360, 740, 'android', true], [390, 844, 'iphone', true], [768, 1024, 'ipad', true], [1024, 768, 'laptop', false], [1440, 900, 'desktop', false]];
-const PAGES = ['/', '/browse', '/my-requests', '/messages', '/account', '/requests/new'];
+const PAGES = ['/', '/browse', '/my-requests', '/messages', '/account', '/requests/new', '/notifications'];
 const problems = [];
 
 const browser = await chromium.launch();

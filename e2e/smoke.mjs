@@ -107,6 +107,12 @@ await vendor.click('button:has-text("Send offer")');
 await vendor.waitForURL('**/messages/*');
 await vendor.waitForSelector('.bubble');
 
+// The 🔔 shows the new offer; opening it clears the count.
+await buyer.goto(BASE + '/'); await buyer.waitForSelector('.bell .unread-dot');
+await buyer.click('.bell'); await buyer.waitForSelector('.inbox-item.unread:has-text("made an offer")');
+await shot(buyer, '10b-notifications');
+await buyer.waitForSelector('.bell .unread-dot', { state: 'detached' });
+
 await buyer.goto(BASE + '/messages');
 await buyer.waitForSelector('.inbox-item');
 await shot(buyer, '11-buyer-inbox');

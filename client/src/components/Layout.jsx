@@ -14,6 +14,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [unread, setUnread] = useState(0);
+  const [bell, setBell] = useState(0); // unread notifications
   const { pathname } = useLocation();
   const { lang, setLang } = useLanguage();
   const other = lang === 'ar' ? 'en' : 'ar';
@@ -27,12 +28,13 @@ export default function Layout() {
     else setLang(user.language);
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps -- only when a member logs in
 
-  // Unread count for the Messages tab: polled every 15 s while the tab is
-  // visible, re-checked on every page change, and right after a
-  // conversation marks messages read (the 'unc:read' event).
+  // Unread counts for the Messages tab and the 🔔: polled every 15 s while
+  // the tab is visible, re-checked on every page change, and right after a
+  // page marks something read (the 'unc:read' event).
   const loggedIn = Boolean(user);
   const refreshUnread = useCallback(() => {
     api('/conversations/unread-count').then((d) => setUnread(d.unread)).catch(() => {});
+    api('/notifications/unread-count').then((d) => setBell(d.unread)).catch(() => {});
   }, []);
   usePolling(refreshUnread, 15000, loggedIn);
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function Layout() {
     return () => window.removeEventListener('unc:read', refreshUnread);
   }, [refreshUnread]);
   useEffect(() => {
-    if (!loggedIn) setUnread(0);
+    if (!loggedIn) { setUnread(0); setBell(0); }
   }, [loggedIn]);
 
   return (
@@ -63,6 +65,12 @@ export default function Layout() {
             {user?.role === 'admin' && <NavLink to="/admin">{t('Admin')}</NavLink>}
             {user ? (
               <>
+                <NavLink to="/notifications" className="bell" aria-label={bell > 0 ? t('Notifications ({n} new)', { n: bell }) : t('Notifications')} title={t('Notifications')}>
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                  {bell > 0 && <span className="unread-dot">{bell > 99 ? '99+' : bell}</span>}
+                </NavLink>
                 <NavLink to="/account" className={tabbed}>{t('Account')}</NavLink>
                 <button className="btn sm secondary hide-phone" onClick={async () => { await logout(); navigate('/'); }}>{t('Log out')}</button>
               </>

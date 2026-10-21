@@ -7,6 +7,7 @@ import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth } from '../middleware/auth.js';
 import { avatarUrl } from '../lib/uploads.js';
 import { RATE_WINDOW_DAYS, VISIBLE, canStillRate, ratingQueries } from '../lib/ratings.js';
+import { notify } from '../lib/notify.js';
 
 export function ratingRoutes(db) {
   const r = Router();
@@ -33,6 +34,7 @@ export function ratingRoutes(db) {
       throw err;
     }
     audit(db, me, 'rating.created', `deal:${deal.id}`, { stars });
+    notify(db, ratee, 'rating', { actorId: me, listingId: deal.listing_id, conversationId: deal.conversation_id });
     res.status(201).json({ ok: true });
   });
 

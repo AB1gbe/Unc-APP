@@ -466,4 +466,15 @@ export default {
   '♥ Saved for later': '♥ محفوظ لوقت لاحق',
   'Requests you saved to come back to. Closed ones drop off this list.': 'طلبات حفظتها لتعود إليها لاحقاً. الطلبات المغلقة تختفي من هذه القائمة.',
   'Nothing saved yet. Tap ♡ Save on a request to keep it here.': 'لا يوجد شيء محفوظ بعد. اضغط ♡ حفظ على أي طلب لتجده هنا.',
+  // Notifications (session 13)
+  Notifications: 'الإشعارات',
+  'Notifications ({n} new)': 'الإشعارات ({n} جديدة)',
+  'A member': 'أحد الأعضاء',
+  New: 'جديد',
+  '{name} made an offer on “{title}”': 'قدّم {name} عرضاً على «{title}»',
+  '{name} picked your offer for “{title}”. Deal done! 🤝': 'اختار {name} عرضك على «{title}». تمّت الصفقة! 🤝',
+  '{name} rated your deal on “{title}”.': 'قيّم {name} صفقتكما على «{title}».',
+  'Your identity is verified ✓ You can now post requests and make offers.': 'تم التحقق من هويتك ✓ يمكنك الآن نشر الطلبات وتقديم العروض.',
+  'Your identity check was not approved. See why and try again.': 'لم تتم الموافقة على التحقق من هويتك. اعرف السبب وحاول مرة أخرى.',
+  'Nothing yet. Offers, deals, ratings and identity check results will show up here.': 'لا شيء بعد. ستظهر هنا العروض والصفقات والتقييمات ونتيجة التحقق من الهوية.',
 };

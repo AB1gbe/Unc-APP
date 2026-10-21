@@ -211,6 +211,21 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_saved_listing ON saved_listings(listing_id);
   `,
+  // 9: notifications (session 13) - see server/src/lib/notify.js.
+  `
+  CREATE TABLE notifications (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    kind            TEXT NOT NULL,
+    actor_id        INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    listing_id      INTEGER REFERENCES listings(id) ON DELETE CASCADE,
+    conversation_id INTEGER REFERENCES conversations(id) ON DELETE CASCADE,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    read_at         TEXT
+  );
+  CREATE INDEX idx_notifications_user ON notifications(user_id, id);
+  CREATE INDEX idx_notifications_unread ON notifications(user_id) WHERE read_at IS NULL;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
@@ -267,7 +282,8 @@ export function cleanupExpired(db) {
   const sessions = db.prepare(`DELETE FROM sessions WHERE expires_at <= ${now}`).run().changes;
   const resets = db.prepare(`DELETE FROM password_resets WHERE expires_at <= ${now} OR used_at IS NOT NULL`).run().changes;
   const codes = db.prepare(`DELETE FROM email_codes WHERE expires_at <= ${now}`).run().changes;
-  return { sessions, resets, codes };
+  const notifications = db.prepare(`DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at <= datetime('now', '-90 days')`).run().changes;
+  return { sessions, resets, codes, notifications };
 }
 
 export function audit(db, actorId, action, target, meta) {
