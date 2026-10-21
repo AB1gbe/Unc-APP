@@ -20,3 +20,5 @@ Screenshots land in `e2e/screenshots/`. The ones in `docs/attachments/` came fro
 
 ## Then look at the screenshots
 Tests passing ≠ looks right. Looking at them found [[Mistakes and Fixes#M10]].
+
+Next → [[Step 13 - Real email sending]]

@@ -17,6 +17,10 @@ date: 2026-10-21
 ## What is tested (`server/test/`)
 - `kyc.test.js` (10 tests): unverified users blocked from posting; email required before KYC; wrong-code limit; under-18 rejected; fake image rejected; duplicate ID blocked; business doc required; reject → resubmit → approve; KYC files admin-only; full ID never returned.
 - `messaging.test.js` (11 tests): no direct-message endpoints exist; vendor contacts about a listing; no duplicate conversations; can't offer on own request; unverified vendors blocked; outsiders can't read/write; separate thread per vendor; closed request = read-only; only owner edits; reporting; bans.
+- `password.test.js` (8 tests, session 02): see [[Password Reset#Tests]].
+- `mail-transports.test.js` (3 tests, session 02): real SMTP delivery to a local SMTP server, failure reporting, Resend API call.
 - `e2e/smoke.mjs`: full browser journey with two users and an admin.
+
+Total: **32 tests**.
 
 Run: `npm test` (API) · `npm run e2e` (browser, see [[Step 12 - End-to-end check]]).

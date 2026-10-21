@@ -7,6 +7,7 @@ tags: [architecture, reference]
 Unc-APP/
 ├── package.json            Root: npm workspaces + scripts (dev, build, start, test, seed, e2e)
 ├── package-lock.json       Exact versions of every package (commit it!)
+├── .env.example            Copy to .env for local settings (email, admin…); .env is git-ignored
 ├── CLAUDE.md               Instructions for AI sessions (always document in docs/)
 ├── README.md               Short intro + quick start
 ├── docs/                   ← THIS Obsidian vault
@@ -25,14 +26,15 @@ Unc-APP/
 │   │   │   ├── http.js         HttpError + JSON error handler
 │   │   │   ├── validate.js     Input validators (str, int, email, isoDate, password, ageOn…)
 │   │   │   ├── uploads.js      Multer in-memory uploads, magic-byte sniffing, saveFile()
-│   │   │   ├── mailer.js       sendMail() — console in dev; plug a provider here
+│   │   │   ├── mailer.js       sendMail()/trySendMail(): console | memory | smtp (nodemailer) | resend
+│   │   │   ├── emails.js       Text + HTML of every email (code, reset link, password changed)
 │   │   │   └── categories.js   CATEGORIES + CURRENCIES lists
 │   │   ├── middleware/auth.js  loadUser, requireAuth, requireVerified, requireAdmin, publicMe
 │   │   ├── kyc/
 │   │   │   ├── index.js        getProvider(), applyDecision()
 │   │   │   └── providers/      manual.js (+ README on adding Stripe/Persona…)
 │   │   └── routes/
-│   │       ├── auth.js          /api/auth/*
+│   │       ├── auth.js          /api/auth/* (incl. forgot/reset/change password)
 │   │       ├── kyc.js           /api/kyc (submit + status), sendKycFile()
 │   │       ├── listings.js      /api/listings/*
 │   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/*, /api/reports
@@ -40,7 +42,9 @@ Unc-APP/
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage)
 │       ├── kyc.test.js
-│       └── messaging.test.js
+│       ├── messaging.test.js
+│       ├── password.test.js
+│       └── mail-transports.test.js
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into
@@ -63,6 +67,7 @@ Unc-APP/
             ├── Inbox.jsx           Conversations grouped by request, tabs received/sent
             ├── Conversation.jsx    Chat with polling
             ├── Login.jsx  Register.jsx  VerifyEmail.jsx (+ Steps bar)  Verification.jsx (KYC)
-            ├── Account.jsx  NotFound.jsx
+            ├── ForgotPassword.jsx  ResetPassword.jsx
+            ├── Account.jsx (profile + change password)  NotFound.jsx
             └── admin/AdminHome.jsx (stats, KYC queue, reports)  admin/KycReview.jsx
 ```

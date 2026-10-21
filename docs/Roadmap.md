@@ -4,10 +4,10 @@ tags: [roadmap]
 # Roadmap
 
 ## Before public launch
-- [ ] Real email provider → [[Email Verification]]
+- [x] Real email sending (SMTP / Resend) → [[Email Sending]] *(session 02)* — still to do: pick a provider and verify your domain
 - [ ] Production env vars + HTTPS + backups → [[Deploying to Production]]
 - [ ] Privacy policy, terms, KYC data-retention policy (auto-delete documents after N days)
-- [ ] Password reset by email
+- [x] Password reset by email + change password → [[Password Reset]] *(session 02)*
 - [ ] Decide on automated KYC provider → [[KYC Verification#Adding an automated provider]]
 
 ## Next features

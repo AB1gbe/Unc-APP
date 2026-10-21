@@ -1,27 +1,13 @@
 ---
 tags: [feature, auth]
+updated: 2026-10-21 (session 02)
 ---
 # Email Verification
 
-**Where:** `server/src/routes/auth.js` (`issueEmailCode`, `/verify-email`, `/resend-code`), `server/src/lib/mailer.js`, `client/src/pages/VerifyEmail.jsx`.
+**Where:** `server/src/routes/auth.js` (`issueEmailCode`, `/verify-email`, `/resend-code`), `client/src/pages/VerifyEmail.jsx`. Sending: [[Email Sending]].
 
 - On register a 6-digit code is generated (`crypto.randomInt`), stored as a peppered hash, valid **15 minutes**, **5 attempts**.
-- **Development:** the code is printed in the server terminal (`[mail] Your code is 123456`) and shown on the page (`devCode`). In production `devCode` is never sent.
-- Email must be verified before KYC.
-
-## Switching to real email
-Pick a provider (Resend, Postmark, Amazon SES, SendGrid). Example with Resend:
-```bash
-npm install resend --workspace server
-```
-```js
-// server/src/lib/mailer.js
-import { Resend } from 'resend';
-const resend = new Resend(process.env.RESEND_API_KEY);
-export async function sendMail(to, subject, text) {
-  if (config.isTest) return;
-  if (!config.isProd) return console.log(`[mail] to=${to} ${text}`);
-  await resend.emails.send({ from: 'Unc <no-reply@yourdomain.com>', to, subject, text });
-}
-```
-You must verify your sending domain with the provider (DNS records) first. Add `RESEND_API_KEY` to [[Environment Variables]].
+- The email is sent with `verificationCodeEmail(code)`.
+- **Only with `MAIL_TRANSPORT=console`** (and never in production) the API also returns `devCode`, which the page shows in a blue "Development mode" box. With real email configured you must use your inbox.
+- If sending fails at sign-up, the account is still created and the page asks the user to press *Send a new code*.
+- Email must be verified before KYC. Completing a password reset also marks the email verified (clicking the emailed link proves ownership).

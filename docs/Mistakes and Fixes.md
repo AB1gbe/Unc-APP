@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21
+updated: 2026-10-21 (session 02)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 13 mistakes — 5 tooling/setup, 6 app bugs caught before release, 2 dev-environment gotchas. All fixed.
+**Totals so far:** 16 entries — 5 tooling/setup, 6 app bugs caught before release, 3 dev-environment gotchas, 1 documentation gap found by the owner, 1 false alarm. All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -23,6 +23,9 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M11 | Client | Unread badge stayed after reading | 01 |
 | M12 | Dev env | `pkill -f` killed its own shell | 01 |
 | M13 | Dev env | Same, because start + stop were in one command | 01 |
+| M14 | Docs | Owner's first run on Windows failed: `ENOENT … package.json` | [[2026-10-21 Session 02]] |
+| M15 | Dev env | Test SMTP catcher imported a package by a guessed internal path | 02 |
+| M16 | False alarm | Garbled "â" in the reset email screenshot | 02 |
 
 ---
 
@@ -133,3 +136,25 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 - **Cause:** that time the same shell command *also started* the server with the literal text `src/index.js`, so the pattern still matched the shell.
 - **Fix:** run "stop server" as its own separate command.
 - **Lesson:** stopping processes by name is fragile. Simplest for you: press **Ctrl + C** in the terminal running `npm run dev`.
+
+## M14
+**First run on Windows: `npm error enoent Could not read package.json: … C:\Users\a.baqer\package.json`**
+- **Reported by:** the owner, with a screenshot, running `npm install && npm run seed && npm run dev` in a fresh Command Prompt.
+- **Cause (two gaps in my instructions):**
+  1. The command was run in the home folder `C:\Users\a.baqer`, not inside the project. npm looks for `package.json` in the *current* folder. My chat summary said "run this" without saying "first clone and `cd` into the project".
+  2. The code lives on the branch `claude/vibrant-edison-r9o798`, not `main`. A plain `git clone` checks out `main`, which only has the one-line README — so even inside the folder it would have failed.
+- **Fix:** [[Run the App Locally]] now has a Windows section with every command, including `git clone -b claude/vibrant-edison-r9o798 …` and `cd Unc-APP`, plus this error in the troubleshooting table. README updated the same way. (Once the branch is merged into `main`, the `-b …` part is no longer needed.)
+- **Lesson:** instructions for a non-developer must start from "open a terminal" and say *which folder* and *which branch*. Never assume the reader is already inside the project.
+
+## M15
+**`ERR_MODULE_NOT_FOUND …/smtp-server/lib/smtp-server.js`** (test tooling only)
+- **Context:** a throw-away script that runs a fake SMTP server so the app could send real emails during the browser test.
+- **Cause:** I imported a guessed internal file path; that package actually ships its code in `dist/cjs/`.
+- **Fix:** import by package name — `import { SMTPServer } from 'smtp-server'` — and let Node resolve it (the script had to sit inside the project so Node could find `node_modules`).
+- **Lesson:** never import a package's internal files; use the package name.
+
+## M16
+**False alarm: "ignore this email â€" your password…" in the email screenshot**
+- **Cause:** my quick test decoder turned each UTF-8 *byte* of "—" into a separate character. Real email apps decode it correctly — the email itself was fine.
+- **Action anyway:** replaced the raw "—" in the HTML email with the entity `&mdash;`, which survives any charset handling.
+- **Lesson:** when something looks broken, check whether the *viewer* is broken before changing the product — but if a cheap change makes it robust either way, do it.

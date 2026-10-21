@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21
+updated: 2026-10-21 (session 02)
 ---
 # Unc — Project Vault
 
@@ -33,10 +33,12 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 10 - Client setup]]
 - [[Step 11 - Client pages]]
 - [[Step 12 - End-to-end check]]
+- [[Step 13 - Real email sending]]
+- [[Step 14 - Password reset]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -51,7 +53,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21)
+## Status (2026-10-21, after session 02)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -59,7 +61,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Requests: post / browse / search / edit / close | ✅ done |
 | Listing-bound private messaging | ✅ done |
 | Admin: KYC queue, reports, bans | ✅ done |
-| API tests | ✅ 21 passing |
+| Password reset + change password | ✅ done |
+| Real email (SMTP or Resend) | ✅ done — needs your provider details in `.env` |
+| API tests | ✅ 32 passing |
 | Browser end-to-end test | ✅ passing |
-| Real email sending | ⏳ prints to console — see [[Email Verification]] |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

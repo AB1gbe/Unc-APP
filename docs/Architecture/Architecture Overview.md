@@ -28,7 +28,7 @@ tags: [architecture]
 ## Permission gates (server/src/middleware/auth.js)
 | Gate | Allows |
 |---|---|
-| none | Browse/search open requests, view a request, register, login |
+| none | Browse/search open requests, view a request, register, login, forgot/reset password |
 | `requireAuth` | Logged in & not banned: inbox, read own conversations, account, submit KYC, close own request, report |
 | `requireVerified` | + email verified + KYC approved: **post/edit requests, make offers, send messages** |
 | `requireAdmin` | Admin role: KYC queue/decisions, view KYC files, reports, bans |

@@ -11,16 +11,18 @@ The app is **one Node process**: the API also serves the built React site. So an
 - [ ] `ADMIN_EMAIL` / `ADMIN_PASSWORD` set to real values
 - [ ] HTTPS in front (hosts below do this automatically) — cookies are `secure` in production
 - [ ] `DATA_DIR` on a **persistent volume**, with backups
-- [ ] Real email sending wired in → [[Email Verification]]
+- [ ] `MAIL_TRANSPORT=smtp` or `resend` + `MAIL_FROM` on a domain with SPF/DKIM set up → [[Email Sending]]
+- [ ] `APP_URL=https://yourdomain.com` (otherwise reset links point to localhost)
 - [ ] Decide on KYC: keep manual review, or plug in a provider → [[KYC Verification]]
 - [ ] Privacy policy + terms (KYC data is sensitive personal data; GDPR/CCPA apply)
 
 ## Generic steps (any VPS or platform)
 ```bash
-git clone https://github.com/AB1gbe/Unc-APP.git && cd Unc-APP
+git clone -b claude/vibrant-edison-r9o798 https://github.com/AB1gbe/Unc-APP.git && cd Unc-APP   # or main once merged
 npm ci                 # exact versions from package-lock.json
 npm run build          # builds client/dist
-NODE_ENV=production SECRET_PEPPER=... ADMIN_PASSWORD=... DATA_DIR=/var/data/unc npm start
+cp .env.example .env   # then fill in the production values
+npm start
 ```
 
 ## Example: Render.com

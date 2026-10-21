@@ -17,5 +17,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 008 | [[ADR-008 File storage]] | Local disk, KYC folder private | S3/R2, database BLOBs, Cloudinary |
 | 009 | [[ADR-009 Styling approach]] | One plain CSS file with tokens | Tailwind, MUI/Chakra, CSS modules |
 | 010 | [[ADR-010 Testing]] | node:test + supertest; Playwright smoke | Jest, Vitest, Cypress, manual only |
+| 011 | [[ADR-011 Email delivery]] | SMTP via nodemailer + Resend API option | Provider SDKs, self-hosted mail, SMTP, HTTP API |
+| 012 | [[ADR-012 Password reset design]] | Single-use emailed link, 30 min | 6-digit code, security questions, SMS, admin reset |
 
 Template for new ADRs: copy any ADR and keep the same headings.

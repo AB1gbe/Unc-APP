@@ -31,5 +31,12 @@ tags: [reference]
 | **Route guard** | A wrapper component that redirects you if you're not allowed on a page. |
 | **Session** | "You are logged in" state: a random token in a cookie, its hash stored in the `sessions` table. |
 | **SQLite** | A database stored in a single file. |
+| **SMTP** | The standard protocol for sending email. Every email provider offers an SMTP server address, port and login. |
+| **nodemailer** | The Node.js library that sends email over SMTP. |
+| **SPF / DKIM / DMARC** | DNS records proving your domain allowed a provider to send its email. Without them emails go to spam. |
+| **App Password** | A special Gmail password for apps, needed for Gmail SMTP (requires 2-step verification). |
+| **.env file** | A text file of `NAME=value` settings read at startup. Never committed. |
+| **Account enumeration** | Finding out which emails are registered by watching how the site responds. We give identical answers to prevent it. |
+| **Token (reset)** | A long random secret in the reset link. Only its hash is stored. |
 | **Supertest** | Library to call the API from tests without starting a real server. |
 | **Vite** | The development server and build tool for the React client. |

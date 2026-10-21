@@ -26,6 +26,9 @@ Any account can be both buyer and vendor. A "vendor" is just someone making an o
 
 This is also written into `CLAUDE.md` at the repository root so any future AI session follows it automatically.
 
+## Added in later sessions
+- Session 02: password reset + real email sending ([[Password Reset]], [[Email Sending]]).
+
 ## Words we use
 - **Request** = **Listing** in the code. A buyer's post saying what they want. (The database table is `listings`.)
 - **Offer** = the first message a vendor sends about a request (optionally with a price).

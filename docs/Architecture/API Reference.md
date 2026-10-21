@@ -23,7 +23,12 @@ Gate legend: — public · **A** logged in · **V** verified (email + KYC) · **
 | POST | `/api/auth/verify-email` | A | `code` (6 digits). 5 wrong tries → 429 |
 | POST | `/api/auth/resend-code` | A | `{ok, devCode?}` |
 
-`devCode` is included **only when NODE_ENV ≠ production**.
+| POST | `/api/auth/forgot-password` | — | `email` → always `{ok, message}` |
+| POST | `/api/auth/reset-password/check` | — | `token` → `{ok}` or 400 `code: RESET_INVALID` |
+| POST | `/api/auth/reset-password` | — | `token, password` → `{ok}`; ends all sessions |
+| POST | `/api/auth/change-password` | A | `currentPassword, password` → `{ok}`; ends other sessions |
+
+`register` also returns `emailSent: true/false`. `devCode` is included **only when NODE_ENV ≠ production and MAIL_TRANSPORT is console** (or in tests). `resend-code` → 502 if the email couldn't be sent.
 
 ## KYC — `server/src/routes/kyc.js`
 | Method | Path | Gate | Notes |
