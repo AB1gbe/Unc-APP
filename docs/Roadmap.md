@@ -26,13 +26,14 @@ tags: [roadmap]
 - [x] Photos in chat messages (private) + up to 6 request photos, full-screen viewer *(session 13)*
 - [x] Saved requests (♡ Save) *(session 13)*
 - [x] In-app notifications 🔔 (offers, deals, ratings, identity result) *(session 13)*
-- [ ] Email/push notification when a new offer arrives (in-app 🔔 done in session 13)
+- [x] Push notification to the phone when a new offer arrives (session 15) — [[Push Notifications]]. Email for new offers: still open.
 - [ ] Saved searches for vendors ("notify me of new Electronics requests in Austin")
 - [ ] Location with radius instead of free-text city
 - [ ] Admin UI for the audit log; promote/demote admins
 - [ ] Block a user (stop a specific vendor contacting you again)
 - [x] Works on phones/tablets + "Add to Home Screen" (manifest, icons, bottom tab bar) → [[ADR-001 Platform]] *(session 13)*
-- [ ] Offline support (service worker) + push notifications → [[ADR-001 Platform]]
+- [ ] Offline support (service worker exists since session 15, but caches nothing yet) → [[ADR-001 Platform]]
+- [ ] Push for more events (deal, rating, identity result), with a per-kind on/off — [[ADR-022 Push notifications]]
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]

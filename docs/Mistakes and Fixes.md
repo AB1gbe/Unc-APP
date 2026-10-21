@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 14)
+updated: 2026-10-21 (session 15)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 55 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55). All fixed.
+**Totals so far:** 59 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -65,6 +65,10 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M53 | Test | Old test still expected the 3-photo limit | 13 |
 | M54 | Design | Chat **Send** button squeezed to "Sen / d" after adding 📷 | 13 |
 | M55 | Process | Session note written after the merge, so it missed `main` | [[2026-10-21 Session 14]] |
+| M56 | Test | New test used the title "Mine", which is too short → 400 (session 13, logged late) | [[2026-10-21 Session 15]] |
+| M57 | Dev env | Headless Chromium reports notifications as "blocked" no matter what | 15 |
+| M58 | Dev env | Push refused in a private/incognito browser profile | 15 |
+| M59 | Client | Stuck "Turn on" button and an English-only error when subscribing failed | 15 |
 
 ---
 
@@ -366,4 +370,26 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause:** pull request #3 was opened and merged first, and the note written afterwards. In session 11 the note was pushed *before* the merge.
 - **Fix:** the note is on `claude/vibrant-edison-r9o798` and goes into `main` with the next pull request.
 - **Lesson:** for "open and merge", write and push the session note first, then open the pull request.
+
+## M56
+**`saved.test.js` failed with 400 on its first run (session 13, logged late)**
+- **Cause:** the test made a request titled "Mine". Titles need at least a few characters, so the request was refused before the test reached what it was checking.
+- **Fix:** title "My own request". Not logged at the time, which breaks the vault rule; recorded now.
+- **Lesson:** test data must pass the app's own validation. Copy values from `helpers.js` defaults.
+
+## M57
+**In the browser test, the notifications card always said "blocked"**
+- **Cause:** Playwright's default headless Chromium ("headless shell") reports notification permission as denied, even after `grantPermissions(['notifications'])`.
+- **Fix/decision:** the browser tests only check that the card shows. The full flow was probed with `chromium.launch({ channel: 'chromium' })` (the newer headless mode), and the server is tested with a fake push service.
+
+## M58
+**"Chrome currently does not support the Push API in incognito mode"**
+- **Cause:** a normal Playwright browser context is like an incognito window, and Chrome refuses push there on purpose.
+- **Fix:** probe with `chromium.launchPersistentContext(folder, { channel: 'chromium' })`. For members, the card now explains private windows (see M59).
+
+## M59
+**When subscribing failed, the button stayed greyed out, or showed an English browser error**
+- **Found by:** the M58 probe. In the sandbox, subscribing waits forever because Google's push servers can't be reached; in incognito, the error text was "Registration failed - permission denied" in English, even in Arabic.
+- **Fix:** `enablePush()` gives up after 20 s and shows a translated message ("Couldn't turn on notifications in this browser. Private/incognito windows can't get them; otherwise check your connection and try again."). The raw error goes to the browser console.
+- **Lesson:** anything that waits on another company's server needs a timeout, and browser error text is never shown as-is.
 

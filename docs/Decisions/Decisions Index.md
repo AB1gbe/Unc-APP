@@ -28,5 +28,6 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 019 | [[ADR-019 Phones, tablets and PWA]] | Responsive site + manifest, bottom tab bar under 900 px, 44 px touch targets, `e2e:devices` check | native app, hamburger menu, 760 px breakpoint |
 | 020 | [[ADR-020 Photos in chat and requests]] | Chat photos private to the conversation; 6 public request photos; shrink in the browser | public chat photos, server-side resizing, several per message |
 | 021 | [[ADR-021 Saved requests and notifications]] | Saved list on the server; 🔔 for offer/deal/rating/identity only, polled every 15 s | browser storage, notify every message, WebSockets |
+| 022 | [[ADR-022 Push notifications]] | Web Push (`web-push`), auto-generated VAPID keys, new offers only, name + title on the lock screen, off on log out | native app, SMS, email, WhatsApp, every event |
 
 Template for new ADRs: copy any ADR and keep the same headings.
