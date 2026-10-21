@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 13)
+updated: 2026-10-21 (session 14)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 54 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54). All fixed.
+**Totals so far:** 55 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -64,6 +64,7 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M52 | Server | A missing public photo returned 500 instead of 404 | 13 |
 | M53 | Test | Old test still expected the 3-photo limit | 13 |
 | M54 | Design | Chat **Send** button squeezed to "Sen / d" after adding 📷 | 13 |
+| M55 | Process | Session note written after the merge, so it missed `main` | [[2026-10-21 Session 14]] |
 
 ---
 
@@ -359,4 +360,10 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Found by:** looking at the chat screenshot before committing the photos step.
 - **Cause:** the new 📷 button took width; flex items may shrink, so the button's text wrapped.
 - **Fix:** `.chat-form .btn, .chat-form .attach { flex-shrink: 0; white-space: nowrap; }`.
+
+## M55
+**The session-14 note isn't in `main`**
+- **Cause:** pull request #3 was opened and merged first, and the note written afterwards. In session 11 the note was pushed *before* the merge.
+- **Fix:** the note is on `claude/vibrant-edison-r9o798` and goes into `main` with the next pull request.
+- **Lesson:** for "open and merge", write and push the session note first, then open the pull request.
 

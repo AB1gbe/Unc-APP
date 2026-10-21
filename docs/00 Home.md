@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 13)
+updated: 2026-10-21 (session 14)
 ---
 # Unc — Project Vault
 
@@ -65,7 +65,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 13)
+## Status (2026-10-21, after session 14)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -80,11 +80,11 @@ This vault is the complete record of the project: **how** everything was built, 
 | Ratings after a deal (blind, two-way) + member profiles | ✅ done — in `main` since session 11 |
 | Live preview while building (`npm run live`) | ✅ done |
 | One-word `pull` / `push` | ✅ done |
-| Arabic + right-to-left (pages, server messages, emails) | ✅ done — on branch |
-| Profiles (photo, bio, interests), welcome step, member home | ✅ done — on branch (session 13) |
-| Photos: request (6), offer, private chat photos, full-screen viewer | ✅ done — on branch (session 13) |
-| Phones, tablets, every screen size; installable (Add to Home Screen) | ✅ done — on branch (session 13) |
-| Saved requests (♡) and notifications (🔔) | ✅ done — on branch (session 13) |
+| Arabic + right-to-left (pages, server messages, emails) | ✅ done — in `main` since session 14 |
+| Profiles (photo, bio, interests), welcome step, member home | ✅ done — in `main` since session 14 |
+| Photos: request (6), offer, private chat photos, full-screen viewer | ✅ done — in `main` since session 14 |
+| Phones, tablets, every screen size; installable (Add to Home Screen) | ✅ done — in `main` since session 14 |
+| Saved requests (♡) and notifications (🔔) | ✅ done — in `main` since session 14 |
 | API tests | ✅ 93 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

@@ -20,3 +20,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 11]] | Pull request #2 (ratings, live sync, pull/push, Bahrain research) merged into `main` |
 | 2026-10-21 | [[2026-10-21 Session 12]] | Arabic + right-to-left: all pages, server messages, emails, Arabic browser test |
 | 2026-10-21 | [[2026-10-21 Session 13]] | Images (chat, offers, requests), real profiles, welcome step, member home, phones/tablets/installable, saved requests, notifications |
+| 2026-10-21 | [[2026-10-21 Session 14]] | Pull request #3 (Arabic, profiles, photos, phones, saved requests, notifications) merged into `main` |
