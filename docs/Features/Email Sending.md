@@ -13,6 +13,18 @@ updated: 2026-10-21 (session 03)
 | Sign up / "send a new code" | `verificationCodeEmail(code)` | `123456 is your Unc verification code` |
 | "Forgot password?" | `passwordResetEmail(token)` | `Reset your Unc password` |
 | Password reset or changed | `passwordChangedEmail()` | `Your Unc password was changed` |
+| A seller makes an offer on your request (session 17; only while **Account → Email notifications** is ticked) | `newOfferEmail({...})` | `New offer on “<request title>”` |
+
+### The new-offer email (session 17)
+| English | Arabic |
+|---|---|
+| ![[s17-offer-email-en.png]] | ![[s17-offer-email-ar.png]] |
+
+- **Who and when:** sent to the buyer, once per new offer (not for replies), right after the offer is saved. It goes through `trySendMail`, so a failed email never fails the offer.
+- **What it says:** the seller's name, the request, the price (if one was given), the first 300 characters of the message, a **See the offer** button and a footer link to turn these emails off.
+- **Language:** the buyer's language (`users.language`).
+- **Member text direction:** member-written text (names, titles, messages) gets its own direction set explicitly. In HTML that is `<span dir="ltr|rtl">` from `textDir()`; in subjects and plain text, Unicode isolate marks. Email apps ignore `dir="auto"` and `<bdi>` ([[Mistakes and Fixes#M61]]).
+- **Why:** [[ADR-023 Email for new offers]].
 Each has a plain-text **and** an HTML version (some people/apps only show text). HTML uses tables + inline styles because many email apps strip `<style>` tags. Every user-supplied value is HTML-escaped (`esc()`).
 
 ![[20-reset-email.png]]

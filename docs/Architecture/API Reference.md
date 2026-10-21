@@ -21,7 +21,7 @@ Files: `/uploads/listings/*` and `/uploads/avatars/*` are public static files; `
 | POST | `/api/auth/logout` | — | clears session |
 | GET | `/api/auth/me` | — | `{user}` or `{user:null}`. `user` includes `avatarUrl, bio, interests, onboarded` (session 13) |
 | PUT | `/api/auth/language` | A | `language: en/ar` — saves the member's language (emails use it). Session 12 |
-| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories)` — only the fields sent are changed → `{user}`. Session 13 |
+| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17)` — only the fields sent are changed → `{user}`. Session 13 |
 | POST | `/api/auth/avatar` | A | **multipart** file `avatar` → `201 {user}`; replaces (and deletes) the old photo. Session 13 |
 | DELETE | `/api/auth/avatar` | A | removes the profile photo → `{user}`. Session 13 |
 | POST | `/api/auth/onboarded` | A | welcome step finished or skipped → `{user}` with `onboarded: true`. Session 13 |
@@ -95,7 +95,7 @@ Created by `notify()` in `server/src/lib/notify.js`: `offer` (new conversation o
 | POST | `/api/push/unsubscribe` | A | `{endpoint}`: removes this device (also called on log out) |
 | POST | `/api/push/test` | A | sends "Notifications are on" to all my devices → `{sent}`; 409 if none |
 
-Sent by `pushTo()` in `server/src/lib/push.js`. Today only on a **new offer** (`POST /api/listings/:id/contact`, after the transaction), to the buyer, in their language. Push service answers 404/410 → that device is deleted.
+Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buyer (`newOfferEmail`) when `users.email_offers` = 1 (session 17). Push: today only on a **new offer** (`POST /api/listings/:id/contact`, after the transaction), to the buyer, in their language. Push service answers 404/410 → that device is deleted.
 
 ## Admin — `server/src/routes/admin.js` (all ADM)
 | Method | Path | Notes |

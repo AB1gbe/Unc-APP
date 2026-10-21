@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 15)
+updated: 2026-10-21 (session 17)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 59 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59). All fixed.
+**Totals so far:** 63 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -69,6 +69,10 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M57 | Dev env | Headless Chromium reports notifications as "blocked" no matter what | 15 |
 | M58 | Dev env | Push refused in a private/incognito browser profile | 15 |
 | M59 | Client | Stuck "Turn on" button and an English-only error when subscribing failed | 15 |
+| M60 | Client | Email tick box jumped back when clicked, until the server answered | [[2026-10-21 Session 17]] |
+| M61 | Email | English message shown backwards in the Arabic email | 17 |
+| M62 | Dev env | Re-ran the browser test on the same database → sign-up failed | 17 |
+| M63 | Test | Tests broke on invisible direction marks; the "fails on old code" check stashed too much | 17 |
 
 ---
 
@@ -392,4 +396,30 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Found by:** the M58 probe. In the sandbox, subscribing waits forever because Google's push servers can't be reached; in incognito, the error text was "Registration failed - permission denied" in English, even in Arabic.
 - **Fix:** `enablePush()` gives up after 20 s and shows a translated message ("Couldn't turn on notifications in this browser. Private/incognito windows can't get them; otherwise check your connection and try again."). The raw error goes to the browser console.
 - **Lesson:** anything that waits on another company's server needs a timeout, and browser error text is never shown as-is.
+
+## M60
+**The "Email me…" tick box jumped back when clicked**
+- **Found by:** the browser test (`locator.uncheck: Clicking the checkbox did not change its state`).
+- **Cause:** the box showed `user.emailOffers`, which only changes after the server answers. React put the old value back straight away, so the click looked ignored until the save finished.
+- **Fix:** the card keeps its own `checked` state, sets it at once, and puts it back only if the save fails.
+- **Lesson:** a control that saves on change must show the change straight away.
+
+## M61
+**In the Arabic email, an English message was shown backwards (".months old" at the start)**
+- **Found by:** rendering the email to a picture before committing.
+- **Cause:** the email used `dir="auto"` and `<bdi>` like the website. Email apps (and the HTML once embedded in some clients) don't apply them, so the English text took the email's right-to-left direction.
+- **Fix:** `textDir()` picks `ltr`/`rtl` from the first letter. HTML gets `<span dir=…>` / `<blockquote dir=…>`, and subjects and plain text get Unicode isolate marks (U+2068 … U+2069).
+- **Lesson:** emails are not browsers. Look at every email in both languages.
+
+## M62
+**`npm run e2e` failed at sign-up the second time**
+- **Cause:** it ran twice against the same running server and database, so the test's email addresses already existed.
+- **Fix:** each run on a fresh `DATA_DIR`, as before. The real error (M60) only showed in the first run.
+- **Lesson:** restart the server on a fresh data folder before every journey run.
+
+## M63
+**Two test slips while fixing M61**
+- After adding the isolate marks, the exact subject and text checks failed. The tests now strip the invisible marks first (`plain()`).
+- Proving the new test "fails on the old code": `git stash push -- server/src/lib/emails.js` removed the *whole new email function* (it was not committed yet), so the test failed for the wrong reason. Instead, the old markup (`dir="auto"`, `<bdi>`) was put back temporarily → 1 failure, then the fix was restored → all pass.
+- **Lesson:** "fails on old code" means old *behaviour*, not a missing file.
 

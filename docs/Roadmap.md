@@ -26,7 +26,7 @@ tags: [roadmap]
 - [x] Photos in chat messages (private) + up to 6 request photos, full-screen viewer *(session 13)*
 - [x] Saved requests (♡ Save) *(session 13)*
 - [x] In-app notifications 🔔 (offers, deals, ratings, identity result) *(session 13)*
-- [x] Push notification to the phone when a new offer arrives (session 15) — [[Push Notifications]]. Email for new offers: still open.
+- [x] Push notification to the phone when a new offer arrives (session 15) — [[Push Notifications]]. Email for new offers: done in session 17 ([[Email Sending#The new-offer email (session 17)]]).
 - [ ] Saved searches for vendors ("notify me of new Electronics requests in Austin")
 - [ ] Location with radius instead of free-text city
 - [ ] Admin UI for the audit log; promote/demote admins

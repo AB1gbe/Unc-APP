@@ -29,5 +29,6 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 020 | [[ADR-020 Photos in chat and requests]] | Chat photos private to the conversation; 6 public request photos; shrink in the browser | public chat photos, server-side resizing, several per message |
 | 021 | [[ADR-021 Saved requests and notifications]] | Saved list on the server; 🔔 for offer/deal/rating/identity only, polled every 15 s | browser storage, notify every message, WebSockets |
 | 022 | [[ADR-022 Push notifications]] | Web Push (`web-push`), auto-generated VAPID keys, new offers only, name + title on the lock screen, off on log out | native app, SMS, email, WhatsApp, every event |
+| 023 | [[ADR-023 Email for new offers]] | On by default with a switch in Account; one email per offer with details; sent without waiting; explicit text direction | opt-in, digest, every message, link-free unsubscribe, dir=auto |
 
 Template for new ADRs: copy any ADR and keep the same headings.
