@@ -6,6 +6,7 @@ import { Loading } from './ui.jsx';
 import TabBar from './TabBar.jsx';
 import { usePolling } from '../hooks.js';
 import { LANGUAGES, hasSavedChoice, t, tj, useLanguage } from '../i18n.jsx';
+import Celebrations from './Celebrate.jsx';
 
 // On phones these header links are hidden: the bottom tab bar has them.
 const tabbed = ({ isActive }) => `hide-phone${isActive ? ' active' : ''}`;
@@ -99,6 +100,7 @@ export default function Layout() {
         </Suspense>
       </main>
       {user && <TabBar unread={unread} />}
+      <Celebrations />
     </>
   );
 }

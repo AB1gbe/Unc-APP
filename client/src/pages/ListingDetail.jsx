@@ -7,6 +7,7 @@ import { useApi } from '../hooks.js';
 import { formatDate, t, tj } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
+import { celebrate } from '../components/Celebrate.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -96,6 +97,7 @@ function OfferPanel({ listing }) {
       if (offerPrice !== '') fd.append('offerPrice', offerPrice);
       if (photos[0]) fd.append('image', photos[0]);
       const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
+      celebrate({ text: t("Offer sent! You'll be notified when they reply.") });
       navigate(`/messages/${conversation.id}`);
     } catch (err) {
       if (err.body?.conversationId) return navigate(`/messages/${err.body.conversationId}`);
@@ -140,6 +142,9 @@ function OwnerPanel({ listing, onChange }) {
     setError(null);
     try {
       await api(`/listings/${listing.id}/status`, { method: 'POST', body: { status, conversationId } });
+      if (status === 'fulfilled') {
+        celebrate({ text: conversationId ? t("Found it! 🎉 Don't forget to rate the seller.") : t('Glad you found it! 🎉'), confetti: true });
+      }
       setPicking(false);
       onChange();
     } catch (err) {
@@ -159,7 +164,7 @@ function OwnerPanel({ listing, onChange }) {
         {listing.status === 'open' && !picking && (
           <div className="stack">
             <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>{t('Edit')}</Link>
-            <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it — mark fulfilled')}</button>
+            <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it! 🎉')}</button>
             <button className="btn secondary block" onClick={() => confirmThen('closed', t('Close this request without buying? Conversations about it will become read-only.'))}>
               {t('Close without buying')}
             </button>
@@ -181,7 +186,7 @@ function OwnerPanel({ listing, onChange }) {
               <span>{t('Someone else / not through Unc')}</span>
             </label>
             <div className="row" style={{ marginTop: '.5rem' }}>
-              <button className="btn ok" disabled={!dealWith}>{t('Mark fulfilled')}</button>
+              <button className="btn ok" disabled={!dealWith}>{t('Yes, I found it')}</button>
               <button type="button" className="btn secondary" onClick={() => setPicking(false)}>{t('Cancel')}</button>
             </div>
           </form>

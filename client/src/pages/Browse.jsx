@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
-import { ErrorBox, ListingCard, Loading } from '../components/ui.jsx';
+import { ErrorBox, ListingCard, CardsLoading, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
 
@@ -52,9 +52,9 @@ export default function Browse() {
         <button className="btn">{t('Search')}</button>
       </form>
       <ErrorBox error={error} />
-      {loading ? <Loading /> : result.listings.length === 0 ? (
+      {loading ? <CardsLoading /> : result.listings.length === 0 ? (
         <div className="card empty">
-          <p>{t('No open requests match your search.')}</p>
+          <p>{t("Nobody's asked for that yet. Looking for it yourself? Post it and let sellers come to you.")}</p>
           {user && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
         </div>
       ) : (

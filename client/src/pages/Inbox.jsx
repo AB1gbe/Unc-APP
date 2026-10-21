@@ -31,7 +31,7 @@ export default function Inbox() {
       </div>
       {groups.size === 0 ? (
         <div className="card empty">
-          <p>{t('No conversations yet.')}</p>
+          <p>{t('Quiet in here… for now.')}</p>
           <p className="small">{t('Conversations start when a seller makes an offer on a request.')} <Link to="/">{t('Browse requests')}</Link></p>
         </div>
       ) : (

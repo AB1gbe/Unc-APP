@@ -86,6 +86,7 @@ await buyer.setInputFiles('#images', img);
 await shot(buyer, '07-new-request');
 await buyer.click('button:has-text("Post request")');
 await buyer.waitForSelector('text=Your request');
+await buyer.waitForSelector('.toast:has-text("Posted!")'); // celebration message
 await shot(buyer, '08-request-owner-view');
 const listingUrl = buyer.url();
 
@@ -139,7 +140,9 @@ await buyer.click('button:has-text("I found it")');
 await buyer.waitForSelector('text=Who did you buy from?');
 await buyer.check('.choice:has-text("Riverside Electronics") input');
 await shot(buyer, '21-pick-seller');
-await buyer.click('button:has-text("Mark fulfilled")');
+await buyer.click('button:has-text("Yes, I found it")');
+await buyer.waitForSelector('.toast:has-text("Found it!")');
+await shot(buyer, '21b-found-it');
 await buyer.waitForSelector('text=Bought from');
 await buyer.click('text=Rate them');
 await buyer.waitForSelector('text=Deal done!');

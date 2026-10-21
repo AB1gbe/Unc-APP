@@ -13,8 +13,34 @@ export function ErrorBox({ error }) {
   return <div className="alert error" role="alert">{error.message || String(error)}</div>;
 }
 
+// Grey placeholder shapes while a page loads (feels faster than a word).
+// Screen readers still hear "Loading…".
 export function Loading() {
-  return <p className="muted">{t('Loading…')}</p>;
+  return (
+    <div className="skeleton" role="status" aria-busy="true">
+      <span className="visually-hidden">{t('Loading…')}</span>
+      <div className="sk-line" style={{ width: '60%' }} />
+      <div className="sk-line" />
+      <div className="sk-line" style={{ width: '80%' }} />
+    </div>
+  );
+}
+
+// Placeholder request cards for grids (Home, Browse, Saved).
+export function CardsLoading({ count = 3 }) {
+  return (
+    <div className="grid" role="status" aria-busy="true">
+      <span className="visually-hidden">{t('Loading…')}</span>
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className="card skeleton" aria-hidden>
+          <div className="sk-photo" />
+          <div className="sk-line" style={{ width: '40%' }} />
+          <div className="sk-line" style={{ width: '85%' }} />
+          <div className="sk-line" style={{ width: '60%' }} />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function KycBadge({ status }) {
@@ -28,7 +54,7 @@ export function KycBadge({ status }) {
   return <span className={`badge ${cls}`}>{text}</span>;
 }
 
-const STATUS_LABELS = { open: () => t('open'), fulfilled: () => t('fulfilled'), closed: () => t('closed') };
+const STATUS_LABELS = { open: () => t('open'), fulfilled: () => t('found'), closed: () => t('closed') };
 export const statusLabel = (status) => STATUS_LABELS[status]?.() ?? status;
 
 export function StatusBadge({ status }) {

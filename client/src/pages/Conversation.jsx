@@ -9,6 +9,7 @@ import { usePolling } from '../hooks.js';
 import Lightbox from '../components/Lightbox.jsx';
 import { shrinkImage } from '../images.js';
 import { formatDateTime, t, tj } from '../i18n.jsx';
+import { celebrate } from '../components/Celebrate.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -125,7 +126,7 @@ export default function Conversation() {
         {(error || pollError) && <div style={{ padding: '0 1rem' }}><ErrorBox error={error || pollError} /></div>}
         {conv.readOnly ? (
           <div className="chat-form muted small" style={{ justifyContent: 'center' }}>
-            {l.status === 'fulfilled' ? t('This request has been fulfilled. The conversation is read-only.') : t('This request is closed. The conversation is read-only.')}
+            {l.status === 'fulfilled' ? t('Found! 🎉 This request is done, so the chat is now read-only.') : t('This request is closed. The conversation is read-only.')}
           </div>
         ) : (
           <>
@@ -167,6 +168,7 @@ function DealBanner({ conv, onRated }) {
     setError(null);
     try {
       await api(`/deals/${deal.id}/rating`, { method: 'POST', body: { stars, comment: comment || undefined } });
+      celebrate({ text: t('Thanks for rating! ⭐ It helps everyone on Unc.'), confetti: stars >= 4 });
       await onRated();
     } catch (err) {
       setError(err);
