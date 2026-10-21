@@ -20,7 +20,7 @@ const FIELDS = {
     dateOfBirth: 'Date of birth', decision: 'Decision', description: 'Details', displayName: 'Name', email: 'Email',
     idNumber: 'ID number', idType: 'ID type', legalName: 'Full legal name', listingId: 'Request', message: 'Message',
     neededBy: 'Needed by', note: 'Note', offerPrice: 'Price', password: 'Password', reason: 'Reason', stars: 'Stars',
-    status: 'Status', title: 'Title', token: 'Link', avatar: 'Profile photo', bio: 'About you', interests: 'Interests', docFront: 'Front of ID', docBack: 'Back of ID', selfie: 'Selfie',
+    status: 'Status', title: 'Title', token: 'Link', avatar: 'Profile photo', bio: 'About you', interests: 'Interests', story: 'Your story', image: 'Photo', action: 'Answer', docFront: 'Front of ID', docBack: 'Back of ID', selfie: 'Selfie',
     businessDoc: 'Business registration document', images: 'Photos', language: 'Language', banned: 'banned',
   },
   ar: {
@@ -30,7 +30,7 @@ const FIELDS = {
     dateOfBirth: 'تاريخ الميلاد', decision: 'القرار', description: 'التفاصيل', displayName: 'الاسم', email: 'البريد الإلكتروني',
     idNumber: 'رقم الهوية', idType: 'نوع الهوية', legalName: 'الاسم الكامل', listingId: 'الطلب', message: 'الرسالة',
     neededBy: 'تاريخ الحاجة', note: 'الملاحظة', offerPrice: 'السعر', password: 'كلمة المرور', reason: 'السبب', stars: 'عدد النجوم',
-    status: 'الحالة', title: 'العنوان', token: 'الرابط', avatar: 'الصورة الشخصية', bio: 'نبذة عنك', interests: 'الاهتمامات', docFront: 'الوجه الأمامي للهوية', docBack: 'الوجه الخلفي للهوية',
+    status: 'الحالة', title: 'العنوان', token: 'الرابط', avatar: 'الصورة الشخصية', bio: 'نبذة عنك', interests: 'الاهتمامات', story: 'قصتك', image: 'الصورة', action: 'الرد', docFront: 'الوجه الأمامي للهوية', docBack: 'الوجه الخلفي للهوية',
     selfie: 'الصورة الشخصية', businessDoc: 'مستند السجل التجاري', images: 'الصور', language: 'اللغة', banned: 'banned',
   },
 };
@@ -80,6 +80,8 @@ const AR = {
   'A newer price has been offered since. Answer that one instead.': 'تم عرض سعر أحدث منذ ذلك الحين. ردّ عليه بدلاً من هذا.',
   'This price has already been answered.': 'تم الرد على هذا السعر من قبل.',
   'Message not found.': 'الرسالة غير موجودة.',
+  'You already shared a story about this deal.': 'سبق أن شاركت قصة عن هذه الصفقة.',
+  'Story not found.': 'القصة غير موجودة.',
   'emailOffers must be true or false.': 'قيمة رسائل العروض يجب أن تكون true أو false.',
   'Notifications are not turned on for any of your devices yet.': 'الإشعارات غير مفعّلة على أي من أجهزتك بعد.',
   'banned must be true or false.': 'قيمة الحظر يجب أن تكون true أو false.',

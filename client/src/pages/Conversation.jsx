@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, budget, money, toDate } from '../api.js';
-import { Activity, Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
 import { ReportLink } from './ListingDetail.jsx';
 import { usePolling } from '../hooks.js';
 import Lightbox from '../components/Lightbox.jsx';
 import { shrinkImage } from '../images.js';
 import { formatDateTime, t, tj } from '../i18n.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
+import { StoryForm } from '../components/Stories.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -107,7 +108,8 @@ export default function Conversation() {
               {conv.other.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}{' '}
               <KycBadge status={conv.other.verified ? 'approved' : 'unverified'} />{' '}
               <RatingBadge rating={conv.other.rating} />{' '}
-              <Activity activity={conv.otherActivity} />
+              <Activity activity={conv.otherActivity} />{' '}
+              <Badges badges={conv.otherBadges} />
               <div className="small muted">
                 {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <bdi>{l.city}</bdi>
               </div>
@@ -199,6 +201,7 @@ function DealBanner({ conv, onRated }) {
         ) : (
           <span className="muted"> · {deal.otherHasRated ? t('They rated you too.') : tj('Waiting for {name} to rate you.', { name: <bdi>{other.displayName}</bdi> })} {t("Ratings show on profiles once you've both rated (or after 14 days).")}</span>
         )}
+        {!deal.myStory && <StoryForm dealId={deal.id} otherName={other.displayName} onShared={onRated} />}
       </div>
     );
   }

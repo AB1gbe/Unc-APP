@@ -350,3 +350,13 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .share { position: relative; display: inline-block; }
 .share-menu { position: absolute; top: calc(100% + .4rem); inset-inline-end: 0; display: grid; gap: .4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .5rem; box-shadow: 0 8px 24px rgba(0,0,0,.12); z-index: 20; min-width: 150px; }
 .nav a.btn.whatsapp, .btn.whatsapp { background: #25d366; color: #fff; }
+
+/* ===== Stories and badges (session 20) ===== */
+.story { margin: 0; display: grid; gap: .6rem; align-content: start; }
+.story-photo { width: calc(100% + 2rem); margin: -1rem -1rem 0; height: 180px; object-fit: cover; border-radius: 12px 12px 0 0; }
+.story blockquote { margin: 0; font-size: 1.05rem; line-height: 1.45; }
+.story figcaption { gap: .5rem; flex-wrap: nowrap; }
+.story-form { display: grid; gap: .5rem; margin-top: .75rem; padding-top: .75rem; border-top: 1px dashed var(--border); }
+.earned { display: inline-flex; flex-wrap: wrap; gap: .3rem; vertical-align: middle; }
+.earned .badge { background: #fff7e6; color: #8a5a00; }
+.earned .badge.earned-new { background: #ecfdf3; color: #0a7a3d; }

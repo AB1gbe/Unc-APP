@@ -9,11 +9,14 @@ import { avatarUrl } from '../lib/uploads.js';
 import { RATE_WINDOW_DAYS, VISIBLE, canStillRate, ratingQueries } from '../lib/ratings.js';
 import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
+import { badgeQueries } from '../lib/badges.js';
+import { storiesAbout } from './stories.js';
 
 export function ratingRoutes(db) {
   const r = Router();
   const ratings = ratingQueries(db);
   const activity = activityQueries(db);
+  const badgesFor = badgeQueries(db, ratings, activity);
 
   r.post('/deals/:id/rating', requireAuth, (req, res) => {
     const deal = db.prepare('SELECT * FROM deals WHERE id = ?').get(Number(req.params.id));
@@ -78,7 +81,9 @@ export function ratingRoutes(db) {
         deals,
         rating: ratings.summaryFor(m.id),
         activity: req.user ? activity.summaryFor(m.id) : undefined,
+        badges: badgesFor(m.id),
       },
+      stories: storiesAbout(db, m.id),
       openRequests,
       reviews: reviews.map((x) => ({
         stars: x.stars,

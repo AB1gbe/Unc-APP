@@ -261,6 +261,21 @@ const MIGRATIONS = [
     PRIMARY KEY (listing_id, user_id)
   );
   `,
+  // 14: "Found it" stories (session 20): after a deal, either side may
+  // share a short public story with an optional photo. hidden_at = hidden
+  // by an admin.
+  `
+  CREATE TABLE stories (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    deal_id    INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+    author_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body       TEXT NOT NULL,
+    image      TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    hidden_at  TEXT,
+    UNIQUE (deal_id, author_id)
+  );
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

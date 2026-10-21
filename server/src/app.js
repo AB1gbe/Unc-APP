@@ -8,12 +8,13 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { errorHandler, notFound } from './lib/http.js';
-import { AVATAR_DIR, LISTING_DIR } from './lib/uploads.js';
+import { AVATAR_DIR, LISTING_DIR, STORY_DIR } from './lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from './lib/categories.js';
 import { loadUser } from './middleware/auth.js';
 import { withPreview } from './lib/previews.js';
 import { authRoutes } from './routes/auth.js';
 import { notificationRoutes } from './routes/notifications.js';
+import { storyRoutes } from './routes/stories.js';
 import { pushRoutes } from './routes/push.js';
 import { kycRoutes } from './routes/kyc.js';
 import { listingRoutes } from './routes/listings.js';
@@ -48,6 +49,7 @@ export function createApp(db) {
   app.use('/api/admin', adminRoutes(db));
   app.use('/api/notifications', notificationRoutes(db));
   app.use('/api/push', pushRoutes(db));
+  app.use('/api', storyRoutes(db));
   app.use('/api', (_req, _res, next) => next(notFound('Unknown API route')));
 
   // Listing photos are public. KYC files are NOT served statically - only
@@ -55,6 +57,7 @@ export function createApp(db) {
   // Photo names are random and never reused, so browsers may cache them for a year.
   app.use('/uploads/listings', express.static(LISTING_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
   app.use('/uploads/avatars', express.static(AVATAR_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+  app.use('/uploads/stories', express.static(STORY_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
 
   // In production the built React app is served by this same server.
   if (fs.existsSync(config.clientDist)) {

@@ -12,6 +12,7 @@ import { parseInterests, requireAuth, requireVerified } from '../middleware/auth
 import { ratingQueries } from '../lib/ratings.js';
 import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
+import { badgeQueries } from '../lib/badges.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -51,12 +52,14 @@ export function listingRoutes(db) {
   const ratings = ratingQueries(db);
   const activity = activityQueries(db);
   const viewCount = db.prepare('SELECT COUNT(*) AS n FROM listing_views WHERE listing_id = ?');
+  const badgesFor = badgeQueries(db, ratings, activity);
 
   // The full single-request view: adds the buyer's rating and, for the
   // owner, which conversation the deal was made in.
   function detailView(id, me) {
     const listing = withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id));
     listing.buyer.rating = ratings.summaryFor(listing.buyer.id);
+    listing.buyer.badges = badgesFor(listing.buyer.id);
     if (me) listing.buyer.activity = activity.summaryFor(listing.buyer.id);
     if (me?.id === listing.buyer.id) {
       listing.viewCount = viewCount.get(id).n;

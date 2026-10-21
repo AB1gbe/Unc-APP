@@ -174,6 +174,14 @@ await shot(buyer, '22-rate-form');
 await buyer.click('button:has-text("Submit rating")');
 await buyer.waitForSelector('text=Waiting for Riverside Electronics to rate you');
 await shot(buyer, '23-rated-waiting');
+// A "Found it" story with a photo (optional, public).
+await buyer.fill('.story-form textarea', 'Got my PS5 the same day — thanks Riverside! 🎮');
+await buyer.setInputFiles('#storyPhoto', face);
+await buyer.waitForSelector('.story-form .thumb img');
+await shot(buyer, '23b-story-form');
+await buyer.click('.story-form button:has-text("Share publicly")');
+await buyer.waitForSelector('.toast:has-text("Story shared")');
+await buyer.waitForSelector('.story-form', { state: 'detached' });
 
 await vendor.reload();
 await vendor.waitForSelector('text=has already rated you');
@@ -184,7 +192,11 @@ await shot(vendor, '24-both-rated');
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
+await buyer.waitForSelector('.story:has-text("Got my PS5")'); // the story, on the seller's profile
+await buyer.waitForSelector('.earned .badge'); // earned badges (🌱 New member)
 await shot(buyer, '25-profile');
+await buyer.goto(BASE + '/'); await buyer.waitForSelector('.story:has-text("Got my PS5")');
+await shot(buyer, '26-home-stories');
 // Account: the phone-notifications card is there (headless Chrome can't
 // subscribe, so it shows the 'blocked' or 'turn on' state).
 await buyer.goto(BASE + '/account'); await buyer.waitForSelector('.push-card h2');

@@ -183,6 +183,25 @@ export function Activity({ activity }) {
   return <span className="activity small muted">{parts.reduce((all, p, i) => (i ? [...all, ' · ', p] : [p]), [])}</span>;
 }
 
+// Earned badges (server/src/lib/badges.js has the rules).
+const BADGES = {
+  fast: () => ['⚡', t('Fast responder'), t('Usually replies within an hour')],
+  'top-finder': () => ['🏆', t('Top finder'), t('5+ deals as a seller, rated 4.5★ or more')],
+  trusted: () => ['🤝', t('Trusted buyer'), t('3+ deals as a buyer, rated 4.5★ or more')],
+  new: () => ['🌱', t('New member'), t('Joined in the last 30 days')],
+};
+export function Badges({ badges }) {
+  if (!badges?.length) return null;
+  return (
+    <span className="earned">
+      {badges.filter((b) => BADGES[b]).map((b) => {
+        const [icon, name, why] = BADGES[b]();
+        return <span key={b} className={`badge earned-${b}`} title={why}>{icon} {name}</span>;
+      })}
+    </span>
+  );
+}
+
 // ---- Ratings ----
 
 // Read-only stars, e.g. <Stars value={4.5} />. Half values round to the

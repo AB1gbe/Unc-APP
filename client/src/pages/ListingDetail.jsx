@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Activity, Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
@@ -56,7 +56,7 @@ export default function ListingDetail() {
           <div>
             <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status="approved" />
             <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {t('Requested by a verified member')}</span></div>
-            {!isOwner && <Activity activity={l.buyer.activity} />}
+            {!isOwner && <Activity activity={l.buyer.activity} />} <Badges badges={l.buyer.badges} />
           </div>
         </div>
       </article>

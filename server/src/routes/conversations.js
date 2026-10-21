@@ -23,6 +23,7 @@ import { pushTo } from '../lib/push.js';
 import { trySendMail } from '../lib/mailer.js';
 import { newOfferEmail } from '../lib/emails.js';
 import { activityQueries } from '../lib/activity.js';
+import { badgeQueries } from '../lib/badges.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -60,6 +61,8 @@ export function conversationRoutes(db) {
 
   const ratings = ratingQueries(db);
   const activity = activityQueries(db);
+  const badgesFor = badgeQueries(db, ratings, activity);
+  const storyBy = db.prepare('SELECT 1 FROM stories WHERE deal_id = ? AND author_id = ?');
   const dealForConv = db.prepare('SELECT * FROM deals WHERE conversation_id = ?');
   const ratingBy = db.prepare('SELECT stars, comment, created_at FROM ratings WHERE deal_id = ? AND rater_id = ?');
 
@@ -78,6 +81,7 @@ export function conversationRoutes(db) {
       // Blind: I only see their rating of me once I've rated too.
       theirRating: mine && theirs ? { stars: theirs.stars, comment: theirs.comment } : null,
       canRate: !mine && canStillRate(d.created_at),
+      myStory: Boolean(storyBy.get(d.id, meId)),
     };
   }
 
@@ -233,7 +237,11 @@ export function conversationRoutes(db) {
       markRead.run(c.id, req.user.id);
     }
     res.json({
-      conversation: { ...view(c, req.user), otherActivity: activity.summaryFor(c.buyer_id === req.user.id ? c.vendor_id : c.buyer_id) },
+      conversation: (() => {
+        const otherId = c.buyer_id === req.user.id ? c.vendor_id : c.buyer_id;
+        const otherActivity = activity.summaryFor(otherId);
+        return { ...view(c, req.user), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime) };
+      })(),
       messages: messages.map((m) => messageView(m, c.id, req.user.id)),
     });
   });

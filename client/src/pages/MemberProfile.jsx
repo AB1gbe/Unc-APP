@@ -3,10 +3,11 @@
 // contacted about a specific request.
 import { Link, useParams } from 'react-router-dom';
 import { ago, toDate } from '../api.js';
-import { Activity, Avatar, ErrorBox, KycBadge, ListingCard, Loading, Stars } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ErrorBox, KycBadge, ListingCard, Loading, Stars } from '../components/ui.jsx';
 import { useAuth } from '../auth.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
+import { StoryCard } from '../components/Stories.jsx';
 
 export default function MemberProfile() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export default function MemberProfile() {
   const { user } = useAuth();
   if (loading) return <Loading />;
   if (error) return <ErrorBox error={error} />;
-  const { member: m, reviews, openRequests } = data;
+  const { member: m, reviews, openRequests, stories = [] } = data;
   const isMe = user?.id === m.id;
 
   return (
@@ -30,6 +31,7 @@ export default function MemberProfile() {
               <span>{t('Member since {date}', { date: formatDate(toDate(m.memberSince), { month: 'long', year: 'numeric' }) })}</span>
               <span>{tn(m.deals, '{n} deal', '{n} deals')}</span>
             </div>
+            <Badges badges={m.badges} />
             {m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <bdi>{m.city}</bdi></div>}
             <div style={{ marginTop: '.3rem' }}><Activity activity={m.activity} /></div>
           </div>
@@ -62,6 +64,12 @@ export default function MemberProfile() {
         <div>
           <h2>{t('Looking for right now')}</h2>
           <div className="grid">{openRequests.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+        </div>
+      )}
+      {stories.length > 0 && (
+        <div>
+          <h2>{t('Found on Unc 🎉')}</h2>
+          <div className="grid">{stories.map((s) => <StoryCard key={s.id} story={s} />)}</div>
         </div>
       )}
       <div className="card">

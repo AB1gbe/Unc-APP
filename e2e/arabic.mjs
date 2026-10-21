@@ -35,8 +35,19 @@ async function check(p, name) {
   const info = await p.evaluate(() => ({
     dir: document.documentElement.dir,
     overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
-    // visible text, minus email addresses
-    text: document.body.innerText.replace(/\S+@\S+/g, ''),
+    // Visible interface text, minus email addresses. Text members wrote
+    // (titles, names, stories) sits in <bdi> or dir="auto" and may be in any
+    // language, so it is skipped: only the app's own words must be Arabic.
+    text: (() => {
+      const parts = [];
+      const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      while (walk.nextNode()) {
+        const el = walk.currentNode.parentElement;
+        if (!el || el.closest('bdi, [dir="auto"], script, style') || !el.checkVisibility()) continue;
+        parts.push(walk.currentNode.textContent);
+      }
+      return parts.join(' ').replace(/\S+@\S+/g, '');
+    })(),
   }));
   if (info.dir !== 'rtl') problems.push(`${name}: dir=${info.dir}`);
   if (info.overflow) problems.push(`${name}: horizontal overflow`);

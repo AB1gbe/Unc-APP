@@ -60,6 +60,8 @@ async function seedDemo(db) {
     const rate = db.prepare('INSERT INTO ratings (deal_id, rater_id, ratee_id, stars, comment) VALUES (?, ?, ?, ?, ?)');
     rate.run(dealId, buyer, shop, 5, 'Friendly, fast, and exactly what I asked for.');
     rate.run(dealId, shop, buyer, 5, 'On time and easy to deal with.');
+    db.prepare('INSERT INTO stories (deal_id, author_id, body) VALUES (?, ?, ?)')
+      .run(dealId, buyer, 'Got the charger and case the same afternoon — thanks Riverside! 🙌');
   }
   console.log('Demo data ready. Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');
 }
