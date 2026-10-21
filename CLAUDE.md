@@ -18,3 +18,4 @@ Use Obsidian `[[wikilinks]]`; put images in `docs/attachments/`.
 - Never serve `uploads/kyc` statically or return full ID numbers.
 - Email goes through `sendMail`/`trySendMail` in `server/src/lib/mailer.js`; wording lives in `server/src/lib/emails.js`. Never return tokens or codes in API responses outside console/test mode.
 - The owner runs Windows (cmd). Give Windows-friendly commands, and say which folder and branch to be in.
+- When giving setup steps, say first whether they are optional and why they matter, before the instructions.
