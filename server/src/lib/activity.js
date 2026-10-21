@@ -7,7 +7,7 @@
 export const ACTIVE_MINUTES = 5; // "Active now" if seen this recently
 
 export function activityQueries(db) {
-  const seen = db.prepare('SELECT last_seen_at FROM users WHERE id = ?');
+  const seen = db.prepare('SELECT last_seen_at, hide_activity FROM users WHERE id = ?');
   // UNION ALL keeps both halves on their indexes (see performance.test.js).
   const replies = db.prepare(`
     WITH mine AS (
@@ -34,8 +34,12 @@ export function activityQueries(db) {
   }
 
   // { lastSeenAt, replyTime: 'hour' | 'hours' | 'day' | 'days' | null }
+  // Members who chose "Hide when I'm online" never have a lastSeenAt (it
+  // isn't stored either; this is a second safety net). Their reply time
+  // still shows: it comes from their messages, not from tracking them.
   function summaryFor(userId) {
-    return { lastSeenAt: seen.get(userId)?.last_seen_at ?? null, replyTime: replyTime(userId) };
+    const u = seen.get(userId);
+    return { lastSeenAt: u && !u.hide_activity ? u.last_seen_at : null, replyTime: replyTime(userId) };
   }
   return { summaryFor, replyTime };
 }

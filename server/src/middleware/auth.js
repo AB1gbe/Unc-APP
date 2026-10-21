@@ -21,7 +21,8 @@ export function loadUser(db) {
     req.sessionTokenHash = token ? sha256(token) : null;
     // "Active now": remember when the member was last here, at most once a
     // minute, so the 4-second chat polls don't write on every request.
-    if (req.user && (!req.user.last_seen_at || Date.now() - Date.parse(`${req.user.last_seen_at.replace(' ', 'T')}Z`) > 60_000)) {
+    // Not at all for members who chose "Hide when I'm online".
+    if (req.user && !req.user.hide_activity && (!req.user.last_seen_at || Date.now() - Date.parse(`${req.user.last_seen_at.replace(' ', 'T')}Z`) > 60_000)) {
       touch.run(req.user.id);
     }
     next();
@@ -83,5 +84,6 @@ export function publicMe(u) {
     interests: parseInterests(u.interests),
     onboarded: Boolean(u.onboarded_at),
     emailOffers: u.email_offers !== 0,
+    hideActivity: u.hide_activity === 1,
   };
 }

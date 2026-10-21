@@ -82,6 +82,7 @@ const AR = {
   'Message not found.': 'الرسالة غير موجودة.',
   'You already shared a story about this deal.': 'سبق أن شاركت قصة عن هذه الصفقة.',
   'Story not found.': 'القصة غير موجودة.',
+  'hideActivity must be true or false.': 'قيمة إخفاء النشاط يجب أن تكون true أو false.',
   'emailOffers must be true or false.': 'قيمة رسائل العروض يجب أن تكون true أو false.',
   'Notifications are not turned on for any of your devices yet.': 'الإشعارات غير مفعّلة على أي من أجهزتك بعد.',
   'banned must be true or false.': 'قيمة الحظر يجب أن تكون true أو false.',

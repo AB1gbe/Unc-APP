@@ -570,4 +570,8 @@ export default {
   '5+ deals as a seller, rated 4.5★ or more': '5 صفقات أو أكثر كبائع، بتقييم 4.5★ أو أعلى',
   '3+ deals as a buyer, rated 4.5★ or more': '3 صفقات أو أكثر كمشترٍ، بتقييم 4.5★ أو أعلى',
   'Joined in the last 30 days': 'انضم خلال آخر 30 يوماً',
+  // Privacy (session 22)
+  Privacy: 'الخصوصية',
+  "Hide when I'm online": 'إخفاء وقت تواجدي',
+  "Others won't see “Active now” or when you were last here, and Unc stops keeping that time. Your usual reply time and badges still show, because they come from your messages.": 'لن يرى الآخرون «متصل الآن» أو آخر وقت كنت فيه هنا، ويتوقف Unc عن حفظ هذا الوقت. يظل متوسط سرعة ردك وشاراتك ظاهرة لأنها مأخوذة من رسائلك.',
 };

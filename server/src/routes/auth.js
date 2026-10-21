@@ -261,6 +261,12 @@ export function authRoutes(db) {
       if (typeof b.emailOffers !== 'boolean') throw new HttpError(400, 'emailOffers must be true or false.', { field: 'emailOffers' });
       changes.email_offers = b.emailOffers ? 1 : 0;
     }
+    if ('hideActivity' in b) {
+      if (typeof b.hideActivity !== 'boolean') throw new HttpError(400, 'hideActivity must be true or false.', { field: 'hideActivity' });
+      changes.hide_activity = b.hideActivity ? 1 : 0;
+      // Hiding also forgets the last visit we stored.
+      if (b.hideActivity) changes.last_seen_at = null;
+    }
     const cols = Object.keys(changes);
     if (cols.length) {
       db.prepare(`UPDATE users SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(changes), req.user.id);

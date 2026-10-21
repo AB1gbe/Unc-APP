@@ -37,6 +37,7 @@ export default function Account() {
         <ProfileEditor />
       </div>
       <EmailSettings />
+      <PrivacySettings />
       <PushSettings />
       <ChangePassword />
       <div className="card row spread">
@@ -93,39 +94,61 @@ function ChangePassword() {
   );
 }
 
-// "Email me about new offers" (on by default). Saves as soon as it's ticked.
-function EmailSettings() {
+// A tick box that saves one setting (PATCH /api/auth/me) as soon as it's
+// clicked. The tick changes at once and goes back if saving fails
+// (waiting for the server made it jump back: Mistakes and Fixes M60).
+function ToggleSetting({ field, label, hint }) {
   const { user, setUser } = useAuth();
-  // Shown at once; put back if saving fails. (Waiting for the server made
-  // the tick jump back until it answered.)
-  const [checked, setChecked] = useState(user.emailOffers);
+  const [checked, setChecked] = useState(Boolean(user[field]));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   async function change(e) {
-    const emailOffers = e.target.checked;
-    setChecked(emailOffers);
+    const value = e.target.checked;
+    setChecked(value);
     setBusy(true);
     setError(null);
     try {
-      setUser((await api('/auth/me', { method: 'PATCH', body: { emailOffers } })).user);
+      setUser((await api('/auth/me', { method: 'PATCH', body: { [field]: value } })).user);
     } catch (err) {
-      setChecked(!emailOffers);
+      setChecked(!value);
       setError(err);
     } finally {
       setBusy(false);
     }
   }
   return (
-    <div className="card">
-      <h2>{t('Email notifications')}</h2>
+    <>
       <ErrorBox error={error} />
       <label className="toggle-row">
-        <input type="checkbox" checked={checked} disabled={busy} onChange={change} />
+        <input type="checkbox" checked={checked} disabled={busy} onChange={change} data-setting={field} />
         <span>
-          {t('Email me when a seller makes an offer on my request')}
-          <span className="hint" style={{ display: 'block' }}>{tj('Sent to {email}. Replies and deals stay in the app.', { email: <span className="ltr">{user.email}</span> })}</span>
+          {label}
+          <span className="hint" style={{ display: 'block' }}>{hint}</span>
         </span>
       </label>
+    </>
+  );
+}
+
+// "Email me about new offers" (on by default).
+function EmailSettings() {
+  const { user } = useAuth();
+  return (
+    <div className="card">
+      <h2>{t('Email notifications')}</h2>
+      <ToggleSetting field="emailOffers" label={t('Email me when a seller makes an offer on my request')}
+        hint={tj('Sent to {email}. Replies and deals stay in the app.', { email: <span className="ltr">{user.email}</span> })} />
+    </div>
+  );
+}
+
+// "Hide when I'm online" (session 22, ADR-029).
+function PrivacySettings() {
+  return (
+    <div className="card">
+      <h2>{t('Privacy')}</h2>
+      <ToggleSetting field="hideActivity" label={t("Hide when I'm online")}
+        hint={t("Others won't see “Active now” or when you were last here, and Unc stops keeping that time. Your usual reply time and badges still show, because they come from your messages.")} />
     </div>
   );
 }
