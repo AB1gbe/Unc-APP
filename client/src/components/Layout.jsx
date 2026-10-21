@@ -4,7 +4,7 @@ import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { Loading } from './ui.jsx';
 import { usePolling } from '../hooks.js';
-import { LANGUAGES, t, tj, useLanguage } from '../i18n.jsx';
+import { LANGUAGES, hasSavedChoice, t, tj, useLanguage } from '../i18n.jsx';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -13,6 +13,15 @@ export default function Layout() {
   const { pathname } = useLocation();
   const { lang, setLang } = useLanguage();
   const other = lang === 'ar' ? 'en' : 'ar';
+
+  // Keep the member's saved language and this device in step:
+  // - language picked on this device -> tell the server (emails use it);
+  // - nothing picked here yet (e.g. a new laptop) -> use the member's language.
+  useEffect(() => {
+    if (!user?.language || user.language === lang) return;
+    if (hasSavedChoice()) api('/auth/language', { method: 'PUT', body: { language: lang } }).catch(() => {});
+    else setLang(user.language);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps -- only when a member logs in
 
   // Unread count for the Messages tab: polled every 15 s while the tab is
   // visible, re-checked on every page change, and right after a

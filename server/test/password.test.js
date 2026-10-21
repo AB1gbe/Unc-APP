@@ -20,7 +20,7 @@ test('registration emails a verification code (text + html)', async () => {
   const mail = lastMailTo(me.body.user.email);
   assert.ok(mail, 'an email was sent');
   assert.match(mail.subject, /verification code/);
-  assert.match(mail.html, /<html>/);
+  assert.match(mail.html, /<html[\s>]/);
 });
 
 test('forgot-password answers identically for unknown emails and sends nothing', async () => {

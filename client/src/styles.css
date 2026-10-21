@@ -156,6 +156,8 @@ input[type="file"] { padding: .5rem; }
 
 /* ===== Tables (admin) ===== */
 table { width: 100%; border-collapse: collapse; }
+/* Wide tables scroll inside their card on phones instead of widening the page. */
+.table-scroll { overflow-x: auto; }
 th, td { text-align: start; padding: .6rem; border-bottom: 1px solid var(--border); font-size: .9rem; vertical-align: top; }
 th { color: var(--muted); font-weight: 600; }
 .doc-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }

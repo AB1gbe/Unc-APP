@@ -182,6 +182,12 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_ratings_ratee ON ratings(ratee_id, created_at);
   `,
+  // 5: each member's language, so emails go out in it (session 12).
+  // NULL = no preference yet (e.g. accounts made before this, the admin):
+  // emails then use English, and the website keeps the browser's language.
+  `
+  ALTER TABLE users ADD COLUMN language TEXT CHECK (language IN ('en', 'ar'));
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

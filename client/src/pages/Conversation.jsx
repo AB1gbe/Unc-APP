@@ -117,7 +117,7 @@ export default function Conversation() {
           </div>
         ) : (
           <form className="chat-form" onSubmit={send}>
-            <textarea placeholder={t('Message about “{title}”…', { title: l.title })} dir="auto" value={text} maxLength={2000}
+            <textarea placeholder={t('Message about “{title}”…', { title: l.title })} value={text} maxLength={2000}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) send(e); }} />
             {conv.myRole === 'vendor' && (
@@ -159,7 +159,7 @@ function DealBanner({ conv, onRated }) {
       <div className="deal-banner small">
         🤝 <b>{t('Deal done.')}</b> {tj('You rated {name}', { name: <bdi>{other.displayName}</bdi> })} <Stars value={deal.myRating.stars} />
         {deal.theirRating ? (
-          <> · {t('They rated you')} <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> “<bdi>{deal.theirRating.comment}</bdi>”</>}</>
+          <> · {t('They rated you')} <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> {tj('“{text}”', { text: <bdi>{deal.theirRating.comment}</bdi> })}</>}</>
         ) : (
           <span className="muted"> · {deal.otherHasRated ? t('They rated you too.') : tj('Waiting for {name} to rate you.', { name: <bdi>{other.displayName}</bdi> })} {t("Ratings show on profiles once you've both rated (or after 14 days).")}</span>
         )}
@@ -178,7 +178,7 @@ function DealBanner({ conv, onRated }) {
       <ErrorBox error={error} />
       <StarInput value={stars} onChange={setStars} />
       <div className="row" style={{ gap: '.5rem', alignItems: 'flex-end' }}>
-        <textarea placeholder={t('Optional: a few words for other members (shown on their profile)')} dir="auto" maxLength={500} value={comment}
+        <textarea placeholder={t('Optional: a few words for other members (shown on their profile)')} maxLength={500} value={comment}
           onChange={(e) => setComment(e.target.value)} style={{ flex: 1, minHeight: 44, height: 44 }} />
         <button className="btn" disabled={!stars || busy}>{busy ? t('Saving…') : t('Submit rating')}</button>
       </div>

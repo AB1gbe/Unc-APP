@@ -100,7 +100,7 @@ function OfferPanel({ listing }) {
       </div>
       <div className="field">
         <label htmlFor="message">{t('Message')}</label>
-        <textarea id="message" required maxLength={2000} placeholder={t('Describe what you have: condition, photos available, when you can deliver…')} dir="auto" value={message} onChange={(e) => setMessage(e.target.value)} />
+        <textarea id="message" required maxLength={2000} placeholder={t('Describe what you have: condition, photos available, when you can deliver…')} value={message} onChange={(e) => setMessage(e.target.value)} />
       </div>
       <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send offer')}</button>
       <p className="hint">{t('Never pay or ask for payment outside a method you trust. Report anything suspicious.')}</p>

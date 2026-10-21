@@ -61,5 +61,6 @@ export function publicMe(u) {
     emailVerified: Boolean(u.email_verified_at),
     kycStatus: u.kyc_status,
     createdAt: u.created_at,
+    language: u.language,
   };
 }

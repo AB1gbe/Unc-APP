@@ -65,7 +65,7 @@ export default function NewListing() {
       <ErrorBox error={error} />
       <div className="field">
         <label htmlFor="title">{t('Title')}</label>
-        <input id="title" required minLength={5} maxLength={100} placeholder={t('e.g. Looking for an iPhone 15, 128GB, any colour')} dir="auto" value={form.title} onChange={set('title')} />
+        <input id="title" required minLength={5} maxLength={100} placeholder={t('e.g. Looking for an iPhone 15, 128GB, any colour')} value={form.title} onChange={set('title')} />
       </div>
       <div className="field">
         <label htmlFor="category">{t('Category')}</label>
@@ -76,7 +76,7 @@ export default function NewListing() {
       </div>
       <div className="field">
         <label htmlFor="description">{t('Details')}</label>
-        <textarea id="description" required minLength={10} maxLength={3000} placeholder={t('Condition, model, size, colour, must-haves, deal-breakers…')} dir="auto" value={form.description} onChange={set('description')} />
+        <textarea id="description" required minLength={10} maxLength={3000} placeholder={t('Condition, model, size, colour, must-haves, deal-breakers…')} value={form.description} onChange={set('description')} />
       </div>
       <div className="field">
         <label>{t('Budget')} <span className="muted">{t('(optional)')}</span></label>

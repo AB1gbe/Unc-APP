@@ -55,6 +55,15 @@ export function tn(n, one, other, vars = {}) {
   return fill(n === 1 ? one : other, all);
 }
 
+// Has the person picked a language on THIS device (vs. the browser default)?
+export function hasSavedChoice() {
+  try {
+    return localStorage.getItem(STORAGE_KEY) in LANGUAGES;
+  } catch {
+    return false;
+  }
+}
+
 function initialLanguage() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);

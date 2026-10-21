@@ -8,6 +8,7 @@ import * as v from '../lib/validate.js';
 import { SESSION_COOKIE, requireAuth, publicMe } from '../middleware/auth.js';
 import { trySendMail } from '../lib/mailer.js';
 import { verificationCodeEmail, passwordResetEmail, passwordChangedEmail } from '../lib/emails.js';
+import { LANGS, langOf, translateMessage } from '../lib/i18n.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -23,7 +24,9 @@ export function authRoutes(db) {
     limit: config.isTest ? 10_000 : max,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
-    message: { error: 'Too many attempts. Please wait a few minutes.' },
+    // Sent by the limiter itself (not errorHandler), so translate here.
+    handler: (req, res, _next, options) => res.status(options.statusCode)
+      .json({ error: translateMessage('Too many attempts. Please wait a few minutes.', langOf(req)) }),
   });
   const limits = {
     register: limit(10),
@@ -73,6 +76,8 @@ export function authRoutes(db) {
     const displayName = v.str(req.body, 'displayName', { min: 2, max: 60 });
     const accountType = v.oneOf(req.body, 'accountType', ['individual', 'business']);
     const city = v.str(req.body, 'city', { max: 80, optional: true });
+    // The language the website was in when they signed up (emails use it).
+    const language = langOf(req);
 
     if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
       throw new HttpError(409, 'An account with this email already exists.', { field: 'email' });
@@ -81,8 +86,8 @@ export function authRoutes(db) {
     let info;
     try {
       info = db.prepare(`
-        INSERT INTO users (email, password_hash, display_name, account_type, city) VALUES (?, ?, ?, ?, ?)
-      `).run(email, hash, displayName, accountType, city);
+        INSERT INTO users (email, password_hash, display_name, account_type, city, language) VALUES (?, ?, ?, ?, ?, ?)
+      `).run(email, hash, displayName, accountType, city, language);
     } catch (err) {
       // Two sign-ups with the same email at the same moment: the check above
       // passed for both, the database's UNIQUE rule stops the second.
@@ -95,7 +100,7 @@ export function authRoutes(db) {
     const code = issueEmailCode(user);
     startSession(res, user.id);
     // The account exists even if the email fails; the user can resend.
-    const emailSent = await trySendMail({ to: user.email, ...verificationCodeEmail(code) });
+    const emailSent = await trySendMail({ to: user.email, ...verificationCodeEmail(code, user.language) });
     res.status(201).json({ user: publicMe(user), emailSent, ...devExtra(code) });
   });
 
@@ -143,7 +148,7 @@ export function authRoutes(db) {
   r.post('/resend-code', limits.resendCode, requireAuth, async (req, res) => {
     if (req.user.email_verified_at) throw new HttpError(400, 'Email is already verified.');
     const code = issueEmailCode(req.user);
-    if (!(await trySendMail({ to: req.user.email, ...verificationCodeEmail(code) }))) {
+    if (!(await trySendMail({ to: req.user.email, ...verificationCodeEmail(code, req.user.language) }))) {
       throw new HttpError(502, "We couldn't send the email right now. Please try again in a minute.");
     }
     res.json({ ok: true, ...devExtra(code) });
@@ -164,9 +169,9 @@ export function authRoutes(db) {
         .run(sha256(token), user.id, expires);
       // Not awaited on purpose: waiting for the mail provider would make
       // "account exists" answers slower, which leaks who is a member.
-      trySendMail({ to: user.email, ...passwordResetEmail(token) });
+      trySendMail({ to: user.email, ...passwordResetEmail(token, user.language) });
     }
-    res.json({ ok: true, message: 'If an account exists for that email, a reset link is on its way.' });
+    res.json({ ok: true, message: translateMessage('If an account exists for that email, a reset link is on its way.', langOf(req)) });
   });
 
   function findResetToken(token) {
@@ -206,7 +211,7 @@ export function authRoutes(db) {
       if (!user.email_verified_at) db.prepare(`UPDATE users SET email_verified_at = datetime('now') WHERE id = ?`).run(user.id);
       audit(db, user.id, 'auth.password_reset', `user:${user.id}`);
     });
-    await trySendMail({ to: user.email, ...passwordChangedEmail() });
+    await trySendMail({ to: user.email, ...passwordChangedEmail(user.language) });
     res.json({ ok: true });
   });
 
@@ -221,8 +226,16 @@ export function authRoutes(db) {
     // Log out every OTHER device, keep this one.
     db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?').run(req.user.id, req.sessionTokenHash);
     audit(db, req.user.id, 'auth.password_changed', `user:${req.user.id}`);
-    await trySendMail({ to: req.user.email, ...passwordChangedEmail() });
+    await trySendMail({ to: req.user.email, ...passwordChangedEmail(req.user.language) });
     res.json({ ok: true });
+  });
+
+  // The website calls this when a logged-in member switches language, so
+  // emails reach them in the language they use.
+  r.put('/language', requireAuth, (req, res) => {
+    const language = v.oneOf(req.body, 'language', LANGS);
+    db.prepare('UPDATE users SET language = ? WHERE id = ?').run(language, req.user.id);
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 
   r.patch('/me', requireAuth, (req, res) => {

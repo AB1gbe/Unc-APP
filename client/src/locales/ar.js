@@ -386,4 +386,6 @@ export default {
   'This submission was already {status}.': 'تمت مراجعة هذا الطلب مسبقًا: {status}.',
   'Request failed ({status})': 'تعذّر تنفيذ الطلب ({status})',
   'Could not reach the server. Check your connection and try again.': 'تعذّر الاتصال بالخادم. تحقق من اتصالك وحاول مرة أخرى.',
+  // Quotation marks: Arabic uses « » (they also face the right way in right-to-left text).
+  '“{text}”': '«{text}»',
 };

@@ -33,7 +33,7 @@ export default function AdminHome() {
           </div>
         </div>
         {kyc.loading ? <Loading /> : kyc.data?.submissions.length === 0 ? <p className="muted">{t('Nothing here.')}</p> : (
-          <table>
+          <div className="table-scroll"><table>
             <thead><tr><th>{t('Submitted')}</th><th>{t('Legal name')}</th><th>{t('Account')}</th><th>{t('Type')}</th><th>{t('ID')}</th><th></th></tr></thead>
             <tbody>
               {kyc.data?.submissions.map((s) => (
@@ -47,7 +47,7 @@ export default function AdminHome() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </section>
 
@@ -76,7 +76,7 @@ function ReportRow({ report: r, onDone }) {
             title: <bdi>{r.listing_title}</bdi>, name: <bdi>{r.reporter_name}</bdi>, email: <span className="ltr">{r.reporter_email}</span>,
           })}
           <div className="muted small">{formatDateTime(toDate(r.created_at))}</div>
-          <p dir="auto" style={{ margin: '.3rem 0 0' }}>“{r.reason}”</p>
+          <p style={{ margin: '.3rem 0 0' }}>{tj('“{text}”', { text: <bdi>{r.reason}</bdi> })}</p>
         </div>
         <div className="row" style={{ gap: '.4rem' }}>
           {r.listing_id && <Link className="btn sm secondary" to={`/requests/${r.listing_id}`}>{t('View request')}</Link>}

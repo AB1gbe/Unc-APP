@@ -77,7 +77,7 @@ export default function KycReview() {
               <ErrorBox error={actionError} />
               <div className="field">
                 <label htmlFor="note">{t('Note to user (required to reject)')}</label>
-                <textarea id="note" dir="auto" value={note} onChange={(e) => setNote(e.target.value)} />
+                <textarea id="note" value={note} onChange={(e) => setNote(e.target.value)} />
                 <div className="row" style={{ gap: '.3rem', marginTop: '.4rem' }}>
                   {/* The button shows the reason in the admin's language but saves the
                       English wording, so each member sees it in THEIR language. */}

@@ -1,5 +1,8 @@
 // HttpError lets any route `throw new HttpError(403, '...')` and have the
-// error middleware turn it into a clean JSON response.
+// error middleware turn it into a clean JSON response. Messages are written
+// in English and translated here (lib/i18n.js) to the request's language.
+import { langOf, translateMessage } from './i18n.js';
+
 export class HttpError extends Error {
   constructor(status, message, extra) {
     super(message);
@@ -20,7 +23,15 @@ const UPLOAD_ERRORS = {
   LIMIT_FIELD_VALUE: [400, 'A form field is too long.'],
 };
 
-export function errorHandler(err, req, res, _next) {
+export function errorHandler(err, req, res, next) {
+  // Translate whatever message the handlers below send.
+  const lang = langOf(req);
+  const json = res.json.bind(res);
+  res.json = (body) => json(body?.error ? { ...body, error: translateMessage(body.error, lang) } : body);
+  return handleError(err, req, res, next);
+}
+
+function handleError(err, req, res, _next) {
   // Upload problems (multer) are the user's mistake, not a server error.
   if (UPLOAD_ERRORS[err?.code]) {
     const [status, message] = UPLOAD_ERRORS[err.code];
