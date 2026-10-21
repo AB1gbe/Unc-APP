@@ -99,6 +99,34 @@ await vendor.waitForSelector('text=can you do $350', { timeout: 8000 });
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
 
+// Ratings: buyer marks the request fulfilled, picking this seller -> both rate
+await buyer.goto(listingUrl);
+await buyer.click('button:has-text("I found it")');
+await buyer.waitForSelector('text=Who did you buy from?');
+await buyer.check('.choice:has-text("Riverside Electronics") input');
+await shot(buyer, '21-pick-seller');
+await buyer.click('button:has-text("Mark fulfilled")');
+await buyer.waitForSelector('text=Bought from');
+await buyer.click('text=Rate them');
+await buyer.waitForSelector('text=Deal done!');
+await buyer.click('.star-input label:nth-of-type(5)');
+await buyer.fill('.deal-banner textarea', 'Exactly as described, quick pickup.');
+await shot(buyer, '22-rate-form');
+await buyer.click('button:has-text("Submit rating")');
+await buyer.waitForSelector('text=Waiting for Riverside Electronics to rate you');
+await shot(buyer, '23-rated-waiting');
+
+await vendor.reload();
+await vendor.waitForSelector('text=has already rated you');
+await vendor.click('.star-input label:nth-of-type(4)');
+await vendor.click('button:has-text("Submit rating")');
+await vendor.waitForSelector('text=They rated you');
+await shot(vendor, '24-both-rated');
+
+await buyer.click('.chat-head a[href^="/members/"]');
+await buyer.waitForSelector('text=Exactly as described');
+await shot(buyer, '25-profile');
+
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await shot(mp, '14-mobile-home');
