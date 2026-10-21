@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 09)
+updated: 2026-10-21 (session 13)
 ---
 # Unc — Project Vault
 
@@ -42,10 +42,15 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 14 - Password reset]]
 - [[Step 15 - Performance and hardening]]
 - [[Step 16 - Ratings]]
+- [[Step 17 - Arabic and RTL]]
+- [[Step 18 - Profiles, welcome and home]]
+- [[Step 19 - Phones, tablets and app icons]]
+- [[Step 20 - Photos everywhere]]
+- [[Step 21 - Saved requests and notifications]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -60,7 +65,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 09)
+## Status (2026-10-21, after session 13)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -75,6 +80,11 @@ This vault is the complete record of the project: **how** everything was built, 
 | Ratings after a deal (blind, two-way) + member profiles | ✅ done — in `main` since session 11 |
 | Live preview while building (`npm run live`) | ✅ done |
 | One-word `pull` / `push` | ✅ done |
-| API tests | ✅ 63 passing |
-| Browser end-to-end test | ✅ passing |
+| Arabic + right-to-left (pages, server messages, emails) | ✅ done — on branch |
+| Profiles (photo, bio, interests), welcome step, member home | ✅ done — on branch (session 13) |
+| Photos: request (6), offer, private chat photos, full-screen viewer | ✅ done — on branch (session 13) |
+| Phones, tablets, every screen size; installable (Add to Home Screen) | ✅ done — on branch (session 13) |
+| Saved requests (♡) and notifications (🔔) | ✅ done — on branch (session 13) |
+| API tests | ✅ 93 passing |
+| Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

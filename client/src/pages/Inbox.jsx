@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ago } from '../api.js';
-import { Avatar, ErrorBox, Loading } from '../components/ui.jsx';
+import { Avatar, ErrorBox, Loading, statusLabel } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
+import { t } from '../i18n.jsx';
 
 export default function Inbox() {
   const { data, error, loading } = useApi('/conversations');
@@ -22,16 +23,16 @@ export default function Inbox() {
 
   return (
     <>
-      <h1>Messages</h1>
+      <h1>{t('Messages')}</h1>
       <div className="row" style={{ marginBottom: '1rem', gap: '.5rem' }}>
-        {[['all', 'All'], ['buyer', 'Offers I received'], ['vendor', 'Offers I sent']].map(([v, l]) => (
+        {[['all', t('All')], ['buyer', t('Offers I received')], ['vendor', t('Offers I sent')]].map(([v, l]) => (
           <button key={v} className={`btn sm ${tab === v ? '' : 'secondary'}`} onClick={() => setTab(v)}>{l}</button>
         ))}
       </div>
       {groups.size === 0 ? (
         <div className="card empty">
-          <p>No conversations yet.</p>
-          <p className="small">Conversations start when a seller makes an offer on a request. <Link to="/">Browse requests</Link></p>
+          <p>{t('No conversations yet.')}</p>
+          <p className="small">{t('Conversations start when a seller makes an offer on a request.')} <Link to="/">{t('Browse requests')}</Link></p>
         </div>
       ) : (
         <div className="stack">
@@ -39,24 +40,24 @@ export default function Inbox() {
             <section key={listing.id} className="card" style={{ padding: 0 }}>
               <div style={{ padding: '.8rem 1rem', borderBottom: '1px solid var(--border)' }} className="row spread">
                 <div>
-                  <span className="muted small">Request</span>{' '}
-                  <Link to={`/requests/${listing.id}`}><b>{listing.title}</b></Link>
+                  <span className="muted small">{t('Request')}</span>{' '}
+                  <Link to={`/requests/${listing.id}`}><b><bdi>{listing.title}</bdi></b></Link>
                 </div>
-                {listing.status !== 'open' && <span className="badge grey">{listing.status}</span>}
+                {listing.status !== 'open' && <span className="badge grey">{statusLabel(listing.status)}</span>}
               </div>
               {items.map((c) => (
                 <Link key={c.id} to={`/messages/${c.id}`} className="inbox-item">
-                  <Avatar name={c.other.displayName} />
+                  <Avatar name={c.other.displayName} src={c.other.avatarUrl} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="row spread">
-                      <b>{c.other.displayName}</b>
+                      <b><bdi>{c.other.displayName}</bdi></b>
                       <span className="muted small">{ago(c.lastMessageAt)}</span>
                     </div>
                     <div className="muted small" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {c.myRole === 'buyer' ? 'Offer from seller' : 'Your offer'} · {c.lastMessage}
+                      {c.myRole === 'buyer' ? t('Offer from seller') : t('Your offer')} · <bdi>{c.lastMessage || t('📷 Photo')}</bdi>
                     </div>
                   </div>
-                  {c.needsRating && <span className="badge warn">★ Rate</span>}
+                  {c.needsRating && <span className="badge warn">{t('★ Rate')}</span>}
                   {c.unread > 0 && <span className="unread-dot">{c.unread}</span>}
                 </Link>
               ))}

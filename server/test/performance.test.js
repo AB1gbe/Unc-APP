@@ -51,6 +51,10 @@ test('hot queries use indexes, not full table scans', () => {
   assert.match(unread, /idx_conversations_vendor/);
   assert.doesNotMatch(unread, /SCAN m\b/);
   assert.match(plan('SELECT * FROM listings WHERE buyer_id = 1 ORDER BY created_at DESC'), /idx_listings_buyer/);
+  // Polled by every open tab (session 13): the 🔔 count and the list.
+  assert.match(plan('SELECT COUNT(*) FROM notifications WHERE user_id = 1 AND read_at IS NULL'), /idx_notifications_unread/);
+  assert.match(plan('SELECT * FROM notifications WHERE user_id = 1 ORDER BY id DESC LIMIT 50'), /idx_notifications_user/);
+  assert.match(plan('SELECT * FROM saved_listings WHERE user_id = 1'), /PRIMARY KEY|sqlite_autoindex_saved_listings/);
 });
 
 test('cleanupExpired removes only dead sessions, codes and reset links', async () => {

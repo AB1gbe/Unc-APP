@@ -3,6 +3,8 @@ import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import { RequireAdmin, RequireAuth, RequireVerified } from './components/ui.jsx';
 import Browse from './pages/Browse.jsx';
+import Home from './pages/Home.jsx';
+import { useAuth } from './auth.jsx';
 import ListingDetail from './pages/ListingDetail.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -20,19 +22,31 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'));
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail.jsx'));
 const Verification = lazy(() => import('./pages/Verification.jsx'));
 const Account = lazy(() => import('./pages/Account.jsx'));
+const Welcome = lazy(() => import('./pages/Welcome.jsx'));
+const Notifications = lazy(() => import('./pages/Notifications.jsx'));
+const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
 const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
+
+// Members land on their personal home; visitors see the request list.
+function HomeOrBrowse() {
+  const { user } = useAuth();
+  return user ? <Home /> : <Browse />;
+}
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Browse />} />
-        <Route path="requests/new" element={<RequireAuth><RequireVerified action="post a request"><NewListing /></RequireVerified></RequireAuth>} />
+        <Route index element={<HomeOrBrowse />} />
+        <Route path="browse" element={<Browse />} />
+        <Route path="requests/new" element={<RequireAuth><RequireVerified action="post"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="requests/:id" element={<ListingDetail />} />
-        <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit a request"><NewListing /></RequireVerified></RequireAuth>} />
+        <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="my-requests" element={<RequireAuth><MyListings /></RequireAuth>} />
+        <Route path="notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
+        <Route path="saved" element={<RequireAuth><Saved /></RequireAuth>} />
         <Route path="messages" element={<RequireAuth><Inbox /></RequireAuth>} />
         <Route path="messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />
         <Route path="login" element={<Login />} />
@@ -40,6 +54,7 @@ export default function App() {
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="reset-password" element={<ResetPassword />} />
         <Route path="verify-email" element={<RequireAuth><VerifyEmail /></RequireAuth>} />
+        <Route path="welcome" element={<RequireAuth><Welcome /></RequireAuth>} />
         <Route path="verification" element={<RequireAuth><Verification /></RequireAuth>} />
         <Route path="members/:id" element={<MemberProfile />} />
         <Route path="account" element={<RequireAuth><Account /></RequireAuth>} />

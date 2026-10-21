@@ -182,6 +182,50 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_ratings_ratee ON ratings(ratee_id, created_at);
   `,
+  // 5: each member's language, so emails go out in it (session 12).
+  // NULL = no preference yet (e.g. accounts made before this, the admin):
+  // emails then use English, and the website keeps the browser's language.
+  `
+  ALTER TABLE users ADD COLUMN language TEXT CHECK (language IN ('en', 'ar'));
+  `,
+  // 6: profiles (session 13) - photo, short bio, interests (JSON list of
+  // categories), and when the welcome steps were finished or skipped.
+  `
+  ALTER TABLE users ADD COLUMN avatar TEXT;
+  ALTER TABLE users ADD COLUMN bio TEXT;
+  ALTER TABLE users ADD COLUMN interests TEXT NOT NULL DEFAULT '[]';
+  ALTER TABLE users ADD COLUMN onboarded_at TEXT;
+  `,
+  // 7: a photo in a chat message (session 13). PRIVATE: stored in
+  // uploads/chat and only served to the two people in the conversation.
+  `
+  ALTER TABLE messages ADD COLUMN image TEXT;
+  `,
+  // 8: saved requests (session 13) - a member's "♥ save for later" list.
+  `
+  CREATE TABLE saved_listings (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, listing_id)
+  );
+  CREATE INDEX idx_saved_listing ON saved_listings(listing_id);
+  `,
+  // 9: notifications (session 13) - see server/src/lib/notify.js.
+  `
+  CREATE TABLE notifications (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    kind            TEXT NOT NULL,
+    actor_id        INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    listing_id      INTEGER REFERENCES listings(id) ON DELETE CASCADE,
+    conversation_id INTEGER REFERENCES conversations(id) ON DELETE CASCADE,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    read_at         TEXT
+  );
+  CREATE INDEX idx_notifications_user ON notifications(user_id, id);
+  CREATE INDEX idx_notifications_unread ON notifications(user_id) WHERE read_at IS NULL;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
@@ -238,7 +282,8 @@ export function cleanupExpired(db) {
   const sessions = db.prepare(`DELETE FROM sessions WHERE expires_at <= ${now}`).run().changes;
   const resets = db.prepare(`DELETE FROM password_resets WHERE expires_at <= ${now} OR used_at IS NOT NULL`).run().changes;
   const codes = db.prepare(`DELETE FROM email_codes WHERE expires_at <= ${now}`).run().changes;
-  return { sessions, resets, codes };
+  const notifications = db.prepare(`DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at <= datetime('now', '-90 days')`).run().changes;
+  return { sessions, resets, codes, notifications };
 }
 
 export function audit(db, actorId, action, target, meta) {

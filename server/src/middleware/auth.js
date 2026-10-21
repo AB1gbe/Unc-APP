@@ -5,6 +5,7 @@
 //   requireAdmin     -> logged in + admin role
 import { sha256 } from '../lib/crypto.js';
 import { HttpError } from '../lib/http.js';
+import { avatarUrl } from '../lib/uploads.js';
 
 export const SESSION_COOKIE = 'unc_session';
 
@@ -49,6 +50,15 @@ export function requireAdmin(req, res, next) {
 }
 
 // What the client is allowed to see about the logged-in user.
+export const parseInterests = (json) => {
+  try {
+    const list = JSON.parse(json || '[]');
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+};
+
 export function publicMe(u) {
   if (!u) return null;
   return {
@@ -61,5 +71,10 @@ export function publicMe(u) {
     emailVerified: Boolean(u.email_verified_at),
     kycStatus: u.kyc_status,
     createdAt: u.created_at,
+    language: u.language,
+    avatarUrl: avatarUrl(u.avatar),
+    bio: u.bio,
+    interests: parseInterests(u.interests),
+    onboarded: Boolean(u.onboarded_at),
   };
 }

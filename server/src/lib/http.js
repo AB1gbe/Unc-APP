@@ -1,5 +1,8 @@
 // HttpError lets any route `throw new HttpError(403, '...')` and have the
-// error middleware turn it into a clean JSON response.
+// error middleware turn it into a clean JSON response. Messages are written
+// in English and translated here (lib/i18n.js) to the request's language.
+import { langOf, translateMessage } from './i18n.js';
+
 export class HttpError extends Error {
   constructor(status, message, extra) {
     super(message);
@@ -20,7 +23,15 @@ const UPLOAD_ERRORS = {
   LIMIT_FIELD_VALUE: [400, 'A form field is too long.'],
 };
 
-export function errorHandler(err, req, res, _next) {
+export function errorHandler(err, req, res, next) {
+  // Translate whatever message the handlers below send.
+  const lang = langOf(req);
+  const json = res.json.bind(res);
+  res.json = (body) => json(body?.error ? { ...body, error: translateMessage(body.error, lang) } : body);
+  return handleError(err, req, res, next);
+}
+
+function handleError(err, req, res, _next) {
   // Upload problems (multer) are the user's mistake, not a server error.
   if (UPLOAD_ERRORS[err?.code]) {
     const [status, message] = UPLOAD_ERRORS[err.code];
@@ -31,6 +42,11 @@ export function errorHandler(err, req, res, _next) {
   }
   // Errors from Express/body-parser/multer that are safe to show (bad JSON,
   // cut-off upload...) carry `expose` and a 4xx status.
+  // A missing file from express.static (e.g. a deleted photo) is a plain
+  // 404, not a server error - its error object has status 404 but no
+  // "expose" flag, so check it first.
+  const status = err?.status ?? err?.statusCode;
+  if (status === 404) return res.status(404).json({ error: 'Not found' });
   if (err?.expose && err.status >= 400 && err.status < 500) {
     return res.status(err.status).json({ error: err.status === 400 ? 'The request could not be read. Please try again.' : err.message });
   }

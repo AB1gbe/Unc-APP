@@ -1,14 +1,20 @@
 // "Listings" are REQUESTS posted by buyers: "I want X". Vendors browse them
 // and reach out about a specific one (see conversations.js).
+import fs from 'node:fs';
+import path from 'node:path';
 import { Router } from 'express';
 import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
-import { LISTING_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { LISTING_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
-import { requireAuth, requireVerified } from '../middleware/auth.js';
+import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
+import { notify } from '../lib/notify.js';
 
+export const MAX_PHOTOS = 6;
+
+// images: [{ id, file }] in display order
 export function listingView(row, images = []) {
   return {
     id: row.id,
@@ -23,23 +29,24 @@ export function listingView(row, images = []) {
     status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-    buyer: { id: row.buyer_id, displayName: row.buyer_name, accountType: row.buyer_type },
-    images: images.map((f) => `/uploads/listings/${f}`),
+    buyer: { id: row.buyer_id, displayName: row.buyer_name, accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
+    images: images.map((i) => `/uploads/listings/${i.file}`),
+    photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}` })),
     offerCount: row.offer_count ?? undefined,
   };
 }
 
 const BASE_SELECT = `
-  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.banned_at IS NOT NULL AS buyer_banned,
+  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.banned_at IS NOT NULL AS buyer_banned,
          (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count
   FROM listings l JOIN users u ON u.id = l.buyer_id
 `;
 
 export function listingRoutes(db) {
   const r = Router();
-  const upload = memoryUpload(3);
-  const imagesFor = db.prepare('SELECT file FROM listing_images WHERE listing_id = ? ORDER BY id');
-  const withImages = (row) => listingView(row, imagesFor.all(row.id).map((i) => i.file));
+  const upload = memoryUpload(MAX_PHOTOS);
+  const imagesFor = db.prepare('SELECT id, file FROM listing_images WHERE listing_id = ? ORDER BY id');
+  const withImages = (row) => listingView(row, imagesFor.all(row.id));
   const ratings = ratingQueries(db);
 
   // The full single-request view: adds the buyer's rating and, for the
@@ -82,6 +89,47 @@ export function listingRoutes(db) {
     });
   });
 
+  // "Requests you could help with" on the member's home page: open
+  // requests in their interests (all categories if they chose none), not
+  // their own, not ones they already answered; same city first, newest first.
+  r.get('/for-you', requireAuth, (req, res) => {
+    const interests = parseInterests(req.user.interests).filter((c) => CATEGORIES.includes(c));
+    const rows = db.prepare(`
+      ${BASE_SELECT}
+      WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ?
+        AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id AND c.vendor_id = ?)
+        ${interests.length ? `AND l.category IN (${interests.map(() => '?').join(', ')})` : ''}
+      ORDER BY (lower(l.city) = lower(COALESCE(?, ''))) DESC, l.created_at DESC, l.id DESC
+      LIMIT 6
+    `).all(req.user.id, req.user.id, ...interests, req.user.city);
+    res.json({ listings: rows.map(withImages), basedOnInterests: interests.length > 0 });
+  });
+
+  // The member's saved requests ("♥ Save"), newest saved first. Only ones
+  // that are still open are listed; closed ones stay saved but hidden.
+  r.get('/saved', requireAuth, (req, res) => {
+    const rows = db.prepare(`
+      ${BASE_SELECT} JOIN saved_listings s ON s.listing_id = l.id AND s.user_id = ?
+      WHERE l.status = 'open' AND u.banned_at IS NULL
+      ORDER BY s.created_at DESC, l.id DESC
+      LIMIT 100
+    `).all(req.user.id);
+    res.json({ listings: rows.map(withImages) });
+  });
+
+  r.put('/:id/save', requireAuth, (req, res) => {
+    const row = db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(Number(req.params.id));
+    if (!row || row.buyer_banned || row.status !== 'open') throw notFound('This request does not exist or is no longer open.');
+    if (row.buyer_id === req.user.id) throw new HttpError(400, "You can't save your own request.");
+    db.prepare('INSERT OR IGNORE INTO saved_listings (user_id, listing_id) VALUES (?, ?)').run(req.user.id, row.id);
+    res.json({ saved: true });
+  });
+
+  r.delete('/:id/save', requireAuth, (req, res) => {
+    db.prepare('DELETE FROM saved_listings WHERE user_id = ? AND listing_id = ?').run(req.user.id, Number(req.params.id));
+    res.json({ saved: false });
+  });
+
   // The logged-in buyer's own requests, any status.
   r.get('/mine', requireAuth, (req, res) => {
     const rows = db.prepare(`${BASE_SELECT} WHERE l.buyer_id = ? ORDER BY l.created_at DESC, l.id DESC`).all(req.user.id);
@@ -104,11 +152,12 @@ export function listingRoutes(db) {
     if (req.user && req.user.id !== row.buyer_id) {
       const conv = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, req.user.id);
       listing.myConversationId = conv?.id ?? null;
+      listing.saved = Boolean(db.prepare('SELECT 1 FROM saved_listings WHERE user_id = ? AND listing_id = ?').get(req.user.id, row.id));
     }
     res.json({ listing });
   });
 
-  r.post('/', requireVerified, upload.array('images', 3), (req, res) => {
+  r.post('/', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
     const data = readListingBody(req.body);
     // All photos are checked before anything is saved, and the listing +
     // photo rows are written in one transaction: a bad photo means nothing
@@ -150,6 +199,37 @@ export function listingRoutes(db) {
 
   // Mark as fulfilled / closed / reopen. Once not open, all its
   // conversations become read-only.
+  // Add photos to an open request (owner only), up to MAX_PHOTOS in total.
+  r.post('/:id/images', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
+    const row = ownListing(db, req);
+    if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
+    const files = req.files || [];
+    if (!files.length) throw new HttpError(400, 'Please upload images.', { field: 'images' });
+    const have = db.prepare('SELECT COUNT(*) AS n FROM listing_images WHERE listing_id = ?').get(row.id).n;
+    if (have + files.length > MAX_PHOTOS) {
+      throw new HttpError(400, `A request can have at most ${MAX_PHOTOS} photos.`, { field: 'images' });
+    }
+    const photos = saveFiles(LISTING_DIR(), files.map((file) => ({ file })));
+    try {
+      tx(db, () => {
+        for (const name of photos.names) db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(row.id, name);
+      });
+    } catch (err) {
+      photos.discard();
+      throw err;
+    }
+    res.status(201).json({ listing: detailView(row.id, req.user) });
+  });
+
+  r.delete('/:id/images/:imageId', requireAuth, (req, res) => {
+    const row = ownListing(db, req);
+    const img = db.prepare('SELECT * FROM listing_images WHERE id = ? AND listing_id = ?').get(Number(req.params.imageId), row.id);
+    if (!img) throw notFound('File not found');
+    db.prepare('DELETE FROM listing_images WHERE id = ?').run(img.id);
+    fs.rmSync(path.join(LISTING_DIR(), img.file), { force: true });
+    res.json({ listing: detailView(row.id, req.user) });
+  });
+
   // When marking "fulfilled" the buyer may say which conversation the deal
   // came from (conversationId). That records a DEAL, which both sides can
   // then rate. Leave it out if they found the item elsewhere.
@@ -171,11 +251,13 @@ export function listingRoutes(db) {
           throw new HttpError(409, 'This deal has already been rated, so it can no longer be changed.');
         }
         db.prepare('DELETE FROM deals WHERE id = ?').run(deal.id);
+        db.prepare(`DELETE FROM notifications WHERE kind = 'deal' AND conversation_id = ?`).run(deal.conversation_id);
       }
       if (conv && !keepsDeal) {
         const info = db.prepare('INSERT INTO deals (listing_id, conversation_id, buyer_id, vendor_id) VALUES (?, ?, ?, ?)')
           .run(row.id, conv.id, conv.buyer_id, conv.vendor_id);
         audit(db, req.user.id, 'deal.created', `deal:${info.lastInsertRowid}`, { listingId: row.id, vendorId: conv.vendor_id });
+        notify(db, conv.vendor_id, 'deal', { actorId: req.user.id, listingId: row.id, conversationId: conv.id });
       }
       db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
       audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);

@@ -67,8 +67,8 @@ test('upload and JSON mistakes return 4xx, not 500', async () => {
   const u = await t.user();
   let req = u.post('/api/listings').field('title', 'Looking for a camera').field('description', 'Any decent camera')
     .field('category', 'Electronics').field('city', 'Austin');
-  for (let i = 0; i < 4; i++) req = req.attach('images', PNG, `${i}.png`);
-  assert.equal((await req).status, 400); // 4 photos (max 3)
+  for (let i = 0; i < 7; i++) req = req.attach('images', PNG, `${i}.png`);
+  assert.equal((await req).status, 400); // 7 photos (max 6 since session 13)
   assert.equal((await u.post('/api/listings').attach('surprise', PNG, 'x.png')).status, 400); // unknown field
   const bad = await t.request(t.app).post('/api/auth/login').set('Content-Type', 'application/json').send('{"email":');
   assert.equal(bad.status, 400);

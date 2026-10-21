@@ -11,7 +11,7 @@ tags: [roadmap]
 - [ ] Decide on automated KYC provider → [[KYC Verification#Adding an automated provider]]
 
 ## For a Bahrain launch (from [[Bahrain Market Research]])
-- [ ] Arabic interface with right-to-left layout (plus English)
+- [x] Arabic interface with right-to-left layout (plus English) → [[Arabic and RTL]] *(session 12)*
 - [ ] BHD currency (3 decimals)
 - [ ] BenefitPay payments/deposits via a licensed payment provider
 - [ ] Identity via eKey for Business (ask Beyon Connect about eligibility) — document + selfie service until then
@@ -21,13 +21,18 @@ tags: [roadmap]
 
 ## Next features
 - [x] Ratings & reviews after a request is fulfilled → [[Ratings]] *(session 09)*
-- [ ] Photos in chat messages
-- [ ] Email/push notification when a new offer arrives
+- [x] Member profiles: photo, bio, interests, welcome step *(session 13)*
+- [x] Member home page: needs attention, your requests, requests for you *(session 13)*
+- [x] Photos in chat messages (private) + up to 6 request photos, full-screen viewer *(session 13)*
+- [x] Saved requests (♡ Save) *(session 13)*
+- [x] In-app notifications 🔔 (offers, deals, ratings, identity result) *(session 13)*
+- [ ] Email/push notification when a new offer arrives (in-app 🔔 done in session 13)
 - [ ] Saved searches for vendors ("notify me of new Electronics requests in Austin")
 - [ ] Location with radius instead of free-text city
 - [ ] Admin UI for the audit log; promote/demote admins
 - [ ] Block a user (stop a specific vendor contacting you again)
-- [ ] PWA install + push → [[ADR-001 Platform]]
+- [x] Works on phones/tablets + "Add to Home Screen" (manifest, icons, bottom tab bar) → [[ADR-001 Platform]] *(session 13)*
+- [ ] Offline support (service worker) + push notifications → [[ADR-001 Platform]]
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]

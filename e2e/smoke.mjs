@@ -15,7 +15,10 @@ const BASE = process.env.BASE_URL || 'http://localhost:4000';
 const shot = (p, n) => p.screenshot({ path: `${OUT}/${n}.png`, fullPage: true });
 const browser = await chromium.launch();
 const img = `${OUT}/fake-id.png`;
-{ const p = await browser.newPage(); await p.setContent('<div style="width:300px;height:200px;background:#cde">ID CARD</div>'); await p.screenshot({ path: img }); await p.close(); }
+// Test images: only the element is captured (not the whole white page).
+{ const p = await browser.newPage(); await p.setContent('<div style="width:300px;height:200px;background:#cde">ID CARD</div>'); await p.locator('div').screenshot({ path: img }); await p.close(); }
+const face = `${OUT}/fake-face.png`;
+{ const p = await browser.newPage(); await p.setContent('<div style="width:240px;height:240px;background:linear-gradient(135deg,#2f6fed,#f5a623);color:#fff;font:700 96px sans-serif;display:grid;place-items:center">R</div>'); await p.locator('div').screenshot({ path: face }); await p.close(); }
 
 async function onboard(name, email, type) {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
@@ -30,6 +33,14 @@ async function onboard(name, email, type) {
   const code = (await p.textContent('.alert.info b')).trim();
   await shot(p, '02-verify-email');
   await p.fill('#code', code); await p.click('button:has-text("Confirm email")');
+  // Welcome step: photo, a few words, interests
+  await p.waitForURL('**/welcome');
+  await p.setInputFiles('.photo-edit input[type=file]', face);
+  await p.waitForSelector('.photo-edit img.avatar');
+  await p.fill('#bio', type === 'business' ? 'Family electronics shop in Austin since 2010.' : 'I like retro games and good coffee.');
+  await p.click(`.chip:has-text("${type === 'business' ? 'Electronics' : 'Toys & Kids'}")`);
+  await shot(p, `02b-welcome-${type}`);
+  await p.click('button:has-text("Save and continue")');
   await p.waitForURL('**/verification');
   await p.click('button:has-text("Start verification")');
   await p.fill('#legalName', name + ' Legal'); await p.fill('#dateOfBirth', '1990-04-03'); await p.fill('#country', 'United States');
@@ -82,11 +93,25 @@ await vendor.goto(BASE + '/');
 await vendor.waitForSelector('.card h3');
 await shot(vendor, '09-browse');
 await vendor.goto(listingUrl);
+// Save it for later, see it on the Saved page and the home page, then come back.
+await vendor.click('.save-btn'); await vendor.waitForSelector('.save-btn.on');
+await vendor.goto(BASE + '/saved'); await vendor.waitForSelector('.card h3:has-text("PS5")');
+await shot(vendor, '09b-saved');
+await vendor.goto(BASE + '/'); await vendor.waitForSelector('h2:has-text("Saved for later")');
+await vendor.goto(listingUrl); await vendor.waitForSelector('.save-btn.on');
 await vendor.fill('#offerPrice', '380'); await vendor.fill('#message', 'Hi! I have a PS5 disc edition with 2 controllers, boxed, 6 months old.');
+await vendor.setInputFiles('#offerPhoto', face); // photo of the item with the offer
+await vendor.waitForSelector('.thumb img');
 await shot(vendor, '10-make-offer');
 await vendor.click('button:has-text("Send offer")');
 await vendor.waitForURL('**/messages/*');
 await vendor.waitForSelector('.bubble');
+
+// The 🔔 shows the new offer; opening it clears the count.
+await buyer.goto(BASE + '/'); await buyer.waitForSelector('.bell .unread-dot');
+await buyer.click('.bell'); await buyer.waitForSelector('.inbox-item.unread:has-text("made an offer")');
+await shot(buyer, '10b-notifications');
+await buyer.waitForSelector('.bell .unread-dot', { state: 'detached' });
 
 await buyer.goto(BASE + '/messages');
 await buyer.waitForSelector('.inbox-item');
@@ -94,8 +119,17 @@ await shot(buyer, '11-buyer-inbox');
 await buyer.click('.inbox-item');
 await buyer.waitForSelector('.bubble');
 await buyer.fill('.chat-form textarea', 'Sounds great — can you do $350 if I pick up today?');
-await buyer.click('.chat-form button');
+await buyer.setInputFiles('.chat-form input[type=file]', img); // buyer sends a photo too
+await buyer.waitForSelector('.attach-preview img');
+await buyer.click('.chat-form button.btn');
 await vendor.waitForSelector('text=can you do $350', { timeout: 8000 });
+await vendor.waitForSelector('.bubble.mine .bubble-photo img'); // vendor's own offer photo
+// open a photo full-screen and close it again
+await vendor.click('.bubble.mine .bubble-photo');
+await vendor.waitForSelector('.lightbox img');
+await shot(vendor, '12b-photo-viewer');
+await vendor.keyboard.press('Escape');
+await vendor.waitForSelector('.lightbox', { state: 'detached' });
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
 

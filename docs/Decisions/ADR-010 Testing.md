@@ -26,6 +26,8 @@ date: 2026-10-21
 
 - `ratings.test.js` (12 tests, session 09): see [[Ratings#Tests]].
 
-Total: **63 tests**.
+- `i18n-coverage.test.js` (4) and `arabic.test.js` (8), session 12: see [[Arabic and RTL#Tests]]. Plus `e2e/arabic.mjs`.
+
+Total: **75 tests**.
 
 Run: `npm test` (API) · `npm run e2e` (browser, see [[Step 12 - End-to-end check]]).

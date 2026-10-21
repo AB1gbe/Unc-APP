@@ -73,7 +73,7 @@ Copy `.env.example` to `.env` in the project folder (Windows: `copy .env.example
 |---|---|
 | `npm run dev` | API + website with auto-reload |
 | `npm run dev:server` / `npm run dev:client` | Only one of them |
-| `npm test` | Run the API tests (63 as of session 09 — fewer means you need `git pull`) |
+| `npm test` | Run the API tests (75 as of session 12 — fewer means you need `pull`) |
 | `npm run build` | Build the website into `client/dist` |
 | `npm start` | Run the API, which also serves the built website on :4000 |
 | `npm run seed` | Admin + demo data (incl. one rated deal) |
@@ -81,6 +81,7 @@ Copy `.env.example` to `.env` in the project folder (Windows: `copy .env.example
 | `npm run live` | App + auto-pull of pushed changes → [[Watch Changes Live]] |
 | `npm run mail:test -- you@example.com` | Send one test email with your `.env` settings ([[Email Sending]]) |
 | `npm run e2e` | Browser test (needs `npm run build` + `npm start` on a fresh DB) |
+| `npm run e2e:ar` | Same journey in Arabic, with right-to-left / phone / English-leak checks |
 
 ## Reset everything
 Stop the app (Ctrl + C) and delete the `server/data` folder (database + uploads). It's recreated on next start.

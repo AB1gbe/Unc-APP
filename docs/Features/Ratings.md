@@ -25,7 +25,7 @@ tags: [feature, ratings]
 | **Blind:** hidden until both rated, or 14 days pass | Nobody can wait for a bad review and retaliate | `VISIBLE` SQL condition in `lib/ratings.js` |
 | Rating window: 30 days after the deal | Reviews about recent experiences only | `canStillRate()` |
 | Buyer may switch/undo the deal (pick another seller, reopen) **until someone rates** | Fix a mis-click, but no wiping a rating | `/status` route → 409 once rated |
-| Profiles only for verified, non-banned members; show name, business/individual, member since, deals, rating, reviews — **no email, no city, no message button** | MUST #3: contact stays listing-only | `GET /api/members/:id` |
+| Profiles only for verified, non-banned members; show name, photo, bio, city, interests, business/individual, member since, deals, rating, reviews, open requests (session 13) — **no email, no phone, no message button** | MUST #3: contact stays listing-only | `GET /api/members/:id` |
 
 ## Where ratings show
 - Next to names: chat header, offers list on your request, seller chooser, buyer box on a request page → "★ 4.5 (12)" or "No ratings yet".

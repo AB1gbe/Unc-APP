@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { config } from '../config.js';
@@ -8,6 +10,9 @@ import * as v from '../lib/validate.js';
 import { SESSION_COOKIE, requireAuth, publicMe } from '../middleware/auth.js';
 import { trySendMail } from '../lib/mailer.js';
 import { verificationCodeEmail, passwordResetEmail, passwordChangedEmail } from '../lib/emails.js';
+import { LANGS, langOf, translateMessage } from '../lib/i18n.js';
+import { AVATAR_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { CATEGORIES } from '../lib/categories.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -23,7 +28,9 @@ export function authRoutes(db) {
     limit: config.isTest ? 10_000 : max,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
-    message: { error: 'Too many attempts. Please wait a few minutes.' },
+    // Sent by the limiter itself (not errorHandler), so translate here.
+    handler: (req, res, _next, options) => res.status(options.statusCode)
+      .json({ error: translateMessage('Too many attempts. Please wait a few minutes.', langOf(req)) }),
   });
   const limits = {
     register: limit(10),
@@ -73,6 +80,8 @@ export function authRoutes(db) {
     const displayName = v.str(req.body, 'displayName', { min: 2, max: 60 });
     const accountType = v.oneOf(req.body, 'accountType', ['individual', 'business']);
     const city = v.str(req.body, 'city', { max: 80, optional: true });
+    // The language the website was in when they signed up (emails use it).
+    const language = langOf(req);
 
     if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
       throw new HttpError(409, 'An account with this email already exists.', { field: 'email' });
@@ -81,8 +90,8 @@ export function authRoutes(db) {
     let info;
     try {
       info = db.prepare(`
-        INSERT INTO users (email, password_hash, display_name, account_type, city) VALUES (?, ?, ?, ?, ?)
-      `).run(email, hash, displayName, accountType, city);
+        INSERT INTO users (email, password_hash, display_name, account_type, city, language) VALUES (?, ?, ?, ?, ?, ?)
+      `).run(email, hash, displayName, accountType, city, language);
     } catch (err) {
       // Two sign-ups with the same email at the same moment: the check above
       // passed for both, the database's UNIQUE rule stops the second.
@@ -95,7 +104,7 @@ export function authRoutes(db) {
     const code = issueEmailCode(user);
     startSession(res, user.id);
     // The account exists even if the email fails; the user can resend.
-    const emailSent = await trySendMail({ to: user.email, ...verificationCodeEmail(code) });
+    const emailSent = await trySendMail({ to: user.email, ...verificationCodeEmail(code, user.language) });
     res.status(201).json({ user: publicMe(user), emailSent, ...devExtra(code) });
   });
 
@@ -143,7 +152,7 @@ export function authRoutes(db) {
   r.post('/resend-code', limits.resendCode, requireAuth, async (req, res) => {
     if (req.user.email_verified_at) throw new HttpError(400, 'Email is already verified.');
     const code = issueEmailCode(req.user);
-    if (!(await trySendMail({ to: req.user.email, ...verificationCodeEmail(code) }))) {
+    if (!(await trySendMail({ to: req.user.email, ...verificationCodeEmail(code, req.user.language) }))) {
       throw new HttpError(502, "We couldn't send the email right now. Please try again in a minute.");
     }
     res.json({ ok: true, ...devExtra(code) });
@@ -164,9 +173,9 @@ export function authRoutes(db) {
         .run(sha256(token), user.id, expires);
       // Not awaited on purpose: waiting for the mail provider would make
       // "account exists" answers slower, which leaks who is a member.
-      trySendMail({ to: user.email, ...passwordResetEmail(token) });
+      trySendMail({ to: user.email, ...passwordResetEmail(token, user.language) });
     }
-    res.json({ ok: true, message: 'If an account exists for that email, a reset link is on its way.' });
+    res.json({ ok: true, message: translateMessage('If an account exists for that email, a reset link is on its way.', langOf(req)) });
   });
 
   function findResetToken(token) {
@@ -206,7 +215,7 @@ export function authRoutes(db) {
       if (!user.email_verified_at) db.prepare(`UPDATE users SET email_verified_at = datetime('now') WHERE id = ?`).run(user.id);
       audit(db, user.id, 'auth.password_reset', `user:${user.id}`);
     });
-    await trySendMail({ to: user.email, ...passwordChangedEmail() });
+    await trySendMail({ to: user.email, ...passwordChangedEmail(user.language) });
     res.json({ ok: true });
   });
 
@@ -221,14 +230,60 @@ export function authRoutes(db) {
     // Log out every OTHER device, keep this one.
     db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?').run(req.user.id, req.sessionTokenHash);
     audit(db, req.user.id, 'auth.password_changed', `user:${req.user.id}`);
-    await trySendMail({ to: req.user.email, ...passwordChangedEmail() });
+    await trySendMail({ to: req.user.email, ...passwordChangedEmail(req.user.language) });
     res.json({ ok: true });
   });
 
+  // The website calls this when a logged-in member switches language, so
+  // emails reach them in the language they use.
+  r.put('/language', requireAuth, (req, res) => {
+    const language = v.oneOf(req.body, 'language', LANGS);
+    db.prepare('UPDATE users SET language = ? WHERE id = ?').run(language, req.user.id);
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // Edit profile. Only the fields that are sent are changed.
   r.patch('/me', requireAuth, (req, res) => {
-    const displayName = v.str(req.body, 'displayName', { min: 2, max: 60 });
-    const city = v.str(req.body, 'city', { max: 80, optional: true });
-    db.prepare('UPDATE users SET display_name = ?, city = ? WHERE id = ?').run(displayName, city, req.user.id);
+    const b = req.body || {};
+    const changes = {};
+    if ('displayName' in b) changes.display_name = v.str(b, 'displayName', { min: 2, max: 60 });
+    if ('city' in b) changes.city = v.str(b, 'city', { max: 80, optional: true });
+    if ('bio' in b) changes.bio = v.str(b, 'bio', { max: 300, optional: true });
+    if ('interests' in b) {
+      const list = Array.isArray(b.interests) ? [...new Set(b.interests)] : null;
+      if (!list || list.length > 8 || list.some((c) => !CATEGORIES.includes(c))) {
+        throw new HttpError(400, 'Choose up to 8 interests from the list.', { field: 'interests' });
+      }
+      changes.interests = JSON.stringify(list);
+    }
+    const cols = Object.keys(changes);
+    if (cols.length) {
+      db.prepare(`UPDATE users SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(changes), req.user.id);
+    }
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // Profile photo. Public, so it must never be the identity-check selfie
+  // (that one stays in the private KYC folder).
+  const avatarUpload = memoryUpload(1);
+  r.post('/avatar', requireAuth, avatarUpload.single('avatar'), (req, res) => {
+    if (!req.file) throw new HttpError(400, 'Please upload avatar.', { field: 'avatar' });
+    const saved = saveFiles(AVATAR_DIR(), [{ file: req.file }]);
+    const old = req.user.avatar;
+    db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(saved.names[0], req.user.id);
+    if (old) fs.rmSync(path.join(AVATAR_DIR(), old), { force: true });
+    res.status(201).json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  r.delete('/avatar', requireAuth, (req, res) => {
+    if (req.user.avatar) fs.rmSync(path.join(AVATAR_DIR(), req.user.avatar), { force: true });
+    db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(req.user.id);
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // The welcome steps were completed or skipped: don't show them again.
+  r.post('/onboarded', requireAuth, (req, res) => {
+    db.prepare(`UPDATE users SET onboarded_at = COALESCE(onboarded_at, datetime('now')) WHERE id = ?`).run(req.user.id);
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 

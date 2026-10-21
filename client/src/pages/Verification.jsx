@@ -2,15 +2,17 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { api, toDate } from '../api.js';
+import { reasonText } from '../kycReasons.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, KycBadge, Loading } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { Steps } from './VerifyEmail.jsx';
+import { formatDateTime, t, tj } from '../i18n.jsx';
 
 const ID_TYPES = [
-  ['passport', 'Passport'],
-  ['national_id', 'National ID card'],
-  ['drivers_license', "Driver's license"],
+  ['passport', () => t('Passport')],
+  ['national_id', () => t('National ID card')],
+  ['drivers_license', () => t("Driver's license")],
 ];
 
 export default function Verification() {
@@ -24,7 +26,7 @@ export default function Verification() {
     return (
       <div className="narrow">
         <ErrorBox error={error} />
-        <button className="btn secondary" onClick={reload}>Try again</button>
+        <button className="btn secondary" onClick={reload}>{t('Try again')}</button>
       </div>
     );
   }
@@ -34,43 +36,43 @@ export default function Verification() {
 
   return (
     <div className="narrow">
-      <Steps current={status === 'approved' ? 3 : 2} />
+      <Steps current={status === 'approved' ? 4 : 3} />
       {status === 'approved' && (
         <div className="card center">
-          <h1>You're verified ✓</h1>
-          <p className="muted">You can now post requests and contact buyers.</p>
+          <h1>{t("You're verified ✓")}</h1>
+          <p className="muted">{t('You can now post requests and contact buyers.')}</p>
           <div className="row" style={{ justifyContent: 'center' }}>
-            <Link className="btn" to="/requests/new">Post a request</Link>
-            <Link className="btn secondary" to="/">Browse requests</Link>
+            <Link className="btn" to="/requests/new">{t('Post a request')}</Link>
+            <Link className="btn secondary" to="/">{t('Browse requests')}</Link>
           </div>
         </div>
       )}
       {status === 'pending' && (
         <div className="card">
-          <h1>We're checking your documents</h1>
+          <h1>{t("We're checking your documents")}</h1>
           <p><KycBadge status="pending" /></p>
-          <p className="muted">Submitted {toDate(sub.submittedAt).toLocaleString()}. This usually takes less than a day. You can browse in the meantime.</p>
-          <button className="btn secondary" onClick={async () => { await reload(); }}>Refresh status</button>
+          <p className="muted">{t('Submitted {date}. This usually takes less than a day. You can browse in the meantime.', { date: formatDateTime(toDate(sub.submittedAt)) })}</p>
+          <button className="btn secondary" onClick={async () => { await reload(); }}>{t('Refresh status')}</button>
         </div>
       )}
       {(status === 'unverified' || status === 'rejected') && !showForm && (
         <div className="card">
-          <h1>Verify your identity</h1>
+          <h1>{t('Verify your identity')}</h1>
           {status === 'rejected' && (
             <div className="alert error">
-              <b>Your last verification was not approved.</b>
-              {sub?.reviewNote && <div>Reason: {sub.reviewNote}</div>}
-              <div>Please try again with clear photos.</div>
+              <b>{t('Your last verification was not approved.')}</b>
+              {sub?.reviewNote && <div>{tj('Reason: {reason}', { reason: <bdi>{reasonText(sub.reviewNote)}</bdi> })}</div>}
+              <div>{t('Please try again with clear photos.')}</div>
             </div>
           )}
-          <p className="muted">To keep everyone safe, every member who posts or makes offers is verified. You'll need:</p>
+          <p className="muted">{t("To keep everyone safe, every member who posts or makes offers is verified. You'll need:")}</p>
           <ul>
-            <li>A government photo ID (passport, national ID or driver's license)</li>
-            <li>A selfie, taken now, with your face clearly visible</li>
-            {user.accountType === 'business' && <li>A business registration document (photo or PDF)</li>}
+            <li>{t("A government photo ID (passport, national ID or driver's license)")}</li>
+            <li>{t('A selfie, taken now, with your face clearly visible')}</li>
+            {user.accountType === 'business' && <li>{t('A business registration document (photo or PDF)')}</li>}
           </ul>
-          <p className="muted small">Your documents are only visible to our verification team and are never shown to other members. We store only the last 4 characters of your ID number.</p>
-          <button className="btn block" onClick={() => setShowForm(true)}>Start verification</button>
+          <p className="muted small">{t('Your documents are only visible to our verification team and are never shown to other members. We store only the last 4 characters of your ID number.')}</p>
+          <button className="btn block" onClick={() => setShowForm(true)}>{t('Start verification')}</button>
         </div>
       )}
       {(status === 'unverified' || status === 'rejected') && showForm && (
@@ -130,62 +132,62 @@ function KycForm({ isBusiness, onDone }) {
 
   return (
     <form className="card" onSubmit={submit}>
-      <h1>Your details</h1>
-      <p className="muted small">Enter them exactly as they appear on your ID.</p>
+      <h1>{t('Your details')}</h1>
+      <p className="muted small">{t('Enter them exactly as they appear on your ID.')}</p>
       <ErrorBox error={error} />
       <div className="field">
-        <label htmlFor="legalName">Full legal name</label>
+        <label htmlFor="legalName">{t('Full legal name')}</label>
         <input id="legalName" required value={form.legalName} onChange={set('legalName')} autoComplete="name" />
       </div>
       <div className="field-row">
         <div className="field">
-          <label htmlFor="dateOfBirth">Date of birth</label>
+          <label htmlFor="dateOfBirth">{t('Date of birth')}</label>
           <input id="dateOfBirth" type="date" required value={form.dateOfBirth} onChange={set('dateOfBirth')} />
-          <div className="hint">You must be 18 or older.</div>
+          <div className="hint">{t('You must be 18 or older.')}</div>
         </div>
         <div className="field">
-          <label htmlFor="country">Country that issued your ID</label>
+          <label htmlFor="country">{t('Country that issued your ID')}</label>
           <input id="country" required value={form.country} onChange={set('country')} autoComplete="country-name" />
         </div>
       </div>
       <div className="field-row">
         <div className="field">
-          <label htmlFor="idType">ID type</label>
+          <label htmlFor="idType">{t('ID type')}</label>
           <select id="idType" value={form.idType} onChange={set('idType')}>
-            {ID_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            {ID_TYPES.map(([v, l]) => <option key={v} value={v}>{l()}</option>)}
           </select>
         </div>
         <div className="field">
-          <label htmlFor="idNumber">ID number</label>
+          <label htmlFor="idNumber">{t('ID number')}</label>
           <input id="idNumber" required value={form.idNumber} onChange={set('idNumber')} autoComplete="off" />
         </div>
       </div>
 
       {isBusiness && (
         <>
-          <h2 style={{ marginTop: '1rem' }}>Business details</h2>
+          <h2 style={{ marginTop: '1rem' }}>{t('Business details')}</h2>
           <div className="field-row">
             <div className="field">
-              <label htmlFor="businessName">Registered business name</label>
+              <label htmlFor="businessName">{t('Registered business name')}</label>
               <input id="businessName" required value={form.businessName} onChange={set('businessName')} />
             </div>
             <div className="field">
-              <label htmlFor="businessRegNumber">Registration number</label>
+              <label htmlFor="businessRegNumber">{t('Registration number')}</label>
               <input id="businessRegNumber" required value={form.businessRegNumber} onChange={set('businessRegNumber')} />
             </div>
           </div>
         </>
       )}
 
-      <h2 style={{ marginTop: '1rem' }}>Photos</h2>
-      <p className="muted small">JPG, PNG or WEBP, up to 5 MB each. Make sure all text is readable and nothing is cut off.</p>
-      <FileField name="docFront" label={form.idType === 'passport' ? 'Passport photo page' : 'Front of ID'} required onChange={setFile} />
-      {needsBack && <FileField name="docBack" label="Back of ID" required onChange={setFile} />}
-      <FileField name="selfie" label="Selfie" hint="Look straight at the camera in good light. No hats or sunglasses." capture="user" required onChange={setFile} />
+      <h2 style={{ marginTop: '1rem' }}>{t('Photos')}</h2>
+      <p className="muted small">{t('JPG, PNG or WEBP, up to 5 MB each. Make sure all text is readable and nothing is cut off.')}</p>
+      <FileField name="docFront" label={form.idType === 'passport' ? t('Passport photo page') : t('Front of ID')} required onChange={setFile} />
+      {needsBack && <FileField name="docBack" label={t('Back of ID')} required onChange={setFile} />}
+      <FileField name="selfie" label={t('Selfie')} hint={t('Look straight at the camera in good light. No hats or sunglasses.')} capture="user" required onChange={setFile} />
       {isBusiness && (
-        <FileField name="businessDoc" label="Business registration document" accept="image/jpeg,image/png,image/webp,application/pdf" hint="Photo or PDF." required onChange={setFile} />
+        <FileField name="businessDoc" label={t('Business registration document')} accept="image/jpeg,image/png,image/webp,application/pdf" hint={t('Photo or PDF.')} required onChange={setFile} />
       )}
-      <button className="btn block" disabled={busy}>{busy ? 'Uploading…' : 'Submit for verification'}</button>
+      <button className="btn block" disabled={busy}>{busy ? t('Uploading…') : t('Submit for verification')}</button>
     </form>
   );
 }
