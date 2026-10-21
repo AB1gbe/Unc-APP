@@ -20,7 +20,7 @@ Asked in [[2026-10-21 Session 19]]. These are ideas only: nothing is built yet. 
 ## 2. Show that real people are here (social proof)
 | Idea | What it looks like | Effort |
 |---|---|---|
-| **"Happening near you" feed** on Home | "Someone in Riffa found a PS5 · 2h ago", "3 shops answered requests in Manama today". No names unless the person agreed. | M |
+| ✅ **"Happening near you" feed** on Home (built in session 26) | "Someone in Riffa found a PS5 · 2h ago", "3 shops answered requests in Manama today". No names unless the person agreed. | M |
 | **Seen by sellers** on a request | "👀 7 sellers looked at this · 2 made offers": the buyer sees interest growing instead of silence | S |
 | **"Active now" / "Replies within ~1 hour"** on profiles and in chats | Computed from message times; turns a name into a person you can expect an answer from | S–M |
 | **"Found it" success stories** | After a deal, both sides can share a photo and a sentence ("Got my bike, thanks Ali! 🚲"). Shown on Home and both profiles. Opt-in. | M |

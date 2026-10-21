@@ -65,6 +65,11 @@ test('hot queries use indexes, not full table scans', () => {
   assert.match(replyPlan, /idx_conversations_buyer/);
   assert.match(replyPlan, /idx_conversations_vendor/);
   assert.doesNotMatch(replyPlan, /SCAN (messages|conversations)\b/);
+  // Session 26: the "Happening near you" feed.
+  assert.match(plan(`SELECT * FROM deals WHERE created_at >= datetime('now', '-7 days') ORDER BY created_at DESC LIMIT 20`), /idx_deals_created/);
+  assert.match(plan(`SELECT * FROM listings WHERE status = 'open' AND created_at >= datetime('now', '-7 days') ORDER BY created_at DESC LIMIT 20`), /idx_listings_status/);
+  assert.match(plan(`SELECT * FROM users WHERE account_type = 'business' AND created_at >= datetime('now', '-7 days') ORDER BY created_at DESC LIMIT 10`), /idx_users_new_shops/);
+  assert.match(plan(`SELECT COUNT(*) FROM conversations WHERE created_at >= datetime('now', '-1 day')`), /idx_conversations_created/);
 });
 
 test('cleanupExpired removes only dead sessions, codes and reset links', async () => {

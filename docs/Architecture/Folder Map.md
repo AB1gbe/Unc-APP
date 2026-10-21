@@ -63,6 +63,7 @@ Unc-APP/
 │   │       ├── notifications.js /api/notifications/* (session 13)
 │   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
 │   │       ├── stories.js       /api/stories, /api/deals/:id/story, /api/admin/stories/:id/hide (session 20)
+│   │       ├── feed.js          /api/feed: "Happening near you" (session 26)
 │   │       └── admin.js         /api/admin/*
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage)
@@ -87,7 +88,8 @@ Unc-APP/
 │       ├── previews.test.js        link-preview tags on request pages (session 20)
 │       ├── stories-badges.test.js  "Found it" stories + earned badges (session 20)
 │       ├── seasons.test.js         home greeting + seasonal line (client/src/seasons.js) (session 20)
-│       └── shop.test.js            shop pages, contact-details guard, "open now" (client/src/hours.js) (session 24)
+│       ├── shop.test.js            shop pages, contact-details guard, "open now" (client/src/hours.js) (session 24)
+│       └── feed.test.js            "Happening near you": anonymity, city first, exclusions (session 26)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -117,6 +119,7 @@ Unc-APP/
         │   ├── ProfileEditor.jsx  Photo, name, city, bio, interests — Account page + Welcome (session 13)
         │   ├── ShopEditor.jsx     "Your shop page": cover, area, opening hours (business accounts, session 24)
         │   ├── ShopHours.jsx      Opening-hours card, OpenNow, dayName() (session 24)
+        │   ├── Feed.jsx           "Happening near you" card: Home and the landing page (session 26)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
         │   ├── Lightbox.jsx       Full-screen photo viewer: swipe, arrow keys, Esc (session 13)
         │   ├── Celebrate.jsx      celebrate(): toast + confetti; <Celebrations/> sits in Layout (session 20)

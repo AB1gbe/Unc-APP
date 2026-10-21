@@ -73,6 +73,20 @@ The five "recommended first" ideas from [[Social Marketplace Ideas]], all built 
 | 🤝 Trusted buyer | 3+ deals as the buyer, rated 4.5★ or more (2+ visible ratings) |
 | 🌱 New member | Joined in the last 30 days |
 
+## 6. "Happening near you" (session 26)
+**Why:** [[ADR-031 Happening near you]] · **Build:** [[Step 31 - Happening near you]]
+**Where:** `server/src/routes/feed.js`, `client/src/components/Feed.jsx` (on `Home.jsx`, and `Browse.jsx` for visitors)
+
+![[s26-feed.png]]
+
+- A card with up to 8 recent things (last 7 days), **your city first** (highlighted):
+  - 🎉 "Someone in Austin found what they needed in Electronics": a deal, **anonymous**, with only the city and category;
+  - 🆕 "New request in Riffa: Need a bike": open requests, never your own;
+  - 🏪 "New shop in Seef: Riffa Gadgets": newly verified business accounts (shops are public by choice);
+  - 💬 "3 offers made on requests in Riffa today": from 2 offers.
+- Visitors see it as "Happening on Unc" on the landing page, without the city ordering.
+- Never: names of private people, closed requests, banned members, or invented activity.
+
 ## Tests
-- `npm test`: `offer-responses.test.js` (3), `activity.test.js` (3), `previews.test.js` (2), `stories-badges.test.js` (3), `seasons.test.js` (2), and index checks in `performance.test.js`.
+- `npm test`: `feed.test.js` (2, session 26), `offer-responses.test.js` (3), `activity.test.js` (3), `previews.test.js` (2), `stories-badges.test.js` (3), `seasons.test.js` (2), and index checks in `performance.test.js`.
 - `e2e/smoke.mjs` now covers all five features.

@@ -197,6 +197,10 @@ await buyer.waitForSelector('.earned .badge'); // earned badges (🌱 New member
 await shot(buyer, '25-profile');
 await buyer.goto(BASE + '/'); await buyer.waitForSelector('.story:has-text("Got my PS5")');
 await shot(buyer, '26-home-stories');
+// "Happening near you": the deal shows up anonymously, Austin first.
+await buyer.waitForSelector('.feed li.near:has-text("Someone in Austin found what they needed in Electronics")');
+if (await buyer.locator('.feed:has-text("Sam Buyer")').count()) throw new Error('the feed named a private member');
+await buyer.locator('.feed').screenshot({ path: `${OUT}/29-feed.png` });
 // Account: the phone-notifications card is there (headless Chrome can't
 // subscribe, so it shows the 'blocked' or 'turn on' state).
 await buyer.goto(BASE + '/account'); await buyer.waitForSelector('.push-card h2');
@@ -235,6 +239,6 @@ await shot(buyer, '28-shop-page');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
-const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await shot(mp, '14-mobile-home');
+const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.feed li'); /* visitors see "Happening on Unc" */ await shot(mp, '14-mobile-home');
 console.log('E2E OK');
 await browser.close();

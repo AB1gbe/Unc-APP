@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 24)
+updated: 2026-10-21 (session 26)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 75 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75). All fixed.
+**Totals so far:** 76 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -85,6 +85,7 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M73 | Test | `t.user('approved', 'business')` failed: no business details sent | [[2026-10-21 Session 24]] |
 | M74 | Test | Fixing the helper made `t.kyc()` always attach the business document, breaking an old test | 24 |
 | M75 | Design | Profile name broke mid-word on phones ("Electronic / s") | 24 |
+| M76 | Self-review | Feed draft ran one database query per item to hide your own requests | [[2026-10-21 Session 26]] |
 
 ---
 
@@ -504,4 +505,11 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Found by:** the iPhone screenshot from `npm run e2e:devices`, which now includes the shop page.
 - **Cause:** the profile header put a 96 px photo, the text and the rating side by side, leaving the name about 110 px. The global `overflow-wrap: anywhere` then broke it inside the word. This had been there since session 13, but the shop lines made it obvious.
 - **Fix:** under 760 px, the photo is 64 px, the rating moves to its own line, and the name may only wrap between words.
+
+## M76
+**The first feed draft asked the database "is this my request?" once per item**
+- **Found by:** self-review right after writing it, before any test.
+- **Cause:** the own-request filter was written in JavaScript, after the query, with a lookup inside `.filter()`. With 20 requests that would be 20 extra queries on every Home visit.
+- **Fix:** the condition moved into the SQL (`AND l.buyer_id <> ?`), so it is one query.
+- **Lesson:** filter in the query, not in a loop that queries again.
 

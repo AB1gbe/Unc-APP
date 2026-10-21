@@ -8,6 +8,7 @@ import { partOfDay, season } from '../seasons.js';
 import { useApi } from '../hooks.js';
 import { t, tj, tn } from '../i18n.jsx';
 import { StoriesStrip } from '../components/Stories.jsx';
+import Feed from '../components/Feed.jsx';
 
 // Written out in full so the translation test can find every text.
 const GREETING = {
@@ -95,6 +96,8 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      <Feed />
 
       {saved.data?.listings.length > 0 && (
         <section>

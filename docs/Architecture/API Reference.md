@@ -127,3 +127,9 @@ Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buye
 Only when the built website exists (`client/dist`, or `CLIENT_DIST`). Every non-API, non-upload `GET` returns `index.html` (`Cache-Control: no-cache`) with Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`, `og:locale`, `twitter:card`) inserted before `</head>`, so WhatsApp, X, iMessage… show a card. `/requests/:id` for an **open** request whose buyer isn't banned gets its title (also in `<title>`), price, city and first photo, in the buyer's language; every other page gets the general Unc card and `/icons/icon-512.png`. `og:url` / `og:image` are built from `APP_URL`.
 
 **Shop fields (session 24):** `/api/auth/me` and `GET /api/members/:id` include `coverUrl`, `shopArea` and `shopHours` for business accounts only. `/uploads/covers/*` are public files.
+
+## Feed — `server/src/routes/feed.js` (session 26)
+| Method | Path | Gate | Notes |
+|---|---|---|---|
+| GET | `/api/feed` | — | `{city, items: [{kind, at, city, near, category?, listing?{id,title}, shop?{id,displayName}, count?}]}`, at most 8, from the last 7 days. The member's city comes first (`near`). Kinds: `found` (anonymous: city + category only), `request` (open, not your own), `shop` (new verified business), `offers-today` (2+ new conversations on requests in your city in 24 h). Private people are never named; banned members are left out. Works logged out (no `near`). |
+

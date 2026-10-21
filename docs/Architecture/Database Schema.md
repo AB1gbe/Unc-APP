@@ -3,7 +3,7 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20), 15 = `users.hide_activity` (session 22), 16 = `users.cover` + `shop_area` + `shop_hours` (session 24). `PRAGMA user_version` = 16 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20), 15 = `users.hide_activity` (session 22), 16 = `users.cover` + `shop_area` + `shop_hours` (session 24), 17 = feed indexes `idx_deals_created`, `idx_conversations_created`, `idx_users_new_shops` (partial: business accounts) (session 26). `PRAGMA user_version` = 17 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions

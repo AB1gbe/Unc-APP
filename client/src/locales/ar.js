@@ -595,4 +595,12 @@ export default {
   'Save shop page': 'حفظ صفحة المتجر',
   'Saved ✓': 'تم الحفظ ✓',
   Map: 'الخريطة',
+  // "Happening near you" (session 26)
+  'Someone in {city} found what they needed in {category}': 'وجد شخص في {city} ما يحتاجه في {category}',
+  'New request in {city}: {title}': 'طلب جديد في {city}: {title}',
+  'New shop in {city}: {name}': 'متجر جديد في {city}: {name}',
+  '{n} offers made on requests in {city} today': '{n} عروض قُدّمت على طلبات في {city} اليوم',
+  'Happening near you': 'ما يحدث بالقرب منك',
+  'Happening on Unc': 'ما يحدث على Unc',
+  '{city} first, then the rest of Unc.': '{city} أولاً، ثم بقية Unc.',
 };
