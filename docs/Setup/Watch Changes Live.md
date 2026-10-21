@@ -37,6 +37,8 @@ and the browser updates a moment later. Stop it with **Ctrl + C**.
 |---|---|
 | Browser shows an old page | Refresh (F5) once. |
 | `api` shows a crash after a sync that changed `package.json` | The sync runs `npm install` itself; once it finishes, press Ctrl + C and run `npm run live` again. |
+| Red `[web] http proxy error: /api/... ECONNREFUSED` lines right after `Restarting 'src/index.js'` | Harmless. A sync changed server files, so the API restarts for a few seconds; the page's requests during that gap fail. When `[api] Unc API listening on http://localhost:4000` appears, it works again (refresh if the page looks empty). Only a problem if that "listening" line never comes. |
+| `[api] ../.env not found. Continuing without it.` | Normal: no `.env` means emails are printed in this window instead of sent. See [[Email Sending]]. |
 | Sync says it's paused | Read the message — usually a local edit to undo. |
 | You want only the syncing, not the app | `npm run sync` |
 
