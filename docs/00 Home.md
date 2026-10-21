@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 23)
+updated: 2026-10-21 (session 24)
 ---
 # Unc — Project Vault
 
@@ -55,10 +55,11 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 27 - Share and link previews]]
 - [[Step 28 - Stories and badges]]
 - [[Step 29 - Hide my activity]]
+- [[Step 30 - Shop pages]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -73,7 +74,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 23)
+## Status (2026-10-21, after session 24)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -97,6 +98,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Push notifications to the phone for new offers | ✅ done — in `main` since session 16; real-phone test still to do → [[Push Notifications]] |
 | Feels human: greetings and celebrations, offer cards, "Active now", share with previews, stories and badges | ✅ done — in `main` since session 21 → [[Social Touches]] |
 | "Hide when I'm online" privacy setting | ✅ done — in `main` since session 23 |
-| API tests | ✅ 115 passing |
+| Shop pages for business accounts (cover, area, opening hours, no contact details) | ✅ done — on branch (session 24) → [[Shop Pages]] |
+| API tests | ✅ 119 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

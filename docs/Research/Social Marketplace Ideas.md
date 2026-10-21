@@ -29,7 +29,7 @@ Asked in [[2026-10-21 Session 19]]. These are ideas only: nothing is built yet. 
 ## 3. Profiles that feel like people and shops
 | Idea | What it looks like | Effort |
 |---|---|---|
-| **Shop pages** for business accounts | Cover photo, specialities (chips), area on a map, opening hours, "Deals done", gallery from success stories | M |
+| ✅ **Shop pages** for business accounts (built in session 24 → [[Shop Pages]]) | Cover photo, specialities (chips), area on a map, opening hours, "Deals done", gallery from success stories | M |
 | **Badges** | ✓ Verified (exists) · ⚡ Fast responder · 🏆 Top finder (10+ deals, 4.5★+) · 🤝 Trusted buyer · 🌱 New member. Earned automatically, never bought. | M |
 | **Thank-you notes on ratings**, with an optional photo of what was received | Reviews become stories | S–M |
 
