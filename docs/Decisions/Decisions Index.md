@@ -24,5 +24,9 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 015 | [[ADR-015 Ratings]] | Deal-based, two-way, blind 1–5 stars | anyone rates, one-way, thumbs, visible at once, editable |
 | 016 | [[ADR-016 Live preview while building]] | Auto-pull on the owner's PC (`npm run live`) | public tunnel, screenshots only, deploy every step |
 | 017 | [[ADR-017 Arabic and RTL]] | Custom `t()` keyed by English, `dir=rtl` + logical CSS, server translates by `Accept-Language`, Western digits | i18next, FormatJS, ID keys, Arabic-Indic digits, separate RTL CSS |
+| 018 | [[ADR-018 Profiles and onboarding]] | Optional profile photo (never the KYC selfie), bio, interests from categories, one skippable welcome step, personal home | profiles table, free-text tags, no onboarding, long wizard |
+| 019 | [[ADR-019 Phones, tablets and PWA]] | Responsive site + manifest, bottom tab bar under 900 px, 44 px touch targets, `e2e:devices` check | native app, hamburger menu, 760 px breakpoint |
+| 020 | [[ADR-020 Photos in chat and requests]] | Chat photos private to the conversation; 6 public request photos; shrink in the browser | public chat photos, server-side resizing, several per message |
+| 021 | [[ADR-021 Saved requests and notifications]] | Saved list on the server; 🔔 for offer/deal/rating/identity only, polled every 15 s | browser storage, notify every message, WebSockets |
 
 Template for new ADRs: copy any ADR and keep the same headings.

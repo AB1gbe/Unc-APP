@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 12)
+updated: 2026-10-21 (session 13)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 47 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47). All fixed.
+**Totals so far:** 54 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -57,6 +57,13 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M45 | Arabic | Prices showed as "$US 300" | 12 |
 | M46 | Arabic | English titles on Arabic pages had punctuation thrown to the wrong end | 12 |
 | M47 | Test | A test looked for exactly `<html>`; emails now start `<html lang=…>` | 12 |
+| M48 | Client | After confirming email, the welcome step was skipped | [[2026-10-21 Session 13]] |
+| M49 | Test data | Profile photos looked blank in screenshots | 13 |
+| M50 | Replicability | Icon generator deleted right after use | 13 |
+| M51 | Design | iPad header wrapped to 3 lines (115 px tall) | 13 |
+| M52 | Server | A missing public photo returned 500 instead of 404 | 13 |
+| M53 | Test | Old test still expected the 3-photo limit | 13 |
+| M54 | Design | Chat **Send** button squeezed to "Sen / d" after adding 📷 | 13 |
 
 ---
 
@@ -311,3 +318,45 @@ An independent review read every file and reproduced each problem. All fixed; ea
 ## M47
 **Old test `registration emails a verification code` failed after emails got `lang`/`dir`**
 - **Cause:** it checked for exactly `<html>`. **Fix:** check `/<html[\s>]/` ("is an HTML email"). Same lesson as [[Mistakes and Fixes#M37]]: test the meaning, not the exact text.
+
+## M48
+**After confirming the email code, new members skipped the new Welcome step**
+- **Symptom:** the browser test landed on `/verification` instead of `/welcome`.
+- **Cause:** `VerifyEmail.jsx` had two redirects: the new `navigate('/welcome')` after success, and an older `<Navigate to="/verification">` shown once `user.emailVerified` became true. The second one won the race.
+- **Fix:** both use one rule: `user.onboarded ? '/verification' : '/welcome'`.
+- **Lesson:** when changing where a flow goes, search for *every* redirect on that page (`grep -n "Navigate\|navigate(" file`).
+
+## M49
+**Profile photos looked empty/white in the screenshots**
+- **Cause:** the browser test's "photo" was a screenshot of a whole white page with a small box on it — shrunk to an avatar it was just white.
+- **Fix:** screenshot only the element (`locator('div').screenshot()`), and a separate colourful "face" test image. Avatars also got a thin border so a white photo still looks like a photo.
+- **Lesson:** test data should look like real data, or screenshots can't catch anything.
+
+## M50
+**Deleted the app-icon generator right after using it**
+- **Cause:** treated it as a throw-away script. But then nobody could re-make the icons without AI — against the vault rule.
+- **Fix:** recreated as `scripts/make-icons.mjs` (`node scripts/make-icons.mjs`), documented in [[Step 19 - Phones, tablets and app icons]].
+- **Lesson:** anything that produced a committed file is part of the project.
+
+## M51
+**iPad (768–899 px): the header wrapped onto 3 lines (115 px tall)**
+- **Found by:** `npm run e2e:devices` (header-height check).
+- **Cause:** the bottom tab bar only started below 760 px, so tablets got the full desktop header in too little width.
+- **Fix:** tab bar and `.hide-phone` apply up to **899 px**.
+
+## M52
+**A missing public photo (`/uploads/avatars/nope.jpg`) returned 500**
+- **Found by:** a new test in `server/test/photos.test.js` (it failed on the old code).
+- **Cause:** `express.static`'s 404 error reached our `errorHandler`, which treated every non-`expose` error as a crash.
+- **Fix:** `errorHandler` checks `err.status ?? err.statusCode` first: 404 → `{ error: 'Not found' }`.
+
+## M53
+**`review-fixes.test.js` failed after raising the request photo limit from 3 to 6**
+- **Cause:** it sent 4 photos to test "too many". **Fix:** send 7 (`MAX_PHOTOS + 1`). **Lesson:** same as [[Mistakes and Fixes#M37]] — tests should use the constant, not a copy of it.
+
+## M54
+**Chat Send button squeezed to "Sen / d" on a laptop screen**
+- **Found by:** looking at the chat screenshot before committing the photos step.
+- **Cause:** the new 📷 button took width; flex items may shrink, so the button's text wrapped.
+- **Fix:** `.chat-form .btn, .chat-form .attach { flex-shrink: 0; white-space: nowrap; }`.
+

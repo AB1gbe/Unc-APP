@@ -13,9 +13,9 @@ Use Obsidian `[[wikilinks]]`; put images in `docs/attachments/`.
 ## Project facts
 - Reverse marketplace: buyers post requests; verified vendors contact them **only about a specific request**.
 - npm workspaces: `server/` (Express 5, node:sqlite) and `client/` (React 19, Vite 8). Always install from the root with `--workspace`.
-- `npm test` must stay green (75+ tests). New bug fix = new test that FAILS on the old code (check with `git stash push -- server/src`). Schema changes = append to `MIGRATIONS` in `server/src/db.js`, never edit old entries.
+- `npm test` must stay green (93+ tests). Layout changes: also run `npm run e2e:devices` (needs `npm run seed` and a running server). New text needs Arabic in `client/src/locales/ar.js`; the coverage test fails otherwise. New bug fix = new test that FAILS on the old code (check with `git stash push -- server/src`). Schema changes = append to `MIGRATIONS` in `server/src/db.js`, never edit old entries.
 - Never add an endpoint or UI that lets users message each other outside a listing's conversation.
-- Never serve `uploads/kyc` statically or return full ID numbers.
+- Never serve `uploads/kyc` or `uploads/chat` statically, and never return full ID numbers. Chat photos go only to that conversation's two members.
 - Email goes through `sendMail`/`trySendMail` in `server/src/lib/mailer.js`; wording lives in `server/src/lib/emails.js`. Never return tokens or codes in API responses outside console/test mode.
 - The owner runs Windows (cmd). Give Windows-friendly commands, and say which folder and branch to be in.
 - When giving setup steps, say first whether they are optional and why they matter, before the instructions.
