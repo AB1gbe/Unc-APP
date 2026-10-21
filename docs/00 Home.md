@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 22)
+updated: 2026-10-21 (session 23)
 ---
 # Unc — Project Vault
 
@@ -73,7 +73,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 22)
+## Status (2026-10-21, after session 23)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -96,7 +96,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Email to the buyer for every new offer (switch in Account) | ✅ done — in `main` since session 18 |
 | Push notifications to the phone for new offers | ✅ done — in `main` since session 16; real-phone test still to do → [[Push Notifications]] |
 | Feels human: greetings and celebrations, offer cards, "Active now", share with previews, stories and badges | ✅ done — in `main` since session 21 → [[Social Touches]] |
-| "Hide when I'm online" privacy setting | ✅ done — on branch (session 22) |
+| "Hide when I'm online" privacy setting | ✅ done — in `main` since session 23 |
 | API tests | ✅ 115 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
