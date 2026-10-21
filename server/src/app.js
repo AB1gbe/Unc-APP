@@ -11,6 +11,7 @@ import { errorHandler, notFound } from './lib/http.js';
 import { AVATAR_DIR, LISTING_DIR } from './lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from './lib/categories.js';
 import { loadUser } from './middleware/auth.js';
+import { withPreview } from './lib/previews.js';
 import { authRoutes } from './routes/auth.js';
 import { notificationRoutes } from './routes/notifications.js';
 import { pushRoutes } from './routes/push.js';
@@ -61,10 +62,23 @@ export function createApp(db) {
     // so a changed file gets a new name: safe to cache "forever".
     app.use('/assets', express.static(path.join(config.clientDist, 'assets'), { immutable: true, maxAge: '365d' }));
     // Everything else (index.html) must be re-checked so new deploys show up.
-    app.use(express.static(config.clientDist, { setHeaders: (res) => res.set('Cache-Control', 'no-cache') }));
-    app.get(/^(?!\/api|\/uploads).*/, (_req, res) => {
+    // index: false -> "/" also goes through the page handler below.
+    app.use(express.static(config.clientDist, { index: false, setHeaders: (res) => res.set('Cache-Control', 'no-cache') }));
+    // Every page is index.html with link-preview tags for WhatsApp & co.
+    // (lib/previews.js). A request page gets its own title, price and photo,
+    // but only while it is open and its buyer isn't banned.
+    const findPreview = db.prepare(`
+      SELECT l.*, u.language AS buyer_language,
+             (SELECT file FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS first_image
+      FROM listings l JOIN users u ON u.id = l.buyer_id
+      WHERE l.id = ? AND l.status = 'open' AND u.banned_at IS NULL
+    `);
+    app.get(/^(?!\/api|\/uploads).*/, (req, res) => {
+      const id = req.path.match(/^\/requests\/(\d+)\/?$/)?.[1];
+      const listing = id ? findPreview.get(Number(id)) : null;
+      const html = fs.readFileSync(path.join(config.clientDist, 'index.html'), 'utf8');
       res.set('Cache-Control', 'no-cache');
-      res.sendFile(path.join(config.clientDist, 'index.html'));
+      res.type('html').send(withPreview(html, listing ?? null, req.path));
     });
   }
 

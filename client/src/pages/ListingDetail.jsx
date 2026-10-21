@@ -8,6 +8,7 @@ import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
+import ShareButton from '../components/ShareButton.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ export default function ListingDetail() {
         <div className="row spread">
           <span className="badge">{t(l.category)}</span>
           <div className="row" style={{ gap: '.5rem' }}>
+            {l.status === 'open' && <ShareButton listing={l} mine={isOwner} />}
             {user && !isOwner && l.status === 'open' && <SaveButton listing={l} />}
             <StatusBadge status={l.status} />
           </div>

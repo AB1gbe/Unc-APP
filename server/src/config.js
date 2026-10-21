@@ -35,7 +35,8 @@ export const config = {
   dataDir,
   dbFile: process.env.DB_FILE || path.join(dataDir, 'unc.sqlite'),
   uploadDir: path.join(dataDir, 'uploads'),
-  clientDist: path.resolve(serverRoot, '..', 'client', 'dist'),
+  // The built website. CLIENT_DIST lets tests point at a small stand-in.
+  clientDist: process.env.CLIENT_DIST || path.resolve(serverRoot, '..', 'client', 'dist'),
   // Pepper is mixed into hashes of ID numbers so a leaked DB alone can't be
   // brute-forced back into ID numbers.
   pepper: process.env.SECRET_PEPPER || 'dev-only-pepper-change-me',

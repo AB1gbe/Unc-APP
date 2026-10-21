@@ -542,4 +542,12 @@ export default {
   'People who looked at it': 'عدد من شاهدوه',
   'Share it to reach more sellers.': 'شاركه لتصل إلى بائعين أكثر.',
   '{n} people looked at it': { zero: 'لم يشاهده أحد بعد', one: 'شاهده شخص واحد', two: 'شاهده شخصان', few: 'شاهده {n} أشخاص', many: 'شاهده {n} شخصًا', other: 'شاهده {n} شخص' },
+  // Sharing (session 20)
+  "I'm looking for: {title}. Have one? Make me an offer on Unc:": 'أبحث عن: {title}. لديك واحد؟ قدّم لي عرضاً على Unc:',
+  'Someone is looking for: {title}. Have one? Make an offer on Unc:': 'هناك من يبحث عن: {title}. لديك واحد؟ قدّم عرضك على Unc:',
+  'Link copied! Paste it anywhere.': 'تم نسخ الرابط! الصقه أينما تريد.',
+  'Copy this link:': 'انسخ هذا الرابط:',
+  '↗ Share': '↗ مشاركة',
+  WhatsApp: 'واتساب',
+  'Copy link': 'نسخ الرابط',
 };

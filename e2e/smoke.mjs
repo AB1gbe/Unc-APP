@@ -87,6 +87,12 @@ await shot(buyer, '07-new-request');
 await buyer.click('button:has-text("Post request")');
 await buyer.waitForSelector('text=Your request');
 await buyer.waitForSelector('.toast:has-text("Posted!")'); // celebration message
+// Share: on a computer, a WhatsApp link with the request's address.
+await buyer.click('.share > button');
+const wa = await buyer.getAttribute('.share-menu a.whatsapp', 'href');
+if (!wa.startsWith('https://wa.me/?text=') || !decodeURIComponent(wa).includes(buyer.url())) throw new Error(`bad WhatsApp link: ${wa}`);
+await shot(buyer, '08b-share');
+await buyer.click('.share > button'); // close the menu
 await shot(buyer, '08-request-owner-view');
 const listingUrl = buyer.url();
 

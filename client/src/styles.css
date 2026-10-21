@@ -345,3 +345,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .activity { display: inline-block; }
 .active-now { color: #0a7a3d; font-weight: 600; }
 .active-now::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; margin-inline-end: .35rem; vertical-align: middle; }
+
+/* Share menu (session 20) */
+.share { position: relative; display: inline-block; }
+.share-menu { position: absolute; top: calc(100% + .4rem); inset-inline-end: 0; display: grid; gap: .4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .5rem; box-shadow: 0 8px 24px rgba(0,0,0,.12); z-index: 20; min-width: 150px; }
+.nav a.btn.whatsapp, .btn.whatsapp { background: #25d366; color: #fff; }
