@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 17)
+updated: 2026-10-21 (session 18)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 63 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63). All fixed.
+**Totals so far:** 64 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -73,6 +73,7 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M61 | Email | English message shown backwards in the Arabic email | 17 |
 | M62 | Dev env | Re-ran the browser test on the same database → sign-up failed | 17 |
 | M63 | Test | Tests broke on invisible direction marks; the "fails on old code" check stashed too much | 17 |
+| M64 | Reporting | Told the owner "105 tests pass"; it was 101 | [[2026-10-21 Session 18]] |
 
 ---
 
@@ -422,4 +423,10 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - After adding the isolate marks, the exact subject and text checks failed. The tests now strip the invisible marks first (`plain()`).
 - Proving the new test "fails on the old code": `git stash push -- server/src/lib/emails.js` removed the *whole new email function* (it was not committed yet), so the test failed for the wrong reason. Instead, the old markup (`dir="auto"`, `<bdi>`) was put back temporarily → 1 failure, then the fix was restored → all pass.
 - **Lesson:** "fails on old code" means old *behaviour*, not a missing file.
+
+## M64
+**The end-of-session-17 message said "105 automated tests pass"; the run showed 101**
+- **Cause:** the number was written from memory instead of copied from the last `npm test` output (`# pass 101`).
+- **Fix:** corrected to the owner in session 18; the vault notes (session 17 log, Home, CLAUDE.md) already said 101.
+- **Lesson:** copy numbers from the command output, never from memory.
 

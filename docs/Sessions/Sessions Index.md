@@ -24,3 +24,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 15]] | Push notifications to the phone for new offers (Web Push) |
 | 2026-10-21 | [[2026-10-21 Session 16]] | Pull request #4 (phone push notifications for new offers) merged into `main` |
 | 2026-10-21 | [[2026-10-21 Session 17]] | Email notifications for new offers (with an on/off switch) |
+| 2026-10-21 | [[2026-10-21 Session 18]] | Pull request #5 (email for new offers) merged into `main` |

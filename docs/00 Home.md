@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-21 (session 17)
+updated: 2026-10-21 (session 18)
 ---
 # Unc — Project Vault
 
@@ -67,7 +67,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-21, after session 17)
+## Status (2026-10-21, after session 18)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -87,7 +87,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Photos: request (6), offer, private chat photos, full-screen viewer | ✅ done — in `main` since session 14 |
 | Phones, tablets, every screen size; installable (Add to Home Screen) | ✅ done — in `main` since session 14 |
 | Saved requests (♡) and notifications (🔔) | ✅ done — in `main` since session 14 |
-| Email to the buyer for every new offer (switch in Account) | ✅ done — on branch (session 17) |
+| Email to the buyer for every new offer (switch in Account) | ✅ done — in `main` since session 18 |
 | Push notifications to the phone for new offers | ✅ done — in `main` since session 16; real-phone test still to do → [[Push Notifications]] |
 | API tests | ✅ 101 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
