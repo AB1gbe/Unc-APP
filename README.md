@@ -10,7 +10,7 @@ A **reverse marketplace**: buyers post what they want, and **identity-verified**
 ## Quick start
 Requires **Node.js 22.13+** and Git. Works the same in Windows Command Prompt.
 ```bash
-git clone -b claude/vibrant-edison-r9o798 https://github.com/AB1gbe/Unc-APP.git
+git clone https://github.com/AB1gbe/Unc-APP.git
 cd Unc-APP
 npm install
 npm run seed    # optional demo data
