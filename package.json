@@ -19,7 +19,9 @@
     "seed": "npm run seed --workspace server",
     "test": "npm test --workspace server",
     "e2e": "node e2e/smoke.mjs",
-    "mail:test": "npm run mail:test --workspace server --"
+    "mail:test": "npm run mail:test --workspace server --",
+    "sync": "node scripts/live-sync.mjs",
+    "live": "concurrently -n api,web,sync -c blue,green,magenta \"npm:dev:server\" \"npm:dev:client\" \"npm:sync\""
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
