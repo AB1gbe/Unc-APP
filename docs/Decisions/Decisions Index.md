@@ -35,5 +35,6 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 026 | [[ADR-026 Activity and privacy]] | "Active now" for members only, rough times, median reply time (3+), distinct views shown to the buyer only | public activity, exact times, average, "who viewed you" |
 | 027 | [[ADR-027 Link previews]] | Server adds Open Graph tags per request (buyer's language, first photo); phone share sheet or WhatsApp/Copy | SSR, prerender service, generated images |
 | 028 | [[ADR-028 Stories and badges]] | Opt-in story per side per deal, author delete, admin hide; badges computed from deals/ratings/reply time | anyone posts, pre-approval, paid or hand-picked badges |
+| 029 | [[ADR-029 Hide my activity]] | Hide online status only; clear and stop storing the last visit; off by default; Account card | hide everything, hide but keep storing, WhatsApp-style fair-play rule |
 
 Template for new ADRs: copy any ADR and keep the same headings.

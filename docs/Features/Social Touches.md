@@ -36,6 +36,7 @@ The five "recommended first" ideas from [[Social Marketplace Ideas]], all built 
 
 - **🟢 Active now** (seen in the last 5 minutes), or "Active 2 hours ago" (within a week), plus "Usually replies within an hour / a few hours / a day". The reply time is the median over at least 3 conversations.
 - Shown in chats, on profiles and on request pages, **only to logged-in members**, and never about yourself.
+- **Privacy (session 22):** Account → Privacy → **Hide when I'm online**. While it's on, nobody sees "Active now" or "Active … ago" for you, and Unc clears and stops recording your last visit. Reply time and badges still show. ![[s22-privacy.png]]
 - On their own request, the buyer sees "👀 7 people looked at it · 2 offers", and a 👀 count on their request cards. Each logged-in member is counted once; the buyer is never counted.
 
 ## 4. Share to WhatsApp, with preview cards

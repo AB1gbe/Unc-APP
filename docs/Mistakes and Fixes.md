@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 20)
+updated: 2026-10-21 (session 22)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 71 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71). All fixed.
+**Totals so far:** 72 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -81,6 +81,7 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M69 | Test | Arabic check flagged English *stories and names* written by members | 20 |
 | M70 | Dev env | Re-ran the Arabic test on a used database (repeat of M62) | 20 |
 | M71 | Design | Story photo stopped short of the card's edge | 20 |
+| M72 | Self-review | A test selector would have matched both tick boxes on Account | [[2026-10-21 Session 22]] |
 
 ---
 
@@ -476,4 +477,10 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Found by:** looking at the Home screenshot.
 - **Cause:** the global `img { max-width: 100% }` rule capped the photo's width, and the negative margins used 1 rem where cards have 1.25 rem padding. The loading placeholder had the same margin problem.
 - **Fix:** `max-width: none` with 1.25 rem margins (1 rem on phones), like `.card-photo`.
+
+## M72
+**The browser test's `.toggle-row input[type=checkbox]` would have matched two tick boxes**
+- **Found by:** self-review while adding the Privacy card, before running the test. Playwright refuses a locator that matches several elements ("strict mode"), so the email check would have failed.
+- **Fix:** each tick box has `data-setting="emailOffers"` or `data-setting="hideActivity"`, and the test uses those.
+- **Lesson:** give test hooks a unique attribute instead of selecting by layout classes.
 

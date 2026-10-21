@@ -3,7 +3,7 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20). `PRAGMA user_version` = 14 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20), 15 = `users.hide_activity` (session 22). `PRAGMA user_version` = 15 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
@@ -24,7 +24,7 @@ users ─┬─< sessions
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `users` | language `en/ar/NULL` (session 12, NULL = no preference), avatar, bio, interests, onboarded_at (session 13, see below), email_offers `1/0` (session 17, default 1 = email me about new offers), last_seen_at (session 20, see below), email (unique), password_hash, display_name, account_type `individual/business`, role `user/admin`, email_verified_at, **kyc_status** `unverified/pending/approved/rejected`, banned_at | `kyc_status` is the fast flag every gate checks |
+| `users` | language `en/ar/NULL` (session 12, NULL = no preference), avatar, bio, interests, onboarded_at (session 13, see below), email_offers `1/0` (session 17, default 1 = email me about new offers), last_seen_at (session 20, see below), hide_activity `0/1` (session 22: 1 = "Hide when I'm online"; `last_seen_at` is then cleared and not recorded), email (unique), password_hash, display_name, account_type `individual/business`, role `user/admin`, email_verified_at, **kyc_status** `unverified/pending/approved/rejected`, banned_at | `kyc_status` is the fast flag every gate checks |
 | `sessions` | token_hash (PK), user_id, expires_at | Only SHA-256 of the cookie token |
 | `password_resets` | token_hash (PK), user_id, expires_at, used_at | Only SHA-256 of the emailed token; 30 min; single use. Added in migration 2 (session 02) |
 | `email_codes` | user_id (PK), code_hash, expires_at, attempts | 6-digit code, peppered hash, 15 min, 5 tries |

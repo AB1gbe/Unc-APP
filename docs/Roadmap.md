@@ -38,7 +38,7 @@ tags: [roadmap]
 ## Making it feel social and human (ideas, session 19)
 - [x] The recommended first five, built in session 20 → [[Social Touches]].
 - [ ] More from [[Social Marketplace Ideas]]: shop pages, "Happening near you" feed, reactions, typing indicator, favourite sellers, city pages, "Me too".
-- [ ] "Hide my activity" switch before a public launch ([[ADR-026 Activity and privacy]]).
+- [x] "Hide when I'm online" switch (session 22) → [[ADR-029 Hide my activity]].
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
