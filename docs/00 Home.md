@@ -19,6 +19,10 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[01 Project Brief]] — what we're building and the three MUSTs
 - [[Install Prerequisites]] → [[Run the App Locally]] — get it running in ~10 minutes
 - [[Watch Changes Live]] — watch the app update while Claude builds (optional)
+- [[Pull and Push]] — type `pull` or `push` instead of git commands
+
+### Market
+- [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
 - [[Glossary]] — every technical word used here, explained
 
 ### Rebuild it from zero (step by step)
@@ -70,6 +74,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Code review: 15 bugs | ✅ all fixed, each with a test |
 | Ratings after a deal (blind, two-way) + member profiles | ✅ done — on branch, not yet in `main` |
 | Live preview while building (`npm run live`) | ✅ done |
+| One-word `pull` / `push` | ✅ done |
 | API tests | ✅ 63 passing |
 | Browser end-to-end test | ✅ passing |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

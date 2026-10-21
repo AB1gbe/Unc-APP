@@ -11,6 +11,9 @@ Unc-APP/
 ├── CLAUDE.md               Instructions for AI sessions (always document in docs/)
 ├── README.md               Short intro + quick start
 ├── docs/                   ← THIS Obsidian vault
+├── pull.cmd / push.cmd    Type `pull` / `push` in Command Prompt (session 10)
+├── .gitattributes        Keeps .cmd files with Windows line endings
+├── scripts/git-helper.mjs  The pull/push logic (session 10)
 ├── scripts/live-sync.mjs  `npm run live` / `npm run sync`: auto-pull pushed changes (session 09)
 ├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored)
 ├── server/

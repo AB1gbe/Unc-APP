@@ -6,7 +6,7 @@ updated: 2026-10-21 (session 09)
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 37 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test). All fixed.
+**Totals so far:** 39 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -47,6 +47,8 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M35 | Review bug | Vendor couldn't open a closed request they had talked about; one failed poll left a permanent error | 05 |
 | M36 | Dev env | Test setup for live sync left a stray "tmp" commit locally | [[2026-10-21 Session 09]] |
 | M37 | Test | A test hard-coded the database version, so adding migration 4 broke it | 09 |
+| M38 | Script | `push` showed `ocs/Roadmap.md` instead of `docs/Roadmap.md` | [[2026-10-21 Session 10]] |
+| M39 | Script | `push` froze at its second question | 10 |
 
 ---
 
@@ -249,3 +251,16 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause:** the session-05 test said `assert.equal(version, 3)` — a hard-coded number that's wrong the moment a migration is added.
 - **Fix:** `db.js` exports `MIGRATION_COUNT = MIGRATIONS.length`; the test compares against that and also checks the new `ratings` table exists.
 - **Lesson:** tests should check the rule ("up to date"), not today's number.
+
+## M38
+**`push` listed `ocs/Roadmap.md` — first letter missing**
+- **Found by:** the stand-in test (see [[Pull and Push#How it was tested]]).
+- **Cause:** the helper `git()` used `.trim()` on git's output. `git status --porcelain` lines *start* with a meaningful space (` M docs/Roadmap.md`, where the first column is empty); trimming the whole output removed it from the first line, so slicing off the 3-character status cut into the file name.
+- **Fix:** `.trimEnd()` instead of `.trim()` (`scripts/git-helper.mjs`).
+- **Lesson:** don't trim machine-readable output whose columns have meaning.
+
+## M39
+**`push` froze at the second question ("Your name:") when answers were typed/pasted ahead**
+- **Cause (two steps):** first, each question opened its own reader, and the first reader swallowed all the input. Second, even with one shared reader, Node's `readline` `question()` drops lines that arrive *before* the question is asked — so pasted answers vanished and the script waited forever.
+- **Fix:** one reader that **queues** every incoming line; each question takes the next queued answer (or waits). Re-tested with all answers piped in at once, and with each step under a 30-second time limit so a freeze shows as a failure, not a hang.
+- **Lesson:** test interactive scripts with input supplied all at once, not only by hand — and always put a timeout on automated runs of anything that can wait for input.

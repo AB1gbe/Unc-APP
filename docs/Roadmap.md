@@ -10,6 +10,15 @@ tags: [roadmap]
 - [x] Password reset by email + change password → [[Password Reset]] *(session 02)*
 - [ ] Decide on automated KYC provider → [[KYC Verification#Adding an automated provider]]
 
+## For a Bahrain launch (from [[Bahrain Market Research]])
+- [ ] Arabic interface with right-to-left layout (plus English)
+- [ ] BHD currency (3 decimals)
+- [ ] BenefitPay payments/deposits via a licensed payment provider
+- [ ] Identity via eKey for Business (ask Beyon Connect about eligibility) — document + selfie service until then
+- [ ] Shop accounts: CR number checked on Sijilat (status active)
+- [ ] PDPL review (consent, data protection officer, where data is hosted)
+- [ ] Share a request to WhatsApp / Instagram
+
 ## Next features
 - [x] Ratings & reviews after a request is fulfilled → [[Ratings]] *(session 09)*
 - [ ] Photos in chat messages

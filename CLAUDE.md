@@ -22,3 +22,4 @@ Use Obsidian `[[wikilinks]]`; put images in `docs/attachments/`.
 - Stopping a server from a shell: one `pkill` per call, with a self-safe pattern like `src/index[.]js`.
 - Behind a hosting proxy set `TRUST_PROXY` (see docs/Decisions/ADR-014). Hot queries must keep using indexes (`server/test/performance.test.js`).
 - The owner may be watching with `npm run live` (auto-pulls the branch). Push in small, tested steps so each pull shows one working change; never push a red build.
+- The owner uses `pull` / `push` (scripts/git-helper.mjs) and may push to the working branch too: always fetch and merge before pushing. Research notes go in docs/Research/.
