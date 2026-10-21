@@ -3,9 +3,24 @@
 import { Link } from 'react-router-dom';
 import { ago } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Avatar, ListingCard, Loading, StatusBadge } from '../components/ui.jsx';
+import { Avatar, CardsLoading, ListingCard, Loading, StatusBadge } from '../components/ui.jsx';
+import { partOfDay, season } from '../seasons.js';
 import { useApi } from '../hooks.js';
 import { t, tj, tn } from '../i18n.jsx';
+import { StoriesStrip } from '../components/Stories.jsx';
+
+// Written out in full so the translation test can find every text.
+const GREETING = {
+  morning: (v) => tj('Good morning, {name}', v),
+  afternoon: (v) => tj('Good afternoon, {name}', v),
+  evening: (v) => tj('Good evening, {name}', v),
+};
+const SEASON = {
+  ramadan: () => t('Ramadan Kareem 🌙 Wishing you a blessed month.'),
+  'eid-fitr': () => t('Eid Mubarak! 🎉 Enjoy the celebrations.'),
+  'eid-adha': () => t('Eid al-Adha Mubarak! 🎉'),
+  'national-day': () => t('Happy National Day, Bahrain! 🇧🇭'),
+};
 
 export default function Home() {
   const { user } = useAuth();
@@ -26,8 +41,8 @@ export default function Home() {
         <div className="row" style={{ flexWrap: 'nowrap', flex: 1, minWidth: 0 }}>
           <Avatar name={user.displayName} src={user.avatarUrl} size={48} />
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ margin: 0 }}>{tj('Hi, {name}', { name: <bdi>{user.displayName}</bdi> })}</h1>
-            <div className="muted small">{t('Here is what is happening with your requests and offers.')}</div>
+            <h1 style={{ margin: 0 }}>{GREETING[partOfDay()]({ name: <bdi>{user.displayName}</bdi> })}</h1>
+            <div className="muted small">{SEASON[season()]?.() ?? t('Here is what is happening with your requests and offers.')}</div>
           </div>
         </div>
         <Link className="btn hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
@@ -64,7 +79,7 @@ export default function Home() {
           <h2 style={{ margin: 0 }}>{t('Your open requests')}</h2>
           <Link to="/my-requests">{t('See all')} <span className="flip">→</span></Link>
         </div>
-        {mine.loading ? <Loading /> : openRequests.length === 0 ? (
+        {mine.loading ? <CardsLoading /> : openRequests.length === 0 ? (
           <div className="card empty">
             <p>{t('Looking for something? Post it and let sellers come to you.')}</p>
             {isVerified(user) && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
@@ -103,12 +118,13 @@ export default function Home() {
           </div>
           <Link to="/browse">{t('Browse all')} <span className="flip">→</span></Link>
         </div>
-        {forYou.loading ? <Loading /> : (forYou.data?.listings.length ?? 0) === 0 ? (
-          <div className="card empty">{t('Nothing new right now. Check back soon.')}</div>
+        {forYou.loading ? <CardsLoading /> : (forYou.data?.listings.length ?? 0) === 0 ? (
+          <div className="card empty">{t("You're all caught up! New requests show up here as soon as they're posted.")}</div>
         ) : (
           <div className="grid">{forYou.data.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
         )}
       </section>
+      <StoriesStrip />
     </div>
   );
 }

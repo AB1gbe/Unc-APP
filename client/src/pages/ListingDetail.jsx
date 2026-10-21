@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Avatar, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
-import { formatDate, t, tj } from '../i18n.jsx';
+import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
+import { celebrate } from '../components/Celebrate.jsx';
+import ShareButton from '../components/ShareButton.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -25,6 +27,7 @@ export default function ListingDetail() {
         <div className="row spread">
           <span className="badge">{t(l.category)}</span>
           <div className="row" style={{ gap: '.5rem' }}>
+            {l.status === 'open' && <ShareButton listing={l} mine={isOwner} />}
             {user && !isOwner && l.status === 'open' && <SaveButton listing={l} />}
             <StatusBadge status={l.status} />
           </div>
@@ -53,6 +56,7 @@ export default function ListingDetail() {
           <div>
             <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status="approved" />
             <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {t('Requested by a verified member')}</span></div>
+            {!isOwner && <Activity activity={l.buyer.activity} />} <Badges badges={l.buyer.badges} />
           </div>
         </div>
       </article>
@@ -96,6 +100,7 @@ function OfferPanel({ listing }) {
       if (offerPrice !== '') fd.append('offerPrice', offerPrice);
       if (photos[0]) fd.append('image', photos[0]);
       const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
+      celebrate({ text: t("Offer sent! You'll be notified when they reply.") });
       navigate(`/messages/${conversation.id}`);
     } catch (err) {
       if (err.body?.conversationId) return navigate(`/messages/${err.body.conversationId}`);
@@ -140,6 +145,9 @@ function OwnerPanel({ listing, onChange }) {
     setError(null);
     try {
       await api(`/listings/${listing.id}/status`, { method: 'POST', body: { status, conversationId } });
+      if (status === 'fulfilled') {
+        celebrate({ text: conversationId ? t("Found it! 🎉 Don't forget to rate the seller.") : t('Glad you found it! 🎉'), confetti: true });
+      }
       setPicking(false);
       onChange();
     } catch (err) {
@@ -155,11 +163,17 @@ function OwnerPanel({ listing, onChange }) {
     <div className="stack">
       <div className="card">
         <h2>{t('Your request')}</h2>
+        {listing.status === 'open' && (
+          <p className="small muted">
+            👀 {tn(listing.viewCount ?? 0, '{n} person looked at it', '{n} people looked at it')} · 💬 {tn(offers.length, '{n} offer', '{n} offers')}
+            {(listing.viewCount ?? 0) === 0 && <> · {t('Share it to reach more sellers.')}</>}
+          </p>
+        )}
         <ErrorBox error={error} />
         {listing.status === 'open' && !picking && (
           <div className="stack">
             <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>{t('Edit')}</Link>
-            <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it — mark fulfilled')}</button>
+            <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it! 🎉')}</button>
             <button className="btn secondary block" onClick={() => confirmThen('closed', t('Close this request without buying? Conversations about it will become read-only.'))}>
               {t('Close without buying')}
             </button>
@@ -181,7 +195,7 @@ function OwnerPanel({ listing, onChange }) {
               <span>{t('Someone else / not through Unc')}</span>
             </label>
             <div className="row" style={{ marginTop: '.5rem' }}>
-              <button className="btn ok" disabled={!dealWith}>{t('Mark fulfilled')}</button>
+              <button className="btn ok" disabled={!dealWith}>{t('Yes, I found it')}</button>
               <button type="button" className="btn secondary" onClick={() => setPicking(false)}>{t('Cancel')}</button>
             </div>
           </form>

@@ -243,6 +243,39 @@ const MIGRATIONS = [
   `
   ALTER TABLE users ADD COLUMN email_offers INTEGER NOT NULL DEFAULT 1;
   `,
+  // 12: answering a price in the chat (session 20). kind = NULL (normal
+  // message), 'accept' or 'decline'; reply_to = the price message answered.
+  `
+  ALTER TABLE messages ADD COLUMN kind TEXT CHECK (kind IN ('accept', 'decline'));
+  ALTER TABLE messages ADD COLUMN reply_to INTEGER REFERENCES messages(id) ON DELETE CASCADE;
+  CREATE INDEX idx_messages_reply ON messages(reply_to) WHERE reply_to IS NOT NULL;
+  `,
+  // 13: activity (session 20): when a member was last seen, and which
+  // members opened a request ("👀 Seen by 7 people", shown to its buyer).
+  `
+  ALTER TABLE users ADD COLUMN last_seen_at TEXT;
+  CREATE TABLE listing_views (
+    listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_seen_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (listing_id, user_id)
+  );
+  `,
+  // 14: "Found it" stories (session 20): after a deal, either side may
+  // share a short public story with an optional photo. hidden_at = hidden
+  // by an admin.
+  `
+  CREATE TABLE stories (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    deal_id    INTEGER NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+    author_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body       TEXT NOT NULL,
+    image      TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    hidden_at  TEXT,
+    UNIQUE (deal_id, author_id)
+  );
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

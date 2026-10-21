@@ -17,7 +17,7 @@ export default function MyListings() {
       {!isVerified(user) && <VerifyPrompt action="postMany" />}
       <ErrorBox error={error} />
       {loading ? <Loading /> : data?.listings.length === 0 ? (
-        <div className="card empty">{t("You haven't posted any requests yet.")}</div>
+        <div className="card empty">{t('What are you looking for? Post your first request — it takes a minute.')}</div>
       ) : (
         <div className="grid">
           {data?.listings.map((l) => (

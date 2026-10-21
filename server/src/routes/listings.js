@@ -11,6 +11,8 @@ import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
 import { notify } from '../lib/notify.js';
+import { activityQueries } from '../lib/activity.js';
+import { badgeQueries } from '../lib/badges.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -48,13 +50,19 @@ export function listingRoutes(db) {
   const imagesFor = db.prepare('SELECT id, file FROM listing_images WHERE listing_id = ? ORDER BY id');
   const withImages = (row) => listingView(row, imagesFor.all(row.id));
   const ratings = ratingQueries(db);
+  const activity = activityQueries(db);
+  const viewCount = db.prepare('SELECT COUNT(*) AS n FROM listing_views WHERE listing_id = ?');
+  const badgesFor = badgeQueries(db, ratings, activity);
 
   // The full single-request view: adds the buyer's rating and, for the
   // owner, which conversation the deal was made in.
   function detailView(id, me) {
     const listing = withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id));
     listing.buyer.rating = ratings.summaryFor(listing.buyer.id);
+    listing.buyer.badges = badgesFor(listing.buyer.id);
+    if (me) listing.buyer.activity = activity.summaryFor(listing.buyer.id);
     if (me?.id === listing.buyer.id) {
+      listing.viewCount = viewCount.get(id).n;
       listing.dealConversationId = db.prepare('SELECT conversation_id FROM deals WHERE listing_id = ?').get(id)?.conversation_id ?? null;
     }
     return listing;
@@ -133,7 +141,7 @@ export function listingRoutes(db) {
   // The logged-in buyer's own requests, any status.
   r.get('/mine', requireAuth, (req, res) => {
     const rows = db.prepare(`${BASE_SELECT} WHERE l.buyer_id = ? ORDER BY l.created_at DESC, l.id DESC`).all(req.user.id);
-    res.json({ listings: rows.map(withImages) });
+    res.json({ listings: rows.map((row) => ({ ...withImages(row), viewCount: viewCount.get(row.id).n })) });
   });
 
   r.get('/:id', (req, res) => {
@@ -147,6 +155,10 @@ export function listingRoutes(db) {
       || (row.buyer_banned && !isAdmin)                                  // banned buyer: gone for everyone
       || (row.status !== 'open' && !isOwner && !isParticipant && !isAdmin); // closed: owner, its vendors, admins
     if (hidden) throw notFound('This request does not exist or is no longer open.');
+    // "👀 Seen by N people": count each logged-in member once (not the buyer).
+    if (me && me.id !== row.buyer_id) {
+      db.prepare('INSERT OR IGNORE INTO listing_views (listing_id, user_id) VALUES (?, ?)').run(row.id, me.id);
+    }
     const listing = detailView(row.id, me);
     // Tell a vendor whether they've already reached out about this one.
     if (req.user && req.user.id !== row.buyer_id) {

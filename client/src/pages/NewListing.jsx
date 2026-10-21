@@ -7,6 +7,7 @@ import { ErrorBox, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
+import { celebrate } from '../components/Celebrate.jsx';
 
 const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '' };
 
@@ -65,6 +66,7 @@ export default function NewListing() {
         Object.entries(form).forEach(([k, v]) => v !== '' && fd.append(k, v));
         images.forEach((f) => fd.append('images', f));
         ({ listing } = await api('/listings', { method: 'POST', form: fd }));
+        celebrate({ text: t('Posted! 🎉 Sellers can see your request now.'), confetti: true });
       }
       navigate(`/requests/${listing.id}`);
     } catch (err) {

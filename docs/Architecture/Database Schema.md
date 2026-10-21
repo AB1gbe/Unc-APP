@@ -3,26 +3,28 @@ tags: [architecture, database]
 ---
 # Database Schema
 
-Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17). `PRAGMA user_version` = 11 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
+Source of truth: `server/src/db.js` → `MIGRATIONS`: migration 1 = initial schema, 2 = `password_resets` (session 02), 3 = performance indexes (session 05), 4 = `deals` + `ratings` (session 09), 5 = `users.language` (session 12), 6 = profile columns on `users`, 7 = `messages.image`, 8 = `saved_listings`, 9 = `notifications` (all session 13), 10 = `push_subscriptions` (session 15), 11 = `users.email_offers` (session 17), 12 = `messages.kind` + `messages.reply_to`, 13 = `users.last_seen_at` + `listing_views`, 14 = `stories` (all session 20). `PRAGMA user_version` = 14 on an up-to-date database (`MIGRATION_COUNT`). Database file: `server/data/unc.sqlite`.
 
 ```
 users ─┬─< sessions
        ├─< password_resets
-       ├─< deals (buyer/vendor, 1 per listing, 1 per conversation) ─< ratings (≤ 2 per deal)
+       ├─< deals (buyer/vendor, 1 per listing, 1 per conversation) ─┬─< ratings (≤ 2 per deal)
+       │                                                            └─< stories (≤ 2 per deal, 1 per side)
        ├─< email_codes (1:1)
        ├─< kyc_submissions
        ├─< saved_listings >── listings (a member's saved requests)
+       ├─< listing_views >── listings (who opened a request, once each)
        ├─< notifications (→ actor user, listing?, conversation?)
        ├─< listings ─┬─< listing_images
        │             └─< conversations >── users (vendor)
-       │                     └─< messages (optional private image)
+       │                     └─< messages (optional private image; reply_to → the price message answered)
        ├─< reports (→ listing or conversation)
        └─< audit_log
 ```
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `users` | language `en/ar/NULL` (session 12, NULL = no preference), avatar, bio, interests, onboarded_at (session 13, see below), email_offers `1/0` (session 17, default 1 = email me about new offers), email (unique), password_hash, display_name, account_type `individual/business`, role `user/admin`, email_verified_at, **kyc_status** `unverified/pending/approved/rejected`, banned_at | `kyc_status` is the fast flag every gate checks |
+| `users` | language `en/ar/NULL` (session 12, NULL = no preference), avatar, bio, interests, onboarded_at (session 13, see below), email_offers `1/0` (session 17, default 1 = email me about new offers), last_seen_at (session 20, see below), email (unique), password_hash, display_name, account_type `individual/business`, role `user/admin`, email_verified_at, **kyc_status** `unverified/pending/approved/rejected`, banned_at | `kyc_status` is the fast flag every gate checks |
 | `sessions` | token_hash (PK), user_id, expires_at | Only SHA-256 of the cookie token |
 | `password_resets` | token_hash (PK), user_id, expires_at, used_at | Only SHA-256 of the emailed token; 30 min; single use. Added in migration 2 (session 02) |
 | `email_codes` | user_id (PK), code_hash, expires_at, attempts | 6-digit code, peppered hash, 15 min, 5 tries |
@@ -30,12 +32,14 @@ users ─┬─< sessions
 | `listings` | buyer_id, title, description, category, budget_min/max, currency, city, needed_by, status `open/fulfilled/closed` | The buyer's *request* |
 | `listing_images` | listing_id, file | Up to 6 (`MAX_PHOTOS`, was 3 before session 13), public in `uploads/listings/`; the owner can add/remove them later |
 | `conversations` | listing_id **NOT NULL**, buyer_id, vendor_id, last_message_at | `UNIQUE(listing_id, vendor_id)`, `CHECK(buyer_id <> vendor_id)` |
-| `messages` | conversation_id, sender_id, body, offer_price, read_at, image | `image` (migration 7, session 13) = random filename in `uploads/chat/` — **private**, only served to the two participants (and admins via a report). Body may be empty when a photo is attached |
+| `messages` | conversation_id, sender_id, body, offer_price, read_at, image | `image` (migration 7, session 13) = random filename in `uploads/chat/` — **private**, only served to the two participants (and admins via a report). Body may be empty when a photo is attached. `kind` + `reply_to` (migration 12, session 20): see below |
 | `deals` | listing_id (unique), conversation_id (unique), buyer_id, vendor_id, created_at | Recorded when the buyer marks a request fulfilled and picks the seller. Session 09 |
 | `ratings` | deal_id, rater_id, ratee_id, stars 1–5, comment, created_at | `UNIQUE(deal_id, rater_id)`; visibility rule in `lib/ratings.js`. Session 09 |
 | `saved_listings` | user_id, listing_id, created_at | `PRIMARY KEY(user_id, listing_id)`; both `ON DELETE CASCADE`. The "♡ Save" list. Migration 8, session 13 |
 | `notifications` | user_id, kind, actor_id?, listing_id?, conversation_id?, created_at, read_at | kind = `offer/deal/rating/kyc_approved/kyc_rejected` (`KINDS` in `lib/notify.js`). No text stored: the app writes the wording from `kind`, in the reader's language. `actor_id` → `ON DELETE SET NULL`, the rest cascade. Migration 9, session 13 |
 | `push_subscriptions` | user_id, endpoint (UNIQUE), p256dh, auth, created_at | One row per phone/computer that turned on push notifications. `endpoint` is the push service's address for that device; `p256dh`/`auth` encrypt the message so only that device can read it. Cascade on user delete. Migration 10, session 15 |
+| `listing_views` | listing_id, user_id, first_seen_at | `PRIMARY KEY(listing_id, user_id)`: each logged-in member counted once per request (never the buyer). Drives "👀 N people looked at it" (`viewCount`, owner only). Both cascade. Migration 13, session 20 |
+| `stories` | deal_id, author_id, body (5–280 chars), image?, created_at, hidden_at | "Found it" stories. `UNIQUE(deal_id, author_id)`: buyer and seller may each share one per deal. `image` = random filename in `uploads/stories/` (**public**). `hidden_at` = hidden by an admin. Both cascade. Migration 14, session 20 |
 | `reports` | reporter_id, listing_id?, conversation_id?, reason, status | |
 | `audit_log` | actor_id, action, target, meta (JSON) | KYC decisions, file views, bans, etc. |
 
@@ -56,6 +60,15 @@ Why: [[ADR-013 Performance]].
 | `bio` | up to 300 characters |
 | `interests` | `NOT NULL DEFAULT '[]'` — JSON list of up to 8 categories; drives `GET /api/listings/for-you` |
 | `onboarded_at` | set when the welcome step is finished or skipped (`POST /api/auth/onboarded`) |
+
+## Session 20 columns (migrations 12–13)
+| Column | Notes |
+|---|---|
+| `messages.kind` | `NULL` = normal message, `'accept'` / `'decline'` = a one-tap answer to the other side's price (`CHECK`) |
+| `messages.reply_to` | the price message that was answered (`REFERENCES messages(id) ON DELETE CASCADE`); a price can be answered only once |
+| `users.last_seen_at` | set by `loadUser` (`server/src/middleware/auth.js`) at most once a minute; "🟢 Active now" = within 5 minutes (`ACTIVE_MINUTES` in `lib/activity.js`) |
+
+Index `idx_messages_reply (reply_to) WHERE reply_to IS NOT NULL` (migration 12) answers "has this price been answered?". `listing_views` counts use its primary key (`sqlite_autoindex_listing_views_1`); that and the reply-time query in `lib/activity.js` are checked in `server/test/performance.test.js`.
 
 ## Indexes added in session 13
 | Index | Speeds up |

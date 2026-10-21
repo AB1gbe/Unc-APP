@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
-import { budget, ago } from '../api.js';
+import { budget, ago, toDate } from '../api.js';
 import { t, tj, tn } from '../i18n.jsx';
 
 export function ErrorBox({ error }) {
@@ -13,8 +13,34 @@ export function ErrorBox({ error }) {
   return <div className="alert error" role="alert">{error.message || String(error)}</div>;
 }
 
+// Grey placeholder shapes while a page loads (feels faster than a word).
+// Screen readers still hear "Loading…".
 export function Loading() {
-  return <p className="muted">{t('Loading…')}</p>;
+  return (
+    <div className="skeleton" role="status" aria-busy="true">
+      <span className="visually-hidden">{t('Loading…')}</span>
+      <div className="sk-line" style={{ width: '60%' }} />
+      <div className="sk-line" />
+      <div className="sk-line" style={{ width: '80%' }} />
+    </div>
+  );
+}
+
+// Placeholder request cards for grids (Home, Browse, Saved).
+export function CardsLoading({ count = 3 }) {
+  return (
+    <div className="grid" role="status" aria-busy="true">
+      <span className="visually-hidden">{t('Loading…')}</span>
+      {Array.from({ length: count }, (_, i) => (
+        <div key={i} className="card skeleton" aria-hidden>
+          <div className="sk-photo" />
+          <div className="sk-line" style={{ width: '40%' }} />
+          <div className="sk-line" style={{ width: '85%' }} />
+          <div className="sk-line" style={{ width: '60%' }} />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function KycBadge({ status }) {
@@ -28,7 +54,7 @@ export function KycBadge({ status }) {
   return <span className={`badge ${cls}`}>{text}</span>;
 }
 
-const STATUS_LABELS = { open: () => t('open'), fulfilled: () => t('fulfilled'), closed: () => t('closed') };
+const STATUS_LABELS = { open: () => t('open'), fulfilled: () => t('found'), closed: () => t('closed') };
 export const statusLabel = (status) => STATUS_LABELS[status]?.() ?? status;
 
 export function StatusBadge({ status }) {
@@ -63,6 +89,7 @@ export function ListingCard({ listing }) {
         <span>📍 <bdi>{listing.city}</bdi></span>
         <span>🕒 {ago(listing.createdAt)}</span>
         {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
+        {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
       </div>
     </Link>
   );
@@ -129,6 +156,50 @@ export function RequireAdmin({ children }) {
   if (user === undefined) return <Loading />;
   if (user?.role !== 'admin') return <Navigate to="/" replace />;
   return children;
+}
+
+// ---- Activity (session 20) ----
+
+const ACTIVE_MS = 5 * 60 * 1000;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const REPLY = {
+  hour: () => t('Usually replies within an hour'),
+  hours: () => t('Usually replies within a few hours'),
+  day: () => t('Usually replies within a day'),
+  days: () => t('Usually takes a few days to reply'),
+};
+
+// "🟢 Active now · Usually replies within an hour". Shows nothing it doesn't
+// know (never online, or not seen for a week).
+export function Activity({ activity }) {
+  if (!activity) return null;
+  const seen = activity.lastSeenAt ? toDate(activity.lastSeenAt).getTime() : 0;
+  const since = Date.now() - seen;
+  const parts = [];
+  if (seen && since < ACTIVE_MS) parts.push(<span key="on" className="active-now">{t('Active now')}</span>);
+  else if (seen && since < WEEK_MS) parts.push(<span key="ago">{t('Active {time}', { time: ago(activity.lastSeenAt) })}</span>);
+  if (activity.replyTime) parts.push(<span key="reply">{REPLY[activity.replyTime]()}</span>);
+  if (!parts.length) return null;
+  return <span className="activity small muted">{parts.reduce((all, p, i) => (i ? [...all, ' · ', p] : [p]), [])}</span>;
+}
+
+// Earned badges (server/src/lib/badges.js has the rules).
+const BADGES = {
+  fast: () => ['⚡', t('Fast responder'), t('Usually replies within an hour')],
+  'top-finder': () => ['🏆', t('Top finder'), t('5+ deals as a seller, rated 4.5★ or more')],
+  trusted: () => ['🤝', t('Trusted buyer'), t('3+ deals as a buyer, rated 4.5★ or more')],
+  new: () => ['🌱', t('New member'), t('Joined in the last 30 days')],
+};
+export function Badges({ badges }) {
+  if (!badges?.length) return null;
+  return (
+    <span className="earned">
+      {badges.filter((b) => BADGES[b]).map((b) => {
+        const [icon, name, why] = BADGES[b]();
+        return <span key={b} className={`badge earned-${b}`} title={why}>{icon} {name}</span>;
+      })}
+    </span>
+  );
 }
 
 // ---- Ratings ----

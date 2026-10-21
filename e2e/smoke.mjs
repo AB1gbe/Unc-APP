@@ -86,6 +86,13 @@ await buyer.setInputFiles('#images', img);
 await shot(buyer, '07-new-request');
 await buyer.click('button:has-text("Post request")');
 await buyer.waitForSelector('text=Your request');
+await buyer.waitForSelector('.toast:has-text("Posted!")'); // celebration message
+// Share: on a computer, a WhatsApp link with the request's address.
+await buyer.click('.share > button');
+const wa = await buyer.getAttribute('.share-menu a.whatsapp', 'href');
+if (!wa.startsWith('https://wa.me/?text=') || !decodeURIComponent(wa).includes(buyer.url())) throw new Error(`bad WhatsApp link: ${wa}`);
+await shot(buyer, '08b-share');
+await buyer.click('.share > button'); // close the menu
 await shot(buyer, '08-request-owner-view');
 const listingUrl = buyer.url();
 
@@ -118,6 +125,9 @@ await buyer.waitForSelector('.inbox-item');
 await shot(buyer, '11-buyer-inbox');
 await buyer.click('.inbox-item');
 await buyer.waitForSelector('.bubble');
+// A quick-reply chip fills the message box.
+await buyer.click('.quick-replies .chip:has-text("Where can we meet?")');
+if ((await buyer.inputValue('.chat-form textarea')) !== 'Where can we meet?') throw new Error('quick reply did not fill the box');
 await buyer.fill('.chat-form textarea', 'Sounds great — can you do $350 if I pick up today?');
 await buyer.setInputFiles('.chat-form input[type=file]', img); // buyer sends a photo too
 await buyer.waitForSelector('.attach-preview img');
@@ -130,16 +140,31 @@ await vendor.waitForSelector('.lightbox img');
 await shot(vendor, '12b-photo-viewer');
 await vendor.keyboard.press('Escape');
 await vendor.waitForSelector('.lightbox', { state: 'detached' });
+await vendor.waitForSelector('.chat-head .active-now'); // the buyer is online right now
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
 
+// Offer cards: the buyer counters with $350, the seller accepts it.
+await buyer.click('.offer-actions button:has-text("Counter")');
+await buyer.fill('.offer-actions input', '350');
+await buyer.click('.offer-actions button:has-text("Send")');
+await vendor.waitForSelector('.offer-card:has-text("Counter-offer") button:has-text("Accept")', { timeout: 8000 });
+await vendor.click('.offer-card button:has-text("Accept")');
+await vendor.waitForSelector('.answer-line:has-text("You accepted")');
+await buyer.waitForSelector('.answer-line:has-text("accepted")', { timeout: 8000 });
+await buyer.waitForSelector('text=Got it? Mark the request as found');
+await shot(buyer, '13b-offer-accepted');
+
 // Ratings: buyer marks the request fulfilled, picking this seller -> both rate
 await buyer.goto(listingUrl);
+await buyer.waitForSelector('text=1 person looked at it'); // the seller opened it
 await buyer.click('button:has-text("I found it")');
 await buyer.waitForSelector('text=Who did you buy from?');
 await buyer.check('.choice:has-text("Riverside Electronics") input');
 await shot(buyer, '21-pick-seller');
-await buyer.click('button:has-text("Mark fulfilled")');
+await buyer.click('button:has-text("Yes, I found it")');
+await buyer.waitForSelector('.toast:has-text("Found it!")');
+await shot(buyer, '21b-found-it');
 await buyer.waitForSelector('text=Bought from');
 await buyer.click('text=Rate them');
 await buyer.waitForSelector('text=Deal done!');
@@ -149,6 +174,14 @@ await shot(buyer, '22-rate-form');
 await buyer.click('button:has-text("Submit rating")');
 await buyer.waitForSelector('text=Waiting for Riverside Electronics to rate you');
 await shot(buyer, '23-rated-waiting');
+// A "Found it" story with a photo (optional, public).
+await buyer.fill('.story-form textarea', 'Got my PS5 the same day — thanks Riverside! 🎮');
+await buyer.setInputFiles('#storyPhoto', face);
+await buyer.waitForSelector('.story-form .thumb img');
+await shot(buyer, '23b-story-form');
+await buyer.click('.story-form button:has-text("Share publicly")');
+await buyer.waitForSelector('.toast:has-text("Story shared")');
+await buyer.waitForSelector('.story-form', { state: 'detached' });
 
 await vendor.reload();
 await vendor.waitForSelector('text=has already rated you');
@@ -159,7 +192,11 @@ await shot(vendor, '24-both-rated');
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
+await buyer.waitForSelector('.story:has-text("Got my PS5")'); // the story, on the seller's profile
+await buyer.waitForSelector('.earned .badge'); // earned badges (🌱 New member)
 await shot(buyer, '25-profile');
+await buyer.goto(BASE + '/'); await buyer.waitForSelector('.story:has-text("Got my PS5")');
+await shot(buyer, '26-home-stories');
 // Account: the phone-notifications card is there (headless Chrome can't
 // subscribe, so it shows the 'blocked' or 'turn on' state).
 await buyer.goto(BASE + '/account'); await buyer.waitForSelector('.push-card h2');
