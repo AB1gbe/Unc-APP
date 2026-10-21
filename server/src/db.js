@@ -289,6 +289,13 @@ const MIGRATIONS = [
   ALTER TABLE users ADD COLUMN shop_area TEXT;
   ALTER TABLE users ADD COLUMN shop_hours TEXT;
   `,
+  // 17: indexes for the "Happening near you" feed (session 26): recent
+  // deals, recent offers, and new shops.
+  `
+  CREATE INDEX idx_deals_created ON deals(created_at);
+  CREATE INDEX idx_conversations_created ON conversations(created_at);
+  CREATE INDEX idx_users_new_shops ON users(created_at) WHERE account_type = 'business';
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
