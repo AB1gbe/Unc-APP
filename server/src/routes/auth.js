@@ -11,8 +11,10 @@ import { SESSION_COOKIE, requireAuth, publicMe } from '../middleware/auth.js';
 import { trySendMail } from '../lib/mailer.js';
 import { verificationCodeEmail, passwordResetEmail, passwordChangedEmail } from '../lib/emails.js';
 import { LANGS, langOf, translateMessage } from '../lib/i18n.js';
-import { AVATAR_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { AVATAR_DIR, COVER_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES } from '../lib/categories.js';
+import { CONTACT_MESSAGE, hasContactDetails } from '../lib/contact-guard.js';
+import { readShopHours } from '../lib/shop-hours.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -249,6 +251,18 @@ export function authRoutes(db) {
     if ('displayName' in b) changes.display_name = v.str(b, 'displayName', { min: 2, max: 60 });
     if ('city' in b) changes.city = v.str(b, 'city', { max: 80, optional: true });
     if ('bio' in b) changes.bio = v.str(b, 'bio', { max: 300, optional: true });
+    // Public text must not carry a way to contact the member directly.
+    if (hasContactDetails(changes.bio)) throw new HttpError(400, CONTACT_MESSAGE, { field: 'bio' });
+    const isShop = req.user.account_type === 'business';
+    if (('shopArea' in b || 'shopHours' in b) && !isShop) throw new HttpError(400, 'Only business accounts have a shop page.');
+    if ('shopArea' in b) {
+      changes.shop_area = v.str(b, 'shopArea', { max: 80, optional: true });
+      if (hasContactDetails(changes.shop_area)) throw new HttpError(400, CONTACT_MESSAGE, { field: 'shopArea' });
+    }
+    if ('shopHours' in b) {
+      const hours = readShopHours(b.shopHours);
+      changes.shop_hours = hours && JSON.stringify(hours);
+    }
     if ('interests' in b) {
       const list = Array.isArray(b.interests) ? [...new Set(b.interests)] : null;
       if (!list || list.length > 8 || list.some((c) => !CATEGORIES.includes(c))) {
@@ -289,6 +303,23 @@ export function authRoutes(db) {
   r.delete('/avatar', requireAuth, (req, res) => {
     if (req.user.avatar) fs.rmSync(path.join(AVATAR_DIR(), req.user.avatar), { force: true });
     db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(req.user.id);
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // Shop cover photo (business accounts; public, wide).
+  r.post('/cover', requireAuth, avatarUpload.single('cover'), (req, res) => {
+    if (req.user.account_type !== 'business') throw new HttpError(400, 'Only business accounts have a shop page.');
+    if (!req.file) throw new HttpError(400, 'Please upload cover.', { field: 'cover' });
+    const saved = saveFiles(COVER_DIR(), [{ file: req.file }]);
+    const old = req.user.cover;
+    db.prepare('UPDATE users SET cover = ? WHERE id = ?').run(saved.names[0], req.user.id);
+    if (old) fs.rmSync(path.join(COVER_DIR(), old), { force: true });
+    res.status(201).json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  r.delete('/cover', requireAuth, (req, res) => {
+    if (req.user.cover) fs.rmSync(path.join(COVER_DIR(), req.user.cover), { force: true });
+    db.prepare('UPDATE users SET cover = NULL WHERE id = ?').run(req.user.id);
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 

@@ -38,17 +38,21 @@ export async function setup() {
     if (stage === 'registered') return agent;
     await agent.post('/api/auth/verify-email').send({ code: reg.body.devCode }).expect(200);
     if (stage === 'email') return agent;
-    const sub = await kyc(agent, { idNumber: `ID-${n}-0000${n}` }).expect(201);
+    // Business accounts also need a business name, number and document.
+    const business = accountType === 'business' ? { businessName: `Test Shop ${n}`, businessRegNumber: `CR-${n}-1234` } : {};
+    const sub = await kyc(agent, { idNumber: `ID-${n}-0000${n}`, ...business }, { businessDoc: accountType === 'business' }).expect(201);
     if (stage === 'pending') return agent;
     await admin.post(`/api/admin/kyc/${sub.body.submission.id}/decision`).send({ decision: 'approved' }).expect(200);
     return agent;
   }
 
-  function kyc(agent, overrides = {}) {
+  // businessDoc: also attach the business registration document.
+  function kyc(agent, overrides = {}, { businessDoc = false } = {}) {
     const f = { legalName: 'Test Person', dateOfBirth: '1990-05-01', country: 'US', idType: 'national_id', idNumber: 'X1234567', ...overrides };
     let req = agent.post('/api/kyc');
     for (const [k, v] of Object.entries(f)) req = req.field(k, v);
-    return req.attach('docFront', PNG, 'f.png').attach('docBack', PNG, 'b.png').attach('selfie', PNG, 's.png');
+    req = req.attach('docFront', PNG, 'f.png').attach('docBack', PNG, 'b.png').attach('selfie', PNG, 's.png');
+    return businessDoc ? req.attach('businessDoc', PNG, 'cr.png') : req;
   }
 
   async function listing(agent, overrides = {}) {

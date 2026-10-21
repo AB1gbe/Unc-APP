@@ -281,6 +281,14 @@ const MIGRATIONS = [
   `
   ALTER TABLE users ADD COLUMN hide_activity INTEGER NOT NULL DEFAULT 0;
   `,
+  // 16: shop pages for business accounts (session 24): a cover photo, the
+  // area the shop is in, and opening hours (JSON, see lib/shop-hours.js).
+  // Deliberately no phone, website or email: contact stays inside requests.
+  `
+  ALTER TABLE users ADD COLUMN cover TEXT;
+  ALTER TABLE users ADD COLUMN shop_area TEXT;
+  ALTER TABLE users ADD COLUMN shop_hours TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

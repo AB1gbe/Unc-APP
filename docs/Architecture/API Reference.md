@@ -21,8 +21,9 @@ Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (ses
 | POST | `/api/auth/logout` | — | clears session |
 | GET | `/api/auth/me` | — | `{user}` or `{user:null}`. `user` includes `avatarUrl, bio, interests, onboarded` (session 13) |
 | PUT | `/api/auth/language` | A | `language: en/ar` — saves the member's language (emails use it). Session 12 |
-| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17), hideActivity (true/false, session 22; true also clears last_seen_at)` — only the fields sent are changed → `{user}`. Session 13 |
+| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17), hideActivity (true/false, session 22; true also clears last_seen_at), shopArea (≤80) and shopHours (7 × null or {open, close}) — business accounts only, session 24`. `bio` and `shopArea` are refused (400) if they contain a phone number, link, email or @handle (`lib/contact-guard.js`, session 24) — only the fields sent are changed → `{user}`. Session 13 |
 | POST | `/api/auth/avatar` | A | **multipart** file `avatar` → `201 {user}`; replaces (and deletes) the old photo. Session 13 |
+| POST / DELETE | `/api/auth/cover` | A | Business accounts only (400 otherwise). **multipart** file `cover` → `201 {user}` with `coverUrl`; replaces the old one. DELETE removes it. Session 24 |
 | DELETE | `/api/auth/avatar` | A | removes the profile photo → `{user}`. Session 13 |
 | POST | `/api/auth/onboarded` | A | welcome step finished or skipped → `{user}` with `onboarded: true`. Session 13 |
 | POST | `/api/auth/verify-email` | A | `code` (6 digits). 5 wrong tries → 429 |
@@ -124,3 +125,5 @@ Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buye
 
 ## Pages / link previews — `server/src/app.js` + `server/src/lib/previews.js` (session 20)
 Only when the built website exists (`client/dist`, or `CLIENT_DIST`). Every non-API, non-upload `GET` returns `index.html` (`Cache-Control: no-cache`) with Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`, `og:locale`, `twitter:card`) inserted before `</head>`, so WhatsApp, X, iMessage… show a card. `/requests/:id` for an **open** request whose buyer isn't banned gets its title (also in `<title>`), price, city and first photo, in the buyer's language; every other page gets the general Unc card and `/icons/icon-512.png`. `og:url` / `og:image` are built from `APP_URL`.
+
+**Shop fields (session 24):** `/api/auth/me` and `GET /api/members/:id` include `coverUrl`, `shopArea` and `shopHours` for business accounts only. `/uploads/covers/*` are public files.

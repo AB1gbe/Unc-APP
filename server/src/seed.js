@@ -44,6 +44,10 @@ async function seedDemo(db) {
   profile.run('Always hunting for good second-hand electronics and furniture.', JSON.stringify(['Electronics', 'Home & Furniture']), 'buyer@demo.local');
   profile.run('Family electronics shop since 2010. Phones, consoles and accessories, original parts only.', JSON.stringify(['Electronics', 'Phones & Tablets', 'Computers']), 'vendor@demo.local');
   profile.run('I find hard-to-get items and car parts for people. Quick and honest.', JSON.stringify(['Vehicles & Parts', 'Tools & DIY', 'Services']), 'freelancer@demo.local');
+  // The demo shop has a shop page: its area and opening hours (closed Fridays).
+  const hours = Array.from({ length: 7 }, (_, d) => (d === 5 ? null : { open: '09:00', close: '21:00' }));
+  db.prepare('UPDATE users SET shop_area = COALESCE(shop_area, ?), shop_hours = COALESCE(shop_hours, ?) WHERE email = ?')
+    .run('North Loop, Austin', JSON.stringify(hours), 'vendor@demo.local');
 
   // One finished, rated deal so profiles and star ratings have something to show.
   const shop = db.prepare('SELECT id FROM users WHERE email = ?').get('vendor@demo.local').id;

@@ -8,7 +8,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { errorHandler, notFound } from './lib/http.js';
-import { AVATAR_DIR, LISTING_DIR, STORY_DIR } from './lib/uploads.js';
+import { AVATAR_DIR, COVER_DIR, LISTING_DIR, STORY_DIR } from './lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from './lib/categories.js';
 import { loadUser } from './middleware/auth.js';
 import { withPreview } from './lib/previews.js';
@@ -58,6 +58,7 @@ export function createApp(db) {
   app.use('/uploads/listings', express.static(LISTING_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
   app.use('/uploads/avatars', express.static(AVATAR_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
   app.use('/uploads/stories', express.static(STORY_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+  app.use('/uploads/covers', express.static(COVER_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
 
   // In production the built React app is served by this same server.
   if (fs.existsSync(config.clientDist)) {

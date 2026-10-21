@@ -30,3 +30,5 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 21]] | Pull request #6 (the five social touches) merged into `main` |
 | 2026-10-21 | [[2026-10-21 Session 22]] | "Hide when I'm online" privacy setting |
 | 2026-10-21 | [[2026-10-21 Session 23]] | Pull request #7 ("Hide when I'm online") merged into `main` |
+| 2026-10-21 | [[2026-10-21 Session 24]] | Shop pages for business accounts (cover, area, opening hours, no contact details) |
+| 2026-10-21 | [[2026-10-21 Session 25]] | Pull request #8 (shop pages) merged into `main` |

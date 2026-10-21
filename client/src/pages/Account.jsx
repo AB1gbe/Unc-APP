@@ -6,6 +6,7 @@ import { Avatar, ErrorBox, KycBadge } from '../components/ui.jsx';
 import ProfileEditor from '../components/ProfileEditor.jsx';
 import { formatDate, t, tj } from '../i18n.jsx';
 import PushSettings from '../components/PushSettings.jsx';
+import ShopEditor from '../components/ShopEditor.jsx';
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -36,6 +37,7 @@ export default function Account() {
         <p className="muted small">{t('This is what other members see when they look at your name.')}</p>
         <ProfileEditor />
       </div>
+      {user.accountType === 'business' && <ShopEditor />}
       <EmailSettings />
       <PrivacySettings />
       <PushSettings />

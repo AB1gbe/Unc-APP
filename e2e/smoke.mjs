@@ -215,6 +215,24 @@ await shot(buyer, '27-privacy');
 await vendor.reload(); await vendor.waitForSelector('h1');
 if (await vendor.locator('.active-now').count()) throw new Error('"Active now" still shown after hiding');
 
+// Shop page: the business seller adds area, hours and a cover photo.
+await vendor.goto(BASE + '/account'); await vendor.waitForSelector('.shop-editor');
+await vendor.fill('#shopArea', 'Call 3912 3456'); // a phone number is refused
+await vendor.click('.shop-editor button:has-text("Save shop page")');
+await vendor.waitForSelector('.shop-editor .alert.error');
+await vendor.fill('#shopArea', 'Seef, Manama');
+for (let d = 0; d < 7; d++) if (d !== 5) await vendor.locator('.hours-row input[type=checkbox]').nth(d).check(); // closed Fridays
+await vendor.setInputFiles('[data-testid=cover-input]', img);
+await vendor.waitForSelector('img.shop-cover-preview');
+await vendor.click('.shop-editor button:has-text("Save shop page")');
+await vendor.waitForSelector('text=Saved ✓');
+const shopUrl = BASE + await vendor.getAttribute('a[href^="/members/"]', 'href');
+await buyer.goto(shopUrl);
+await buyer.waitForSelector('img.shop-cover');
+await buyer.waitForSelector('.shop-hours .open-now, .shop-hours .closed-now');
+await buyer.waitForSelector('text=Seef, Manama');
+await shot(buyer, '28-shop-page');
+
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await shot(mp, '14-mobile-home');

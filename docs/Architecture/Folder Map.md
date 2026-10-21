@@ -23,7 +23,7 @@ Unc-APP/
 │   ├── package.json        Server deps + scripts
 │   ├── data/               (created at runtime, git-ignored) database + uploads/
 │   │                         uploads/listings (public), uploads/avatars (public, session 13),
-│   │                         uploads/stories (public, session 20),
+│   │                         uploads/stories (public, session 20), uploads/covers (public shop covers, session 24),
 │   │                         uploads/kyc (PRIVATE), uploads/chat (PRIVATE, session 13)
 │   ├── src/
 │   │   ├── index.js        Starts the server (opens DB, ensures admin, listen)
@@ -44,6 +44,8 @@ Unc-APP/
 │   │   │   ├── categories.js   CATEGORIES + CURRENCIES lists
 │   │   │   ├── ratings.js      Rating rules: windows, blind visibility, summaries (session 09)
 │   │   │   ├── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*) (session 13)
+│   │   │   ├── contact-guard.js hasContactDetails(): no phones/links/emails/@handles in public text (session 24)
+│   │   │   ├── shop-hours.js   readShopHours(): validates opening hours (session 24)
 │   │   │   ├── push.js         pushTo(): phone notifications via Web Push; VAPID keys (session 15)
 │   │   │   ├── activity.js     "Active now" (last_seen_at) + usual reply time (session 20)
 │   │   │   ├── badges.js       Earned badges: fast, top-finder, trusted, new (session 20)
@@ -84,7 +86,8 @@ Unc-APP/
 │       ├── activity.test.js        "Active now", reply time, "Seen by N people" (session 20)
 │       ├── previews.test.js        link-preview tags on request pages (session 20)
 │       ├── stories-badges.test.js  "Found it" stories + earned badges (session 20)
-│       └── seasons.test.js         home greeting + seasonal line (client/src/seasons.js) (session 20)
+│       ├── seasons.test.js         home greeting + seasonal line (client/src/seasons.js) (session 20)
+│       └── shop.test.js            shop pages, contact-details guard, "open now" (client/src/hours.js) (session 24)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -104,6 +107,7 @@ Unc-APP/
         ├── push.js         pushSupport(), enablePush(), disablePush() for this device (session 15)
         ├── images.js       shrinkImage(): resizes photos in the browser before upload (session 13)
         ├── seasons.js      partOfDay(), season(), hijri(): home greeting + seasonal line (session 20)
+        ├── hours.js        openState(): "Open now" from a shop's hours, incl. past midnight (session 24)
         ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
         ├── styles.css      The whole design system
         ├── components/
@@ -111,6 +115,8 @@ Unc-APP/
         │   ├── TabBar.jsx  Bottom tab bar on phones/tablets (under 900 px, members only) (session 13)
         │   ├── PushSettings.jsx   "Notifications on this phone" card: turn on, test, turn off (session 15)
         │   ├── ProfileEditor.jsx  Photo, name, city, bio, interests — Account page + Welcome (session 13)
+        │   ├── ShopEditor.jsx     "Your shop page": cover, area, opening hours (business accounts, session 24)
+        │   ├── ShopHours.jsx      Opening-hours card, OpenNow, dayName() (session 24)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
         │   ├── Lightbox.jsx       Full-screen photo viewer: swipe, arrow keys, Esc (session 13)
         │   ├── Celebrate.jsx      celebrate(): toast + confetti; <Celebrations/> sits in Layout (session 20)
