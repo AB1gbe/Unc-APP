@@ -88,7 +88,7 @@ export default function Conversation() {
       <div className="card chat">
         <div className="chat-head">
           <div className="row">
-            <Avatar name={conv.other.displayName} />
+            <Avatar name={conv.other.displayName} src={conv.other.avatarUrl} />
             <div style={{ flex: 1 }}>
               <Link to={`/members/${conv.other.id}`}><b><bdi>{conv.other.displayName}</bdi></b></Link>{' '}
               {conv.other.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}{' '}

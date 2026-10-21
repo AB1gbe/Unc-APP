@@ -21,7 +21,7 @@ const ALLOWED = new Set(['Unc', 'unc', 'un', 'c', 'USD', 'EUR', 'GBP', 'CAD', 'A
 const browser = await chromium.launch();
 const problems = [];
 const img = `${OUT}/ar-fake-id.png`;
-{ const p = await browser.newPage(); await p.setContent('<div style="width:300px;height:200px;background:#cde">ID</div>'); await p.screenshot({ path: img }); await p.close(); }
+{ const p = await browser.newPage(); await p.setContent('<div style="width:300px;height:200px;background:#cde">ID</div>'); await p.locator('div').screenshot({ path: img }); await p.close(); }
 
 async function newUser() {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 }, locale: 'ar-BH' });
@@ -62,6 +62,9 @@ async function onboard(p, { name, email, business, idNumber }) {
   await check(p, 'verify-email');
   await p.fill('#code', (await p.textContent('.alert.info b')).trim());
   await p.click('form button.btn.block');
+  await p.waitForURL('**/welcome');
+  await check(p, 'welcome');
+  await p.click('form .row .btn.secondary'); // "Skip for now"
   await p.waitForURL('**/verification');
   await check(p, 'verification-start');
   await p.click('.card button.btn.block');

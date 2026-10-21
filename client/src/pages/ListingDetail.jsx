@@ -36,7 +36,7 @@ export default function ListingDetail() {
         )}
         <hr style={{ border: 0, borderTop: '1px solid var(--border)', margin: '1rem 0' }} />
         <div className="row">
-          <Avatar name={l.buyer.displayName} />
+          <Avatar name={l.buyer.displayName} src={l.buyer.avatarUrl} />
           <div>
             <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status="approved" />
             <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {t('Requested by a verified member')}</span></div>
@@ -152,7 +152,7 @@ function OwnerPanel({ listing, onChange }) {
             {offers.map((c) => (
               <label key={c.id} className="choice">
                 <input type="radio" name="dealWith" value={c.id} checked={dealWith === String(c.id)} onChange={(e) => setDealWith(e.target.value)} required />
-                <Avatar name={c.other.displayName} />
+                <Avatar name={c.other.displayName} src={c.other.avatarUrl} />
                 <span><b><bdi>{c.other.displayName}</bdi></b><br /><RatingBadge rating={c.other.rating} /></span>
               </label>
             ))}
@@ -184,7 +184,7 @@ function OwnerPanel({ listing, onChange }) {
           <p className="muted" style={{ padding: '0 1rem 1rem' }}>{t('No offers yet. Sellers who have what you need will message you here.')}</p>
         ) : offers.map((c) => (
           <Link key={c.id} className="inbox-item" to={`/messages/${c.id}`}>
-            <Avatar name={c.other.displayName} />
+            <Avatar name={c.other.displayName} src={c.other.avatarUrl} />
             <div>
               <b><bdi>{c.other.displayName}</bdi></b> {c.other.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}
               {c.id === listing.dealConversationId && <span className="badge ok">{t('Deal')}</span>}

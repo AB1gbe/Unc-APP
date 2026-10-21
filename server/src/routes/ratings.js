@@ -4,7 +4,8 @@ import { Router } from 'express';
 import { audit } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
-import { requireAuth } from '../middleware/auth.js';
+import { parseInterests, requireAuth } from '../middleware/auth.js';
+import { avatarUrl } from '../lib/uploads.js';
 import { RATE_WINDOW_DAYS, VISIBLE, canStillRate, ratingQueries } from '../lib/ratings.js';
 
 export function ratingRoutes(db) {
@@ -42,7 +43,7 @@ export function ratingRoutes(db) {
       throw notFound('Member not found.');
     }
     const reviews = db.prepare(`
-      SELECT r.stars, r.comment, r.created_at, u.id AS from_id, u.display_name AS from_name,
+      SELECT r.stars, r.comment, r.created_at, u.id AS from_id, u.display_name AS from_name, u.avatar AS from_avatar,
              l.title AS listing_title, CASE WHEN d.vendor_id = r.ratee_id THEN 'vendor' ELSE 'buyer' END AS role
       FROM ratings r JOIN deals d ON d.id = r.deal_id
       JOIN users u ON u.id = r.rater_id
@@ -51,6 +52,14 @@ export function ratingRoutes(db) {
       ORDER BY r.created_at DESC, r.id DESC LIMIT 50
     `).all(m.id);
     const { deals } = db.prepare('SELECT COUNT(*) AS deals FROM deals WHERE buyer_id = ? OR vendor_id = ?').get(m.id, m.id);
+    // Their open requests, newest first (the same cards as Browse).
+    const openRequests = db.prepare(`
+      SELECT id, title, category, budget_min, budget_max, currency, city, created_at
+      FROM listings WHERE buyer_id = ? AND status = 'open' ORDER BY created_at DESC, id DESC LIMIT 6
+    `).all(m.id).map((l) => ({
+      id: l.id, title: l.title, category: l.category, budgetMin: l.budget_min, budgetMax: l.budget_max,
+      currency: l.currency, city: l.city, createdAt: l.created_at, description: '',
+    }));
     res.json({
       member: {
         id: m.id,
@@ -58,15 +67,20 @@ export function ratingRoutes(db) {
         accountType: m.account_type,
         verified: true,
         memberSince: m.created_at,
+        avatarUrl: avatarUrl(m.avatar),
+        bio: m.bio,
+        city: m.city,
+        interests: parseInterests(m.interests),
         deals,
         rating: ratings.summaryFor(m.id),
       },
+      openRequests,
       reviews: reviews.map((x) => ({
         stars: x.stars,
         comment: x.comment,
         createdAt: x.created_at,
         role: x.role, // what the reviewed member was in that deal
-        from: { id: x.from_id, displayName: x.from_name },
+        from: { id: x.from_id, displayName: x.from_name, avatarUrl: avatarUrl(x.from_avatar) },
         listingTitle: x.listing_title,
       })),
     });

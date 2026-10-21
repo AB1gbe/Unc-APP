@@ -36,8 +36,11 @@ export function StatusBadge({ status }) {
   return <span className={`badge ${cls}`}>{statusLabel(status)}</span>;
 }
 
-export function Avatar({ name }) {
-  return <div className="avatar" aria-hidden>{(name || '?').trim()[0]?.toUpperCase()}</div>;
+// Profile photo, or the first letter of the name when there is none.
+export function Avatar({ name, src, size = 40 }) {
+  const style = { width: size, height: size, fontSize: size * 0.42 };
+  if (src) return <img className="avatar" src={src} alt="" style={style} loading="lazy" />;
+  return <div className="avatar" aria-hidden style={style}>{(name || '?').trim()[0]?.toUpperCase()}</div>;
 }
 
 export function ListingCard({ listing }) {
@@ -48,9 +51,11 @@ export function ListingCard({ listing }) {
         <span className="price">{budget(listing)}</span>
       </div>
       <h3 dir="auto">{listing.title}</h3>
-      <p dir="auto" className="muted small" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-        {listing.description}
-      </p>
+      {listing.description && (
+        <p dir="auto" className="muted small" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          {listing.description}
+        </p>
+      )}
       <div className="meta">
         <span>📍 <bdi>{listing.city}</bdi></span>
         <span>🕒 {ago(listing.createdAt)}</span>

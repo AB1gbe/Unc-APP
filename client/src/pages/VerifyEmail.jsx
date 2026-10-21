@@ -15,7 +15,9 @@ export default function VerifyEmail() {
   const [notice, setNotice] = useState(null);
   const [emailFailed, setEmailFailed] = useState(Boolean(state?.emailFailed));
 
-  if (user.emailVerified) return <Navigate to="/verification" replace />;
+  // Already confirmed (also right after entering the code): same destination
+  // rule as submit() below, or this redirect would skip the welcome step.
+  if (user.emailVerified) return <Navigate to={user.onboarded ? '/verification' : '/welcome'} replace />;
 
   async function submit(e) {
     e.preventDefault();
@@ -23,7 +25,8 @@ export default function VerifyEmail() {
     try {
       const { user } = await api('/auth/verify-email', { method: 'POST', body: { code } });
       setUser(user);
-      navigate('/verification');
+      // New members get the (skippable) profile step before identity.
+      navigate(user.onboarded ? '/verification' : '/welcome');
     } catch (err) {
       setError(err);
     }
@@ -69,7 +72,7 @@ export default function VerifyEmail() {
 
 // The 3-step progress bar shown during onboarding.
 export function Steps({ current }) {
-  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Identity'), t('Verify (KYC)')]];
+  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Profile'), t('Photo & interests')], [t('Identity'), t('Verify (KYC)')]];
   return (
     <div className="steps">
       {steps.map(([title, sub], i) => (

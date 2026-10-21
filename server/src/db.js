@@ -188,6 +188,14 @@ const MIGRATIONS = [
   `
   ALTER TABLE users ADD COLUMN language TEXT CHECK (language IN ('en', 'ar'));
   `,
+  // 6: profiles (session 13) - photo, short bio, interests (JSON list of
+  // categories), and when the welcome steps were finished or skipped.
+  `
+  ALTER TABLE users ADD COLUMN avatar TEXT;
+  ALTER TABLE users ADD COLUMN bio TEXT;
+  ALTER TABLE users ADD COLUMN interests TEXT NOT NULL DEFAULT '[]';
+  ALTER TABLE users ADD COLUMN onboarded_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

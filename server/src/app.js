@@ -8,7 +8,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { errorHandler, notFound } from './lib/http.js';
-import { LISTING_DIR } from './lib/uploads.js';
+import { AVATAR_DIR, LISTING_DIR } from './lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from './lib/categories.js';
 import { loadUser } from './middleware/auth.js';
 import { authRoutes } from './routes/auth.js';
@@ -49,6 +49,7 @@ export function createApp(db) {
   // through the admin route that checks permissions.
   // Photo names are random and never reused, so browsers may cache them for a year.
   app.use('/uploads/listings', express.static(LISTING_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+  app.use('/uploads/avatars', express.static(AVATAR_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
 
   // In production the built React app is served by this same server.
   if (fs.existsSync(config.clientDist)) {

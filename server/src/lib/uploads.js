@@ -10,6 +10,9 @@ import { HttpError } from './http.js';
 
 export const KYC_DIR = () => path.join(config.uploadDir, 'kyc');         // private
 export const LISTING_DIR = () => path.join(config.uploadDir, 'listings'); // public
+export const AVATAR_DIR = () => path.join(config.uploadDir, 'avatars');   // public (profile photos)
+
+export const avatarUrl = (file) => (file ? `/uploads/avatars/${file}` : null);
 
 const SIGNATURES = [
   { ext: '.jpg', mime: 'image/jpeg', bytes: [0xff, 0xd8, 0xff] },

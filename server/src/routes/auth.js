@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { config } from '../config.js';
@@ -9,6 +11,8 @@ import { SESSION_COOKIE, requireAuth, publicMe } from '../middleware/auth.js';
 import { trySendMail } from '../lib/mailer.js';
 import { verificationCodeEmail, passwordResetEmail, passwordChangedEmail } from '../lib/emails.js';
 import { LANGS, langOf, translateMessage } from '../lib/i18n.js';
+import { AVATAR_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { CATEGORIES } from '../lib/categories.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -238,10 +242,48 @@ export function authRoutes(db) {
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 
+  // Edit profile. Only the fields that are sent are changed.
   r.patch('/me', requireAuth, (req, res) => {
-    const displayName = v.str(req.body, 'displayName', { min: 2, max: 60 });
-    const city = v.str(req.body, 'city', { max: 80, optional: true });
-    db.prepare('UPDATE users SET display_name = ?, city = ? WHERE id = ?').run(displayName, city, req.user.id);
+    const b = req.body || {};
+    const changes = {};
+    if ('displayName' in b) changes.display_name = v.str(b, 'displayName', { min: 2, max: 60 });
+    if ('city' in b) changes.city = v.str(b, 'city', { max: 80, optional: true });
+    if ('bio' in b) changes.bio = v.str(b, 'bio', { max: 300, optional: true });
+    if ('interests' in b) {
+      const list = Array.isArray(b.interests) ? [...new Set(b.interests)] : null;
+      if (!list || list.length > 8 || list.some((c) => !CATEGORIES.includes(c))) {
+        throw new HttpError(400, 'Choose up to 8 interests from the list.', { field: 'interests' });
+      }
+      changes.interests = JSON.stringify(list);
+    }
+    const cols = Object.keys(changes);
+    if (cols.length) {
+      db.prepare(`UPDATE users SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(changes), req.user.id);
+    }
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // Profile photo. Public, so it must never be the identity-check selfie
+  // (that one stays in the private KYC folder).
+  const avatarUpload = memoryUpload(1);
+  r.post('/avatar', requireAuth, avatarUpload.single('avatar'), (req, res) => {
+    if (!req.file) throw new HttpError(400, 'Please upload avatar.', { field: 'avatar' });
+    const saved = saveFiles(AVATAR_DIR(), [{ file: req.file }]);
+    const old = req.user.avatar;
+    db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(saved.names[0], req.user.id);
+    if (old) fs.rmSync(path.join(AVATAR_DIR(), old), { force: true });
+    res.status(201).json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  r.delete('/avatar', requireAuth, (req, res) => {
+    if (req.user.avatar) fs.rmSync(path.join(AVATAR_DIR(), req.user.avatar), { force: true });
+    db.prepare('UPDATE users SET avatar = NULL WHERE id = ?').run(req.user.id);
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // The welcome steps were completed or skipped: don't show them again.
+  r.post('/onboarded', requireAuth, (req, res) => {
+    db.prepare(`UPDATE users SET onboarded_at = COALESCE(onboarded_at, datetime('now')) WHERE id = ?`).run(req.user.id);
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 

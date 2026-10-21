@@ -39,6 +39,12 @@ async function seedDemo(db) {
     add.run(buyer, 'Need a solid oak dining table for 6', 'Rectangular, around 180cm. Light scratches are fine.', 'Home & Furniture', 200, 600, 'Austin', null);
     add.run(buyer, 'Someone to assemble IKEA wardrobe', 'PAX wardrobe, 2 doors. This Saturday if possible.', 'Services', 50, 120, 'Austin', null);
   }
+  // Profiles: a few words and interests, so demo profiles aren't empty.
+  const profile = db.prepare(`UPDATE users SET bio = COALESCE(bio, ?), interests = CASE WHEN interests = '[]' THEN ? ELSE interests END, onboarded_at = COALESCE(onboarded_at, datetime('now')) WHERE email = ?`);
+  profile.run('Always hunting for good second-hand electronics and furniture.', JSON.stringify(['Electronics', 'Home & Furniture']), 'buyer@demo.local');
+  profile.run('Family electronics shop since 2010. Phones, consoles and accessories, original parts only.', JSON.stringify(['Electronics', 'Phones & Tablets', 'Computers']), 'vendor@demo.local');
+  profile.run('I find hard-to-get items and car parts for people. Quick and honest.', JSON.stringify(['Vehicles & Parts', 'Tools & DIY', 'Services']), 'freelancer@demo.local');
+
   // One finished, rated deal so profiles and star ratings have something to show.
   const shop = db.prepare('SELECT id FROM users WHERE email = ?').get('vendor@demo.local').id;
   if (!db.prepare('SELECT 1 FROM deals WHERE buyer_id = ? AND vendor_id = ?').get(buyer, shop)) {

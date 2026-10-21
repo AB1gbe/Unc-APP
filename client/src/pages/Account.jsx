@@ -2,34 +2,24 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, toDate } from '../api.js';
 import { useAuth } from '../auth.jsx';
-import { ErrorBox, KycBadge } from '../components/ui.jsx';
+import { Avatar, ErrorBox, KycBadge } from '../components/ui.jsx';
+import ProfileEditor from '../components/ProfileEditor.jsx';
 import { formatDate, t } from '../i18n.jsx';
 
 export default function Account() {
-  const { user, setUser } = useAuth();
-  const [form, setForm] = useState({ displayName: user.displayName, city: user.city || '' });
-  const [error, setError] = useState(null);
-  const [saved, setSaved] = useState(false);
-
-  async function save(e) {
-    e.preventDefault();
-    setError(null);
-    setSaved(false);
-    try {
-      const { user } = await api('/auth/me', { method: 'PATCH', body: form });
-      setUser(user);
-      setSaved(true);
-    } catch (err) {
-      setError(err);
-    }
-  }
+  const { user } = useAuth();
 
   return (
-    <div className="narrow stack">
+    <div className="narrow stack" style={{ maxWidth: 680 }}>
       <div className="card">
-        <h1>{t('Account')}</h1>
-        <p className="muted"><span className="ltr">{user.email}</span> · {user.accountType === 'business' ? t('Business') : t('Individual')} · {t('member since {date}', { date: formatDate(toDate(user.createdAt)) })}</p>
         <div className="row">
+          <Avatar name={user.displayName} src={user.avatarUrl} size={56} />
+          <div style={{ flex: 1 }}>
+            <h1 style={{ margin: 0 }}>{t('Account')}</h1>
+            <p className="muted" style={{ margin: 0 }}><span className="ltr">{user.email}</span> · {user.accountType === 'business' ? t('Business') : t('Individual')} · {t('member since {date}', { date: formatDate(toDate(user.createdAt)) })}</p>
+          </div>
+        </div>
+        <div className="row" style={{ marginTop: '.75rem' }}>
           <span>{t('Email:')} {user.emailVerified ? <span className="badge ok">{t('✓ Confirmed')}</span> : <Link to="/verify-email">{t('Confirm now')}</Link>}</span>
           <span>{t('Identity:')} <KycBadge status={user.kycStatus} /></span>
           {user.kycStatus === 'approved' && <Link to={`/members/${user.id}`}>{t('View my public profile & ratings')} <span className="flip">→</span></Link>}
@@ -38,20 +28,11 @@ export default function Account() {
           <p style={{ marginTop: '.75rem' }}><Link className="btn sm" to="/verification">{t('Go to verification')}</Link></p>
         )}
       </div>
-      <form className="card" onSubmit={save}>
-        <h2>{t('Profile')}</h2>
-        <ErrorBox error={error} />
-        {saved && <div className="alert ok">{t('Saved.')}</div>}
-        <div className="field">
-          <label htmlFor="displayName">{t('Display name')}</label>
-          <input id="displayName" required value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} />
-        </div>
-        <div className="field">
-          <label htmlFor="city">{t('City')}</label>
-          <input id="city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-        </div>
-        <button className="btn">{t('Save')}</button>
-      </form>
+      <div className="card">
+        <h2>{t('Your profile')}</h2>
+        <p className="muted small">{t('This is what other members see when they look at your name.')}</p>
+        <ProfileEditor />
+      </div>
       <ChangePassword />
     </div>
   );

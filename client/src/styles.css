@@ -142,6 +142,7 @@ input[type="file"] { padding: .5rem; }
 .inbox-item:hover { background: var(--bg); text-decoration: none; }
 .inbox-item:last-child { border-bottom: 0; }
 .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; font-weight: 700; flex-shrink: 0; }
+img.avatar { object-fit: cover; display: block; border: 1px solid var(--border); }
 .unread-dot { background: var(--brand); color: #fff; border-radius: 999px; font-size: .7rem; padding: 0 .45rem; font-weight: 700; }
 .chat { display: flex; flex-direction: column; height: calc(100vh - 160px); min-height: 420px; padding: 0; overflow: hidden; }
 .chat-head { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
@@ -184,3 +185,11 @@ th { color: var(--muted); font-weight: 600; }
 .review { border-top: 1px solid var(--border); padding: .9rem 0; }
 /* first-of-type: the card's <h2> comes first, so :first-child never matched */
 .review:first-of-type { border-top: 0; }
+
+/* ===== Profiles ===== */
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: .35rem .8rem; font: inherit; font-size: .85rem; cursor: pointer; }
+.chip.on { background: var(--brand-soft); border-color: var(--brand); color: var(--brand); font-weight: 600; }
+span.chip { cursor: default; }
+.photo-edit { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.bio { white-space: pre-wrap; margin: .5rem 0 0; }

@@ -36,7 +36,7 @@ export default function Verification() {
 
   return (
     <div className="narrow">
-      <Steps current={status === 'approved' ? 3 : 2} />
+      <Steps current={status === 'approved' ? 4 : 3} />
       {status === 'approved' && (
         <div className="card center">
           <h1>{t("You're verified ✓")}</h1>

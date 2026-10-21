@@ -15,7 +15,10 @@ const BASE = process.env.BASE_URL || 'http://localhost:4000';
 const shot = (p, n) => p.screenshot({ path: `${OUT}/${n}.png`, fullPage: true });
 const browser = await chromium.launch();
 const img = `${OUT}/fake-id.png`;
-{ const p = await browser.newPage(); await p.setContent('<div style="width:300px;height:200px;background:#cde">ID CARD</div>'); await p.screenshot({ path: img }); await p.close(); }
+// Test images: only the element is captured (not the whole white page).
+{ const p = await browser.newPage(); await p.setContent('<div style="width:300px;height:200px;background:#cde">ID CARD</div>'); await p.locator('div').screenshot({ path: img }); await p.close(); }
+const face = `${OUT}/fake-face.png`;
+{ const p = await browser.newPage(); await p.setContent('<div style="width:240px;height:240px;background:linear-gradient(135deg,#2f6fed,#f5a623);color:#fff;font:700 96px sans-serif;display:grid;place-items:center">R</div>'); await p.locator('div').screenshot({ path: face }); await p.close(); }
 
 async function onboard(name, email, type) {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
@@ -30,6 +33,14 @@ async function onboard(name, email, type) {
   const code = (await p.textContent('.alert.info b')).trim();
   await shot(p, '02-verify-email');
   await p.fill('#code', code); await p.click('button:has-text("Confirm email")');
+  // Welcome step: photo, a few words, interests
+  await p.waitForURL('**/welcome');
+  await p.setInputFiles('.photo-edit input[type=file]', face);
+  await p.waitForSelector('.photo-edit img.avatar');
+  await p.fill('#bio', type === 'business' ? 'Family electronics shop in Austin since 2010.' : 'I like retro games and good coffee.');
+  await p.click(`.chip:has-text("${type === 'business' ? 'Electronics' : 'Toys & Kids'}")`);
+  await shot(p, `02b-welcome-${type}`);
+  await p.click('button:has-text("Save and continue")');
   await p.waitForURL('**/verification');
   await p.click('button:has-text("Start verification")');
   await p.fill('#legalName', name + ' Legal'); await p.fill('#dateOfBirth', '1990-04-03'); await p.fill('#country', 'United States');

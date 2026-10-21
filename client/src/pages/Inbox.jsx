@@ -47,7 +47,7 @@ export default function Inbox() {
               </div>
               {items.map((c) => (
                 <Link key={c.id} to={`/messages/${c.id}`} className="inbox-item">
-                  <Avatar name={c.other.displayName} />
+                  <Avatar name={c.other.displayName} src={c.other.avatarUrl} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="row spread">
                       <b><bdi>{c.other.displayName}</bdi></b>

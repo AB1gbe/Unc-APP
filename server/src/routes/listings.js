@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
-import { LISTING_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { LISTING_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
@@ -23,14 +23,14 @@ export function listingView(row, images = []) {
     status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-    buyer: { id: row.buyer_id, displayName: row.buyer_name, accountType: row.buyer_type },
+    buyer: { id: row.buyer_id, displayName: row.buyer_name, accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
     images: images.map((f) => `/uploads/listings/${f}`),
     offerCount: row.offer_count ?? undefined,
   };
 }
 
 const BASE_SELECT = `
-  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.banned_at IS NOT NULL AS buyer_banned,
+  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.banned_at IS NOT NULL AS buyer_banned,
          (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count
   FROM listings l JOIN users u ON u.id = l.buyer_id
 `;

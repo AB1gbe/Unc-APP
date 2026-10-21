@@ -15,6 +15,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
 import { canStillRate, ratingQueries } from '../lib/ratings.js';
+import { avatarUrl } from '../lib/uploads.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -22,8 +23,8 @@ export function conversationRoutes(db) {
   const getConv = db.prepare(`
     SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
            l.budget_min, l.budget_max, l.currency,
-           b.display_name AS buyer_name, b.account_type AS buyer_type,
-           vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc,
+           b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
+           vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
            b.banned_at AS buyer_banned_at, vu.banned_at AS vendor_banned_at
     FROM conversations c
     JOIN listings l ON l.id = c.listing_id
@@ -76,8 +77,8 @@ export function conversationRoutes(db) {
     const iAmBuyer = c.buyer_id === me.id;
     const deal = dealView(c.id, me.id);
     const other = iAmBuyer
-      ? { id: c.vendor_id, displayName: c.vendor_name, accountType: c.vendor_type, verified: c.vendor_kyc === 'approved' }
-      : { id: c.buyer_id, displayName: c.buyer_name, accountType: c.buyer_type, verified: true };
+      ? { id: c.vendor_id, displayName: c.vendor_name, accountType: c.vendor_type, verified: c.vendor_kyc === 'approved', avatarUrl: avatarUrl(c.vendor_avatar) }
+      : { id: c.buyer_id, displayName: c.buyer_name, accountType: c.buyer_type, verified: true, avatarUrl: avatarUrl(c.buyer_avatar) };
     other.rating = ratings.summaryFor(other.id);
     return {
       id: c.id,
@@ -146,8 +147,8 @@ export function conversationRoutes(db) {
     const rows = db.prepare(`
       SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
              l.budget_min, l.budget_max, l.currency,
-             b.display_name AS buyer_name, b.account_type AS buyer_type,
-             vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc,
+             b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
+             vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
              (SELECT body FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_body,
              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id <> ? AND m.read_at IS NULL) AS unread
       FROM conversations c
