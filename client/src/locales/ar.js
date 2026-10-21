@@ -477,4 +477,17 @@ export default {
   'Your identity is verified ✓ You can now post requests and make offers.': 'تم التحقق من هويتك ✓ يمكنك الآن نشر الطلبات وتقديم العروض.',
   'Your identity check was not approved. See why and try again.': 'لم تتم الموافقة على التحقق من هويتك. اعرف السبب وحاول مرة أخرى.',
   'Nothing yet. Offers, deals, ratings and identity check results will show up here.': 'لا شيء بعد. ستظهر هنا العروض والصفقات والتقييمات ونتيجة التحقق من الهوية.',
+  // Phone notifications (session 15)
+  'Notifications on this phone': 'الإشعارات على هذا الجهاز',
+  'Get a notification the moment a seller makes an offer on one of your requests, even when Unc is closed.': 'يصلك إشعار فور تقديم بائع عرضاً على أحد طلباتك، حتى عندما يكون Unc مغلقاً.',
+  'On iPhone: tap the Share button, then “Add to Home Screen”, open Unc from your home screen, and come back here.': 'على الآيفون: اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية»، وافتح Unc من الشاشة الرئيسية، ثم عد إلى هنا.',
+  'Phone notifications need a secure (https) address. They work once Unc is online, or on this computer at localhost.': 'إشعارات الهاتف تحتاج عنواناً آمناً (https). ستعمل عندما يكون Unc على الإنترنت، أو على هذا الكمبيوتر عبر localhost.',
+  "This browser can't show notifications. Try Chrome, Edge, Firefox or Safari.": 'هذا المتصفح لا يدعم الإشعارات. جرّب Chrome أو Edge أو Firefox أو Safari.',
+  'Notifications are blocked for Unc. Allow them in your browser or phone settings, then reload this page.': 'الإشعارات محظورة لـ Unc. اسمح بها من إعدادات المتصفح أو الهاتف، ثم أعد تحميل الصفحة.',
+  '🔔 Turn on notifications': '🔔 تفعيل الإشعارات',
+  '✓ On for this device': '✓ مفعّلة على هذا الجهاز',
+  'Send a test': 'إرسال تجربة',
+  'Turn off': 'إيقاف',
+  'Sent. It should appear in a few seconds.': 'تم الإرسال. سيظهر خلال ثوانٍ.',
+  "Couldn't turn on notifications in this browser. Private/incognito windows can't get them; otherwise check your connection and try again.": 'تعذّر تفعيل الإشعارات في هذا المتصفح. النوافذ الخاصة (التصفح المتخفي) لا تستقبلها؛ وإلا فتحقق من اتصالك وحاول مرة أخرى.',
 };

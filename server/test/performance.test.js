@@ -55,6 +55,7 @@ test('hot queries use indexes, not full table scans', () => {
   assert.match(plan('SELECT COUNT(*) FROM notifications WHERE user_id = 1 AND read_at IS NULL'), /idx_notifications_unread/);
   assert.match(plan('SELECT * FROM notifications WHERE user_id = 1 ORDER BY id DESC LIMIT 50'), /idx_notifications_user/);
   assert.match(plan('SELECT * FROM saved_listings WHERE user_id = 1'), /PRIMARY KEY|sqlite_autoindex_saved_listings/);
+  assert.match(plan('SELECT * FROM push_subscriptions WHERE user_id = 1'), /idx_push_user/);
 });
 
 test('cleanupExpired removes only dead sessions, codes and reset links', async () => {

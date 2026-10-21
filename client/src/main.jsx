@@ -4,8 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth.jsx';
 import { LanguageProvider } from './i18n.jsx';
 import { api } from './api.js';
+import { registerServiceWorker } from './push.js';
 import App from './App.jsx';
 import './styles.css';
+
+registerServiceWorker();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

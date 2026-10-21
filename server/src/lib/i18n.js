@@ -74,6 +74,8 @@ const AR = {
   'You cannot ban yourself.': 'لا يمكنك حظر نفسك.',
   'Choose up to 8 interests from the list.': 'اختر حتى 8 اهتمامات من القائمة.',
   "You can't save your own request.": 'لا يمكنك حفظ طلبك أنت.',
+  'This browser sent an invalid notification subscription.': 'أرسل هذا المتصفح اشتراك إشعارات غير صالح.',
+  'Notifications are not turned on for any of your devices yet.': 'الإشعارات غير مفعّلة على أي من أجهزتك بعد.',
   'banned must be true or false.': 'قيمة الحظر يجب أن تكون true أو false.',
   'Please enter a valid email address.': 'يُرجى إدخال بريد إلكتروني صحيح.',
   'Password needs at least 8 characters with letters and numbers.': 'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل وتتضمن حروفًا وأرقامًا.',

@@ -19,6 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { CHAT_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { notify } from '../lib/notify.js';
+import { pushTo } from '../lib/push.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -159,6 +160,9 @@ export function conversationRoutes(db) {
       photo?.discard();
       throw err;
     }
+    // After the transaction, so a push never announces an offer that was rolled back.
+    pushTo(db, listing.buyer_id, 'offer', { actor: req.user.display_name, title: listing.title }, `/messages/${convId}`)
+      .catch((err) => console.warn('[push]', err.message));
     res.status(201).json({ conversation: view(getConv.get(convId), req.user) });
   });
 
