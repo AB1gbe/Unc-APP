@@ -21,7 +21,7 @@ Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (ses
 | POST | `/api/auth/logout` | — | clears session |
 | GET | `/api/auth/me` | — | `{user}` or `{user:null}`. `user` includes `avatarUrl, bio, interests, onboarded` (session 13) |
 | PUT | `/api/auth/language` | A | `language: en/ar` — saves the member's language (emails use it). Session 12 |
-| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17)` — only the fields sent are changed → `{user}`. Session 13 |
+| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17), hideActivity (true/false, session 22; true also clears last_seen_at)` — only the fields sent are changed → `{user}`. Session 13 |
 | POST | `/api/auth/avatar` | A | **multipart** file `avatar` → `201 {user}`; replaces (and deletes) the old photo. Session 13 |
 | DELETE | `/api/auth/avatar` | A | removes the profile photo → `{user}`. Session 13 |
 | POST | `/api/auth/onboarded` | A | welcome step finished or skipped → `{user}` with `onboarded: true`. Session 13 |

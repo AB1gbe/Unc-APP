@@ -201,12 +201,19 @@ await shot(buyer, '26-home-stories');
 // subscribe, so it shows the 'blocked' or 'turn on' state).
 await buyer.goto(BASE + '/account'); await buyer.waitForSelector('.push-card h2');
 // New-offer emails: on by default; switching off is saved.
-const emailBox = buyer.locator('.toggle-row input[type=checkbox]');
+const emailBox = buyer.locator('[data-setting=emailOffers]');
 if (!(await emailBox.isChecked())) throw new Error('new-offer emails should be on by default');
 await emailBox.uncheck(); await buyer.waitForTimeout(300);
 await buyer.reload(); await buyer.waitForSelector('.toggle-row');
 if (await emailBox.isChecked()) throw new Error('switching off new-offer emails was not saved');
 await emailBox.check(); await buyer.waitForTimeout(300);
+// Privacy: "Hide when I'm online" removes "Active now" for others.
+const buyerProfile = BASE + await buyer.getAttribute('a[href^="/members/"]', 'href');
+await vendor.goto(buyerProfile); await vendor.waitForSelector('.active-now');
+await buyer.locator('[data-setting=hideActivity]').check(); await buyer.waitForTimeout(300);
+await shot(buyer, '27-privacy');
+await vendor.reload(); await vendor.waitForSelector('h1');
+if (await vendor.locator('.active-now').count()) throw new Error('"Active now" still shown after hiding');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

@@ -276,6 +276,11 @@ const MIGRATIONS = [
     UNIQUE (deal_id, author_id)
   );
   `,
+  // 15: "Hide when I'm online" (session 22). While on, last_seen_at is not
+  // kept at all, so "Active now" can't be shown or leaked.
+  `
+  ALTER TABLE users ADD COLUMN hide_activity INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

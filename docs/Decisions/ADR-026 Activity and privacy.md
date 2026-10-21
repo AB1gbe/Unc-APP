@@ -14,7 +14,7 @@ See [[Social Touches#3. "Active now", reply time, "people looked at it"]].
 | Writing last-seen | On every request; **at most once a minute** | Once a minute | The chat polls every 4 seconds; no write storm. |
 | Reply time | Average; **median of the newest 50 conversations, at least 3** | Median, ≥3 | One very slow reply doesn't ruin it; no label from a single chat. |
 | "Seen by" | Count every page view; **each logged-in member once; never the buyer; shown only to the buyer** | Distinct | Honest numbers; no "who viewed you" list (see the never list in [[Social Marketplace Ideas]]). |
-| Opting out | Switch in Account; **none yet** | None | Kept simple for now. |
+| Opting out | Switch in Account; none yet | **Switch added in session 22** | See [[ADR-029 Hide my activity]]. |
 
 ## Revisit when
 - Before a public launch: add "Hide my activity" in Account (the Bahrain PDPL privacy law asks for transparency and choice).

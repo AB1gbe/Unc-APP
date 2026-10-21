@@ -57,3 +57,29 @@ test('"Seen by N people": each logged-in member once, never the buyer, only the 
   const mine = (await buyer.get('/api/listings/mine').expect(200)).body.listings.find((x) => x.id === l.id);
   assert.equal(mine.viewCount, 2);
 });
+
+test('"Hide when I\'m online": nobody sees it, nothing is stored, and it can be turned back off', async () => {
+  const shy = await t.user();
+  const other = await t.user();
+  const lastSeen = () => t.db.prepare('SELECT last_seen_at FROM users WHERE id = ?').get(shy.id).last_seen_at;
+  assert.equal((await shy.get('/api/auth/me').expect(200)).body.user.hideActivity, false, 'off by default');
+  assert.ok(lastSeen());
+
+  await shy.patch('/api/auth/me').send({ hideActivity: 'yes' }).expect(400);
+  const me = (await shy.patch('/api/auth/me').send({ hideActivity: true }).expect(200)).body.user;
+  assert.equal(me.hideActivity, true);
+  assert.equal(lastSeen(), null, 'the stored visit is forgotten');
+  await shy.get('/api/listings/mine').expect(200);
+  assert.equal(lastSeen(), null, 'new visits are not recorded');
+  assert.equal((await other.get(`/api/members/${shy.id}`).expect(200)).body.member.activity.lastSeenAt, null);
+
+  // Even an old value left in the database is never shown.
+  t.db.prepare(`UPDATE users SET last_seen_at = datetime('now') WHERE id = ?`).run(shy.id);
+  assert.equal(activity.summaryFor(shy.id).lastSeenAt, null);
+
+  await shy.patch('/api/auth/me').send({ hideActivity: false }).expect(200);
+  t.db.prepare('UPDATE users SET last_seen_at = NULL WHERE id = ?').run(shy.id);
+  await shy.get('/api/listings/mine').expect(200);
+  assert.ok(lastSeen(), 'recorded again once switched off');
+  assert.ok((await other.get(`/api/members/${shy.id}`).expect(200)).body.member.activity.lastSeenAt);
+});
