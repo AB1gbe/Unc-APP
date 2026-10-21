@@ -35,6 +35,9 @@ tags: [roadmap]
 - [ ] Offline support (service worker exists since session 15, but caches nothing yet) → [[ADR-001 Platform]]
 - [ ] Push for more events (deal, rating, identity result), with a per-kind on/off — [[ADR-022 Push notifications]]
 
+## Making it feel social and human (ideas, session 19)
+- [ ] Pick from [[Social Marketplace Ideas]]. Recommended first: human wording + celebrations, offer cards with Accept/Counter, "active now" + reply time, share to WhatsApp, success stories + badges.
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]
