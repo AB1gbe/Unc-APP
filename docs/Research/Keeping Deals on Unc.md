@@ -58,6 +58,7 @@ Point 3 matters most, and it's the owner's decision ⚖️.
 - Don't promise "we stop all off-platform deals". We can't; promise protection for deals on Unc instead.
 
 ## Recommended plan
+> ✅ Steps 1 and 2 (hiding, nudge, "Did you get it?") were built in [[2026-10-22 Session 40]], together with draft Terms, a payment card when joining and paying in parts → [[Deals, Terms, Cards and Installments]].
 1. **Now (build):** hide numbers until a price is agreed + the nudge + count attempts (one step).
 2. **Now (build):** "Did you get it?" check-in + the leak measure on the owner dashboard.
 3. **Decide ⚖️:** how Unc earns: per offer (credits) or a shop subscription. Not a commission per deal unless payments go through Unc.

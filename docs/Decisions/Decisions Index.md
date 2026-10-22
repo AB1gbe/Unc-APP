@@ -54,5 +54,10 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 045 | [[ADR-045 Away mode]] | Until a date (≤60 days); alerts + heads-ups pause; "🌴 Away until"; away periods don't count in reply time | open-ended, auto-reply |
 | 046 | [[ADR-046 Pickup checklist and big-deal card]] | After an accepted price; lists by category; ticks on the device; big-deal limit per currency | server-stored ticks, one list |
 | 047 | [[ADR-047 Report follow-up and raise my budget]] | Reporter told "took action"/"found nothing" only; raise budget once a day, tells interested sellers via 🔔 | details, push, unlimited |
+| 048 | [[ADR-048 Hide contact details until a price is agreed]] | Send but show 📵 to the other person until a price is accepted; checked on the server; numbers (also Arabic/spelled), emails, links, handles; attempts counted | block, hide forever, browser-only |
+| 049 | [[ADR-049 Did you get it]] | Ask the buyer once, 3 days after an accepted price, 🔔 only | both sides, repeat, push |
+| 050 | [[ADR-050 Terms of use]] | Draft Terms with "deals agreed on Unc are finished on Unc"; tick at sign-up, banner for existing members, reminder at Accept; versioned | footer link only, final text without a lawyer |
+| 051 | [[ADR-051 Payment card when joining]] | Everyone adds a card after KYC; token only (never the number); Tap Payments, showcase test provider until approved; nothing charged | card only for installments, storing numbers, Stripe |
+| 052 | [[ADR-052 Paying in parts]] | Seller-agreed plan now (2–6 parts, both confirm each, reminders); `provider` ready for an installment partner later | Unc lends (licence), partner now |
 
 Template for new ADRs: copy any ADR and keep the same headings.
