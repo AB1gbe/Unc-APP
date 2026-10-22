@@ -5,6 +5,7 @@ import { ErrorBox, Loading } from '../../components/ui.jsx';
 import { useApi } from '../../hooks.js';
 import { ACCOUNT_TYPE, ID_TYPE, KYC_STATUS, label } from '../../kycReasons.js';
 import { formatDateTime, t, tj } from '../../i18n.jsx';
+import Dashboard from './Dashboard.jsx';
 
 export default function AdminHome() {
   const stats = useApi('/admin/stats');
@@ -22,6 +23,8 @@ export default function AdminHome() {
           ))}
         </div>
       )}
+
+      <Dashboard />
 
       <section className="card">
         <div className="row spread">

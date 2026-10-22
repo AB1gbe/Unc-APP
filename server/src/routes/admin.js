@@ -8,6 +8,7 @@ import * as v from '../lib/validate.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { applyDecision } from '../kyc/index.js';
 import { sendKycFile } from './kyc.js';
+import { METRIC_DAYS, metrics } from '../lib/metrics.js';
 
 export function adminRoutes(db) {
   const r = Router();
@@ -22,6 +23,12 @@ export function adminRoutes(db) {
       conversations: one('SELECT COUNT(*) n FROM conversations'),
       openReports: one(`SELECT COUNT(*) n FROM reports WHERE status = 'open'`),
     });
+  });
+
+  // The owner dashboard (session 37): ?days=7|30|90 (default 30).
+  r.get('/metrics', (req, res) => {
+    const days = METRIC_DAYS.includes(Number(req.query.days)) ? Number(req.query.days) : 30;
+    res.json(metrics(db, days));
   });
 
   // ---- KYC review queue ----

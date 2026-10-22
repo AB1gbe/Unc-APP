@@ -328,6 +328,21 @@ await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people a
 await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
 await shot(vendor, '34-demand');
 
+// Owner dashboard (session 37): the admin sees today's requests in the charts.
+{
+  const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
+  const a = await ctx.newPage();
+  await a.goto(BASE + '/login'); await a.fill('#email', process.env.ADMIN_EMAIL || 'admin@unc.local'); await a.fill('#password', process.env.ADMIN_PASSWORD || 'ChangeMe123!');
+  await a.click('button:has-text("Log in")'); await a.waitForURL(BASE + '/');
+  await a.goto(BASE + '/admin');
+  await a.waitForSelector('.stat-tiles');
+  await a.click('.dashboard button:has-text("7 days")');
+  await a.waitForSelector('.day-col[aria-label$=": 0"]'); // quiet days show as empty columns
+  await a.locator('.day-col').last().hover();
+  await a.locator('.dashboard').screenshot({ path: `${OUT}/39-dashboard.png` });
+  await ctx.close();
+}
+
 // Your data (session 37): download, then ask to delete and change your mind.
 await buyer.goto(BASE + '/account');
 const exported = await buyer.evaluate(() => fetch('/api/auth/me/export').then((r) => r.json()));
