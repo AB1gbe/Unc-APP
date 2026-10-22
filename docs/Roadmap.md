@@ -43,6 +43,9 @@ tags: [roadmap]
 - [ ] More from [[Social Marketplace Ideas]]: reactions, typing indicator, favourite sellers, city pages, "Me too".
 - [x] "Hide when I'm online" switch (session 22) → [[ADR-029 Hide my activity]].
 
+## More ideas (session 30)
+- [ ] Pick from [[More Ideas for the Vision]]. Recommended next: compare offers side by side, request alerts for sellers, governorate/area picker, block + scam warnings, "Still looking?" expiry + request tips.
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]
