@@ -119,6 +119,8 @@ await shot(vendor, '09b-saved');
 await vendor.goto(BASE + '/'); await vendor.waitForSelector('h2:has-text("Saved for later")');
 await vendor.goto(listingUrl); await vendor.waitForSelector('.save-btn.on');
 await vendor.fill('#offerPrice', '380'); await vendor.fill('#message', 'Hi! I have a PS5 disc edition with 2 controllers, boxed, 6 months old.');
+await vendor.selectOption('#offer-condition', 'like-new'); await vendor.selectOption('#offer-warranty', '3m'); // offer details (session 34)
+await vendor.selectOption('#offer-returns', '3d');
 await vendor.setInputFiles('#offerPhoto', face); // photo of the item with the offer
 await vendor.waitForSelector('.thumb img');
 await shot(vendor, '10-make-offer');
@@ -137,6 +139,8 @@ await buyer.waitForSelector('.inbox-item');
 await shot(buyer, '11-buyer-inbox');
 await buyer.click('.inbox-item');
 await buyer.waitForSelector('.bubble');
+await buyer.waitForSelector('.offer-details:has-text("Like new"):has-text("3-month warranty")');
+await buyer.locator('.offer-card').first().screenshot({ path: `${OUT}/36-offer-details.png` });
 // A quick-reply chip fills the message box.
 await buyer.click('.quick-replies .chip:has-text("Where can we meet?")');
 if ((await buyer.inputValue('.chat-form textarea')) !== 'Where can we meet?') throw new Error('quick reply did not fill the box');

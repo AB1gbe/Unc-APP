@@ -21,7 +21,7 @@ const FIELDS = {
     idNumber: 'ID number', idType: 'ID type', legalName: 'Full legal name', listingId: 'Request', message: 'Message',
     neededBy: 'Needed by', note: 'Note', offerPrice: 'Price', password: 'Password', reason: 'Reason', stars: 'Stars',
     status: 'Status', title: 'Title', token: 'Link', avatar: 'Profile photo', cover: 'Cover photo', shopArea: 'Shop area', shopHours: 'Opening hours', bio: 'About you', interests: 'Interests', story: 'Your story', q: 'Words', minBudget: 'Minimum budget', image: 'Photo', action: 'Answer', docFront: 'Front of ID', docBack: 'Back of ID', selfie: 'Selfie',
-    businessDoc: 'Business registration document', images: 'Photos', language: 'Language', banned: 'banned', contactRule: 'Who can make offers', shortName: 'First name only',
+    businessDoc: 'Business registration document', images: 'Photos', language: 'Language', banned: 'banned', contactRule: 'Who can make offers', shortName: 'First name only', condition: 'Condition', warranty: 'Warranty', returns: 'Returns', validUntil: 'Price valid until',
   },
   ar: {
     accountType: 'نوع الحساب', budgetMax: 'الحد الأقصى للميزانية', budgetMin: 'الحد الأدنى للميزانية', businessName: 'الاسم التجاري',
@@ -31,7 +31,7 @@ const FIELDS = {
     idNumber: 'رقم الهوية', idType: 'نوع الهوية', legalName: 'الاسم الكامل', listingId: 'الطلب', message: 'الرسالة',
     neededBy: 'تاريخ الحاجة', note: 'الملاحظة', offerPrice: 'السعر', password: 'كلمة المرور', reason: 'السبب', stars: 'عدد النجوم',
     status: 'الحالة', title: 'العنوان', token: 'الرابط', avatar: 'الصورة الشخصية', cover: 'صورة الغلاف', shopArea: 'منطقة المتجر', shopHours: 'ساعات العمل', bio: 'نبذة عنك', interests: 'الاهتمامات', story: 'قصتك', q: 'الكلمات', minBudget: 'الحد الأدنى للميزانية', image: 'الصورة', action: 'الرد', docFront: 'الوجه الأمامي للهوية', docBack: 'الوجه الخلفي للهوية',
-    selfie: 'الصورة الشخصية', businessDoc: 'مستند السجل التجاري', images: 'الصور', language: 'اللغة', banned: 'banned', contactRule: 'من يمكنه تقديم العروض', shortName: 'الاسم الأول فقط',
+    selfie: 'الصورة الشخصية', businessDoc: 'مستند السجل التجاري', images: 'الصور', language: 'اللغة', banned: 'banned', contactRule: 'من يمكنه تقديم العروض', shortName: 'الاسم الأول فقط', condition: 'الحالة', warranty: 'الضمان', returns: 'الإرجاع', validUntil: 'السعر صالح حتى',
   },
 };
 const field = (lang, f) => FIELDS[lang][f] ?? f;
@@ -95,6 +95,9 @@ const AR = {
   'Only the seller can send a proof photo, and it needs a photo.': 'البائع فقط يمكنه إرسال صورة إثبات، ويجب أن تحتوي على صورة.',
   'Only the buyer can ask for a proof photo.': 'المشتري فقط يمكنه طلب صورة إثبات.',
   'You already asked for a proof photo.': 'لقد طلبت صورة إثبات من قبل.',
+  'Offer details go with a seller’s price.': 'تفاصيل العرض تُضاف مع سعر البائع.',
+  'Choose a date from today up to 60 days ahead.': 'اختر تاريخاً من اليوم وحتى 60 يوماً قادمة.',
+  'This price has expired. Ask the seller for a new one.': 'انتهت صلاحية هذا السعر. اطلب من البائع سعراً جديداً.',
   'shortName must be true or false.': 'قيمة إظهار الاسم الأول يجب أن تكون true أو false.',
   'Shops always show their full name.': 'تظهر المتاجر باسمها الكامل دائماً.',
   'Only shops can make offers on this request.': 'المتاجر فقط يمكنها تقديم عروض على هذا الطلب.',

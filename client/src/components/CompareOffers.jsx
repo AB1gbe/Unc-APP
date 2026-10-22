@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { money } from '../api.js';
 import { useApi } from '../hooks.js';
 import { Avatar, Badges, RatingBadge } from './ui.jsx';
+import { OfferDetailsLine } from './OfferDetails.jsx';
 import { t } from '../i18n.jsx';
 
 const REPLY = {
@@ -56,6 +57,7 @@ export default function CompareOffers({ listing }) {
                     ? <>{money(c.price, listing.currency)} {c.price === cheapest && <span className="badge">{t('Lowest')}</span>}</>
                     : <span className="muted small">{t('No price yet')}</span>}
               </div>
+              <OfferDetailsLine details={c.details} />
               <dl>
                 <dt>{t('Rating')}</dt><dd><RatingBadge rating={o.other.rating} /></dd>
                 <dt>{t('Replies')}</dt><dd>{c.replyTime ? REPLY[c.replyTime]() : <span className="muted">{t('Not enough chats yet')}</span>}</dd>

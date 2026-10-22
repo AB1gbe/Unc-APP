@@ -14,6 +14,7 @@ import { StoryForm } from '../components/Stories.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
 import { Place } from '../components/CityField.jsx';
 import { scamSignals } from '../scam.js';
+import { EMPTY_DETAILS, OfferDetailFields, OfferDetailsLine, addDetails } from '../components/OfferDetails.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ export default function Conversation() {
   const [sending, setSending] = useState(false);
   const [photo, setPhoto] = useState(null);        // photo to send (already shrunk)
   const [proof, setProof] = useState(false);       // that photo shows the chat's code
+  const [details, setDetails] = useState(EMPTY_DETAILS); // condition, warranty… with a price
   const [viewing, setViewing] = useState(null);    // photo URL open full-screen
   const lastId = useRef(0);
   const currentId = useRef(id);
@@ -79,7 +81,7 @@ export default function Conversation() {
     try {
       const fd = new FormData();
       if (text.trim()) fd.append('message', text);
-      if (offer !== '') fd.append('offerPrice', offer);
+      if (offer !== '') { fd.append('offerPrice', offer); if (conv.myRole === 'vendor') addDetails(fd, details); }
       if (photo) fd.append('image', photo);
       if (photo && proof) fd.append('proof', '1');
       await api(`/conversations/${id}/messages`, { method: 'POST', form: fd });
@@ -87,6 +89,7 @@ export default function Conversation() {
       setOffer('');
       setPhoto(null);
       setProof(false);
+      setDetails(EMPTY_DETAILS);
       await load();
     } catch (err) {
       setError(err);
@@ -162,6 +165,9 @@ export default function Conversation() {
         ) : (
           <>
           {photo && <PhotoPreview file={photo} onRemove={() => { setPhoto(null); setProof(false); }} />}
+          {offer !== '' && conv.myRole === 'vendor' && (
+            <div style={{ padding: '0 1rem' }}><OfferDetailFields value={details} onChange={setDetails} idPrefix="chat" /></div>
+          )}
           {photo && conv.myRole === 'vendor' && (
             <label className="proof-check small">
               <input type="checkbox" checked={proof} onChange={(e) => setProof(e.target.checked)} />
@@ -281,6 +287,7 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
   const fromSeller = m.mine ? conv.myRole === 'vendor' : conv.myRole === 'buyer';
   const price = money(m.offerPrice, l.currency);
   const canAnswer = !m.mine && newest && !answer && !conv.readOnly;
+  const expired = Boolean(m.details?.expired);
 
   const run = (fn) => async (e) => {
     e?.preventDefault();
@@ -299,15 +306,16 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
   });
 
   return (
-    <div className="offer-card">
+    <div className={`offer-card ${expired ? 'is-expired' : ''}`}>
       <div className="offer">{fromSeller ? '💰' : '↩️'} {fromSeller ? t('Offer: {price}', { price }) : t('Counter-offer: {price}', { price })}</div>
       {answer === 'accept' && <span className="badge ok">{t('✓ Accepted')}</span>}
       {answer === 'decline' && <span className="badge grey">{t('Declined')}</span>}
+      <OfferDetailsLine details={m.details} />
       {!answer && !newest && <span className="small muted">{t('Replaced by a newer price')}</span>}
       <ErrorBox error={error} />
       {canAnswer && !countering && (
         <div className="offer-actions">
-          <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>
+          {!expired && <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>}
           <button type="button" className="btn sm secondary" disabled={busy} onClick={() => setCountering(true)}>{t('Counter')}</button>
           <button type="button" className="btn sm secondary" disabled={busy} onClick={respond('decline')}>{t('Not for me')}</button>
         </div>

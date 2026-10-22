@@ -350,6 +350,13 @@ const MIGRATIONS = [
   `
   ALTER TABLE messages ADD COLUMN proof TEXT CHECK (proof IN ('photo', 'ask'));
   `,
+  // 24: offer details (session 34), on a seller's priced message.
+  `
+  ALTER TABLE messages ADD COLUMN offer_condition TEXT;
+  ALTER TABLE messages ADD COLUMN offer_warranty TEXT;
+  ALTER TABLE messages ADD COLUMN offer_returns TEXT;
+  ALTER TABLE messages ADD COLUMN offer_valid_until TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

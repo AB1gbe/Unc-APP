@@ -12,6 +12,7 @@ import ShareButton from '../components/ShareButton.jsx';
 import CompareOffers from '../components/CompareOffers.jsx';
 import { Place } from '../components/CityField.jsx';
 import { requestTips } from '../tips.js';
+import { EMPTY_DETAILS, OfferDetailFields, addDetails } from '../components/OfferDetails.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -82,6 +83,7 @@ function OfferPanel({ listing }) {
   const [message, setMessage] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
   const [photos, setPhotos] = useState([]); // optional photo of the item (max 1)
+  const [details, setDetails] = useState(EMPTY_DETAILS);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -112,7 +114,7 @@ function OfferPanel({ listing }) {
     try {
       const fd = new FormData();
       fd.append('message', message);
-      if (offerPrice !== '') fd.append('offerPrice', offerPrice);
+      if (offerPrice !== '') { fd.append('offerPrice', offerPrice); addDetails(fd, details); }
       if (photos[0]) fd.append('image', photos[0]);
       const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
       celebrate({ text: t("Offer sent! You'll be notified when they reply.") });
@@ -134,6 +136,7 @@ function OfferPanel({ listing }) {
         <label htmlFor="offerPrice">{t('Your price ({currency})', { currency: listing.currency })} <span className="muted">{t('(optional)')}</span></label>
         <input id="offerPrice" type="number" min="0" step="1" value={offerPrice} onChange={(e) => setOfferPrice(e.target.value)} />
       </div>
+      {offerPrice !== '' && <OfferDetailFields value={details} onChange={setDetails} />}
       <div className="field">
         <label htmlFor="message">{t('Message')}</label>
         <textarea id="message" required maxLength={2000} placeholder={t('Describe what you have: condition, photos available, when you can deliver…')} value={message} onChange={(e) => setMessage(e.target.value)} />

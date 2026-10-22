@@ -28,6 +28,7 @@ import { badgeQueries } from '../lib/badges.js';
 import { blockedBetween } from '../lib/blocks.js';
 import { CONTACT_MESSAGES, contactBlocker } from '../lib/contact.js';
 import { nameFor } from '../../../shared/names.js';
+import { isExpired, offerDetailsView, readOfferDetails } from '../lib/offers.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -127,9 +128,11 @@ export function conversationRoutes(db) {
     return c;
   }
 
-  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null) {
-    db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to, proof) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .run(convId, senderId, body, offerPrice, image, kind, replyTo, proof);
+  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null, details = null) {
+    db.prepare(`INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to, proof,
+        offer_condition, offer_warranty, offer_returns, offer_valid_until) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(convId, senderId, body, offerPrice, image, kind, replyTo, proof,
+        details?.condition ?? null, details?.warranty ?? null, details?.returns ?? null, details?.validUntil ?? null);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
@@ -142,6 +145,7 @@ export function conversationRoutes(db) {
     // A "please send a proof photo" request shows like an answer line.
     kind: m.kind ?? (m.proof === 'ask' ? 'proof-ask' : null), replyTo: m.reply_to ?? null,
     proof: m.proof === 'photo',
+    details: offerDetailsView(m),
     createdAt: m.created_at, readAt: m.read_at,
   });
 
@@ -171,6 +175,7 @@ export function conversationRoutes(db) {
 
     const body = v.str(req.body, 'message', { min: 2, max: 2000 });
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
+    const details = readOfferDetails(req.body, { isSeller: true, hasPrice: offerPrice != null });
 
     const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
     let convId;
@@ -179,7 +184,7 @@ export function conversationRoutes(db) {
         const info = db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)')
           .run(listing.id, listing.buyer_id, req.user.id);
         const id = Number(info.lastInsertRowid);
-        insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
+        insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, null, details);
         audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
         notify(db, listing.buyer_id, 'offer', { actorId: req.user.id, listingId: listing.id, conversationId: id });
         return id;
@@ -236,7 +241,7 @@ export function conversationRoutes(db) {
   // "Compare offers" (session 31): what the buyer needs to choose between
   // sellers, per conversation. Only ever sent to the request's buyer.
   const latestSellerPrice = db.prepare(`
-    SELECT m.offer_price FROM messages m JOIN conversations c ON c.id = m.conversation_id
+    SELECT m.* FROM messages m JOIN conversations c ON c.id = m.conversation_id
     WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.offer_price IS NOT NULL ORDER BY m.id DESC LIMIT 1
   `);
   const agreedPrice = db.prepare(`
@@ -254,8 +259,10 @@ export function conversationRoutes(db) {
     const c = getConv.get(convId);
     const first = sellerFirst.get(convId);
     const replyTime = activity.replyTime(c.vendor_id);
+    const latest = latestSellerPrice.get(convId);
     return {
-      price: latestSellerPrice.get(convId)?.offer_price ?? null,
+      price: latest?.offer_price ?? null,
+      details: latest ? offerDetailsView(latest) : null,
       agreedPrice: agreedPrice.get(convId)?.offer_price ?? null,
       firstMessage: first?.body ? first.body.slice(0, 140) : null,
       photoUrl: first?.image ? `/api/conversations/${convId}/images/${first.image}` : null,
@@ -278,7 +285,8 @@ export function conversationRoutes(db) {
     const c = participantConv(req);
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
-      SELECT id, sender_id, body, offer_price, image, kind, reply_to, proof, created_at, read_at FROM messages
+      SELECT id, sender_id, body, offer_price, image, kind, reply_to, proof, created_at, read_at,
+             offer_condition, offer_warranty, offer_returns, offer_valid_until FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
     // Opening the conversation marks the other side's messages as read.
@@ -315,10 +323,11 @@ export function conversationRoutes(db) {
     const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(req.file) || offerPrice != null }) ?? '';
     // "proof": this photo shows the chat's code (sellers only, with a photo).
     const proof = ['1', 'true', true].includes(req.body?.proof);
+    const details = readOfferDetails(req.body, { isSeller: req.user.id === c.vendor_id, hasPrice: offerPrice != null });
     if (proof && (!req.file || req.user.id !== c.vendor_id)) throw new HttpError(400, 'Only the seller can send a proof photo, and it needs a photo.', { field: 'image' });
     const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
     try {
-      insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, proof ? 'photo' : null);
+      insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, proof ? 'photo' : null, details);
     } catch (err) {
       photo?.discard();
       throw err;
@@ -344,6 +353,7 @@ export function conversationRoutes(db) {
     const newest = db.prepare('SELECT MAX(id) AS id FROM messages WHERE conversation_id = ? AND offer_price IS NOT NULL').get(c.id).id;
     if (newest !== target.id) throw new HttpError(409, 'A newer price has been offered since. Answer that one instead.');
     if (db.prepare('SELECT 1 FROM messages WHERE reply_to = ?').get(target.id)) throw new HttpError(409, 'This price has already been answered.');
+    if (action === 'accept' && isExpired(target)) throw new HttpError(409, 'This price has expired. Ask the seller for a new one.');
     insertMessage(c.id, req.user.id, '', null, null, action, target.id);
     const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
     audit(db, req.user.id, `offer.${action}`, `conversation:${c.id}`, { messageId: target.id, price: target.offer_price });
