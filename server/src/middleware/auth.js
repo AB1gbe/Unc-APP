@@ -6,6 +6,7 @@
 import { sha256 } from '../lib/crypto.js';
 import { HttpError } from '../lib/http.js';
 import { avatarUrl, coverUrl } from '../lib/uploads.js';
+import { DELETE_AFTER_DAYS } from '../lib/deletion.js';
 
 export const SESSION_COOKIE = 'unc_session';
 
@@ -96,7 +97,7 @@ export function publicMe(u) {
     shortName: u.short_name === 1,
     awayUntil: u.away_until && u.away_until >= new Date().toISOString().slice(0, 10) ? u.away_until : null,
     // When the account will be deleted, if the member asked (session 37).
-    deleteAt: u.delete_requested_at ? new Date(Date.parse(`${u.delete_requested_at.replace(' ', 'T')}Z`) + 7 * 86_400_000).toISOString() : null,
+    deleteAt: u.delete_requested_at ? new Date(Date.parse(`${u.delete_requested_at.replace(' ', 'T')}Z`) + DELETE_AFTER_DAYS * 86_400_000).toISOString() : null,
     ...shopFields(u),
   };
 }
