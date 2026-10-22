@@ -67,6 +67,15 @@ async function seedDemo(db) {
     db.prepare('INSERT INTO stories (deal_id, author_id, body) VALUES (?, ?, ?)')
       .run(dealId, buyer, 'Got the charger and case the same afternoon — thanks Riverside! 🙌');
   }
+  // Two offers on the PS5 request, so "Compare offers" has something to show.
+  const ps5 = db.prepare(`SELECT id FROM listings WHERE buyer_id = ? AND title LIKE 'Looking for a used PS5%'`).get(buyer)?.id;
+  if (ps5 && !db.prepare('SELECT 1 FROM conversations WHERE listing_id = ?').get(ps5)) {
+    const finder = db.prepare('SELECT id FROM users WHERE email = ?').get('freelancer@demo.local').id;
+    for (const [seller, text, price] of [[shop, 'Disc edition, 2 controllers, boxed. 6 months old.', 380], [finder, 'I can get a disc edition with 2 controllers by tomorrow.', 340]]) {
+      const conv = Number(db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)').run(ps5, buyer, seller).lastInsertRowid);
+      db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price) VALUES (?, ?, ?, ?)').run(conv, seller, text, price);
+    }
+  }
   console.log('Demo data ready. Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');
 }
 

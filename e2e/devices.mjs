@@ -28,7 +28,9 @@ const state = await login.context().storageState();
 const ids = await login.evaluate(async () => {
   const mine = await (await fetch('/api/listings/mine')).json();
   const convs = await (await fetch('/api/conversations')).json();
-  return { listing: mine.listings[0]?.id, conv: convs.conversations[0]?.id, shop: convs.conversations[0]?.other.id };
+  // Prefer the request with the most offers, so "Compare offers" is checked too.
+  const most = [...mine.listings].sort((a, b) => (b.offerCount ?? 0) - (a.offerCount ?? 0))[0];
+  return { listing: most?.id, conv: convs.conversations[0]?.id, shop: convs.conversations[0]?.other.id };
 });
 if (ids.listing) PAGES.push(`/requests/${ids.listing}`);
 if (ids.conv) PAGES.push(`/messages/${ids.conv}`);

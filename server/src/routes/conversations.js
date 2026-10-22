@@ -215,12 +215,43 @@ export function conversationRoutes(db) {
     res.json({ unread: n });
   });
 
+  // "Compare offers" (session 31): what the buyer needs to choose between
+  // sellers, per conversation. Only ever sent to the request's buyer.
+  const latestSellerPrice = db.prepare(`
+    SELECT m.offer_price FROM messages m JOIN conversations c ON c.id = m.conversation_id
+    WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.offer_price IS NOT NULL ORDER BY m.id DESC LIMIT 1
+  `);
+  const agreedPrice = db.prepare(`
+    SELECT p.offer_price FROM messages a JOIN messages p ON p.id = a.reply_to
+    WHERE a.conversation_id = ? AND a.kind = 'accept' ORDER BY a.id DESC LIMIT 1
+  `);
+  const sellerFirst = db.prepare(`
+    SELECT m.body, (SELECT image FROM messages i WHERE i.conversation_id = m.conversation_id AND i.sender_id = m.sender_id AND i.image IS NOT NULL ORDER BY i.id LIMIT 1) AS image
+    FROM messages m JOIN conversations c ON c.id = m.conversation_id
+    WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id ORDER BY m.id LIMIT 1
+  `);
+  const unreadIn = db.prepare('SELECT COUNT(*) AS n FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.read_at IS NULL');
+  function compareFor(convId) {
+    const c = getConv.get(convId);
+    const first = sellerFirst.get(convId);
+    const replyTime = activity.replyTime(c.vendor_id);
+    return {
+      price: latestSellerPrice.get(convId)?.offer_price ?? null,
+      agreedPrice: agreedPrice.get(convId)?.offer_price ?? null,
+      firstMessage: first?.body ? first.body.slice(0, 140) : null,
+      photoUrl: first?.image ? `/api/conversations/${convId}/images/${first.image}` : null,
+      replyTime,
+      badges: badgesFor(c.vendor_id, replyTime),
+      unread: unreadIn.get(convId).n,
+    };
+  }
+
   // Conversations about one of MY listings (buyer view on the listing page).
   r.get('/listings/:id/conversations', requireAuth, (req, res) => {
     const listing = db.prepare('SELECT * FROM listings WHERE id = ?').get(Number(req.params.id));
     if (!listing || listing.buyer_id !== req.user.id) throw notFound('Request not found.');
     const ids = db.prepare('SELECT id FROM conversations WHERE listing_id = ? ORDER BY last_message_at DESC').all(listing.id);
-    res.json({ conversations: ids.map(({ id }) => view(getConv.get(id), req.user)) });
+    res.json({ conversations: ids.map(({ id }) => ({ ...view(getConv.get(id), req.user), compare: compareFor(id) })) });
   });
 
   r.get('/conversations/:id', requireAuth, (req, res) => {

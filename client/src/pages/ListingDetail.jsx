@@ -9,6 +9,7 @@ import Lightbox from '../components/Lightbox.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import ShareButton from '../components/ShareButton.jsx';
+import CompareOffers from '../components/CompareOffers.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -22,6 +23,7 @@ export default function ListingDetail() {
   const isOwner = user?.id === l.buyer.id;
 
   return (
+    <>
     <div className="two-col">
       <article className="card">
         <div className="row spread">
@@ -65,6 +67,8 @@ export default function ListingDetail() {
         {!isOwner && user && <ReportLink listingId={l.id} />}
       </aside>
     </div>
+    {isOwner && <CompareOffers listing={l} />}
+    </>
   );
 }
 
