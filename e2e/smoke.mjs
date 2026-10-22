@@ -242,6 +242,22 @@ await vendor.reload();
 await vendor.click('.pickup summary');
 if (!(await vendor.isChecked('.pickup-item:has-text("Switch it on") input'))) throw new Error('pickup tick was not kept');
 await vendor.locator('.pickup').screenshot({ path: `${OUT}/41-pickup.png` });
+// Paying in parts (session 40): the buyer suggests 3 monthly parts; the shop accepts; part 1 is paid and confirmed.
+await buyer.goto(buyerChat);
+await buyer.click('button:has-text("Pay in parts?")');
+await buyer.selectOption('#planParts', '3');
+await buyer.click('button:has-text("Suggest this plan")');
+await buyer.waitForSelector('.plan:has-text("Waiting for")');
+await vendor.reload();
+await vendor.click('.plan button:has-text("Accept plan")');
+await vendor.waitForSelector('.plan-progress');
+await buyer.reload();
+await buyer.locator('.plan-parts button:has-text("I\'ve paid this")').first().click();
+await buyer.waitForSelector('.plan-parts li:has-text("Paid, waiting for the seller")');
+await vendor.reload();
+await vendor.locator('.plan-parts button:has-text("Received ✓")').first().click();
+await vendor.waitForSelector('.plan-parts li.done');
+await vendor.locator('.plan').screenshot({ path: `${OUT}/45-plan.png` });
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');

@@ -506,3 +506,15 @@ form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bott
 .terms-check { margin-bottom: 1rem; font-weight: 400; }
 .terms-banner, .terms-accept { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; justify-content: space-between; padding: .6rem .9rem; border-radius: 10px; background: var(--brand-soft); }
 .accept-terms { flex-basis: 100%; }
+
+/* Paying in parts (session 40) */
+.plan { padding: .6rem 1rem; border-bottom: 1px solid var(--border); display: grid; gap: .45rem; }
+p.plan { display: block; }
+.plan-progress { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.plan-progress span { display: block; height: 100%; background: var(--ok); }
+.plan-parts { margin: 0; padding-inline-start: 1.2rem; display: grid; gap: .3rem; font-size: .9rem; }
+.plan-parts li > span:first-child { margin-inline-end: .5rem; }
+.plan-parts li.done { color: var(--muted); }
+.plan-parts li.late { color: var(--bad); }
+.plan-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .5rem; }
+.plan-fields label { display: grid; gap: .2rem; font-size: .85rem; }

@@ -422,6 +422,40 @@ const MIGRATIONS = [
   );
   ALTER TABLE users ADD COLUMN card_added_at TEXT;
   `,
+  // 33: paying in parts (session 40). provider 'seller' = a plan the buyer
+  // and seller agree (Unc records and reminds, no money through Unc);
+  // 'partner' is kept for an installment company later.
+  `
+  CREATE TABLE installment_plans (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    buyer_id        INTEGER NOT NULL REFERENCES users(id),
+    vendor_id       INTEGER NOT NULL REFERENCES users(id),
+    proposed_by     INTEGER NOT NULL REFERENCES users(id),
+    provider        TEXT NOT NULL DEFAULT 'seller' CHECK (provider IN ('seller', 'partner')),
+    total           INTEGER NOT NULL,
+    currency        TEXT NOT NULL,
+    parts           INTEGER NOT NULL,
+    every           TEXT NOT NULL CHECK (every IN ('week', '2weeks', 'month')),
+    status          TEXT NOT NULL DEFAULT 'proposed' CHECK (status IN ('proposed', 'active', 'declined', 'cancelled', 'completed')),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    decided_at      TEXT
+  );
+  CREATE INDEX idx_plans_conversation ON installment_plans(conversation_id);
+  CREATE TABLE installment_parts (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    plan_id           INTEGER NOT NULL REFERENCES installment_plans(id) ON DELETE CASCADE,
+    n                 INTEGER NOT NULL,
+    amount            INTEGER NOT NULL,
+    due_on            TEXT NOT NULL,
+    paid_at           TEXT,
+    confirmed_at      TEXT,
+    reminded_at       TEXT,
+    late_notified_at  TEXT,
+    UNIQUE (plan_id, n)
+  );
+  CREATE INDEX idx_parts_due ON installment_parts(due_on);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
