@@ -375,6 +375,18 @@ const MIGRATIONS = [
     created_at     TEXT NOT NULL DEFAULT (datetime('now'))
   );
   `,
+  // 27: away mode (session 37): users.away_until (last away day) and every
+  // away period, so reply times can leave those days out.
+  `
+  ALTER TABLE users ADD COLUMN away_until TEXT;
+  CREATE TABLE away_periods (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    starts_at TEXT NOT NULL,
+    ends_at   TEXT NOT NULL
+  );
+  CREATE INDEX idx_away_user ON away_periods(user_id, ends_at);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

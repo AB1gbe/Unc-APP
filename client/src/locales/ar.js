@@ -783,4 +783,11 @@ export default {
   '{n} hours': { one: 'ساعة واحدة', two: 'ساعتان', few: '{n} ساعات', other: '{n} ساعة' },
   'Nothing yet.': 'لا شيء بعد.',
   'Under an hour': 'أقل من ساعة',
+  // Away mode (session 37)
+  '🌴 Away until {date}': '🌴 غائب حتى {date}',
+  'Away mode': 'وضع الغياب',
+  'Going on holiday? Request alerts pause, members see when you are back, and messages that arrive meanwhile do not count against your reply time.': 'مسافر في إجازة؟ تتوقف تنبيهات الطلبات، ويرى الأعضاء متى تعود، ولا تُحسب الرسائل التي تصل خلال غيابك ضمن وقت ردك.',
+  "I'm back": 'عدت',
+  'Away until': 'غائب حتى',
+  'Turn on away mode': 'شغّل وضع الغياب',
 };

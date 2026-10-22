@@ -328,6 +328,17 @@ await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people a
 await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
 await shot(vendor, '34-demand');
 
+// Away mode (session 37): the shop goes away; the buyer sees it in the chat.
+await vendor.goto(BASE + '/account');
+await vendor.fill('#awayUntil', new Date(Date.now() + 5 * 86_400_000).toISOString().slice(0, 10));
+await vendor.click('button:has-text("Turn on away mode")');
+await vendor.waitForSelector('.away-mode button:has-text("I\'m back")');
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.waitForSelector('.chat-head .activity.away');
+await buyer.locator('.chat-head').screenshot({ path: `${OUT}/40-away.png` });
+await vendor.click('.away-mode button:has-text("I\'m back")');
+await vendor.waitForSelector('button:has-text("Turn on away mode")');
+
 // Owner dashboard (session 37): the admin sees today's requests in the charts.
 {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });

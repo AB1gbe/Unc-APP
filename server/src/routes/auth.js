@@ -17,6 +17,7 @@ import { CONTACT_MESSAGE, hasContactDetails } from '../lib/contact-guard.js';
 import { readShopHours } from '../lib/shop-hours.js';
 import { normalizeCity } from '../../../shared/areas.js';
 import { DELETE_AFTER_DAYS, exportData } from '../lib/deletion.js';
+import { MAX_AWAY_DAYS, setAway } from '../lib/activity.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -320,6 +321,15 @@ export function authRoutes(db) {
       // A shop is known by its name, so this is for personal accounts only.
       if (b.shortName && req.user.account_type === 'business') throw new HttpError(400, 'Shops always show their full name.', { field: 'shortName' });
       changes.short_name = b.shortName ? 1 : 0;
+    }
+    // Away mode (session 37): the last away day, or null for "I'm back".
+    if ('awayUntil' in b) {
+      const until = b.awayUntil === null ? null : v.isoDate(b, 'awayUntil');
+      const last = new Date(Date.now() + MAX_AWAY_DAYS * 86_400_000).toISOString().slice(0, 10);
+      if (until && (until < new Date().toISOString().slice(0, 10) || until > last)) {
+        throw new HttpError(400, 'Choose a date from today up to 60 days ahead.', { field: 'awayUntil' });
+      }
+      setAway(db, req.user.id, until);
     }
     const cols = Object.keys(changes);
     if (cols.length) {

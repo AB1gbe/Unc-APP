@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { money } from '../api.js';
 import { useApi } from '../hooks.js';
-import { Avatar, Badges, RatingBadge } from './ui.jsx';
+import { Activity, Avatar, Badges, RatingBadge } from './ui.jsx';
 import { OfferDetailsLine } from './OfferDetails.jsx';
 import { t } from '../i18n.jsx';
 
@@ -63,6 +63,7 @@ export default function CompareOffers({ listing }) {
                 <dt>{t('Replies')}</dt><dd>{c.replyTime ? REPLY[c.replyTime]() : <span className="muted">{t('Not enough chats yet')}</span>}</dd>
               </dl>
               <Badges badges={c.badges} />
+              {c.awayUntil && <Activity activity={{ awayUntil: c.awayUntil }} />}
               {c.hasProof && <span className="badge ok">{t('✓ Proof photo')}</span>}
               {c.firstMessage && <p className="small muted compare-msg" dir="auto">{c.firstMessage}</p>}
               <span className="small">{t('Open chat')} <span className="flip">→</span></span>

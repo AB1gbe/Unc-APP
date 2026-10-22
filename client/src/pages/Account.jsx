@@ -44,6 +44,7 @@ export default function Account() {
       {user.accountType === 'business' && <ShopEditor />}
       <EmailSettings />
       <PrivacySettings />
+      <AwayMode />
       <PushSettings />
       <ChangePassword />
       <YourData />
@@ -234,3 +235,49 @@ function YourData() {
     </div>
   );
 }
+
+// Away mode (session 37): no alerts or favourite heads-ups while away,
+// "🌴 Away until …" on your profile and chats, and messages that arrive
+// meanwhile don't count against your reply time.
+function AwayMode() {
+  const { user, setUser } = useAuth();
+  const [until, setUntil] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const iso = (d) => d.toISOString().slice(0, 10);
+
+  async function save(value) {
+    setBusy(true);
+    setError(null);
+    try {
+      setUser((await api('/auth/me', { method: 'PATCH', body: { awayUntil: value } })).user);
+      setUntil('');
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card away-mode">
+      <h2>{t('Away mode')}</h2>
+      <p className="small muted">{t('Going on holiday? Request alerts pause, members see when you are back, and messages that arrive meanwhile do not count against your reply time.')}</p>
+      <ErrorBox error={error} />
+      {user.awayUntil ? (
+        <div className="row spread">
+          <b>{t('🌴 Away until {date}', { date: formatDate(toDate(user.awayUntil), { day: 'numeric', month: 'long' }) })}</b>
+          <button type="button" className="btn secondary" disabled={busy} onClick={() => save(null)}>{t("I'm back")}</button>
+        </div>
+      ) : (
+        <form className="row" onSubmit={(e) => { e.preventDefault(); save(until); }}>
+          <label htmlFor="awayUntil">{t('Away until')}</label>
+          <input id="awayUntil" type="date" required value={until} onChange={(e) => setUntil(e.target.value)}
+            min={iso(new Date())} max={iso(new Date(Date.now() + 60 * 86_400_000))} style={{ width: 'auto' }} />
+          <button className="btn" disabled={busy || !until}>{t('Turn on away mode')}</button>
+        </form>
+      )}
+    </div>
+  );
+}
+

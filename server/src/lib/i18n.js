@@ -21,7 +21,7 @@ const FIELDS = {
     idNumber: 'ID number', idType: 'ID type', legalName: 'Full legal name', listingId: 'Request', message: 'Message',
     neededBy: 'Needed by', note: 'Note', offerPrice: 'Price', password: 'Password', reason: 'Reason', stars: 'Stars',
     status: 'Status', title: 'Title', token: 'Link', avatar: 'Profile photo', cover: 'Cover photo', shopArea: 'Shop area', shopHours: 'Opening hours', bio: 'About you', interests: 'Interests', story: 'Your story', q: 'Words', minBudget: 'Minimum budget', image: 'Photo', action: 'Answer', docFront: 'Front of ID', docBack: 'Back of ID', selfie: 'Selfie',
-    businessDoc: 'Business registration document', images: 'Photos', language: 'Language', banned: 'banned', contactRule: 'Who can make offers', shortName: 'First name only', condition: 'Condition', warranty: 'Warranty', returns: 'Returns', validUntil: 'Price valid until', kind: 'Problem', details: 'Details',
+    businessDoc: 'Business registration document', images: 'Photos', language: 'Language', banned: 'banned', contactRule: 'Who can make offers', shortName: 'First name only', condition: 'Condition', warranty: 'Warranty', returns: 'Returns', validUntil: 'Price valid until', kind: 'Problem', details: 'Details', awayUntil: 'Away until',
   },
   ar: {
     accountType: 'نوع الحساب', budgetMax: 'الحد الأقصى للميزانية', budgetMin: 'الحد الأدنى للميزانية', businessName: 'الاسم التجاري',
@@ -31,7 +31,7 @@ const FIELDS = {
     idNumber: 'رقم الهوية', idType: 'نوع الهوية', legalName: 'الاسم الكامل', listingId: 'الطلب', message: 'الرسالة',
     neededBy: 'تاريخ الحاجة', note: 'الملاحظة', offerPrice: 'السعر', password: 'كلمة المرور', reason: 'السبب', stars: 'عدد النجوم',
     status: 'الحالة', title: 'العنوان', token: 'الرابط', avatar: 'الصورة الشخصية', cover: 'صورة الغلاف', shopArea: 'منطقة المتجر', shopHours: 'ساعات العمل', bio: 'نبذة عنك', interests: 'الاهتمامات', story: 'قصتك', q: 'الكلمات', minBudget: 'الحد الأدنى للميزانية', image: 'الصورة', action: 'الرد', docFront: 'الوجه الأمامي للهوية', docBack: 'الوجه الخلفي للهوية',
-    selfie: 'الصورة الشخصية', businessDoc: 'مستند السجل التجاري', images: 'الصور', language: 'اللغة', banned: 'banned', contactRule: 'من يمكنه تقديم العروض', shortName: 'الاسم الأول فقط', condition: 'الحالة', warranty: 'الضمان', returns: 'الإرجاع', validUntil: 'السعر صالح حتى', kind: 'المشكلة', details: 'التفاصيل',
+    selfie: 'الصورة الشخصية', businessDoc: 'مستند السجل التجاري', images: 'الصور', language: 'اللغة', banned: 'banned', contactRule: 'من يمكنه تقديم العروض', shortName: 'الاسم الأول فقط', condition: 'الحالة', warranty: 'الضمان', returns: 'الإرجاع', validUntil: 'السعر صالح حتى', kind: 'المشكلة', details: 'التفاصيل', awayUntil: 'غائب حتى',
   },
 };
 const field = (lang, f) => FIELDS[lang][f] ?? f;

@@ -271,6 +271,7 @@ export function conversationRoutes(db) {
       badges: badgesFor(c.vendor_id, replyTime),
       unread: unreadIn.get(convId).n,
       hasProof: Boolean(proofIn.get(convId)),
+      awayUntil: activity.summaryFor(c.vendor_id).awayUntil,
     };
   }
 

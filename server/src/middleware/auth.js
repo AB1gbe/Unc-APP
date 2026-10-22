@@ -94,6 +94,7 @@ export function publicMe(u) {
     emailOffers: u.email_offers !== 0,
     hideActivity: u.hide_activity === 1,
     shortName: u.short_name === 1,
+    awayUntil: u.away_until && u.away_until >= new Date().toISOString().slice(0, 10) ? u.away_until : null,
     // When the account will be deleted, if the member asked (session 37).
     deleteAt: u.delete_requested_at ? new Date(Date.parse(`${u.delete_requested_at.replace(' ', 'T')}Z`) + 7 * 86_400_000).toISOString() : null,
     ...shopFields(u),
