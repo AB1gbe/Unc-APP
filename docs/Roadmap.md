@@ -47,6 +47,9 @@ tags: [roadmap]
 - [x] The recommended next five, built in session 31 → [[Choosing, Alerts and Safety]].
 - [ ] More from [[More Ideas for the Vision]] (the rest of the list).
 
+## Fresh ideas (session 33)
+- [ ] Pick from [[Fresh Ideas for the Vision]]. Recommended next: who may contact me + first-name-only, unmet demand board, proof photo with a code, warranty/condition/valid-until on offers, closing note to sellers + "something went wrong" after a deal.
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]
