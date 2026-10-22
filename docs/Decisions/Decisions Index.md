@@ -39,5 +39,10 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 030 | [[ADR-030 Shop pages]] | Business profile = shop page; cover, area + map link, structured hours with "Open now"; no contact fields and a guard on public text | separate shop page, phone/website fields, embedded map, free-text hours |
 | 031 | [[ADR-031 Happening near you]] | Finds (anonymous, city + category), new requests, new shops, daily offers count; own city first; never invented; time indexes | named finds, request titles, map distance, live updates, filler activity |
 | 032 | [[ADR-032 Favourite sellers]] | ♥ = heads-up when you post in their categories (🔔 + push), answered via the request; verified sellers; public count only | direct messages, all favourites, names public |
+| 033 | [[ADR-033 Compare offers]] | Cards (not a table), latest/agreed price, buyer only, from 2 offers, one API call | table, first price, separate page |
+| 034 | [[ADR-034 Request alerts]] | Words + category + city/governorate + min budget; instant 🔔 + push; one notification per request; max 10 | search-only, digest, unlimited |
+| 035 | [[ADR-035 Bahrain areas]] | Free text tidied to known areas; one shared file; datalist suggestions; governorate = near; translated names | strict list, DB table, select box |
+| 036 | [[ADR-036 Block and scam warnings]] | Block = no contact either way, old chats readable, neutral notice; scam = on-device warning from simple patterns | one-way block, delete chats, server flagging, AI |
+| 037 | [[ADR-037 Expiry and tips]] | Close after 30 days, 🔔 + push 3 days before, one-tap keep open, hourly; at most 2 rule-based tips | never expire, 14 days, auto-renew, scores |
 
 Template for new ADRs: copy any ADR and keep the same headings.

@@ -7,6 +7,7 @@ import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
 import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
+import CityField from '../components/CityField.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -52,10 +53,17 @@ export default function Browse() {
           <option value="">{t('All categories')}</option>
           {categories.map((c) => <option key={c} value={c}>{t(c)}</option>)}
         </select>
-        <input placeholder={t('City')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
+        <CityField governorates placeholder={t('City or governorate')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
         <button className="btn">{t('Search')}</button>
       </form>
       <ErrorBox error={error} />
+      {user && (
+        <p className="small" style={{ marginTop: 0 }}>
+          <Link to={`/alerts?${new URLSearchParams(Object.fromEntries(Object.entries(draft).filter(([, v]) => v)))}`}>
+            {t('🔔 Alert me about new requests like these')}
+          </Link>
+        </p>
+      )}
       {loading ? <CardsLoading /> : result.listings.length === 0 ? (
         <div className="card empty">
           <p>{t("Nobody's asked for that yet. Looking for it yourself? Post it and let sellers come to you.")}</p>

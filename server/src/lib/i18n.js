@@ -20,7 +20,7 @@ const FIELDS = {
     dateOfBirth: 'Date of birth', decision: 'Decision', description: 'Details', displayName: 'Name', email: 'Email',
     idNumber: 'ID number', idType: 'ID type', legalName: 'Full legal name', listingId: 'Request', message: 'Message',
     neededBy: 'Needed by', note: 'Note', offerPrice: 'Price', password: 'Password', reason: 'Reason', stars: 'Stars',
-    status: 'Status', title: 'Title', token: 'Link', avatar: 'Profile photo', cover: 'Cover photo', shopArea: 'Shop area', shopHours: 'Opening hours', bio: 'About you', interests: 'Interests', story: 'Your story', image: 'Photo', action: 'Answer', docFront: 'Front of ID', docBack: 'Back of ID', selfie: 'Selfie',
+    status: 'Status', title: 'Title', token: 'Link', avatar: 'Profile photo', cover: 'Cover photo', shopArea: 'Shop area', shopHours: 'Opening hours', bio: 'About you', interests: 'Interests', story: 'Your story', q: 'Words', minBudget: 'Minimum budget', image: 'Photo', action: 'Answer', docFront: 'Front of ID', docBack: 'Back of ID', selfie: 'Selfie',
     businessDoc: 'Business registration document', images: 'Photos', language: 'Language', banned: 'banned',
   },
   ar: {
@@ -30,7 +30,7 @@ const FIELDS = {
     dateOfBirth: 'تاريخ الميلاد', decision: 'القرار', description: 'التفاصيل', displayName: 'الاسم', email: 'البريد الإلكتروني',
     idNumber: 'رقم الهوية', idType: 'نوع الهوية', legalName: 'الاسم الكامل', listingId: 'الطلب', message: 'الرسالة',
     neededBy: 'تاريخ الحاجة', note: 'الملاحظة', offerPrice: 'السعر', password: 'كلمة المرور', reason: 'السبب', stars: 'عدد النجوم',
-    status: 'الحالة', title: 'العنوان', token: 'الرابط', avatar: 'الصورة الشخصية', cover: 'صورة الغلاف', shopArea: 'منطقة المتجر', shopHours: 'ساعات العمل', bio: 'نبذة عنك', interests: 'الاهتمامات', story: 'قصتك', image: 'الصورة', action: 'الرد', docFront: 'الوجه الأمامي للهوية', docBack: 'الوجه الخلفي للهوية',
+    status: 'الحالة', title: 'العنوان', token: 'الرابط', avatar: 'الصورة الشخصية', cover: 'صورة الغلاف', shopArea: 'منطقة المتجر', shopHours: 'ساعات العمل', bio: 'نبذة عنك', interests: 'الاهتمامات', story: 'قصتك', q: 'الكلمات', minBudget: 'الحد الأدنى للميزانية', image: 'الصورة', action: 'الرد', docFront: 'الوجه الأمامي للهوية', docBack: 'الوجه الخلفي للهوية',
     selfie: 'الصورة الشخصية', businessDoc: 'مستند السجل التجاري', images: 'الصور', language: 'اللغة', banned: 'banned',
   },
 };
@@ -85,6 +85,12 @@ const AR = {
   "Please don't add phone numbers, links, emails or @handles here. Buyers contact you through their requests.": 'من فضلك لا تضف أرقام هواتف أو روابط أو بريداً إلكترونياً أو معرّفات @ هنا. يتواصل معك المشترون عبر طلباتهم.',
   'Only business accounts have a shop page.': 'صفحة المتجر متاحة للحسابات التجارية فقط.',
   'Opening hours are not valid. Use a time like 09:00 for each open day.': 'ساعات العمل غير صالحة. استخدم وقتاً مثل 09:00 لكل يوم عمل.',
+  'Choose at least one thing to watch for: words, a category, a city or a budget.': 'اختر شيئاً واحداً على الأقل للمتابعة: كلمات أو فئة أو مدينة أو ميزانية.',
+  'Alert not found.': 'التنبيه غير موجود.',
+  'Only open requests can be kept open. Reopen it instead.': 'يمكن إبقاء الطلبات المفتوحة فقط. أعد فتحه بدلاً من ذلك.',
+  "You can't contact this member.": 'لا يمكنك التواصل مع هذا العضو.',
+  "You can't message this member.": 'لا يمكنك مراسلة هذا العضو.',
+  "You can't block yourself.": 'لا يمكنك حظر نفسك.',
   "You can't favourite yourself.": 'لا يمكنك إضافة نفسك إلى المفضلة.',
   'hideActivity must be true or false.': 'قيمة إخفاء النشاط يجب أن تكون true أو false.',
   'emailOffers must be true or false.': 'قيمة رسائل العروض يجب أن تكون true أو false.',
@@ -125,6 +131,7 @@ const PATTERNS = [
     : `${field(l, f)} must be a JPG, PNG or WEBP image${pdf ? ' or a PDF' : ''}.`)],
   [/^You must be at least (\d+) years old\.$/, (l, n) => (l === 'ar' ? `يجب أن يكون عمرك ${n} عامًا على الأقل.` : `You must be at least ${n} years old.`)],
   [/^A request can have at most (\d+) photos\.$/, (l, n) => (l === 'ar' ? `يمكن أن يحتوي الطلب على ${n} صور كحد أقصى.` : `A request can have at most ${n} photos.`)],
+  [/^You can have up to (\d+) alerts\. Delete one first\.$/, (l, n) => (l === 'ar' ? `يمكنك إنشاء ${n} تنبيهات كحد أقصى. احذف واحداً أولاً.` : `You can have up to ${n} alerts. Delete one first.`)],
   [/^Ratings can only be left within (\d+) days of the deal\.$/, (l, n) => (l === 'ar' ? `لا يمكن التقييم إلا خلال ${n} يومًا من الصفقة.` : `Ratings can only be left within ${n} days of the deal.`)],
 ];
 

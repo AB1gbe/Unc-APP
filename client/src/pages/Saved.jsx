@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Avatar, ErrorBox, ListingCard, CardsLoading } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { t } from '../i18n.jsx';
+import { Place } from '../components/CityField.jsx';
 
 export default function Saved() {
   const { data, error, loading } = useApi('/listings/saved');
@@ -41,7 +42,7 @@ function FavouriteSellers() {
               <Avatar name={s.displayName} src={s.avatarUrl} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <b><bdi>{s.displayName}</bdi></b> {s.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}
-                {s.city && <div className="muted small">📍 <bdi>{s.city}</bdi></div>}
+                {s.city && <div className="muted small">📍 <Place city={s.city} /></div>}
               </div>
             </Link>
           ))}

@@ -27,10 +27,10 @@ tags: [roadmap]
 - [x] Saved requests (♡ Save) *(session 13)*
 - [x] In-app notifications 🔔 (offers, deals, ratings, identity result) *(session 13)*
 - [x] Push notification to the phone when a new offer arrives (session 15) — [[Push Notifications]]. Email for new offers: done in session 17 ([[Email Sending#The new-offer email (session 17)]]).
-- [ ] Saved searches for vendors ("notify me of new Electronics requests in Austin")
-- [ ] Location with radius instead of free-text city
+- [x] Saved searches for vendors → request alerts (session 31) — [[Choosing, Alerts and Safety]]
+- [x] Bahrain governorates and areas, tidied city names (session 31). Radius/map: still open.
 - [ ] Admin UI for the audit log; promote/demote admins
-- [ ] Block a user (stop a specific vendor contacting you again)
+- [x] Block a user (session 31) — [[Choosing, Alerts and Safety]]
 - [x] Works on phones/tablets + "Add to Home Screen" (manifest, icons, bottom tab bar) → [[ADR-001 Platform]] *(session 13)*
 - [ ] Offline support (service worker exists since session 15, but caches nothing yet) → [[ADR-001 Platform]]
 - [ ] Push for more events (deal, rating, identity result), with a per-kind on/off — [[ADR-022 Push notifications]]
@@ -42,6 +42,10 @@ tags: [roadmap]
 - [x] Favourite sellers (session 28) → [[Social Touches#7. Favourite sellers (session 28)]].
 - [ ] More from [[Social Marketplace Ideas]]: reactions, typing indicator, favourite sellers, city pages, "Me too".
 - [x] "Hide when I'm online" switch (session 22) → [[ADR-029 Hide my activity]].
+
+## More ideas (session 30)
+- [x] The recommended next five, built in session 31 → [[Choosing, Alerts and Safety]].
+- [ ] More from [[More Ideas for the Vision]] (the rest of the list).
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]

@@ -10,6 +10,7 @@ import { formatDate, t, tj, tn } from '../i18n.jsx';
 import { StoryCard } from '../components/Stories.jsx';
 import ShopHours, { OpenNow } from '../components/ShopHours.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
+import { Place } from '../components/CityField.jsx';
 
 export default function MemberProfile() {
   const { id } = useParams();
@@ -46,7 +47,7 @@ export default function MemberProfile() {
                 📍 <bdi>{m.shopArea}</bdi> ·{' '}
                 <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.shopArea)}`} target="_blank" rel="noreferrer">{t('Map')} ↗</a>
               </div>
-            ) : m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <bdi>{m.city}</bdi></div>}
+            ) : m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <Place city={m.city} /></div>}
             {m.shopHours && <div className="small" style={{ marginTop: '.3rem' }}><OpenNow hours={m.shopHours} /></div>}
             <div style={{ marginTop: '.3rem' }}><Activity activity={m.activity} /></div>
           </div>

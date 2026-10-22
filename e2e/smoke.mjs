@@ -76,6 +76,14 @@ const buyer = await onboard('Sam Buyer', 'sam@x.test', 'individual');
 const vendor = await onboard('Riverside Electronics', 'shop@x.test', 'business');
 const admin = await adminApproveAll();
 
+// Request alert: the seller watches Electronics before the buyer posts.
+await vendor.goto(BASE + '/browse'); await vendor.selectOption('.searchbar select', 'Electronics');
+await vendor.click('text=Alert me about new requests like these');
+await vendor.waitForURL('**/alerts?category=Electronics');
+await vendor.click('button:has-text("Save alert")');
+await vendor.waitForSelector('.alert-row:has-text("Electronics")');
+await shot(vendor, '06b-alerts');
+
 await buyer.reload(); await buyer.goto(BASE + '/requests/new');
 await buyer.fill('#title', 'Looking for a used PS5 with two controllers');
 await buyer.selectOption('#category', 'Electronics');
@@ -87,6 +95,7 @@ await shot(buyer, '07-new-request');
 await buyer.click('button:has-text("Post request")');
 await buyer.waitForSelector('text=Your request');
 await buyer.waitForSelector('.toast:has-text("Posted!")'); // celebration message
+await buyer.waitForSelector('text=Open until'); // "Still looking?" expiry date
 // Share: on a computer, a WhatsApp link with the request's address.
 await buyer.click('.share > button');
 const wa = await buyer.getAttribute('.share-menu a.whatsapp', 'href');
@@ -95,6 +104,9 @@ await shot(buyer, '08b-share');
 await buyer.click('.share > button'); // close the menu
 await shot(buyer, '08-request-owner-view');
 const listingUrl = buyer.url();
+// The seller's alert fired for the new request.
+await vendor.goto(BASE + '/notifications');
+await vendor.waitForSelector('.inbox-item:has-text("New request matching your alert")');
 
 await vendor.goto(BASE + '/');
 await vendor.waitForSelector('.card h3');
@@ -185,8 +197,8 @@ await buyer.waitForSelector('.story-form', { state: 'detached' });
 // Favourite seller: from the deal box; a new Electronics request reaches them first.
 await buyer.click('.deal-banner .fav-btn');
 await buyer.waitForSelector('.deal-banner .fav-btn.on');
-await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'USD', city: 'Austin' }) }));
+const controllerId = await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'USD', city: 'Austin' }) }).then((r) => r.json()).then((j) => j.listing.id));
 const vendorChat = vendor.url();
 await vendor.goto(BASE + '/notifications');
 await vendor.waitForSelector('.inbox-item:has-text("who favourited you, is looking for")');
@@ -249,6 +261,23 @@ await buyer.waitForSelector('img.shop-cover');
 await buyer.waitForSelector('.shop-hours .open-now, .shop-hours .closed-now');
 await buyer.waitForSelector('text=Seef, Manama');
 await shot(buyer, '28-shop-page');
+
+// Tips: the controller request has no photo, so the buyer is told to add one.
+await buyer.goto(`${BASE}/requests/${controllerId}`);
+await buyer.waitForSelector('.tips:has-text("Add a photo")');
+await buyer.locator('.tips').screenshot({ path: `${OUT}/32-tips.png` });
+
+// Scam warning + block: a pay-first message gets a warning; the buyer blocks, then unblocks.
+const scamConv = await vendor.evaluate((id) => fetch(`/api/listings/${id}/contact`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: 'I have one. Send a deposit first by bank transfer and I will ship it.' }) }).then((r) => r.json()).then((j) => j.conversation.id), controllerId);
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.waitForSelector('.scam-warning');
+await shot(buyer, '31-scam-warning');
+buyer.once('dialog', (d) => d.accept());
+await buyer.click('button:has-text("Block")');
+await buyer.waitForSelector('.blocked-notice:has-text("You blocked Riverside Electronics")');
+await buyer.goto(BASE + '/account'); await buyer.click('.card:has-text("Blocked members") button:has-text("Unblock")');
+await buyer.waitForSelector('text=Blocked members', { state: 'detached' });
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

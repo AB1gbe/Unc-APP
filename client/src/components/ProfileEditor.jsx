@@ -7,6 +7,7 @@ import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
 import { shrinkImage } from '../images.js';
 import { Avatar, ErrorBox } from './ui.jsx';
+import CityField from './CityField.jsx';
 
 export default function ProfileEditor({ onSaved, submitLabel, extraButton }) {
   const { user, setUser } = useAuth();
@@ -99,7 +100,7 @@ export default function ProfileEditor({ onSaved, submitLabel, extraButton }) {
         </div>
         <div className="field">
           <label htmlFor="city">{t('City')}</label>
-          <input id="city" maxLength={80} value={form.city} onChange={set('city')} />
+          <CityField id="city" maxLength={80} value={form.city} onChange={set('city')} />
         </div>
       </div>
       <div className="field">

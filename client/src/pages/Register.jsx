@@ -4,6 +4,7 @@ import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox } from '../components/ui.jsx';
 import { t, tj } from '../i18n.jsx';
+import CityField from '../components/CityField.jsx';
 
 export default function Register() {
   const { setUser } = useAuth();
@@ -61,7 +62,7 @@ export default function Register() {
         </div>
         <div className="field">
           <label htmlFor="city">{t('City')} <span className="muted">{t('(optional)')}</span></label>
-          <input id="city" value={form.city} onChange={set('city')} />
+          <CityField id="city" value={form.city} onChange={set('city')} />
         </div>
         <button className="btn block" disabled={busy}>{busy ? t('Creating…') : t('Create account')}</button>
       </form>

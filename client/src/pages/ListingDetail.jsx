@@ -9,6 +9,9 @@ import Lightbox from '../components/Lightbox.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import ShareButton from '../components/ShareButton.jsx';
+import CompareOffers from '../components/CompareOffers.jsx';
+import { Place } from '../components/CityField.jsx';
+import { requestTips } from '../tips.js';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -22,6 +25,7 @@ export default function ListingDetail() {
   const isOwner = user?.id === l.buyer.id;
 
   return (
+    <>
     <div className="two-col">
       <article className="card">
         <div className="row spread">
@@ -35,7 +39,7 @@ export default function ListingDetail() {
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
         <p className="price" style={{ fontSize: '1.2rem' }}>{budget(l)}</p>
         <div className="meta" style={{ marginBottom: '1rem' }}>
-          <span>📍 <bdi>{l.city}</bdi></span>
+          <span>📍 <Place city={l.city} /></span>
           <span>🕒 {t('Posted {time}', { time: ago(l.createdAt) })}</span>
           {l.neededBy && <span>📅 {t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
         </div>
@@ -65,6 +69,8 @@ export default function ListingDetail() {
         {!isOwner && user && <ReportLink listingId={l.id} />}
       </aside>
     </div>
+    {isOwner && <CompareOffers listing={l} />}
+    </>
   );
 }
 
@@ -169,6 +175,9 @@ function OwnerPanel({ listing, onChange }) {
             {(listing.viewCount ?? 0) === 0 && <> · {t('Share it to reach more sellers.')}</>}
           </p>
         )}
+        {listing.status === 'open' && listing.expiresAt && <ExpiryLine listing={listing} onChange={onChange} />}
+        {listing.status === 'open' && <Tips listing={listing} offers={offers.length} />}
+        {listing.status === 'closed' && listing.expiredAt && <p className="small muted">{t('This request closed by itself after 30 days. Reopen it if you are still looking.')}</p>}
         <ErrorBox error={error} />
         {listing.status === 'open' && !picking && (
           <div className="stack">
@@ -250,6 +259,52 @@ function SaveButton({ listing }) {
     <button type="button" className={`btn sm secondary save-btn ${saved ? 'on' : ''}`} onClick={toggle} disabled={busy} aria-pressed={saved}>
       {saved ? t('♥ Saved') : t('♡ Save')}
     </button>
+  );
+}
+
+// "Open until 21 Nov · Keep it open" (session 31). The button shows in
+// the last week; it starts the 30 days again.
+function ExpiryLine({ listing, onChange }) {
+  const [busy, setBusy] = useState(false);
+  const ends = toDate(listing.expiresAt);
+  const soon = ends - Date.now() < 7 * 24 * 60 * 60 * 1000;
+  async function renew() {
+    setBusy(true);
+    try {
+      await api(`/listings/${listing.id}/renew`, { method: 'POST' });
+      celebrate({ text: t('Kept open for another 30 days.') });
+      onChange();
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <p className={`small ${soon ? 'expiry-soon' : 'muted'}`}>
+      ⏳ {t('Open until {date}', { date: formatDate(ends, { day: 'numeric', month: 'short' }) })}
+      {soon && <> · <button type="button" className="linkish small" onClick={renew} disabled={busy}>{t('Keep it open')}</button></>}
+    </p>
+  );
+}
+
+// Tips to get more offers (session 31): at most 2, only the useful ones.
+const TIPS = {
+  photo: () => t('Add a photo: requests with one get more offers.'),
+  details: () => t('Add a few more details (size, model, condition) so sellers know exactly what you want.'),
+  budget: () => t('Add a budget: sellers answer faster when they know what you can spend.'),
+  quiet: () => t('No offers yet? Try a wider budget or area, or share it.'),
+  share: () => t('Nobody has looked yet. Share it on WhatsApp to reach more sellers.'),
+};
+function Tips({ listing, offers }) {
+  const tips = requestTips(listing, { offers, views: listing.viewCount ?? 0 });
+  if (!tips.length) return null;
+  return (
+    <div className="tips">
+      <b>{t('💡 Tips to get more offers')}</b>
+      <ul>
+        {tips.map((k) => <li key={k}>{TIPS[k]()}</li>)}
+      </ul>
+      <Link className="small" to={`/requests/${listing.id}/edit`}>{t('Edit request')} <span className="flip">→</span></Link>
+    </div>
   );
 }
 

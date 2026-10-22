@@ -14,6 +14,10 @@ import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { tellFavourites } from './favourites.js';
+import { tellAlerts } from './alerts.js';
+import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.js';
+import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
+import { EXPIRES_AT_SQL } from '../lib/expiry.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -64,6 +68,8 @@ export function listingRoutes(db) {
     if (me) listing.buyer.activity = activity.summaryFor(listing.buyer.id);
     if (me?.id === listing.buyer.id) {
       listing.viewCount = viewCount.get(id).n;
+      listing.expiresAt = db.prepare(`SELECT ${EXPIRES_AT_SQL} AS at FROM listings WHERE id = ?`).get(id).at;
+      listing.expiredAt = db.prepare('SELECT expired_at FROM listings WHERE id = ?').get(id).expired_at;
       listing.dealConversationId = db.prepare('SELECT conversation_id FROM deals WHERE listing_id = ?').get(id)?.conversation_id ?? null;
     }
     return listing;
@@ -73,6 +79,7 @@ export function listingRoutes(db) {
   r.get('/', (req, res) => {
     const where = [`l.status = 'open'`, 'u.banned_at IS NULL'];
     const params = [];
+    if (req.user) { where.push(NOT_BLOCKED_BUYER); params.push(req.user.id); }
     if (req.query.q) {
       where.push('(l.title LIKE ? OR l.description LIKE ?)');
       const like = `%${String(req.query.q).slice(0, 100)}%`;
@@ -83,8 +90,17 @@ export function listingRoutes(db) {
       params.push(req.query.category);
     }
     if (req.query.city) {
-      where.push('l.city LIKE ?');
-      params.push(`%${String(req.query.city).slice(0, 80)}%`);
+      // A whole governorate ("Capital Governorate") searches all its areas;
+      // a known area matches however it was spelled (session 31).
+      const gov = governorateNamed(String(req.query.city));
+      if (gov) {
+        const areas = areasOf(gov);
+        where.push(`l.city IN (${areas.map(() => '?').join(', ')})`);
+        params.push(...areas);
+      } else {
+        where.push('l.city LIKE ?');
+        params.push(`%${normalizeCity(String(req.query.city).slice(0, 80))}%`);
+      }
     }
     // Capped so absurd page numbers can't overflow the OFFSET.
     const page = Math.min(10_000, Math.max(1, Number.parseInt(req.query.page, 10) || 1));
@@ -105,12 +121,12 @@ export function listingRoutes(db) {
     const interests = parseInterests(req.user.interests).filter((c) => CATEGORIES.includes(c));
     const rows = db.prepare(`
       ${BASE_SELECT}
-      WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ?
+      WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ? AND ${NOT_BLOCKED_BUYER}
         AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id AND c.vendor_id = ?)
         ${interests.length ? `AND l.category IN (${interests.map(() => '?').join(', ')})` : ''}
       ORDER BY (lower(l.city) = lower(COALESCE(?, ''))) DESC, l.created_at DESC, l.id DESC
       LIMIT 6
-    `).all(req.user.id, req.user.id, ...interests, req.user.city);
+    `).all(req.user.id, req.user.id, req.user.id, ...interests, req.user.city);
     res.json({ listings: rows.map(withImages), basedOnInterests: interests.length > 0 });
   });
 
@@ -196,7 +212,12 @@ export function listingRoutes(db) {
       throw err;
     }
     // Sellers who were favourited by this buyer hear about it first.
-    tellFavourites(db, req.user, { id, title: data.title, category: data.category });
+    // Then everyone whose request alert matches (session 31), once each.
+    const told = tellFavourites(db, req.user, { id, title: data.title, category: data.category });
+    tellAlerts(db, req.user, {
+      id, title: data.title, description: data.description, category: data.category, city: data.city,
+      budget_min: data.budgetMin, budget_max: data.budgetMax,
+    }, told);
     res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)) });
   });
 
@@ -248,6 +269,14 @@ export function listingRoutes(db) {
   // When marking "fulfilled" the buyer may say which conversation the deal
   // came from (conversationId). That records a DEAL, which both sides can
   // then rate. Leave it out if they found the item elsewhere.
+  // "Keep it open" (session 31): another 30 days for an open request.
+  r.post('/:id/renew', requireAuth, (req, res) => {
+    const row = ownListing(db, req);
+    if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be kept open. Reopen it instead.');
+    db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL WHERE id = ?`).run(row.id);
+    res.json({ listing: detailView(row.id, req.user) });
+  });
+
   r.post('/:id/status', requireAuth, (req, res) => {
     const row = ownListing(db, req);
     const status = v.oneOf(req.body, 'status', ['open', 'fulfilled', 'closed']);
@@ -275,6 +304,8 @@ export function listingRoutes(db) {
         notify(db, conv.vendor_id, 'deal', { actorId: req.user.id, listingId: row.id, conversationId: conv.id });
       }
       db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
+      // Reopening starts a fresh 30 days (session 31).
+      if (status === 'open') db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL, expired_at = NULL WHERE id = ?`).run(row.id);
       audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);
     });
     res.json({ listing: detailView(row.id, req.user) });
@@ -298,7 +329,7 @@ function readListingBody(body) {
     budgetMin: v.int(body, 'budgetMin', { optional: true }),
     budgetMax: v.int(body, 'budgetMax', { optional: true }),
     currency: v.oneOf(body, 'currency', CURRENCIES, { optional: true }) || 'USD',
-    city: v.str(body, 'city', { min: 2, max: 80 }),
+    city: normalizeCity(v.str(body, 'city', { min: 2, max: 80 })),
     neededBy: v.isoDate(body, 'neededBy', { optional: true }),
   };
   if (data.budgetMin !== null && data.budgetMax !== null && data.budgetMin > data.budgetMax) {

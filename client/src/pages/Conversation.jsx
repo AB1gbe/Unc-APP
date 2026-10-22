@@ -12,6 +12,8 @@ import { formatDateTime, t, tj } from '../i18n.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import { StoryForm } from '../components/Stories.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
+import { Place } from '../components/CityField.jsx';
+import { scamSignals } from '../scam.js';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -112,7 +114,7 @@ export default function Conversation() {
               <Activity activity={conv.otherActivity} />{' '}
               <Badges badges={conv.otherBadges} />
               <div className="small muted">
-                {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <bdi>{l.city}</bdi>
+                {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <Place city={l.city} />
               </div>
             </div>
           </div>
@@ -132,12 +134,17 @@ export default function Conversation() {
                 </button>
               )}
               {m.body && <div dir="auto">{m.body}</div>}
+              {!m.mine && scamSignals(m.body).length > 0 && (
+                <div className="scam-warning" role="note">{t("⚠️ Be careful: never send money before you've seen the item, and don't open links from strangers. Unc never asks you to pay by transfer.")}</div>
+              )}
               <div className="time">{formatDateTime(toDate(m.createdAt), { dateStyle: 'short', timeStyle: 'short' })}{m.mine && m.readAt ? ` · ${t('Seen')}` : ''}</div>
             </div>
           ))}
         </div>
         {(error || pollError) && <div style={{ padding: '0 1rem' }}><ErrorBox error={error || pollError} /></div>}
-        {conv.readOnly ? (
+        {conv.blocked ? (
+          <BlockedNotice conv={conv} onChange={load} />
+        ) : conv.readOnly ? (
           <div className="chat-form muted small" style={{ justifyContent: 'center' }}>
             {l.status === 'fulfilled' ? t('Found! 🎉 This request is done, so the chat is now read-only.') : t('This request is closed. The conversation is read-only.')}
           </div>
@@ -164,7 +171,10 @@ export default function Conversation() {
           </>
         )}
       </div>
-      <ReportLink conversationId={conv.id} />
+      <div className="row" style={{ justifyContent: 'center', gap: '1.25rem' }}>
+        <ReportLink conversationId={conv.id} />
+        {!conv.iBlocked && <BlockLink conv={conv} onChange={load} />}
+      </div>
       {viewing && <Lightbox photos={[viewing]} onClose={() => setViewing(null)} />}
     </div>
   );
@@ -320,6 +330,30 @@ function QuickReplies({ role, onPick }) {
   return (
     <div className="quick-replies" aria-label={t('Quick replies')}>
       {phrases.map((p) => <button key={p} type="button" className="chip" onClick={() => onPick(p)}>{p}</button>)}
+    </div>
+  );
+}
+
+// Block (session 31): they can't contact you or your requests any more.
+function BlockLink({ conv, onChange }) {
+  async function block() {
+    if (!window.confirm(t("Block {name}? They won't be able to contact you or answer your requests, and you won't see their requests. You can unblock them in Account → Privacy.", { name: conv.other.displayName }))) return;
+    await api(`/members/${conv.other.id}/block`, { method: 'POST' });
+    await onChange();
+  }
+  return <button type="button" className="linkish small" onClick={block}>{t('🚫 Block')}</button>;
+}
+
+function BlockedNotice({ conv, onChange }) {
+  async function unblock() {
+    await api(`/members/${conv.other.id}/block`, { method: 'DELETE' });
+    await onChange();
+  }
+  return (
+    <div className="chat-form muted small blocked-notice" style={{ justifyContent: 'center' }}>
+      {conv.iBlocked ? (
+        <>{tj("You blocked {name}. They can't contact you or your requests.", { name: <bdi>{conv.other.displayName}</bdi> })} <button type="button" className="linkish" onClick={unblock}>{t('Unblock')}</button></>
+      ) : t("You can't reply in this conversation.")}
     </div>
   );
 }

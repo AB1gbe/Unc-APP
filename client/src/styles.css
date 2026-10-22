@@ -404,3 +404,27 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* ♡ Favourite seller (session 28) */
 .fav-btn.on { color: #e0245e; border-color: #e0245e; }
+
+/* ===== Compare offers (session 31) ===== */
+.compare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .75rem; margin-top: 1rem; }
+.compare-item { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; color: inherit; background: var(--surface); }
+.compare-item:hover { text-decoration: none; border-color: var(--brand); }
+.compare-item.deal { border-color: #16a34a; box-shadow: 0 0 0 1px #16a34a; }
+.compare-item > img, .compare-nophoto { width: 100%; height: 130px; object-fit: cover; display: grid; place-items: center; background: var(--bg); font-size: 2rem; }
+.compare-body { padding: .75rem; display: grid; gap: .45rem; }
+.compare-price { font-size: 1.25rem; font-weight: 800; color: var(--ok, #0a7a3d); }
+.compare dl { display: grid; grid-template-columns: auto 1fr; gap: .2rem .6rem; margin: 0; font-size: .85rem; }
+.compare dt { color: var(--muted); }
+.compare dd { margin: 0; }
+.compare-msg { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.compare-sort { display: inline-flex; align-items: center; gap: .4rem; margin: 0; font-weight: 500; }
+.compare-sort select { width: auto; margin: 0; }
+
+/* Scam warning under a message (session 31) */
+.scam-warning { margin-top: .4rem; padding: .45rem .6rem; border-radius: 8px; background: #fff7e6; color: #8a5a00; border: 1px solid #f5d28a; font-size: .8rem; }
+.linkish.small { font-size: .875rem; } /* .linkish's 'font: inherit' came after .small and undid it (session 31) */
+
+/* Expiry + tips on your own request (session 31) */
+.expiry-soon { color: #b45309; font-weight: 600; }
+.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; font-size: .9rem; }
+.tips ul { margin: .35rem 0 .4rem; padding-inline-start: 1.1rem; }

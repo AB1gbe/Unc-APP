@@ -44,6 +44,14 @@ const TEXT = {
     en: { title: 'A customer is looking for something', body: (v) => `${v.actor}, who favourited you, is looking for “${v.title}”` },
     ar: { title: 'أحد عملائك يبحث عن شيء', body: (v) => `${v.actor} الذي أضافك للمفضلة يبحث عن «${v.title}»` },
   },
+  'alert-match': {
+    en: { title: 'New request for you', body: (v) => `“${v.title}” in ${v.city}` },
+    ar: { title: 'طلب جديد يناسبك', body: (v) => `«${v.title}» في ${v.city}` },
+  },
+  expiring: {
+    en: { title: 'Still looking?', body: (v) => `“${v.title}” closes in 3 days. Tap to keep it open.` },
+    ar: { title: 'ما زلت تبحث؟', body: (v) => `«${v.title}» يُغلق خلال 3 أيام. اضغط لإبقائه مفتوحاً.` },
+  },
   test: {
     en: { title: 'Unc', body: () => 'Notifications are on. You will get one for every new offer.' },
     ar: { title: 'Unc', body: () => 'الإشعارات مفعّلة. سيصلك إشعار مع كل عرض جديد.' },
