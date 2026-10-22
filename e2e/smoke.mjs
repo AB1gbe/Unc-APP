@@ -27,6 +27,7 @@ async function onboard(name, email, type) {
   await p.goto(BASE + '/register');
   if (type === 'business') await p.check('input[value=business]');
   await p.fill('#displayName', name); await p.fill('#email', email); await p.fill('#password', 'Password123'); await p.fill('#city', 'Austin');
+  await p.check('#acceptTerms'); // the Terms (session 40)
   await shot(p, `01-register-${type}`);
   await p.click('button:has-text("Create account")');
   await p.waitForURL('**/verify-email');
@@ -396,6 +397,11 @@ await buyer.waitForSelector('.delete-banner:has-text("Your account will be delet
 await shot(buyer, '38-delete-pending');
 await buyer.click('.delete-banner button:has-text("Keep my account")');
 await buyer.waitForSelector('.delete-banner', { state: 'detached' });
+
+// The Terms page (session 40), and the reminder next to Accept was shown earlier.
+await buyer.goto(BASE + '/terms');
+await buyer.waitForSelector('h2:has-text("Deals agreed on Unc are finished on Unc")');
+await shot(buyer, '44-terms');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

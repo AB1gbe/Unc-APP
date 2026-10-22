@@ -9,7 +9,7 @@ import CityField from '../components/CityField.jsx';
 export default function Register() {
   const { setUser } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ displayName: '', email: '', password: '', accountType: 'individual', city: '' });
+  const [form, setForm] = useState({ displayName: '', email: '', password: '', accountType: 'individual', city: '', acceptTerms: false });
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
@@ -64,6 +64,10 @@ export default function Register() {
           <label htmlFor="city">{t('City')} <span className="muted">{t('(optional)')}</span></label>
           <CityField id="city" value={form.city} onChange={set('city')} />
         </div>
+        <label className="toggle-row terms-check">
+          <input id="acceptTerms" type="checkbox" required checked={form.acceptTerms} onChange={(e) => setForm({ ...form, acceptTerms: e.target.checked })} />
+          <span>{tj('I agree to the {terms}, including that deals agreed on Unc are finished on Unc.', { terms: <Link to="/terms" target="_blank">{t('Terms of use')}</Link> })}</span>
+        </label>
         <button className="btn block" disabled={busy}>{busy ? t('Creating…') : t('Create account')}</button>
       </form>
       <p className="muted small center" style={{ marginTop: '1rem' }}>{tj('Already have an account? {link}', { link: <Link to="/login">{t('Log in')}</Link> })}</p>

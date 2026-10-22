@@ -401,6 +401,7 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
           {!expired && <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>}
           <button type="button" className="btn sm secondary" disabled={busy} onClick={() => setCountering(true)}>{t('Counter')}</button>
           <button type="button" className="btn sm secondary" disabled={busy} onClick={respond('decline')}>{t('Not for me')}</button>
+          {!expired && <div className="small muted accept-terms">{tj('Accepting means you both finish this deal on Unc ({terms}).', { terms: <Link to="/terms">{t('Terms of use')}</Link> })}</div>}
         </div>
       )}
       {canAnswer && countering && (

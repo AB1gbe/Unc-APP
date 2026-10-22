@@ -4,14 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { openDb } from './db.js';
 import { hashPassword } from './lib/crypto.js';
+import { TERMS_VERSION } from './lib/terms.js';
 
 export async function ensureAdmin(db) {
   const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(config.adminEmail);
   if (exists) return exists.id;
   const info = db.prepare(`
-    INSERT INTO users (email, password_hash, display_name, account_type, role, email_verified_at, kyc_status)
-    VALUES (?, ?, 'Admin', 'individual', 'admin', datetime('now'), 'approved')
-  `).run(config.adminEmail, await hashPassword(config.adminPassword));
+    INSERT INTO users (email, password_hash, display_name, account_type, role, email_verified_at, kyc_status, terms_version, terms_accepted_at)
+    VALUES (?, ?, 'Admin', 'individual', 'admin', datetime('now'), 'approved', ?, datetime('now'))
+  `).run(config.adminEmail, await hashPassword(config.adminPassword), TERMS_VERSION);
   if (!config.isTest) console.log(`Created admin account ${config.adminEmail}`);
   return Number(info.lastInsertRowid);
 }
@@ -22,9 +23,9 @@ async function seedDemo(db) {
     const found = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
     if (found) return found.id;
     return Number(db.prepare(`
-      INSERT INTO users (email, password_hash, display_name, account_type, city, email_verified_at, kyc_status)
-      VALUES (?, ?, ?, ?, ?, datetime('now'), 'approved')
-    `).run(email, pw, name, type, city).lastInsertRowid);
+      INSERT INTO users (email, password_hash, display_name, account_type, city, email_verified_at, kyc_status, terms_version, terms_accepted_at)
+      VALUES (?, ?, ?, ?, ?, datetime('now'), 'approved', ?, datetime('now'))
+    `).run(email, pw, name, type, city, TERMS_VERSION).lastInsertRowid);
   };
   const buyer = mk('buyer@demo.local', 'Sam Buyer', 'individual', 'Juffair');
   mk('vendor@demo.local', 'Riverside Electronics', 'business', 'Seef');

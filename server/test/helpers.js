@@ -32,7 +32,7 @@ export async function setup() {
     n += 1;
     const agent = request.agent(app);
     const reg = await agent.post('/api/auth/register').send({
-      email: `user${n}@test.local`, password: 'Password123', displayName: `User ${n}`, accountType, city: 'Austin',
+      email: `user${n}@test.local`, password: 'Password123', displayName: `User ${n}`, accountType, city: 'Austin', acceptTerms: true,
     }).expect(201);
     agent.id = reg.body.user.id;
     if (stage === 'registered') return agent;

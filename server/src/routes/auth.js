@@ -18,6 +18,7 @@ import { readShopHours } from '../lib/shop-hours.js';
 import { normalizeCity } from '../../../shared/areas.js';
 import { DELETE_AFTER_DAYS, exportData } from '../lib/deletion.js';
 import { MAX_AWAY_DAYS, setAway } from '../lib/activity.js';
+import { TERMS_VERSION } from '../lib/terms.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -87,6 +88,8 @@ export function authRoutes(db) {
     const city = normalizeCity(v.str(req.body, 'city', { max: 80, optional: true }));
     // The language the website was in when they signed up (emails use it).
     const language = langOf(req);
+    // Agreeing to the Terms is part of signing up (session 40).
+    if (req.body?.acceptTerms !== true) throw new HttpError(400, 'Please read and accept the Terms to create an account.', { field: 'acceptTerms' });
 
     if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
       throw new HttpError(409, 'An account with this email already exists.', { field: 'email' });
@@ -95,8 +98,9 @@ export function authRoutes(db) {
     let info;
     try {
       info = db.prepare(`
-        INSERT INTO users (email, password_hash, display_name, account_type, city, language) VALUES (?, ?, ?, ?, ?, ?)
-      `).run(email, hash, displayName, accountType, city, language);
+        INSERT INTO users (email, password_hash, display_name, account_type, city, language, terms_version, terms_accepted_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      `).run(email, hash, displayName, accountType, city, language, TERMS_VERSION);
     } catch (err) {
       // Two sign-ups with the same email at the same moment: the check above
       // passed for both, the database's UNIQUE rule stops the second.
@@ -248,6 +252,14 @@ export function authRoutes(db) {
       db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?').run(req.user.id, req.sessionTokenHash);
       audit(db, req.user.id, 'user.delete_requested', `user:${req.user.id}`, { days: DELETE_AFTER_DAYS });
     });
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // Members who joined before the Terms (or before a new version) agree here.
+  r.post('/terms', requireAuth, (req, res) => {
+    if (req.body?.accept !== true) throw new HttpError(400, 'Please read and accept the Terms to create an account.', { field: 'accept' });
+    db.prepare(`UPDATE users SET terms_version = ?, terms_accepted_at = datetime('now') WHERE id = ?`).run(TERMS_VERSION, req.user.id);
+    audit(db, req.user.id, 'user.terms_accepted', `user:${req.user.id}`, { version: TERMS_VERSION });
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 

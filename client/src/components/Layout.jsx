@@ -8,6 +8,7 @@ import { usePolling } from '../hooks.js';
 import { LANGUAGES, hasSavedChoice, t, tj, useLanguage } from '../i18n.jsx';
 import Celebrations from './Celebrate.jsx';
 import DeletePending from './DeletePending.jsx';
+import TermsAccept from './TermsAccept.jsx';
 
 // On phones these header links are hidden: the bottom tab bar has them.
 const tabbed = ({ isActive }) => `hide-phone${isActive ? ' active' : ''}`;
@@ -94,6 +95,9 @@ export default function Layout() {
         <div className="container" style={{ paddingBottom: 0 }}>
           <div className="alert warn" style={{ margin: 0 }}>{tj('Confirm your email to get started. {link}', { link: <Link to="/verify-email">{t('Enter code')}</Link> })}</div>
         </div>
+      )}
+      {user && !user.termsAccepted && pathname !== '/terms' && (
+        <div className="container" style={{ paddingBottom: 0 }}><TermsAccept banner /></div>
       )}
       {user?.deleteAt && (
         <div className="container" style={{ paddingBottom: 0 }}><DeletePending banner /></div>

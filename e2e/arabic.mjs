@@ -68,6 +68,7 @@ async function onboard(p, { name, email, business, idNumber }) {
   await check(p, 'register');
   if (business) await p.check('input[value=business]');
   await p.fill('#displayName', name); await p.fill('#email', email); await p.fill('#password', 'Password123'); await p.fill('#city', 'المنامة');
+  await p.check('#acceptTerms');
   await p.click('form button.btn.block');
   await p.waitForURL('**/verify-email');
   await check(p, 'verify-email');

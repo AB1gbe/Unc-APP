@@ -499,3 +499,10 @@ form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bott
 .contact-nudge { margin: 0 1rem .5rem; padding: .5rem .7rem; border-radius: 8px; background: var(--warn-soft); font-size: .85rem; }
 .field .contact-nudge { margin: .4rem 0 0; }
 .hidden-note { font-size: .75rem; opacity: .8; margin-top: .2rem; }
+
+/* Terms (session 40) */
+.terms h2 { margin-top: 1.25rem; font-size: 1.1rem; }
+.terms p { line-height: 1.6; }
+.terms-check { margin-bottom: 1rem; font-weight: 400; }
+.terms-banner, .terms-accept { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; justify-content: space-between; padding: .6rem .9rem; border-radius: 10px; background: var(--brand-soft); }
+.accept-terms { flex-basis: 100%; }

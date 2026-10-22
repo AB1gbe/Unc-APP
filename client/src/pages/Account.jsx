@@ -49,7 +49,7 @@ export default function Account() {
       <ChangePassword />
       <YourData />
       <div className="card row spread">
-        <span className="muted small">{tj('Signed in as {email}', { email: <span className="ltr">{user.email}</span> })}</span>
+        <span className="muted small">{tj('Signed in as {email}', { email: <span className="ltr">{user.email}</span> })} · <Link to="/terms">{t('Terms of use')}</Link></span>
         <button className="btn secondary" onClick={async () => { await logout(); navigate('/'); }}>{t('Log out')}</button>
       </div>
     </div>

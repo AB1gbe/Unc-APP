@@ -402,6 +402,11 @@ const MIGRATIONS = [
   `
   ALTER TABLE conversations ADD COLUMN got_it_asked_at TEXT;
   `,
+  // 31: the Terms (session 40): which version the member agreed to, and when.
+  `
+  ALTER TABLE users ADD COLUMN terms_version INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE users ADD COLUMN terms_accepted_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
