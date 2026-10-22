@@ -328,6 +328,18 @@ await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people a
 await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
 await shot(vendor, '34-demand');
 
+// Your data (session 37): download, then ask to delete and change your mind.
+await buyer.goto(BASE + '/account');
+const exported = await buyer.evaluate(() => fetch('/api/auth/me/export').then((r) => r.json()));
+if (!exported.requests?.length) throw new Error('export has no requests');
+await buyer.click('button:has-text("Delete my account")');
+await buyer.fill('#deletePassword', 'Password123');
+await buyer.click('button:has-text("Delete my account in 7 days")');
+await buyer.waitForSelector('.delete-banner:has-text("Your account will be deleted on")');
+await shot(buyer, '38-delete-pending');
+await buyer.click('.delete-banner button:has-text("Keep my account")');
+await buyer.waitForSelector('.delete-banner', { state: 'detached' });
+
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.feed li'); /* visitors see "Happening on Unc" */ await shot(mp, '14-mobile-home');

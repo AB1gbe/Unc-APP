@@ -747,4 +747,14 @@ export default {
   'Not as described': 'ليس كما وُصف',
   'No-show': 'لم يحضر',
   'Payment': 'الدفع',
+  // Your data (session 37)
+  'Your data': 'بياناتك',
+  'A file with your profile, requests, your messages, deals, ratings and settings. Identity numbers show only their last 4 digits.': 'ملف فيه ملفك الشخصي وطلباتك ورسائلك وصفقاتك وتقييماتك وإعداداتك. أرقام الهوية تظهر بآخر 4 أرقام فقط.',
+  '⬇ Download my data': '⬇ تنزيل بياناتي',
+  'Delete my account': 'حذف حسابي',
+  'Your open requests close now. After 7 days, your account, photos and identity documents are deleted for good. Until then you can change your mind. Chats with other members stay for them, showing “Deleted member”.': 'تُغلق طلباتك المفتوحة الآن. بعد 7 أيام يُحذف حسابك وصورك ووثائق هويتك نهائياً، ويمكنك التراجع حتى ذلك الحين. تبقى المحادثات لدى الأعضاء الآخرين وتظهر باسم «عضو محذوف».',
+  'Your password': 'كلمة المرور',
+  'Delete my account in 7 days': 'احذف حسابي بعد 7 أيام',
+  'Your account will be deleted on {date}.': 'سيُحذف حسابك في {date}.',
+  'Keep my account': 'أبقِ حسابي',
 };

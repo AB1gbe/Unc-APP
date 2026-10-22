@@ -81,6 +81,10 @@ export function kycRoutes(db) {
       SELECT 1 FROM kyc_submissions WHERE id_number_hash = ? AND user_id <> ? AND status IN ('pending','approved')
     `).get(idHash, user.id);
     if (clash) throw new HttpError(409, 'This ID document is already linked to another account.');
+    // A banned member who deleted their account can't come back (session 37).
+    if (db.prepare('SELECT 1 FROM banned_id_hashes WHERE id_number_hash = ?').get(idHash)) {
+      throw new HttpError(409, 'This ID document is already linked to another account.');
+    }
 
     // Every file is checked before any is written, and they are deleted again
     // if saving the submission fails - no orphaned ID photos on disk.

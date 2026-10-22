@@ -451,3 +451,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 /* "Something went wrong with this deal?" (session 34) */
 .deal-problem { margin: 0; padding: .4rem 1rem; }
 form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+
+/* Your data (session 37) */
+.your-data hr { border: 0; border-top: 1px solid var(--border); margin: 1rem 0; }
+.btn.danger-outline { background: transparent; color: var(--bad); border: 1px solid var(--bad); }
+.delete-banner { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; justify-content: space-between; padding: .6rem .9rem; border-radius: 10px; background: var(--bad-soft); color: var(--text); }

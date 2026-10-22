@@ -94,6 +94,8 @@ export function publicMe(u) {
     emailOffers: u.email_offers !== 0,
     hideActivity: u.hide_activity === 1,
     shortName: u.short_name === 1,
+    // When the account will be deleted, if the member asked (session 37).
+    deleteAt: u.delete_requested_at ? new Date(Date.parse(`${u.delete_requested_at.replace(' ', 'T')}Z`) + 7 * 86_400_000).toISOString() : null,
     ...shopFields(u),
   };
 }

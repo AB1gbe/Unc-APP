@@ -16,6 +16,7 @@ import { CATEGORIES } from '../lib/categories.js';
 import { CONTACT_MESSAGE, hasContactDetails } from '../lib/contact-guard.js';
 import { readShopHours } from '../lib/shop-hours.js';
 import { normalizeCity } from '../../../shared/areas.js';
+import { DELETE_AFTER_DAYS, exportData } from '../lib/deletion.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -223,6 +224,38 @@ export function authRoutes(db) {
   });
 
   // ---- Change password (logged in) ----
+  // "Download my data" (session 37): everything Unc holds about me, as JSON.
+  r.get('/me/export', requireAuth, (req, res) => {
+    audit(db, req.user.id, 'user.exported', `user:${req.user.id}`);
+    res.set('Content-Disposition', `attachment; filename="unc-my-data-${new Date().toISOString().slice(0, 10)}.json"`);
+    res.set('Cache-Control', 'no-store');
+    res.json(exportData(db, req.user));
+  });
+
+  // "Delete my account": needs the password. The account is wiped after
+  // DELETE_AFTER_DAYS (lib/deletion.js); until then it can be cancelled.
+  // Open requests close now, and other devices are logged out.
+  r.post('/me/delete', limits.changePassword, requireAuth, async (req, res) => {
+    if (req.user.role === 'admin') throw new HttpError(400, 'Admin accounts cannot be deleted here.');
+    const password = v.str(req.body, 'password', { max: 200 });
+    if (!(await verifyPassword(password, req.user.password_hash))) {
+      throw new HttpError(400, 'Your password is not correct.', { field: 'password' });
+    }
+    tx(db, () => {
+      db.prepare(`UPDATE users SET delete_requested_at = datetime('now') WHERE id = ? AND delete_requested_at IS NULL`).run(req.user.id);
+      db.prepare(`UPDATE listings SET status = 'closed', updated_at = datetime('now') WHERE buyer_id = ? AND status = 'open'`).run(req.user.id);
+      db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?').run(req.user.id, req.sessionTokenHash);
+      audit(db, req.user.id, 'user.delete_requested', `user:${req.user.id}`, { days: DELETE_AFTER_DAYS });
+    });
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  r.post('/me/delete/cancel', requireAuth, (req, res) => {
+    db.prepare('UPDATE users SET delete_requested_at = NULL WHERE id = ?').run(req.user.id);
+    audit(db, req.user.id, 'user.delete_cancelled', `user:${req.user.id}`);
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
   r.post('/change-password', limits.changePassword, requireAuth, async (req, res) => {
     const current = v.str(req.body, 'currentPassword', { max: 200 });
     const password = v.password(req.body);

@@ -99,6 +99,8 @@ const AR = {
   'Choose a date from today up to 60 days ahead.': 'اختر تاريخاً من اليوم وحتى 60 يوماً قادمة.',
   'This price has expired. Ask the seller for a new one.': 'انتهت صلاحية هذا السعر. اطلب من البائع سعراً جديداً.',
   'You already told us about this deal. Our team will be in touch by email.': 'لقد أبلغتنا عن هذه الصفقة من قبل. سيتواصل معك فريقنا عبر البريد الإلكتروني.',
+  'Admin accounts cannot be deleted here.': 'لا يمكن حذف حسابات المشرفين من هنا.',
+  'Your password is not correct.': 'كلمة المرور غير صحيحة.',
   'shortName must be true or false.': 'قيمة إظهار الاسم الأول يجب أن تكون true أو false.',
   'Shops always show their full name.': 'تظهر المتاجر باسمها الكامل دائماً.',
   'Only shops can make offers on this request.': 'المتاجر فقط يمكنها تقديم عروض على هذا الطلب.',
