@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-22 (session 34)
+updated: 2026-10-22 (session 37)
 ---
 # Unc — Project Vault
 
@@ -23,7 +23,7 @@ This vault is the complete record of the project: **how** everything was built, 
 
 ### Market
 - [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
-- Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]]
+- Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]]
 - [[Glossary]] — every technical word used here, explained
 
 ### Rebuild it from zero (step by step)
@@ -69,10 +69,15 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 40 - Proof photos]]
 - [[Step 41 - Offer details]]
 - [[Step 42 - Closing note and deal problems]]
+- [[Step 43 - Download and delete my data]]
+- [[Step 44 - Owner dashboard]]
+- [[Step 45 - Away mode]]
+- [[Step 46 - Pickup checklist and big-deal card]]
+- [[Step 47 - Report follow-up and raise my budget]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Your Data, Dashboard and Care]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -87,7 +92,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-22, after session 34)
+## Status (2026-10-22, after session 37)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -116,6 +121,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Favourite sellers (heads-up on new requests) | ✅ done — in `main` since session 29 → [[Social Touches]] |
 | Compare offers, request alerts, Bahrain areas, block + scam warnings, expiry + tips | ✅ done — on branch (session 31) → [[Choosing, Alerts and Safety]] |
 | Who may contact me + first name only, unmet demand board, proof photos, offer details, closing note + deal problems | ✅ done — on branch (session 34) → [[Privacy, Demand and Trust]] |
-| API tests | ✅ 148 passing |
+| Download/delete my data, owner dashboard, away mode, pickup checklist + big-deal card, report follow-up + raise my budget | ✅ done — on branch (session 37) → [[Your Data, Dashboard and Care]] |
+| API tests | ✅ 159 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

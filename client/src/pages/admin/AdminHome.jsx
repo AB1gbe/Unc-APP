@@ -5,6 +5,7 @@ import { ErrorBox, Loading } from '../../components/ui.jsx';
 import { useApi } from '../../hooks.js';
 import { ACCOUNT_TYPE, ID_TYPE, KYC_STATUS, label } from '../../kycReasons.js';
 import { formatDateTime, t, tj } from '../../i18n.jsx';
+import Dashboard from './Dashboard.jsx';
 
 export default function AdminHome() {
   const stats = useApi('/admin/stats');
@@ -22,6 +23,8 @@ export default function AdminHome() {
           ))}
         </div>
       )}
+
+      <Dashboard />
 
       <section className="card">
         <div className="row spread">
@@ -84,7 +87,9 @@ function ReportRow({ report: r, onDone }) {
           {r.conversation_id && !thread && (
             <button className="btn sm secondary" onClick={act(async () => setThread(await api(`/admin/reports/${r.id}/conversation`)))}>{t('Read conversation')}</button>
           )}
-          <button className="btn sm" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST' }); onDone(); })}>{t('Mark resolved')}</button>
+          {/* The reporter is told which one (session 37), never the details. */}
+          <button className="btn sm" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'action' } }); onDone(); })}>{t('✓ Took action')}</button>
+          <button className="btn sm secondary" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'nothing' } }); onDone(); })}>{t('Nothing wrong')}</button>
         </div>
       </div>
       {thread && (

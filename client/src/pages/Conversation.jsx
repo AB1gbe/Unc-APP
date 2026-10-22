@@ -14,6 +14,7 @@ import { StoryForm } from '../components/Stories.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
 import { Place } from '../components/CityField.jsx';
 import { scamSignals } from '../scam.js';
+import PickupCard from '../components/PickupCard.jsx';
 import { EMPTY_DETAILS, OfferDetailFields, OfferDetailsLine, addDetails } from '../components/OfferDetails.jsx';
 
 export default function Conversation() {
@@ -103,6 +104,9 @@ export default function Conversation() {
   // Offer cards: only the newest price can be answered, and only once.
   const newestPriceId = Math.max(0, ...messages.filter((m) => m.offerPrice !== null).map((m) => m.id));
   const answers = new Map(messages.filter((m) => m.kind).map((m) => [m.replyTo, m.kind]));
+  // The agreed price, once either side accepted one (for the pickup checklist).
+  const accepted = messages.findLast((m) => m.kind === 'accept');
+  const agreed = accepted ? messages.find((m) => m.id === accepted.replyTo)?.offerPrice ?? null : null;
   const priceOf = (id) => { const m = messages.find((x) => x.id === id); return m ? money(m.offerPrice, l.currency) : ''; };
 
   return (
@@ -127,6 +131,7 @@ export default function Conversation() {
         </div>
         {conv.deal && <DealBanner conv={conv} onRated={load} />}
         {conv.deal && <DealProblem conv={conv} onDone={load} />}
+        {(accepted || conv.deal) && <PickupCard convId={conv.id} category={l.category} price={agreed} currency={l.currency} />}
         <div className="chat-body" ref={bodyRef}>
           {messages.map((m) => m.kind === 'proof-ask' ? (
             <ProofAskLine key={m.id} m={m} conv={conv} />

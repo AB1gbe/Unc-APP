@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
 import { budget, ago, toDate } from '../api.js';
-import { t, tj, tn } from '../i18n.jsx';
+import { t, tj, tn, formatDate } from '../i18n.jsx';
 import { Place } from './CityField.jsx';
 
 export function ErrorBox({ error }) {
@@ -184,6 +184,10 @@ export function Activity({ activity }) {
   const seen = activity.lastSeenAt ? toDate(activity.lastSeenAt).getTime() : 0;
   const since = Date.now() - seen;
   const parts = [];
+  // Away mode (session 37) says it all: no "Active now" next to it.
+  if (activity.awayUntil) {
+    return <span className="activity small away">{t('🌴 Away until {date}', { date: formatDate(toDate(activity.awayUntil), { day: 'numeric', month: 'short' }) })}</span>;
+  }
   if (seen && since < ACTIVE_MS) parts.push(<span key="on" className="active-now">{t('Active now')}</span>);
   else if (seen && since < WEEK_MS) parts.push(<span key="ago">{t('Active {time}', { time: ago(activity.lastSeenAt) })}</span>);
   if (activity.replyTime) parts.push(<span key="reply">{REPLY[activity.replyTime]()}</span>);

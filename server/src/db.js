@@ -364,6 +364,34 @@ const MIGRATIONS = [
   ALTER TABLE reports ADD COLUMN kind TEXT;
   CREATE INDEX idx_reports_deal ON reports(deal_id);
   `,
+  // 26: "Delete my account" (session 37): when it was asked for (7 days to
+  // cancel) and when it was done; ID fingerprints of deleted BANNED members,
+  // so they can't verify a new account with the same document.
+  `
+  ALTER TABLE users ADD COLUMN delete_requested_at TEXT;
+  ALTER TABLE users ADD COLUMN deleted_at TEXT;
+  CREATE TABLE banned_id_hashes (
+    id_number_hash TEXT PRIMARY KEY,
+    created_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  `,
+  // 27: away mode (session 37): users.away_until (last away day) and every
+  // away period, so reply times can leave those days out.
+  `
+  ALTER TABLE users ADD COLUMN away_until TEXT;
+  CREATE TABLE away_periods (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    starts_at TEXT NOT NULL,
+    ends_at   TEXT NOT NULL
+  );
+  CREATE INDEX idx_away_user ON away_periods(user_id, ends_at);
+  `,
+  // 28: report follow-up and "raise my budget" (session 37).
+  `
+  ALTER TABLE reports ADD COLUMN outcome TEXT CHECK (outcome IN ('action', 'nothing'));
+  ALTER TABLE listings ADD COLUMN budget_raised_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

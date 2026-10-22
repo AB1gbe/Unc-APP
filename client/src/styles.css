@@ -451,3 +451,46 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 /* "Something went wrong with this deal?" (session 34) */
 .deal-problem { margin: 0; padding: .4rem 1rem; }
 form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+
+/* Your data (session 37) */
+.your-data hr { border: 0; border-top: 1px solid var(--border); margin: 1rem 0; }
+.btn.danger-outline { background: transparent; color: var(--bad); border: 1px solid var(--bad); }
+.delete-banner { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; justify-content: space-between; padding: .6rem .9rem; border-radius: 10px; background: var(--bad-soft); color: var(--text); }
+
+/* Owner dashboard (session 37): thin bars, 4px rounded ends at the top,
+   2px gaps, a recessive baseline; numbers stay in text colours. */
+.dashboard { display: grid; gap: 1rem; }
+.stat-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; }
+.stat-tile { border: 1px solid var(--border); border-radius: 10px; padding: .6rem .75rem; }
+.stat-value { font-size: 1.6rem; font-weight: 700; }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.chart { margin: 0; display: grid; gap: .4rem; }
+.day-bars { display: grid; grid-template-columns: repeat(var(--count), 1fr); gap: 2px; height: 140px; align-items: end; border-bottom: 1px solid var(--border); }
+.day-col { position: relative; height: 100%; display: flex; align-items: flex-end; outline: none; }
+.day-bar { width: 100%; max-width: 24px; margin-inline: auto; min-height: 0; background: var(--brand); border-radius: 4px 4px 0 0; }
+.day-col:hover .day-bar, .day-col:focus-visible .day-bar { opacity: .75; }
+.bar-tip { position: absolute; bottom: calc(100% + 4px); inset-inline-start: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--text); color: var(--surface); padding: .2rem .45rem; border-radius: 6px; font-size: .75rem; pointer-events: none; display: none; z-index: 2; }
+[dir="rtl"] .bar-tip { transform: translateX(50%); }
+.day-col:hover .bar-tip, .day-col:focus-visible .bar-tip { display: block; }
+/* The first and last few days: keep the label inside the chart. */
+.day-col:nth-child(-n+3) .bar-tip { inset-inline-start: 0; transform: none; }
+.day-col:nth-last-child(-n+3) .bar-tip { inset-inline-start: auto; inset-inline-end: 0; transform: none; }
+.day-axis { display: flex; justify-content: space-between; }
+.list-bars { display: grid; gap: .35rem; }
+.list-row { display: grid; grid-template-columns: minmax(90px, 35%) 1fr auto; gap: .5rem; align-items: center; font-size: .9rem; }
+.list-track { height: 10px; }
+.list-bar { display: block; height: 100%; background: var(--brand); border-start-end-radius: 4px; border-end-end-radius: 4px; }
+
+/* Away mode (session 37) */
+.activity.away { color: var(--warn); font-weight: 600; }
+
+/* Pickup checklist + big-deal card (session 37) */
+.pickup { padding: .5rem 1rem; border-bottom: 1px solid var(--border); display: grid; gap: .5rem; }
+.pickup summary { cursor: pointer; }
+.pickup-item { display: flex; gap: .5rem; align-items: flex-start; padding: .25rem 0; font-size: .9rem; font-weight: 400; }
+.pickup-item input { width: auto; margin-top: .2rem; }
+.big-deal { background: var(--warn-soft); border-radius: 10px; padding: .6rem .8rem; font-size: .9rem; }
+.big-deal ul { margin: .3rem 0 0; padding-inline-start: 1.2rem; }
+
+/* Raise my budget (session 37) */
+.raise-budget { display: grid; gap: .35rem; margin-bottom: .75rem; }

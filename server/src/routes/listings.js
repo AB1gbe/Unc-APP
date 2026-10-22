@@ -19,6 +19,7 @@ import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.
 import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
 import { EXPIRES_AT_SQL } from '../lib/expiry.js';
 import { CONTACT_ALLOWED_SQL, CONTACT_RULES, contactAllowedParams, contactBlocker } from '../lib/contact.js';
+import { NOT_AWAY } from '../lib/activity.js';
 import { nameFor } from '../../../shared/names.js';
 
 export const MAX_PHOTOS = 6;
@@ -281,6 +282,32 @@ export function listingRoutes(db) {
     if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be kept open. Reopen it instead.');
     db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL WHERE id = ?`).run(row.id);
     res.json({ listing: detailView(row.id, req.user) });
+  });
+
+  // "Raise my budget" (session 37): once a day, the buyer raises the top of
+  // the budget, and sellers who looked at or saved the request (and may
+  // still answer it) hear about it. 🔔 only.
+  r.post('/:id/budget', requireVerified, (req, res) => {
+    const row = ownListing(db, req);
+    if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
+    const budgetMax = v.int(req.body, 'budgetMax', { min: 1 });
+    if (budgetMax <= (row.budget_max ?? row.budget_min ?? 0)) throw new HttpError(400, 'The new budget must be higher than the current one.', { field: 'budgetMax' });
+    if (row.budget_raised_at && Date.parse(`${row.budget_raised_at.replace(' ', 'T')}Z`) > Date.now() - 86_400_000) {
+      throw new HttpError(409, 'You can raise the budget once a day.');
+    }
+    const sellers = db.prepare(`
+      SELECT u.id, u.account_type FROM users u
+      WHERE u.id IN (SELECT user_id FROM listing_views WHERE listing_id = ? UNION SELECT user_id FROM saved_listings WHERE listing_id = ?)
+        AND u.id <> ? AND u.banned_at IS NULL AND u.kyc_status = 'approved' AND ${NOT_AWAY}
+        AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = ? AND c.vendor_id = u.id)
+        AND NOT EXISTS (SELECT 1 FROM blocks b WHERE (b.user_id = ? AND b.blocked_id = u.id) OR (b.user_id = u.id AND b.blocked_id = ?))
+    `).all(row.id, row.id, row.buyer_id, row.id, row.buyer_id, row.buyer_id).filter((s) => !contactBlocker(db, row, s));
+    tx(db, () => {
+      db.prepare(`UPDATE listings SET budget_max = ?, budget_raised_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`).run(budgetMax, row.id);
+      for (const s of sellers) notify(db, s.id, 'budget-raised', { actorId: row.buyer_id, listingId: row.id });
+      audit(db, req.user.id, 'listing.budget_raised', `listing:${row.id}`, { from: row.budget_max, to: budgetMax, told: sellers.length });
+    });
+    res.json({ listing: detailView(row.id, req.user), told: sellers.length });
   });
 
   r.post('/:id/status', requireAuth, (req, res) => {

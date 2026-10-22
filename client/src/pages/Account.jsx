@@ -9,6 +9,7 @@ import PushSettings from '../components/PushSettings.jsx';
 import ShopEditor from '../components/ShopEditor.jsx';
 import { useApi } from '../hooks.js';
 import { shortName } from '../../../shared/names.js';
+import DeletePending from '../components/DeletePending.jsx';
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -43,8 +44,10 @@ export default function Account() {
       {user.accountType === 'business' && <ShopEditor />}
       <EmailSettings />
       <PrivacySettings />
+      <AwayMode />
       <PushSettings />
       <ChangePassword />
+      <YourData />
       <div className="card row spread">
         <span className="muted small">{tj('Signed in as {email}', { email: <span className="ltr">{user.email}</span> })}</span>
         <button className="btn secondary" onClick={async () => { await logout(); navigate('/'); }}>{t('Log out')}</button>
@@ -178,6 +181,102 @@ function BlockedMembers() {
           <button type="button" className="linkish" onClick={async () => { await api(`/members/${m.id}/block`, { method: 'DELETE' }); await reload(); }}>{t('Unblock')}</button>
         </div>
       ))}
+    </div>
+  );
+}
+
+// "Download my data" and "Delete my account" (session 37, PDPL).
+function YourData() {
+  const { user, setUser } = useAuth();
+  const [deleting, setDeleting] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  async function confirmDelete(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      setUser((await api('/auth/me/delete', { method: 'POST', body: { password } })).user);
+      setDeleting(false);
+      setPassword('');
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card your-data">
+      <h2>{t('Your data')}</h2>
+      <p className="small muted">{t('A file with your profile, requests, your messages, deals, ratings and settings. Identity numbers show only their last 4 digits.')}</p>
+      <a className="btn secondary" href="/api/auth/me/export" download>{t('⬇ Download my data')}</a>
+      <hr />
+      {user.deleteAt ? (
+        <DeletePending />
+      ) : !deleting ? (
+        user.role !== 'admin' && <button type="button" className="btn danger-outline" onClick={() => setDeleting(true)}>{t('Delete my account')}</button>
+      ) : (
+        <form onSubmit={confirmDelete} className="stack">
+          <p className="small">{t('Your open requests close now. After 7 days, your account, photos and identity documents are deleted for good. Until then you can change your mind. Chats with other members stay for them, showing “Deleted member”.')}</p>
+          <ErrorBox error={error} />
+          <div className="field">
+            <label htmlFor="deletePassword">{t('Your password')}</label>
+            <input id="deletePassword" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+          <div className="row">
+            <button className="btn danger" disabled={busy || !password}>{busy ? t('Saving…') : t('Delete my account in 7 days')}</button>
+            <button type="button" className="btn secondary" onClick={() => setDeleting(false)}>{t('Cancel')}</button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
+// Away mode (session 37): no alerts or favourite heads-ups while away,
+// "🌴 Away until …" on your profile and chats, and messages that arrive
+// meanwhile don't count against your reply time.
+function AwayMode() {
+  const { user, setUser } = useAuth();
+  const [until, setUntil] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const iso = (d) => d.toISOString().slice(0, 10);
+
+  async function save(value) {
+    setBusy(true);
+    setError(null);
+    try {
+      setUser((await api('/auth/me', { method: 'PATCH', body: { awayUntil: value } })).user);
+      setUntil('');
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card away-mode">
+      <h2>{t('Away mode')}</h2>
+      <p className="small muted">{t('Going on holiday? Request alerts pause, members see when you are back, and messages that arrive meanwhile do not count against your reply time.')}</p>
+      <ErrorBox error={error} />
+      {user.awayUntil ? (
+        <div className="row spread">
+          <b>{t('🌴 Away until {date}', { date: formatDate(toDate(user.awayUntil), { day: 'numeric', month: 'long' }) })}</b>
+          <button type="button" className="btn secondary" disabled={busy} onClick={() => save(null)}>{t("I'm back")}</button>
+        </div>
+      ) : (
+        <form className="row" onSubmit={(e) => { e.preventDefault(); save(until); }}>
+          <label htmlFor="awayUntil">{t('Away until')}</label>
+          <input id="awayUntil" type="date" required value={until} onChange={(e) => setUntil(e.target.value)}
+            min={iso(new Date())} max={iso(new Date(Date.now() + 60 * 86_400_000))} style={{ width: 'auto' }} />
+          <button className="btn" disabled={busy || !until}>{t('Turn on away mode')}</button>
+        </form>
+      )}
     </div>
   );
 }

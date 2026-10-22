@@ -225,6 +225,13 @@ await vendor.fill('form.deal-problem textarea', 'The buyer paid only half and pr
 await shot(vendor, '37-deal-problem');
 await vendor.click('button:has-text("Send to the Unc team")');
 await vendor.waitForSelector('.deal-problem:has-text("Thanks for telling us")');
+// Pickup checklist (session 37): ticks stay after a reload (kept on this device).
+await vendor.click('.pickup summary');
+await vendor.check('.pickup-item:has-text("Switch it on") input');
+await vendor.reload();
+await vendor.click('.pickup summary');
+if (!(await vendor.isChecked('.pickup-item:has-text("Switch it on") input'))) throw new Error('pickup tick was not kept');
+await vendor.locator('.pickup').screenshot({ path: `${OUT}/41-pickup.png` });
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
@@ -327,6 +334,57 @@ await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { '
 await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people are asking for');
 await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
 await shot(vendor, '34-demand');
+
+// Away mode (session 37): the shop goes away; the buyer sees it in the chat.
+await vendor.goto(BASE + '/account');
+await vendor.fill('#awayUntil', new Date(Date.now() + 5 * 86_400_000).toISOString().slice(0, 10));
+await vendor.click('button:has-text("Turn on away mode")');
+await vendor.waitForSelector('.away-mode button:has-text("I\'m back")');
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.waitForSelector('.chat-head .activity.away');
+await buyer.locator('.chat-head').screenshot({ path: `${OUT}/40-away.png` });
+await vendor.click('.away-mode button:has-text("I\'m back")');
+await vendor.waitForSelector('button:has-text("Turn on away mode")');
+
+// Raise my budget (session 37), on the controller request ($30–$60).
+await buyer.goto(`${BASE}/requests/${controllerId}`);
+await buyer.click('button:has-text("Raise my budget")');
+await buyer.fill('#raiseBudget', '80');
+await buyer.locator('.raise-budget').screenshot({ path: `${OUT}/42-raise-budget.png` });
+await buyer.click('.raise-budget button:has-text("Raise")');
+await buyer.waitForSelector('.toast:has-text("Budget raised")');
+await buyer.waitForSelector('text=$30 – $80');
+
+// Owner dashboard (session 37): the admin sees today's requests in the charts.
+{
+  const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
+  const a = await ctx.newPage();
+  await a.goto(BASE + '/login'); await a.fill('#email', process.env.ADMIN_EMAIL || 'admin@unc.local'); await a.fill('#password', process.env.ADMIN_PASSWORD || 'ChangeMe123!');
+  await a.click('button:has-text("Log in")'); await a.waitForURL(BASE + '/');
+  await a.goto(BASE + '/admin');
+  await a.waitForSelector('.stat-tiles');
+  await a.click('.dashboard button:has-text("7 days")');
+  await a.waitForSelector('.day-col[aria-label$=": 0"]'); // quiet days show as empty columns
+  await a.locator('.day-col').last().hover();
+  await a.locator('.dashboard').screenshot({ path: `${OUT}/39-dashboard.png` });
+  // Report follow-up: the seller's deal problem is marked "took action"; the seller is told.
+  await a.click('button:has-text("Took action")');
+  await vendor.goto(BASE + '/notifications');
+  await vendor.waitForSelector('.inbox-item:has-text("Our team looked at it and took action")');
+  await ctx.close();
+}
+
+// Your data (session 37): download, then ask to delete and change your mind.
+await buyer.goto(BASE + '/account');
+const exported = await buyer.evaluate(() => fetch('/api/auth/me/export').then((r) => r.json()));
+if (!exported.requests?.length) throw new Error('export has no requests');
+await buyer.click('button:has-text("Delete my account")');
+await buyer.fill('#deletePassword', 'Password123');
+await buyer.click('button:has-text("Delete my account in 7 days")');
+await buyer.waitForSelector('.delete-banner:has-text("Your account will be deleted on")');
+await shot(buyer, '38-delete-pending');
+await buyer.click('.delete-banner button:has-text("Keep my account")');
+await buyer.waitForSelector('.delete-banner', { state: 'detached' });
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

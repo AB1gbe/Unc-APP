@@ -34,7 +34,7 @@ export function conversationRoutes(db) {
   const r = Router();
 
   const getConv = db.prepare(`
-    SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
+    SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city, l.category AS listing_category,
            l.budget_min, l.budget_max, l.currency,
            b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
            b.short_name AND NOT EXISTS (SELECT 1 FROM messages bm WHERE bm.conversation_id = c.id AND bm.sender_id = c.buyer_id) AS buyer_short,
@@ -102,7 +102,7 @@ export function conversationRoutes(db) {
     return {
       id: c.id,
       listing: {
-        id: c.listing_id, title: c.listing_title, status: c.listing_status, city: c.listing_city,
+        id: c.listing_id, title: c.listing_title, status: c.listing_status, city: c.listing_city, category: c.listing_category,
         budgetMin: c.budget_min, budgetMax: c.budget_max, currency: c.currency,
       },
       myRole: iAmBuyer ? 'buyer' : 'vendor',
@@ -271,6 +271,7 @@ export function conversationRoutes(db) {
       badges: badgesFor(c.vendor_id, replyTime),
       unread: unreadIn.get(convId).n,
       hasProof: Boolean(proofIn.get(convId)),
+      awayUntil: activity.summaryFor(c.vendor_id).awayUntil,
     };
   }
 

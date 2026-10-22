@@ -189,6 +189,7 @@ function OwnerPanel({ listing, onChange }) {
         )}
         {listing.status === 'open' && listing.expiresAt && <ExpiryLine listing={listing} onChange={onChange} />}
         {listing.status === 'open' && <Tips listing={listing} offers={offers.length} />}
+        {listing.status === 'open' && <RaiseBudget listing={listing} onChange={onChange} />}
         {listing.status === 'closed' && listing.expiredAt && <p className="small muted">{t('This request closed by itself after 30 days. Reopen it if you are still looking.')}</p>}
         <ErrorBox error={error} />
         {listing.status === 'open' && !picking && (
@@ -295,6 +296,44 @@ function ExpiryLine({ listing, onChange }) {
       ⏳ {t('Open until {date}', { date: formatDate(ends, { day: 'numeric', month: 'short' }) })}
       {soon && <> · <button type="button" className="linkish small" onClick={renew} disabled={busy}>{t('Keep it open')}</button></>}
     </p>
+  );
+}
+
+// "Raise my budget" (session 37): once a day; sellers who looked at or
+// saved the request are told.
+function RaiseBudget({ listing, onChange }) {
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const { told } = await api(`/listings/${listing.id}/budget`, { method: 'POST', body: { budgetMax: amount } });
+      celebrate({ text: tn(told, 'Budget raised. We told {n} seller who looked at it.', 'Budget raised. We told {n} sellers who looked at it.') });
+      setOpen(false);
+      setAmount('');
+      onChange();
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (!open) return <p className="small"><button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('💸 Raise my budget')}</button></p>;
+  return (
+    <form className="raise-budget" onSubmit={submit}>
+      <ErrorBox error={error} />
+      <label htmlFor="raiseBudget" className="small">{t('New top budget ({currency})', { currency: listing.currency })}</label>
+      <div className="row">
+        <input id="raiseBudget" type="number" min={(listing.budgetMax ?? listing.budgetMin ?? 0) + 1} required value={amount} onChange={(e) => setAmount(e.target.value)} style={{ width: 120 }} />
+        <button className="btn sm" disabled={busy || amount === ''}>{t('Raise')}</button>
+        <button type="button" className="btn sm secondary" onClick={() => setOpen(false)}>{t('Cancel')}</button>
+      </div>
+      <p className="hint" style={{ margin: 0 }}>{t('Sellers who looked at or saved your request are told. Once a day.')}</p>
+    </form>
   );
 }
 

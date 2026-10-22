@@ -2,12 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Router } from 'express';
 import { CHAT_DIR } from '../lib/uploads.js';
-import { audit } from '../db.js';
+import { audit, tx } from '../db.js';
+import { notify } from '../lib/notify.js';
 import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { applyDecision } from '../kyc/index.js';
 import { sendKycFile } from './kyc.js';
+import { METRIC_DAYS, metrics } from '../lib/metrics.js';
 
 export function adminRoutes(db) {
   const r = Router();
@@ -22,6 +24,12 @@ export function adminRoutes(db) {
       conversations: one('SELECT COUNT(*) n FROM conversations'),
       openReports: one(`SELECT COUNT(*) n FROM reports WHERE status = 'open'`),
     });
+  });
+
+  // The owner dashboard (session 37): ?days=7|30|90 (default 30).
+  r.get('/metrics', (req, res) => {
+    const days = METRIC_DAYS.includes(Number(req.query.days)) ? Number(req.query.days) : 30;
+    res.json(metrics(db, days));
   });
 
   // ---- KYC review queue ----
@@ -111,10 +119,23 @@ export function adminRoutes(db) {
     res.sendFile(full);
   });
 
+  // outcome (session 37): 'action' (we did something) or 'nothing' (found
+  // nothing wrong). With an outcome, the reporter is told in the 🔔, never
+  // what happened to the other person.
   r.post('/reports/:id/resolve', (req, res) => {
-    const info = db.prepare(`UPDATE reports SET status = 'resolved' WHERE id = ?`).run(Number(req.params.id));
-    if (!info.changes) throw notFound();
-    audit(db, req.user.id, 'report.resolved', `report:${req.params.id}`);
+    const outcome = v.oneOf(req.body, 'outcome', ['action', 'nothing'], { optional: true });
+    const rep = db.prepare(`
+      SELECT r.*, COALESCE(r.listing_id, c.listing_id) AS about_listing FROM reports r
+      LEFT JOIN conversations c ON c.id = r.conversation_id WHERE r.id = ?
+    `).get(Number(req.params.id));
+    if (!rep) throw notFound();
+    tx(db, () => {
+      db.prepare(`UPDATE reports SET status = 'resolved', outcome = ? WHERE id = ?`).run(outcome, rep.id);
+      if (outcome && rep.status === 'open') {
+        notify(db, rep.reporter_id, outcome === 'action' ? 'report-action' : 'report-no-action', { listingId: rep.about_listing });
+      }
+      audit(db, req.user.id, 'report.resolved', `report:${rep.id}`, outcome ? { outcome } : undefined);
+    });
     res.json({ ok: true });
   });
 

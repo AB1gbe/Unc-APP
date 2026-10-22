@@ -49,5 +49,10 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 040 | [[ADR-040 Proof photos]] | Code on paper (UNC-#### from the chat); buyer checks; one-tap ask; new `messages.proof` column | image search, AI, stored random code |
 | 041 | [[ADR-041 Offer details]] | Fixed choices for condition/warranty/returns + optional valid-until (≤60 days); expired = no Accept | free text, both sides |
 | 042 | [[ADR-042 Closing note and deal problems]] | 🔔-only thank-you when an open request closes; deal problem = a report with `deal_id` + `kind`; other side not told | push/email, new table, email support |
+| 043 | [[ADR-043 Download and delete my data]] | JSON export of my data only; delete after 7 days with undo; chats stay as "Deleted member"; banned ID fingerprints kept | instant delete, PDF/CSV, forget banned IDs |
+| 044 | [[ADR-044 Owner dashboard]] | Own tables, 7/30/90 days, % answered (≥1 day old), median time to first offer, plain HTML bars + table | analytics service, averages, chart library |
+| 045 | [[ADR-045 Away mode]] | Until a date (≤60 days); alerts + heads-ups pause; "🌴 Away until"; away periods don't count in reply time | open-ended, auto-reply |
+| 046 | [[ADR-046 Pickup checklist and big-deal card]] | After an accepted price; lists by category; ticks on the device; big-deal limit per currency | server-stored ticks, one list |
+| 047 | [[ADR-047 Report follow-up and raise my budget]] | Reporter told "took action"/"found nothing" only; raise budget once a day, tells interested sellers via 🔔 | details, push, unlimited |
 
 Template for new ADRs: copy any ADR and keep the same headings.

@@ -99,7 +99,7 @@ const admin = await newUser();
 await admin.goto(BASE + '/login'); await admin.fill('#email', ADMIN[0]); await admin.fill('#password', ADMIN[1]);
 await check(admin, 'login');
 await admin.click('form button.btn.block'); await admin.waitForURL(BASE + '/');
-await admin.goto(BASE + '/admin'); await admin.waitForSelector('table');
+await admin.goto(BASE + '/admin'); await admin.waitForSelector('table:visible');
 await check(admin, 'admin');
 let first = true;
 while (await admin.locator('table a.btn.sm').count()) {
