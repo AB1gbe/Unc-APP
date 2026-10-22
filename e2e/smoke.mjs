@@ -279,6 +279,19 @@ await buyer.waitForSelector('.blocked-notice:has-text("You blocked Riverside Ele
 await buyer.goto(BASE + '/account'); await buyer.click('.card:has-text("Blocked members") button:has-text("Unblock")');
 await buyer.waitForSelector('text=Blocked members', { state: 'detached' });
 
+// Proof photo (session 34): the buyer asks; the shop sends a photo with the chat's code.
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.click('button:has-text("Ask for a proof photo")');
+await buyer.waitForSelector('.answer-line:has-text("You asked for a proof photo")');
+await vendor.goto(`${BASE}/messages/${scamConv}`);
+await vendor.waitForSelector('.answer-line:has-text("asked for a proof photo")');
+await vendor.setInputFiles('label.attach input[type=file]', img);
+await vendor.check('.proof-check input');
+await vendor.click('.chat-form button:has-text("Send")');
+await vendor.waitForSelector('.proof-badge');
+await buyer.waitForSelector('.proof-badge:has-text("Check that the paper")', { timeout: 15000 });
+await shot(buyer, '35-proof-photo');
+
 // Privacy (session 34): first name only, and a request only favourite sellers may answer.
 await buyer.goto(BASE + '/account');
 await buyer.locator('[data-setting=shortName]').check(); await buyer.waitForTimeout(300);

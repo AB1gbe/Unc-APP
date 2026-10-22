@@ -61,6 +61,7 @@ export default function CompareOffers({ listing }) {
                 <dt>{t('Replies')}</dt><dd>{c.replyTime ? REPLY[c.replyTime]() : <span className="muted">{t('Not enough chats yet')}</span>}</dd>
               </dl>
               <Badges badges={c.badges} />
+              {c.hasProof && <span className="badge ok">{t('✓ Proof photo')}</span>}
               {c.firstMessage && <p className="small muted compare-msg" dir="auto">{c.firstMessage}</p>}
               <span className="small">{t('Open chat')} <span className="flip">→</span></span>
             </div>

@@ -698,4 +698,14 @@ export default {
   '🔔 Get an alert when a matching request is posted': '🔔 احصل على تنبيه عند نشر طلب مطابق',
   '📊 What people are asking for': '📊 ما الذي يطلبه الناس',
   '📊 What people ask for': '📊 ما يطلبه الناس',
+  // Proof photos (session 34)
+  '✓ Proof photo · {code}': '✓ صورة إثبات · {code}',
+  'Check that the paper in the photo says {code}.': 'تأكد أن الورقة في الصورة مكتوب عليها {code}.',
+  'This is a proof photo: the code {code} is written on paper next to the item': 'هذه صورة إثبات: الرمز {code} مكتوب على ورقة بجانب الغرض',
+  '📸 Ask for a proof photo': '📸 اطلب صورة إثبات',
+  'You asked for a proof photo with the code {code}.': 'طلبت صورة إثبات بالرمز {code}.',
+  '{name} asked for a proof photo.': 'طلب {name} صورة إثبات.',
+  'Write {code} on a piece of paper, put it next to the item, and send a photo of both. Tick “proof photo” before sending.': 'اكتب {code} على ورقة، وضعها بجانب الغرض، وأرسل صورة لهما معاً. اختر «صورة إثبات» قبل الإرسال.',
+  '📸 Proof photo asked for': '📸 طُلبت صورة إثبات',
+  '✓ Proof photo': '✓ صورة إثبات',
 };

@@ -344,6 +344,12 @@ const MIGRATIONS = [
   ALTER TABLE users ADD COLUMN short_name INTEGER NOT NULL DEFAULT 0;
   ALTER TABLE listings ADD COLUMN contact_rule TEXT NOT NULL DEFAULT 'anyone';
   `,
+  // 23: proof photos (session 34): 'photo' = the seller's photo showing the
+  // chat's code on paper; 'ask' = the buyer asked for one. (A new column
+  // because messages.kind only allows accept/decline.)
+  `
+  ALTER TABLE messages ADD COLUMN proof TEXT CHECK (proof IN ('photo', 'ask'));
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
