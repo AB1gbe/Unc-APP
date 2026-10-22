@@ -26,13 +26,14 @@ function describe(n) {
     case 'report-action': return [n.listing ? tj('Thanks for your report about “{title}”. Our team looked at it and took action.', { title }) : t('Thanks for your report. Our team looked at it and took action.'), n.listing ? `/requests/${n.listing.id}` : '/'];
     case 'report-no-action': return [n.listing ? tj('Thanks for your report about “{title}”. Our team looked at it and found nothing against the rules this time.', { title }) : t('Thanks for your report. Our team looked at it and found nothing against the rules this time.'), '/'];
     case 'budget-raised': return [tj('{name} raised the budget for “{title}”. Take another look?', { name, title }), `/requests/${n.listing?.id}`];
+    case 'did-you-get-it': return [tj('Did you get “{title}” from {name}? Mark it found so you can rate each other.', { name, title }), `/requests/${n.listing?.id}`];
     case 'kyc_approved': return [t('Your identity is verified ✓ You can now post requests and make offers.'), '/'];
     case 'kyc_rejected': return [t('Your identity check was not approved. See why and try again.'), '/verification'];
     default: return [n.kind, '/'];
   }
 }
 
-const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳', 'found-elsewhere': '🙏', 'request-closed': '🙏', 'report-action': '⚑', 'report-no-action': '⚑', 'budget-raised': '💸' };
+const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳', 'found-elsewhere': '🙏', 'request-closed': '🙏', 'report-action': '⚑', 'report-no-action': '⚑', 'budget-raised': '💸', 'did-you-get-it': '🤔' };
 
 export default function Notifications() {
   const { data, error, loading } = useApi('/notifications');

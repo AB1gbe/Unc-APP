@@ -398,6 +398,10 @@ const MIGRATIONS = [
   `
   ALTER TABLE messages ADD COLUMN had_contact INTEGER NOT NULL DEFAULT 0;
   `,
+  // 30: "Did you get it?" (session 40): when the buyer was asked, so it's once.
+  `
+  ALTER TABLE conversations ADD COLUMN got_it_asked_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

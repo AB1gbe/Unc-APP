@@ -836,4 +836,5 @@ export default {
   '📵 Contact details are hidden until you agree a price.': '📵 بيانات التواصل مخفية حتى تتفقا على سعر.',
   '📵 Hidden from {name} until you agree a price.': '📵 مخفية عن {name} حتى تتفقا على سعر.',
   '📵 Numbers, emails and links stay hidden until you agree a price. Keep talking here: your rating, proof photos and our help only work for deals on Unc.': '📵 الأرقام والبريد والروابط تبقى مخفية حتى تتفقا على سعر. أكملا الحديث هنا: تقييمك وصور الإثبات ومساعدتنا تعمل فقط للصفقات على Unc.',
+  'Did you get “{title}” from {name}? Mark it found so you can rate each other.': 'هل حصلت على «{title}» من {name}؟ علّمه كـ«وجدته» لتقيّما بعضكما.',
 };
