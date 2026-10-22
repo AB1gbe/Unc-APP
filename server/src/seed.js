@@ -26,18 +26,18 @@ async function seedDemo(db) {
       VALUES (?, ?, ?, ?, ?, datetime('now'), 'approved')
     `).run(email, pw, name, type, city).lastInsertRowid);
   };
-  const buyer = mk('buyer@demo.local', 'Sam Buyer', 'individual', 'Austin');
-  mk('vendor@demo.local', 'Riverside Electronics', 'business', 'Austin');
-  mk('freelancer@demo.local', 'Alex Finder', 'individual', 'Dallas');
+  const buyer = mk('buyer@demo.local', 'Sam Buyer', 'individual', 'Juffair');
+  mk('vendor@demo.local', 'Riverside Electronics', 'business', 'Seef');
+  mk('freelancer@demo.local', 'Alex Finder', 'individual', 'Riffa');
 
   if (!db.prepare('SELECT 1 FROM listings WHERE buyer_id = ?').get(buyer)) {
     const add = db.prepare(`
       INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, city, needed_by)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    add.run(buyer, 'Looking for a used PS5 with 2 controllers', 'Disc edition preferred. Must work perfectly, original box is a bonus.', 'Electronics', 300, 400, 'Austin', null);
-    add.run(buyer, 'Need a solid oak dining table for 6', 'Rectangular, around 180cm. Light scratches are fine.', 'Home & Furniture', 200, 600, 'Austin', null);
-    add.run(buyer, 'Someone to assemble IKEA wardrobe', 'PAX wardrobe, 2 doors. This Saturday if possible.', 'Services', 50, 120, 'Austin', null);
+    add.run(buyer, 'Looking for a used PS5 with 2 controllers', 'Disc edition preferred. Must work perfectly, original box is a bonus.', 'Electronics', 300, 400, 'Juffair', null);
+    add.run(buyer, 'Need a solid oak dining table for 6', 'Rectangular, around 180cm. Light scratches are fine.', 'Home & Furniture', 200, 600, 'Juffair', null);
+    add.run(buyer, 'Someone to assemble IKEA wardrobe', 'PAX wardrobe, 2 doors. This Saturday if possible.', 'Services', 50, 120, 'Juffair', null);
   }
   // Profiles: a few words and interests, so demo profiles aren't empty.
   const profile = db.prepare(`UPDATE users SET bio = COALESCE(bio, ?), interests = CASE WHEN interests = '[]' THEN ? ELSE interests END, onboarded_at = COALESCE(onboarded_at, datetime('now')) WHERE email = ?`);
@@ -47,14 +47,14 @@ async function seedDemo(db) {
   // The demo shop has a shop page: its area and opening hours (closed Fridays).
   const hours = Array.from({ length: 7 }, (_, d) => (d === 5 ? null : { open: '09:00', close: '21:00' }));
   db.prepare('UPDATE users SET shop_area = COALESCE(shop_area, ?), shop_hours = COALESCE(shop_hours, ?) WHERE email = ?')
-    .run('North Loop, Austin', JSON.stringify(hours), 'vendor@demo.local');
+    .run('Block 428, Seef', JSON.stringify(hours), 'vendor@demo.local');
 
   // One finished, rated deal so profiles and star ratings have something to show.
   const shop = db.prepare('SELECT id FROM users WHERE email = ?').get('vendor@demo.local').id;
   if (!db.prepare('SELECT 1 FROM deals WHERE buyer_id = ? AND vendor_id = ?').get(buyer, shop)) {
     const listingId = Number(db.prepare(`
       INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, city, status)
-      VALUES (?, 'Wanted: iPhone 13 charger and case', 'Original Apple charger and a clear case.', 'Phones & Tablets', 20, 60, 'Austin', 'fulfilled')
+      VALUES (?, 'Wanted: iPhone 13 charger and case', 'Original Apple charger and a clear case.', 'Phones & Tablets', 20, 60, 'Juffair', 'fulfilled')
     `).run(buyer).lastInsertRowid);
     const convId = Number(db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)').run(listingId, buyer, shop).lastInsertRowid);
     const msg = db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, read_at) VALUES (?, ?, ?, ?, datetime(\'now\'))');

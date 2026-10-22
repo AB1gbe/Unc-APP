@@ -8,6 +8,7 @@ import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
 import * as v from '../lib/validate.js';
 import { requireAuth } from '../middleware/auth.js';
+import { governorateNamed, governorateOf, normalizeCity } from '../../../shared/areas.js';
 
 const MAX_ALERTS = 10;
 const view = (a) => ({ id: a.id, q: a.q, category: a.category, city: a.city, minBudget: a.min_budget, createdAt: a.created_at });
@@ -22,7 +23,7 @@ export function alertRoutes(db) {
   r.post('/', requireAuth, (req, res) => {
     const q = v.str(req.body, 'q', { max: 80, optional: true });
     const category = req.body?.category ? v.oneOf(req.body, 'category', CATEGORIES) : null;
-    const city = v.str(req.body, 'city', { max: 80, optional: true });
+    const city = normalizeCity(v.str(req.body, 'city', { max: 80, optional: true }));
     const minBudget = v.int(req.body, 'minBudget', { optional: true });
     if (!q && !category && !city && minBudget == null) throw new HttpError(400, 'Choose at least one thing to watch for: words, a category, a city or a budget.');
     if (db.prepare('SELECT COUNT(*) AS n FROM alerts WHERE user_id = ?').get(req.user.id).n >= MAX_ALERTS) {
@@ -47,7 +48,11 @@ export function alertRoutes(db) {
 // without a budget still match.
 export function alertMatches(a, l) {
   if (a.category && a.category !== l.category) return false;
-  if (a.city && !(l.city || '').toLowerCase().includes(a.city.toLowerCase())) return false;
+  if (a.city) {
+    // An alert for a whole governorate matches every area in it (session 31).
+    const gov = governorateNamed(a.city);
+    if (gov ? governorateOf(l.city) !== gov : !(l.city || '').toLowerCase().includes(a.city.toLowerCase())) return false;
+  }
   if (a.min_budget != null) {
     const top = l.budget_max ?? l.budget_min;
     if (top != null && top < a.min_budget) return false;

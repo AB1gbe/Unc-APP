@@ -10,6 +10,7 @@ import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import ShareButton from '../components/ShareButton.jsx';
 import CompareOffers from '../components/CompareOffers.jsx';
+import { Place } from '../components/CityField.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -37,7 +38,7 @@ export default function ListingDetail() {
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
         <p className="price" style={{ fontSize: '1.2rem' }}>{budget(l)}</p>
         <div className="meta" style={{ marginBottom: '1rem' }}>
-          <span>📍 <bdi>{l.city}</bdi></span>
+          <span>📍 <Place city={l.city} /></span>
           <span>🕒 {t('Posted {time}', { time: ago(l.createdAt) })}</span>
           {l.neededBy && <span>📅 {t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
         </div>

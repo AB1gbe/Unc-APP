@@ -7,6 +7,7 @@ import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
 import { budget, ago, toDate } from '../api.js';
 import { t, tj, tn } from '../i18n.jsx';
+import { Place } from './CityField.jsx';
 
 export function ErrorBox({ error }) {
   if (!error) return null;
@@ -86,7 +87,7 @@ export function ListingCard({ listing }) {
         </p>
       )}
       <div className="meta">
-        <span>📍 <bdi>{listing.city}</bdi></span>
+        <span>📍 <Place city={listing.city} /></span>
         <span>🕒 {ago(listing.createdAt)}</span>
         {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
         {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}

@@ -647,4 +647,6 @@ export default {
   '🔔 Alert me about new requests like these': '🔔 نبّهني بالطلبات الجديدة المشابهة',
   '🔔 Request alerts': '🔔 تنبيهات الطلبات',
   'New request matching your alert: “{title}”': 'طلب جديد يطابق تنبيهك: «{title}»',
+  // Areas (session 31)
+  'City or governorate': 'المدينة أو المحافظة',
 };

@@ -15,6 +15,7 @@ import { AVATAR_DIR, COVER_DIR, memoryUpload, saveFiles } from '../lib/uploads.j
 import { CATEGORIES } from '../lib/categories.js';
 import { CONTACT_MESSAGE, hasContactDetails } from '../lib/contact-guard.js';
 import { readShopHours } from '../lib/shop-hours.js';
+import { normalizeCity } from '../../../shared/areas.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -81,7 +82,7 @@ export function authRoutes(db) {
     const password = v.password(req.body);
     const displayName = v.str(req.body, 'displayName', { min: 2, max: 60 });
     const accountType = v.oneOf(req.body, 'accountType', ['individual', 'business']);
-    const city = v.str(req.body, 'city', { max: 80, optional: true });
+    const city = normalizeCity(v.str(req.body, 'city', { max: 80, optional: true }));
     // The language the website was in when they signed up (emails use it).
     const language = langOf(req);
 
@@ -249,7 +250,7 @@ export function authRoutes(db) {
     const b = req.body || {};
     const changes = {};
     if ('displayName' in b) changes.display_name = v.str(b, 'displayName', { min: 2, max: 60 });
-    if ('city' in b) changes.city = v.str(b, 'city', { max: 80, optional: true });
+    if ('city' in b) changes.city = normalizeCity(v.str(b, 'city', { max: 80, optional: true }));
     if ('bio' in b) changes.bio = v.str(b, 'bio', { max: 300, optional: true });
     // Public text must not carry a way to contact the member directly.
     if (hasContactDetails(changes.bio)) throw new HttpError(400, CONTACT_MESSAGE, { field: 'bio' });

@@ -15,6 +15,7 @@ import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { tellFavourites } from './favourites.js';
 import { tellAlerts } from './alerts.js';
+import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -84,8 +85,17 @@ export function listingRoutes(db) {
       params.push(req.query.category);
     }
     if (req.query.city) {
-      where.push('l.city LIKE ?');
-      params.push(`%${String(req.query.city).slice(0, 80)}%`);
+      // A whole governorate ("Capital Governorate") searches all its areas;
+      // a known area matches however it was spelled (session 31).
+      const gov = governorateNamed(String(req.query.city));
+      if (gov) {
+        const areas = areasOf(gov);
+        where.push(`l.city IN (${areas.map(() => '?').join(', ')})`);
+        params.push(...areas);
+      } else {
+        where.push('l.city LIKE ?');
+        params.push(`%${normalizeCity(String(req.query.city).slice(0, 80))}%`);
+      }
     }
     // Capped so absurd page numbers can't overflow the OFFSET.
     const page = Math.min(10_000, Math.max(1, Number.parseInt(req.query.page, 10) || 1));
@@ -304,7 +314,7 @@ function readListingBody(body) {
     budgetMin: v.int(body, 'budgetMin', { optional: true }),
     budgetMax: v.int(body, 'budgetMax', { optional: true }),
     currency: v.oneOf(body, 'currency', CURRENCIES, { optional: true }) || 'USD',
-    city: v.str(body, 'city', { min: 2, max: 80 }),
+    city: normalizeCity(v.str(body, 'city', { min: 2, max: 80 })),
     neededBy: v.isoDate(body, 'neededBy', { optional: true }),
   };
   if (data.budgetMin !== null && data.budgetMax !== null && data.budgetMin > data.budgetMax) {

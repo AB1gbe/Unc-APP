@@ -6,6 +6,7 @@ import { api } from '../api.js';
 import { ErrorBox, Loading } from '../components/ui.jsx';
 import { useApi, useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
+import CityField from '../components/CityField.jsx';
 
 function describe(a) {
   const parts = [];
@@ -67,7 +68,7 @@ export default function Alerts() {
           </div>
           <div className="field">
             <label htmlFor="alertCity">{t('City')} <span className="muted">{t('(optional)')}</span></label>
-            <input id="alertCity" value={form.city} maxLength={80} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+            <CityField governorates id="alertCity" value={form.city} maxLength={80} onChange={(e) => setForm({ ...form, city: e.target.value })} />
           </div>
           <div className="field">
             <label htmlFor="alertBudget">{t('Budget at least')} <span className="muted">{t('(optional)')}</span></label>

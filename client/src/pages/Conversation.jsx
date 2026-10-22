@@ -12,6 +12,7 @@ import { formatDateTime, t, tj } from '../i18n.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import { StoryForm } from '../components/Stories.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
+import { Place } from '../components/CityField.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -112,7 +113,7 @@ export default function Conversation() {
               <Activity activity={conv.otherActivity} />{' '}
               <Badges badges={conv.otherBadges} />
               <div className="small muted">
-                {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <bdi>{l.city}</bdi>
+                {tj('About: {title}', { title: <Link to={`/requests/${l.id}`}><b><bdi>{l.title}</bdi></b></Link> })} · {budget(l)} · <Place city={l.city} />
               </div>
             </div>
           </div>

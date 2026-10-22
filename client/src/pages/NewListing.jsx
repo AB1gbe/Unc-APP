@@ -8,6 +8,7 @@ import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
+import CityField from '../components/CityField.jsx';
 
 const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '' };
 
@@ -112,7 +113,7 @@ export default function NewListing() {
       <div className="field-row">
         <div className="field">
           <label htmlFor="city">{t('City')}</label>
-          <input id="city" required value={form.city} onChange={set('city')} />
+          <CityField id="city" required value={form.city} onChange={set('city')} />
         </div>
         <div className="field">
           <label htmlFor="neededBy">{t('Needed by')} <span className="muted">{t('(optional)')}</span></label>

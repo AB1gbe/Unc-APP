@@ -20,6 +20,8 @@ export const getLang = () => current;
 // Locale for dates and numbers. Arabic keeps Western digits (123), which is
 // what Bahraini apps and price tags normally use (see ADR-017).
 export const locale = () => (current === 'ar' ? 'ar-BH-u-nu-latn' : undefined);
+// 'en' or 'ar' (pages are re-created when the language changes).
+export const currentLang = () => current;
 
 function fill(text, vars) {
   return vars ? text.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m)) : text;

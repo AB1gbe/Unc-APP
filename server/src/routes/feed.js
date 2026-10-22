@@ -4,6 +4,7 @@
 // Shops are named, because a shop page is public by choice. The wording is
 // written by the app from `kind`, so it shows in the reader's language.
 import { Router } from 'express';
+import { governorateOf } from '../../../shared/areas.js';
 
 const DAYS = 7;          // how far back the feed looks
 const LIMIT = 8;         // items shown
@@ -38,7 +39,10 @@ export function feedRoutes(db) {
 
   r.get('/', (req, res) => {
     const city = req.user?.city?.trim() || null;
-    const near = (item) => Boolean(city && item.city && item.city.toLowerCase().includes(city.toLowerCase()));
+    // Near = the same city, or (for Bahrain's areas) the same governorate.
+    const myGov = governorateOf(city);
+    const near = (item) => Boolean(city && item.city && (item.city.toLowerCase().includes(city.toLowerCase())
+      || (myGov && governorateOf(item.city) === myGov)));
     const items = [...found.all(), ...requests.all(req.user?.id ?? 0), ...shops.all()].map((i) => ({ ...i, near: near(i) }));
     if (city) {
       const busy = offersToday.get(city);

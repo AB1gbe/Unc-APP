@@ -5,9 +5,10 @@ import { Link } from 'react-router-dom';
 import { ago } from '../api.js';
 import { useApi } from '../hooks.js';
 import { t, tj } from '../i18n.jsx';
+import { Place } from './CityField.jsx';
 
 function line(i) {
-  const city = <bdi>{i.city}</bdi>;
+  const city = <Place city={i.city} />;
   switch (i.kind) {
     case 'found':
       return ['🎉', tj('Someone in {city} found what they needed in {category}', { city, category: t(i.category) })];
@@ -29,7 +30,7 @@ export default function Feed({ title }) {
   return (
     <section className="card feed" style={{ padding: 0 }}>
       <h2 style={{ padding: '1rem 1rem 0', margin: 0 }}>{title ?? t('Happening near you')}</h2>
-      {data.city && <p className="muted small" style={{ padding: '0 1rem', margin: '.2rem 0 0' }}>{tj('{city} first, then the rest of Unc.', { city: <bdi>{data.city}</bdi> })}</p>}
+      {data.city && <p className="muted small" style={{ padding: '0 1rem', margin: '.2rem 0 0' }}>{tj('{city} first, then the rest of Unc.', { city: <Place city={data.city} /> })}</p>}
       <ul>
         {items.map(([i, [icon, text]], n) => (
           <li key={n} className={i.near ? 'near' : ''}>
