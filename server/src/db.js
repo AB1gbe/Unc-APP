@@ -394,7 +394,7 @@ const MIGRATIONS = [
   `,
   // 29: keeping deals on Unc (session 40): the message had a phone number,
   // email, link or @handle (hidden from the other person until a price is
-  // agreed; counted for the owner dashboard).
+  // agreed; kept so the owner can count attempts later).
   `
   ALTER TABLE messages ADD COLUMN had_contact INTEGER NOT NULL DEFAULT 0;
   `,

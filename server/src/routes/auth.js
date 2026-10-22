@@ -257,7 +257,7 @@ export function authRoutes(db) {
 
   // Members who joined before the Terms (or before a new version) agree here.
   r.post('/terms', requireAuth, (req, res) => {
-    if (req.body?.accept !== true) throw new HttpError(400, 'Please read and accept the Terms to create an account.', { field: 'accept' });
+    if (req.body?.accept !== true) throw new HttpError(400, 'Please read and accept the Terms first.', { field: 'accept' });
     db.prepare(`UPDATE users SET terms_version = ?, terms_accepted_at = datetime('now') WHERE id = ?`).run(TERMS_VERSION, req.user.id);
     audit(db, req.user.id, 'user.terms_accepted', `user:${req.user.id}`, { version: TERMS_VERSION });
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
