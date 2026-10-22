@@ -62,6 +62,7 @@ export default function Browse() {
           <Link to={`/alerts?${new URLSearchParams(Object.fromEntries(Object.entries(draft).filter(([, v]) => v)))}`}>
             {t('🔔 Alert me about new requests like these')}
           </Link>
+          {' · '}<Link to="/demand">{t('📊 What people are asking for')}</Link>
         </p>
       )}
       {loading ? <CardsLoading /> : result.listings.length === 0 ? (

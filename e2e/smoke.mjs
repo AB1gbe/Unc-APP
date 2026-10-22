@@ -297,6 +297,13 @@ await shot(vendor, '33-favourites-only');
 await buyer.goto(BASE + '/account');
 await buyer.locator('[data-setting=shortName]').uncheck(); await buyer.waitForTimeout(300);
 
+// What people are asking for (session 34): with 2 furniture requests, the shop sees that category.
+await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Looking for a standing fan', description: 'Tall, quiet, with a remote.', category: 'Home & Furniture', city: 'Austin' }) }));
+await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people are asking for');
+await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
+await shot(vendor, '34-demand');
+
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.feed li'); /* visitors see "Happening on Unc" */ await shot(mp, '14-mobile-home');

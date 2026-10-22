@@ -686,4 +686,16 @@ export default {
   'The buyer chose to hear only from their favourite sellers.': 'اختار المشتري أن يتلقى العروض من بائعيه المفضلين فقط.',
   'Show only my first name': 'أظهر اسمي الأول فقط',
   'Other members see {name} instead of your full name. In a chat, your full name shows once you send a message there.': 'يرى الأعضاء الآخرون {name} بدلاً من اسمك الكامل. في المحادثة، يظهر اسمك الكامل بعد أن ترسل رسالة فيها.',
+  // What people are asking for (session 34)
+  'What people are asking for': 'ما الذي يطلبه الناس',
+  'Open requests from the last 30 days, by category, with the ones still waiting for an offer first. Counts only: no names.': 'الطلبات المفتوحة في آخر 30 يوماً حسب الفئة، والتي ما زالت تنتظر عرضاً أولاً. أعداد فقط، بلا أسماء.',
+  'All of Bahrain': 'كل البحرين',
+  'Not enough requests here yet. Check back soon.': 'لا توجد طلبات كافية هنا بعد. عد قريباً.',
+  'See them': 'اعرضها',
+  '{n} requests': { zero: 'لا طلبات', one: 'طلب واحد', two: 'طلبان', few: '{n} طلبات', many: '{n} طلبًا', other: '{n} طلب' },
+  '{n} still waiting for an offer': { one: 'طلب واحد ما زال ينتظر عرضاً', two: 'طلبان ما زالا ينتظران عرضاً', few: '{n} طلبات ما زالت تنتظر عرضاً', other: '{n} طلب ما زال ينتظر عرضاً' },
+  'Often asked for:': 'يُطلب كثيراً:',
+  '🔔 Get an alert when a matching request is posted': '🔔 احصل على تنبيه عند نشر طلب مطابق',
+  '📊 What people are asking for': '📊 ما الذي يطلبه الناس',
+  '📊 What people ask for': '📊 ما يطلبه الناس',
 };

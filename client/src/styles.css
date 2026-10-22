@@ -428,3 +428,6 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .expiry-soon { color: #b45309; font-weight: 600; }
 .tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; font-size: .9rem; }
 .tips ul { margin: .35rem 0 .4rem; padding-inline-start: 1.1rem; }
+
+/* "What people are asking for" (session 34) */
+.demand .chip { padding: .1rem .6rem; min-height: 0; margin-inline-start: .3rem; font-size: .8rem; }
