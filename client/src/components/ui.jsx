@@ -130,6 +130,9 @@ export function VerifyPrompt({ action = 'post' }) {
   if (!user.emailVerified) {
     return <div className="alert warn">{tj('Please {confirm} to {action}.', { confirm: <Link to="/verify-email">{t('confirm your email')}</Link>, action: what })}</div>;
   }
+  if (user.kycStatus === 'approved' && !user.hasCard) {
+    return <div className="alert warn">{tj('{add} to {action}. Nothing is charged.', { add: <Link to="/payment-card">{t('Add a payment card')}</Link>, action: what })}</div>;
+  }
   if (user.kycStatus === 'pending') {
     return <div className="alert warn">{t("Your identity check is being reviewed. You can {action} once it's approved.", { action: what })}</div>;
   }

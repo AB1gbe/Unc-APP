@@ -51,7 +51,7 @@ export function deleteNow(db, u) {
     files.push([AVATAR_DIR, u.avatar], [COVER_DIR, u.cover]);
 
     db.prepare(`UPDATE listings SET status = 'closed', updated_at = datetime('now') WHERE buyer_id = ? AND status = 'open'`).run(u.id);
-    for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views']) {
+    for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views', 'payment_cards']) {
       db.prepare(`DELETE FROM ${table} WHERE user_id = ?`).run(u.id);
     }
     db.prepare('DELETE FROM favourites WHERE user_id = ? OR seller_id = ?').run(u.id, u.id);

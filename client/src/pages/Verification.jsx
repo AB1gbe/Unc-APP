@@ -36,8 +36,15 @@ export default function Verification() {
 
   return (
     <div className="narrow">
-      <Steps current={status === 'approved' ? 4 : 3} />
-      {status === 'approved' && (
+      <Steps current={status === 'approved' ? (user.hasCard ? 5 : 4) : 3} />
+      {!user.hasCard && status !== 'unverified' && status !== 'rejected' && (
+        <div className="card add-card-step">
+          <h2>{status === 'approved' ? t('One last step: add a payment card') : t('While you wait: add a payment card')}</h2>
+          <p className="muted">{t('Every member adds a card, so people who break the rules can be held to them. Nothing is charged now.')}</p>
+          <Link className="btn" to="/payment-card">{t('Add a payment card')}</Link>
+        </div>
+      )}
+      {status === 'approved' && user.hasCard && (
         <div className="card center">
           <h1>{t("You're verified ✓")}</h1>
           <p className="muted">{t('You can now post requests and contact buyers.')}</p>

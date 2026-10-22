@@ -47,6 +47,7 @@ export default function Account() {
       <AwayMode />
       <PushSettings />
       <ChangePassword />
+      <CardSettings />
       <YourData />
       <div className="card row spread">
         <span className="muted small">{tj('Signed in as {email}', { email: <span className="ltr">{user.email}</span> })} · <Link to="/terms">{t('Terms of use')}</Link></span>
@@ -276,6 +277,25 @@ function AwayMode() {
             min={iso(new Date())} max={iso(new Date(Date.now() + 60 * 86_400_000))} style={{ width: 'auto' }} />
           <button className="btn" disabled={busy || !until}>{t('Turn on away mode')}</button>
         </form>
+      )}
+    </div>
+  );
+}
+
+// The payment card on file (session 40): only brand, last 4 and expiry.
+function CardSettings() {
+  const { data } = useApi('/payments/card');
+  const card = data?.card;
+  return (
+    <div className="card">
+      <h2>{t('Payment card')}</h2>
+      {card ? (
+        <div className="row spread">
+          <span><b><bdi>{card.brand.toUpperCase()}</bdi></b> <span className="ltr">•••• {card.last4}</span> · {t('expires {date}', { date: `${String(card.expMonth).padStart(2, '0')}/${String(card.expYear).slice(-2)}` })}</span>
+          <Link className="btn sm secondary" to="/payment-card?next=/account">{t('Replace card')}</Link>
+        </div>
+      ) : (
+        <p>{tj('{add}: every member needs one to post and make offers.', { add: <Link to="/payment-card?next=/account">{t('Add a payment card')}</Link> })}</p>
       )}
     </div>
   );

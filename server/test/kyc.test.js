@@ -67,6 +67,9 @@ test('rejected users can resubmit; admin approval unlocks posting', async () => 
 
   const second = await t.kyc(u, { idNumber: 'RS-0001' }).expect(201);
   await t.admin.post(`/api/admin/kyc/${second.body.submission.id}/decision`).send({ decision: 'approved' }).expect(200);
+  // Approved, but posting also needs a payment card (session 40).
+  await u.post('/api/listings').send({ title: 'Looking for a bike', description: 'Any road bike in good condition', category: 'Sports & Outdoors', city: 'Austin' }).expect(403, /payment card/);
+  await u.post('/api/payments/card').send({ token: 'tok_test_visa_4242_12_39' }).expect(201);
   await t.listing(u);
 });
 

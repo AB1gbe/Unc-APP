@@ -407,6 +407,21 @@ const MIGRATIONS = [
   ALTER TABLE users ADD COLUMN terms_version INTEGER NOT NULL DEFAULT 0;
   ALTER TABLE users ADD COLUMN terms_accepted_at TEXT;
   `,
+  // 32: payment cards (session 40). Never a card number: only the payment
+  // company's token, the brand, the last 4 digits and the expiry.
+  `
+  CREATE TABLE payment_cards (
+    user_id      INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    provider     TEXT NOT NULL,
+    provider_ref TEXT NOT NULL,
+    brand        TEXT NOT NULL,
+    last4        TEXT NOT NULL,
+    exp_month    INTEGER NOT NULL,
+    exp_year     INTEGER NOT NULL,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  ALTER TABLE users ADD COLUMN card_added_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

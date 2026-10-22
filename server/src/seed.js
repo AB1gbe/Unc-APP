@@ -30,6 +30,12 @@ async function seedDemo(db) {
   const buyer = mk('buyer@demo.local', 'Sam Buyer', 'individual', 'Juffair');
   mk('vendor@demo.local', 'Riverside Electronics', 'business', 'Seef');
   mk('freelancer@demo.local', 'Alex Finder', 'individual', 'Riffa');
+  // Demo members have a test payment card (session 40), like everyone who joins.
+  for (const email of ['buyer@demo.local', 'vendor@demo.local', 'freelancer@demo.local']) {
+    const id = db.prepare('SELECT id FROM users WHERE email = ?').get(email).id;
+    db.prepare(`INSERT OR IGNORE INTO payment_cards (user_id, provider, provider_ref, brand, last4, exp_month, exp_year) VALUES (?, 'test', 'tok_test_visa_4242_12_39', 'visa', '4242', 12, 2039)`).run(id);
+    db.prepare(`UPDATE users SET card_added_at = COALESCE(card_added_at, datetime('now')) WHERE id = ?`).run(id);
+  }
 
   if (!db.prepare('SELECT 1 FROM listings WHERE buyer_id = ?').get(buyer)) {
     const add = db.prepare(`

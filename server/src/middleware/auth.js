@@ -46,6 +46,10 @@ export function requireVerified(req, res, next) {
     if (req.user.kyc_status !== 'approved') {
       return next(new HttpError(403, 'You need to complete identity verification (KYC) first.', { code: 'KYC_REQUIRED' }));
     }
+    // And a payment card on file (session 40), checked by the payment company.
+    if (!req.user.card_added_at) {
+      return next(new HttpError(403, 'Please add a payment card first.', { code: 'CARD_REQUIRED' }));
+    }
     // Posting, offering and answering need the current Terms (session 40).
     if (!termsAccepted(req.user)) {
       return next(new HttpError(403, 'Please read and accept the Terms first.', { code: 'TERMS_REQUIRED' }));
@@ -101,6 +105,7 @@ export function publicMe(u) {
     hideActivity: u.hide_activity === 1,
     shortName: u.short_name === 1,
     termsAccepted: termsAccepted(u),
+    hasCard: Boolean(u.card_added_at),
     awayUntil: u.away_until && u.away_until >= new Date().toISOString().slice(0, 10) ? u.away_until : null,
     // When the account will be deleted, if the member asked (session 37).
     deleteAt: u.delete_requested_at ? new Date(Date.parse(`${u.delete_requested_at.replace(' ', 'T')}Z`) + DELETE_AFTER_DAYS * 86_400_000).toISOString() : null,

@@ -52,6 +52,15 @@ async function onboard(name, email, type) {
   await p.click('button:has-text("Submit for verification")');
   await p.waitForSelector('text=We\'re checking your documents');
   await shot(p, '04-kyc-pending');
+  // Payment card (session 40), in showcase mode: a declined card first, then a good one.
+  await p.click('.add-card-step a:has-text("Add a payment card")');
+  await p.fill('#cardNumber', '4000 0000 0000 0002'); await p.fill('#cardExpiry', '12/39'); await p.fill('#cardCvc', '123'); await p.fill('#cardName', name);
+  await p.click('button:has-text("Save card")');
+  await p.waitForSelector('.alert.error:has-text("declined")');
+  await p.fill('#cardNumber', '4242 4242 4242 4242');
+  await shot(p, `04b-card-${type}`);
+  await p.click('button:has-text("Save card")');
+  await p.waitForURL('**/verification');
   return p;
 }
 
