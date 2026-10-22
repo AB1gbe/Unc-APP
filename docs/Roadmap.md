@@ -55,6 +55,11 @@ tags: [roadmap]
 - [x] The recommended next five, built in session 37 → [[Your Data, Dashboard and Care]].
 - [ ] More from [[New Directions for the Vision]] (usually in stock, more languages, hold it for me, WhatsApp alerts…).
 
+## Keeping deals on Unc (session 39)
+- [ ] Hide phone numbers/links in chat until a price is agreed + a nudge + count attempts → [[Keeping Deals on Unc]]
+- [ ] "Did you get it?" check-in + leak measure on the owner dashboard
+- [ ] ⚖️ Decide how Unc earns (per offer / shop subscription / commission with payments)
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]
