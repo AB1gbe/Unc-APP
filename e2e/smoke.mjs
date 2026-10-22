@@ -346,6 +346,15 @@ await buyer.locator('.chat-head').screenshot({ path: `${OUT}/40-away.png` });
 await vendor.click('.away-mode button:has-text("I\'m back")');
 await vendor.waitForSelector('button:has-text("Turn on away mode")');
 
+// Raise my budget (session 37), on the controller request ($30–$60).
+await buyer.goto(`${BASE}/requests/${controllerId}`);
+await buyer.click('button:has-text("Raise my budget")');
+await buyer.fill('#raiseBudget', '80');
+await buyer.locator('.raise-budget').screenshot({ path: `${OUT}/42-raise-budget.png` });
+await buyer.click('.raise-budget button:has-text("Raise")');
+await buyer.waitForSelector('.toast:has-text("Budget raised")');
+await buyer.waitForSelector('text=$30 – $80');
+
 // Owner dashboard (session 37): the admin sees today's requests in the charts.
 {
   const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
@@ -358,6 +367,10 @@ await vendor.waitForSelector('button:has-text("Turn on away mode")');
   await a.waitForSelector('.day-col[aria-label$=": 0"]'); // quiet days show as empty columns
   await a.locator('.day-col').last().hover();
   await a.locator('.dashboard').screenshot({ path: `${OUT}/39-dashboard.png` });
+  // Report follow-up: the seller's deal problem is marked "took action"; the seller is told.
+  await a.click('button:has-text("Took action")');
+  await vendor.goto(BASE + '/notifications');
+  await vendor.waitForSelector('.inbox-item:has-text("Our team looked at it and took action")');
   await ctx.close();
 }
 

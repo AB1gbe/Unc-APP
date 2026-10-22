@@ -491,3 +491,6 @@ form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bott
 .pickup-item input { width: auto; margin-top: .2rem; }
 .big-deal { background: var(--warn-soft); border-radius: 10px; padding: .6rem .8rem; font-size: .9rem; }
 .big-deal ul { margin: .3rem 0 0; padding-inline-start: 1.2rem; }
+
+/* Raise my budget (session 37) */
+.raise-budget { display: grid; gap: .35rem; margin-bottom: .75rem; }

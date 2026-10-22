@@ -87,7 +87,9 @@ function ReportRow({ report: r, onDone }) {
           {r.conversation_id && !thread && (
             <button className="btn sm secondary" onClick={act(async () => setThread(await api(`/admin/reports/${r.id}/conversation`)))}>{t('Read conversation')}</button>
           )}
-          <button className="btn sm" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST' }); onDone(); })}>{t('Mark resolved')}</button>
+          {/* The reporter is told which one (session 37), never the details. */}
+          <button className="btn sm" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'action' } }); onDone(); })}>{t('✓ Took action')}</button>
+          <button className="btn sm secondary" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'nothing' } }); onDone(); })}>{t('Nothing wrong')}</button>
         </div>
       </div>
       {thread && (

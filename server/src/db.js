@@ -387,6 +387,11 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_away_user ON away_periods(user_id, ends_at);
   `,
+  // 28: report follow-up and "raise my budget" (session 37).
+  `
+  ALTER TABLE reports ADD COLUMN outcome TEXT CHECK (outcome IN ('action', 'nothing'));
+  ALTER TABLE listings ADD COLUMN budget_raised_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

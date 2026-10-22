@@ -819,4 +819,17 @@ export default {
   '✅ Pickup checklist': '✅ قائمة الاستلام',
   '{done} of {total} checked': '{done} من {total} تم فحصها',
   'Only you see these ticks, on this device.': 'أنت فقط ترى هذه العلامات، على هذا الجهاز.',
+  // Report follow-up + raise my budget (session 37)
+  'Thanks for your report about “{title}”. Our team looked at it and took action.': 'شكراً على بلاغك عن «{title}». راجعه فريقنا واتخذ إجراءً.',
+  'Thanks for your report. Our team looked at it and took action.': 'شكراً على بلاغك. راجعه فريقنا واتخذ إجراءً.',
+  'Thanks for your report about “{title}”. Our team looked at it and found nothing against the rules this time.': 'شكراً على بلاغك عن «{title}». راجعه فريقنا ولم يجد هذه المرة ما يخالف القواعد.',
+  'Thanks for your report. Our team looked at it and found nothing against the rules this time.': 'شكراً على بلاغك. راجعه فريقنا ولم يجد هذه المرة ما يخالف القواعد.',
+  '{name} raised the budget for “{title}”. Take another look?': 'رفع {name} الميزانية لـ «{title}». هل تلقي نظرة أخرى؟',
+  '✓ Took action': '✓ اتُّخذ إجراء',
+  'Nothing wrong': 'لا مخالفة',
+  '💸 Raise my budget': '💸 ارفع ميزانيتي',
+  'New top budget ({currency})': 'الحد الأعلى الجديد للميزانية ({currency})',
+  'Raise': 'ارفع',
+  'Sellers who looked at or saved your request are told. Once a day.': 'سيُبلَّغ البائعون الذين شاهدوا طلبك أو حفظوه. مرة واحدة في اليوم.',
+  'Budget raised. We told {n} sellers who looked at it.': { zero: 'رُفعت الميزانية. لم يشاهد أحد الطلب بعد.', one: 'رُفعت الميزانية. أبلغنا بائعاً واحداً شاهده.', two: 'رُفعت الميزانية. أبلغنا بائعَين شاهداه.', few: 'رُفعت الميزانية. أبلغنا {n} بائعين شاهدوه.', other: 'رُفعت الميزانية. أبلغنا {n} بائعاً شاهدوه.' },
 };
