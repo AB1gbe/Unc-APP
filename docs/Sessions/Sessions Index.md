@@ -37,3 +37,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 28]] | Favourite sellers (heads-up on new requests in their categories) |
 | 2026-10-22 | [[2026-10-22 Session 29]] | Pull request #10 (favourite sellers) merged into `main` |
 | 2026-10-22 | [[2026-10-22 Session 30]] | More ideas that fit the vision (research note, no code) |
+| 2026-10-22 | [[2026-10-22 Session 31]] | Compare offers, request alerts, Bahrain areas, block + scam warnings, expiry + tips |

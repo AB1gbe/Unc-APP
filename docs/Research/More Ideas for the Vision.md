@@ -77,6 +77,7 @@ These cost money per use, and they send photos or text to an AI provider. They n
 | ❌ **Paid ranking of offers or "verified" for money** | — | Breaks trust; on the never list |
 
 ## Recommended next five (most value for the vision)
+> ✅ All five were built in [[2026-10-22 Session 31]] → [[Choosing, Alerts and Safety]].
 1. **Compare offers side by side**: makes the core choice easy.
 2. **Request alerts for sellers**: the engine that brings offers in.
 3. **Governorate and area picker**: fixes location for everything that uses it.

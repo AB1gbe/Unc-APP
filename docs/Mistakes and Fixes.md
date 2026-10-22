@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-21 (session 28)
+updated: 2026-10-22 (session 31)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 77 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77). All fixed.
+**Totals so far:** 81 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -87,6 +87,10 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M75 | Design | Profile name broke mid-word on phones ("Electronic / s") | 24 |
 | M76 | Self-review | Feed draft ran one database query per item to hide your own requests | [[2026-10-21 Session 26]] |
 | M77 | Test | New browser-test steps left the seller and buyer on other pages; later steps failed (twice) | [[2026-10-21 Session 28]] |
+| M78 | Test | Alert test used the description "white" (too short) → 400 (repeat of M56) | [[2026-10-22 Session 31]] |
+| M79 | Self-review | First draft of governorate alert matching called a function that didn't exist | 31 |
+| M80 | Design | "Sort by" on Compare offers stretched full width under the general form styles | 31 |
+| M81 | Design | All small text-buttons (Block, Hide…) were full size: `.linkish` undid `.small` | 31 |
 
 ---
 
@@ -520,4 +524,29 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause:** the new steps opened the seller's 🔔 page and the buyer's Saved page in the **same browser tabs** the rest of the journey uses, and never went back. The later steps expected to still be on the chat page.
 - **Fix:** remember `page.url()` before the detour and `goto` it afterwards (`vendorChat`, `buyerChat`).
 - **Lesson:** a step inserted in the middle of a journey must leave each page where it found it. Check what the next lines expect.
+
+## M78
+**`alerts.test.js` failed with "expected 201, got 400" while creating its test request**
+- **Cause:** the description was "white". Requests need a longer description, so the request was refused before the alert was tested. This is the same slip as [[Mistakes and Fixes#M56]].
+- **Fix:** "White, original, works well".
+- **Lesson (again):** test data must pass the app's own rules. When a test fails while setting up, check the data first.
+
+## M79
+**The first governorate change to alert matching was tangled, and called `governorateNamedLocal`, which doesn't exist**
+- **Found by:** self-review before running anything; it would have crashed on the first alert check.
+- **Fix:** rewritten as one rule. If the alert names a governorate (`governorateNamed`), the request's area must be in it; otherwise the city must match as before.
+- **Lesson:** when a change gets complicated, stop and write the rule in one sentence first.
+
+## M80
+**"Sort by" on Compare offers sat on its own line, and the dropdown stretched across the card**
+- **Found by:** the desktop screenshot from the devices check.
+- **Cause:** the site's general form styles make `label` a block and `select` full width.
+- **Fix:** a `.compare-sort` class (inline-flex, `select { width: auto }`).
+
+## M81
+**"🚫 Block" was bigger than "⚑ Report" next to it, and so was every small text-button**
+- **Found by:** the scam-warning screenshot.
+- **Cause:** `.linkish` sets `font: inherit` and comes *after* `.small` in `styles.css`, so `className="linkish small"` lost the small size everywhere (the story Hide button too).
+- **Fix:** `.linkish.small { font-size: .875rem; }`.
+- **Lesson:** a shorthand like `font:` resets every font setting. Check combined classes when adding one.
 
