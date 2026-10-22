@@ -119,6 +119,8 @@ await shot(vendor, '09b-saved');
 await vendor.goto(BASE + '/'); await vendor.waitForSelector('h2:has-text("Saved for later")');
 await vendor.goto(listingUrl); await vendor.waitForSelector('.save-btn.on');
 await vendor.fill('#offerPrice', '380'); await vendor.fill('#message', 'Hi! I have a PS5 disc edition with 2 controllers, boxed, 6 months old.');
+await vendor.selectOption('#offer-condition', 'like-new'); await vendor.selectOption('#offer-warranty', '3m'); // offer details (session 34)
+await vendor.selectOption('#offer-returns', '3d');
 await vendor.setInputFiles('#offerPhoto', face); // photo of the item with the offer
 await vendor.waitForSelector('.thumb img');
 await shot(vendor, '10-make-offer');
@@ -137,6 +139,8 @@ await buyer.waitForSelector('.inbox-item');
 await shot(buyer, '11-buyer-inbox');
 await buyer.click('.inbox-item');
 await buyer.waitForSelector('.bubble');
+await buyer.waitForSelector('.offer-details:has-text("Like new"):has-text("3-month warranty")');
+await buyer.locator('.offer-card').first().screenshot({ path: `${OUT}/36-offer-details.png` });
 // A quick-reply chip fills the message box.
 await buyer.click('.quick-replies .chip:has-text("Where can we meet?")');
 if ((await buyer.inputValue('.chat-form textarea')) !== 'Where can we meet?') throw new Error('quick reply did not fill the box');
@@ -214,6 +218,13 @@ await vendor.click('.star-input label:nth-of-type(4)');
 await vendor.click('button:has-text("Submit rating")');
 await vendor.waitForSelector('text=They rated you');
 await shot(vendor, '24-both-rated');
+// "Something went wrong with this deal?" (session 34): the seller tells the team.
+await vendor.click('button:has-text("Something went wrong with this deal?")');
+await vendor.check('form.deal-problem input[value=payment]');
+await vendor.fill('form.deal-problem textarea', 'The buyer paid only half and promised the rest by Monday.');
+await shot(vendor, '37-deal-problem');
+await vendor.click('button:has-text("Send to the Unc team")');
+await vendor.waitForSelector('.deal-problem:has-text("Thanks for telling us")');
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
@@ -278,6 +289,44 @@ await buyer.click('button:has-text("Block")');
 await buyer.waitForSelector('.blocked-notice:has-text("You blocked Riverside Electronics")');
 await buyer.goto(BASE + '/account'); await buyer.click('.card:has-text("Blocked members") button:has-text("Unblock")');
 await buyer.waitForSelector('text=Blocked members', { state: 'detached' });
+
+// Proof photo (session 34): the buyer asks; the shop sends a photo with the chat's code.
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.click('button:has-text("Ask for a proof photo")');
+await buyer.waitForSelector('.answer-line:has-text("You asked for a proof photo")');
+await vendor.goto(`${BASE}/messages/${scamConv}`);
+await vendor.waitForSelector('.answer-line:has-text("asked for a proof photo")');
+await vendor.setInputFiles('label.attach input[type=file]', img);
+await vendor.check('.proof-check input');
+await vendor.click('.chat-form button:has-text("Send")');
+await vendor.waitForSelector('.proof-badge');
+await buyer.waitForSelector('.proof-badge:has-text("Check that the paper")', { timeout: 15000 });
+await shot(buyer, '35-proof-photo');
+
+// Privacy (session 34): first name only, and a request only favourite sellers may answer.
+await buyer.goto(BASE + '/account');
+await buyer.locator('[data-setting=shortName]').check(); await buyer.waitForTimeout(300);
+await buyer.goto(BASE + '/requests/new');
+await buyer.fill('#title', 'Looking for a quiet desk fan');
+await buyer.selectOption('#category', 'Home & Furniture');
+await buyer.fill('#description', 'Small, quiet, for a bedroom. Any colour.');
+await buyer.selectOption('#contactRule', 'favourites');
+await buyer.click('button:has-text("Post request")');
+await buyer.waitForURL(/\/requests\/\d+$/);
+const fanUrl = buyer.url();
+await vendor.goto(fanUrl);
+await vendor.waitForSelector('text=Sam B.');
+await vendor.waitForSelector('text=The buyer chose to hear only from their favourite sellers.');
+await shot(vendor, '33-favourites-only');
+await buyer.goto(BASE + '/account');
+await buyer.locator('[data-setting=shortName]').uncheck(); await buyer.waitForTimeout(300);
+
+// What people are asking for (session 34): with 2 furniture requests, the shop sees that category.
+await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Looking for a standing fan', description: 'Tall, quiet, with a remote.', category: 'Home & Furniture', city: 'Austin' }) }));
+await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people are asking for');
+await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
+await shot(vendor, '34-demand');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

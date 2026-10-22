@@ -54,7 +54,7 @@ export default function Inbox() {
                       <span className="muted small">{ago(c.lastMessageAt)}</span>
                     </div>
                     <div className="muted small" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {c.myRole === 'buyer' ? t('Offer from seller') : t('Your offer')} · <bdi>{c.lastKind === 'accept' ? t('🤝 Offer accepted') : c.lastKind === 'decline' ? t('Offer declined') : c.lastMessage || (c.lastPrice != null ? `💰 ${money(c.lastPrice, c.listing.currency)}` : t('📷 Photo'))}</bdi>
+                      {c.myRole === 'buyer' ? t('Offer from seller') : t('Your offer')} · <bdi>{c.lastKind === 'accept' ? t('🤝 Offer accepted') : c.lastKind === 'decline' ? t('Offer declined') : c.lastKind === 'proof-ask' ? t('📸 Proof photo asked for') : c.lastMessage || (c.lastPrice != null ? `💰 ${money(c.lastPrice, c.listing.currency)}` : t('📷 Photo'))}</bdi>
                     </div>
                   </div>
                   {c.needsRating && <span className="badge warn">{t('★ Rate')}</span>}

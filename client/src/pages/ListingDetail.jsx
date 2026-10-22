@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Activity, Avatar, Badges, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
@@ -12,6 +12,7 @@ import ShareButton from '../components/ShareButton.jsx';
 import CompareOffers from '../components/CompareOffers.jsx';
 import { Place } from '../components/CityField.jsx';
 import { requestTips } from '../tips.js';
+import { EMPTY_DETAILS, OfferDetailFields, addDetails } from '../components/OfferDetails.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -42,6 +43,7 @@ export default function ListingDetail() {
           <span>📍 <Place city={l.city} /></span>
           <span>🕒 {t('Posted {time}', { time: ago(l.createdAt) })}</span>
           {l.neededBy && <span>📅 {t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
+          <ContactRule rule={l.contactRule} />
         </div>
         <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{l.description}</p>
         {l.images.length > 0 && (
@@ -81,6 +83,7 @@ function OfferPanel({ listing }) {
   const [message, setMessage] = useState('');
   const [offerPrice, setOfferPrice] = useState('');
   const [photos, setPhotos] = useState([]); // optional photo of the item (max 1)
+  const [details, setDetails] = useState(EMPTY_DETAILS);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -95,6 +98,14 @@ function OfferPanel({ listing }) {
     );
   }
   if (!isVerified(user)) return <div className="card"><h2>{t('Have this?')}</h2><VerifyPrompt action="contact" /></div>;
+  if (listing.contactBlocked) {
+    const why = {
+      shops: t('The buyer chose to hear from shops only.'),
+      rated: t('The buyer chose to hear from sellers rated 4★ or more. Finish a few deals well and you can answer requests like this.'),
+      favourites: t("The buyer chose to hear only from their favourite sellers."),
+    }[listing.contactBlocked];
+    return <div className="card"><h2>{t('Have this?')}</h2><p className="muted">{why}</p></div>;
+  }
 
   async function submit(e) {
     e.preventDefault();
@@ -103,7 +114,7 @@ function OfferPanel({ listing }) {
     try {
       const fd = new FormData();
       fd.append('message', message);
-      if (offerPrice !== '') fd.append('offerPrice', offerPrice);
+      if (offerPrice !== '') { fd.append('offerPrice', offerPrice); addDetails(fd, details); }
       if (photos[0]) fd.append('image', photos[0]);
       const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
       celebrate({ text: t("Offer sent! You'll be notified when they reply.") });
@@ -125,6 +136,7 @@ function OfferPanel({ listing }) {
         <label htmlFor="offerPrice">{t('Your price ({currency})', { currency: listing.currency })} <span className="muted">{t('(optional)')}</span></label>
         <input id="offerPrice" type="number" min="0" step="1" value={offerPrice} onChange={(e) => setOfferPrice(e.target.value)} />
       </div>
+      {offerPrice !== '' && <OfferDetailFields value={details} onChange={setDetails} />}
       <div className="field">
         <label htmlFor="message">{t('Message')}</label>
         <textarea id="message" required maxLength={2000} placeholder={t('Describe what you have: condition, photos available, when you can deliver…')} value={message} onChange={(e) => setMessage(e.target.value)} />

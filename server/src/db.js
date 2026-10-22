@@ -338,6 +338,32 @@ const MIGRATIONS = [
   ALTER TABLE listings ADD COLUMN expiry_reminded_at TEXT;
   ALTER TABLE listings ADD COLUMN expired_at TEXT;
   `,
+  // 22: privacy (session 34): "show only my first name", and who may make
+  // offers on a request (anyone | shops | rated | favourites).
+  `
+  ALTER TABLE users ADD COLUMN short_name INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE listings ADD COLUMN contact_rule TEXT NOT NULL DEFAULT 'anyone';
+  `,
+  // 23: proof photos (session 34): 'photo' = the seller's photo showing the
+  // chat's code on paper; 'ask' = the buyer asked for one. (A new column
+  // because messages.kind only allows accept/decline.)
+  `
+  ALTER TABLE messages ADD COLUMN proof TEXT CHECK (proof IN ('photo', 'ask'));
+  `,
+  // 24: offer details (session 34), on a seller's priced message.
+  `
+  ALTER TABLE messages ADD COLUMN offer_condition TEXT;
+  ALTER TABLE messages ADD COLUMN offer_warranty TEXT;
+  ALTER TABLE messages ADD COLUMN offer_returns TEXT;
+  ALTER TABLE messages ADD COLUMN offer_valid_until TEXT;
+  `,
+  // 25: "Something went wrong" after a deal (session 34): a report about a
+  // deal, with what kind of problem it was.
+  `
+  ALTER TABLE reports ADD COLUMN deal_id INTEGER REFERENCES deals(id) ON DELETE SET NULL;
+  ALTER TABLE reports ADD COLUMN kind TEXT;
+  CREATE INDEX idx_reports_deal ON reports(deal_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

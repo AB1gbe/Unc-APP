@@ -7,6 +7,8 @@ import { HttpError, notFound } from '../lib/http.js';
 import { avatarUrl } from '../lib/uploads.js';
 import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
+import { contactBlocker } from '../lib/contact.js';
+import { nameFor } from '../../../shared/names.js';
 import { parseInterests, requireAuth } from '../middleware/auth.js';
 
 export function favouriteRoutes(db) {
@@ -29,14 +31,14 @@ export function favouriteRoutes(db) {
   // My favourite sellers, newest first.
   r.get('/favourites', requireAuth, (req, res) => {
     const rows = db.prepare(`
-      SELECT u.id, u.display_name, u.avatar, u.account_type, u.city, u.shop_area
+      SELECT u.id, u.display_name, u.short_name, u.avatar, u.account_type, u.city, u.shop_area
       FROM favourites f JOIN users u ON u.id = f.seller_id
       WHERE f.user_id = ? AND u.banned_at IS NULL
       ORDER BY f.created_at DESC, u.id DESC LIMIT 100
     `).all(req.user.id);
     res.json({
       sellers: rows.map((u) => ({
-        id: u.id, displayName: u.display_name, avatarUrl: avatarUrl(u.avatar),
+        id: u.id, displayName: nameFor(u.display_name, u.short_name), avatarUrl: avatarUrl(u.avatar),
         accountType: u.account_type, city: u.shop_area || u.city,
       })),
     });
@@ -50,16 +52,17 @@ export function favouriteRoutes(db) {
 export function tellFavourites(db, buyer, listing) {
   const told = new Set();
   const sellers = db.prepare(`
-    SELECT u.id, u.interests FROM favourites f JOIN users u ON u.id = f.seller_id
+    SELECT u.id, u.interests, u.account_type FROM favourites f JOIN users u ON u.id = f.seller_id
     WHERE f.user_id = ? AND u.kyc_status = 'approved' AND u.banned_at IS NULL
       AND NOT EXISTS (SELECT 1 FROM blocks b WHERE (b.user_id = f.user_id AND b.blocked_id = u.id) OR (b.user_id = u.id AND b.blocked_id = f.user_id))
   `).all(buyer.id);
   for (const s of sellers) {
     const interests = parseInterests(s.interests);
     if (interests.length && !interests.includes(listing.category)) continue;
+    if (contactBlocker(db, listing, s)) continue; // e.g. a "shops only" request
     told.add(s.id);
     notify(db, s.id, 'favourite-request', { actorId: buyer.id, listingId: listing.id });
-    pushTo(db, s.id, 'favourite-request', { actor: buyer.display_name, title: listing.title }, `/requests/${listing.id}`)
+    pushTo(db, s.id, 'favourite-request', { actor: nameFor(buyer.display_name, buyer.short_name), title: listing.title }, `/requests/${listing.id}`)
       .catch((err) => console.warn('[push]', err.message));
   }
   return told;

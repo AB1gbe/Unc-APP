@@ -11,6 +11,9 @@ import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { storiesAbout } from './stories.js';
+import { nameFor } from '../../../shared/names.js';
+
+export const DEAL_PROBLEMS = ['not-as-described', 'no-show', 'payment', 'other'];
 
 export function ratingRoutes(db) {
   const r = Router();
@@ -43,6 +46,23 @@ export function ratingRoutes(db) {
     res.status(201).json({ ok: true });
   });
 
+  // "Something went wrong with this deal" (session 34): either side tells
+  // the team. It becomes a report on the deal's conversation, so an admin
+  // can read that chat (and only that one). One open report per person.
+  r.post('/deals/:id/problem', requireAuth, (req, res) => {
+    const deal = db.prepare('SELECT * FROM deals WHERE id = ?').get(Number(req.params.id));
+    if (!deal || (deal.buyer_id !== req.user.id && deal.vendor_id !== req.user.id)) throw notFound('Deal not found.');
+    const kind = v.oneOf(req.body, 'kind', DEAL_PROBLEMS);
+    const details = v.str(req.body, 'details', { min: 10, max: 1000 });
+    if (db.prepare(`SELECT 1 FROM reports WHERE deal_id = ? AND reporter_id = ? AND status = 'open'`).get(deal.id, req.user.id)) {
+      throw new HttpError(409, 'You already told us about this deal. Our team will be in touch by email.');
+    }
+    db.prepare('INSERT INTO reports (reporter_id, conversation_id, deal_id, kind, reason) VALUES (?, ?, ?, ?, ?)')
+      .run(req.user.id, deal.conversation_id, deal.id, kind, details);
+    audit(db, req.user.id, 'deal.problem', `deal:${deal.id}`, { kind });
+    res.status(201).json({ ok: true });
+  });
+
   r.get('/members/:id', (req, res) => {
     const m = db.prepare('SELECT * FROM users WHERE id = ?').get(Number(req.params.id));
     // Only verified, non-banned members have a public profile.
@@ -50,7 +70,7 @@ export function ratingRoutes(db) {
       throw notFound('Member not found.');
     }
     const reviews = db.prepare(`
-      SELECT r.stars, r.comment, r.created_at, u.id AS from_id, u.display_name AS from_name, u.avatar AS from_avatar,
+      SELECT r.stars, r.comment, r.created_at, u.id AS from_id, u.display_name AS from_name, u.short_name AS from_short, u.avatar AS from_avatar,
              l.title AS listing_title, CASE WHEN d.vendor_id = r.ratee_id THEN 'vendor' ELSE 'buyer' END AS role
       FROM ratings r JOIN deals d ON d.id = r.deal_id
       JOIN users u ON u.id = r.rater_id
@@ -70,7 +90,8 @@ export function ratingRoutes(db) {
     res.json({
       member: {
         id: m.id,
-        displayName: m.display_name,
+        // "Show only my first name" (session 34): everyone but the member sees "Sam B.".
+        displayName: req.user?.id === m.id ? m.display_name : nameFor(m.display_name, m.short_name),
         accountType: m.account_type,
         verified: true,
         memberSince: m.created_at,
@@ -93,7 +114,7 @@ export function ratingRoutes(db) {
         comment: x.comment,
         createdAt: x.created_at,
         role: x.role, // what the reviewed member was in that deal
-        from: { id: x.from_id, displayName: x.from_name, avatarUrl: avatarUrl(x.from_avatar) },
+        from: { id: x.from_id, displayName: nameFor(x.from_name, x.from_short), avatarUrl: avatarUrl(x.from_avatar) },
         listingTitle: x.listing_title,
       })),
     });

@@ -119,7 +119,10 @@ export default function Home() {
                 : tj('Newest requests. {link} to see ones that match what you sell.', { link: <Link to="/account">{t('Add interests')}</Link> })}
             </div>
           </div>
-          <Link to="/browse">{t('Browse all')} <span className="flip">→</span></Link>
+          <span className="row" style={{ gap: '1rem' }}>
+            <Link to="/demand">{t('📊 What people ask for')}</Link>
+            <Link to="/browse">{t('Browse all')} <span className="flip">→</span></Link>
+          </span>
         </div>
         {forYou.loading ? <CardsLoading /> : (forYou.data?.listings.length ?? 0) === 0 ? (
           <div className="card empty">{t("You're all caught up! New requests show up here as soon as they're posted.")}</div>

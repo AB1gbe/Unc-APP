@@ -93,6 +93,7 @@ export function publicMe(u) {
     onboarded: Boolean(u.onboarded_at),
     emailOffers: u.email_offers !== 0,
     hideActivity: u.hide_activity === 1,
+    shortName: u.short_name === 1,
     ...shopFields(u),
   };
 }

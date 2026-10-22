@@ -44,5 +44,10 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 035 | [[ADR-035 Bahrain areas]] | Free text tidied to known areas; one shared file; datalist suggestions; governorate = near; translated names | strict list, DB table, select box |
 | 036 | [[ADR-036 Block and scam warnings]] | Block = no contact either way, old chats readable, neutral notice; scam = on-device warning from simple patterns | one-way block, delete chats, server flagging, AI |
 | 037 | [[ADR-037 Expiry and tips]] | Close after 30 days, 🔔 + push 3 days before, one-tap keep open, hourly; at most 2 rule-based tips | never expire, 14 days, auto-renew, scores |
+| 038 | [[ADR-038 Who may contact me and first name only]] | Per request: anyone / shops / 4★+ / favourites; 🔒 badge + reason; "Sam B." until you write in a chat; not for shops | account-wide, hide requests, nicknames |
+| 039 | [[ADR-039 Unmet demand board]] | Verified members; counts per category, waiting first, words from 2+ requests; 30 days; by governorate | show requests, AI topics, all time |
+| 040 | [[ADR-040 Proof photos]] | Code on paper (UNC-#### from the chat); buyer checks; one-tap ask; new `messages.proof` column | image search, AI, stored random code |
+| 041 | [[ADR-041 Offer details]] | Fixed choices for condition/warranty/returns + optional valid-until (≤60 days); expired = no Accept | free text, both sides |
+| 042 | [[ADR-042 Closing note and deal problems]] | 🔔-only thank-you when an open request closes; deal problem = a report with `deal_id` + `kind`; other side not told | push/email, new table, email support |
 
 Template for new ADRs: copy any ADR and keep the same headings.

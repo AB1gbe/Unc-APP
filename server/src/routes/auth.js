@@ -282,6 +282,12 @@ export function authRoutes(db) {
       // Hiding also forgets the last visit we stored.
       if (b.hideActivity) changes.last_seen_at = null;
     }
+    if ('shortName' in b) {
+      if (typeof b.shortName !== 'boolean') throw new HttpError(400, 'shortName must be true or false.', { field: 'shortName' });
+      // A shop is known by its name, so this is for personal accounts only.
+      if (b.shortName && req.user.account_type === 'business') throw new HttpError(400, 'Shops always show their full name.', { field: 'shortName' });
+      changes.short_name = b.shortName ? 1 : 0;
+    }
     const cols = Object.keys(changes);
     if (cols.length) {
       db.prepare(`UPDATE users SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`).run(...Object.values(changes), req.user.id);

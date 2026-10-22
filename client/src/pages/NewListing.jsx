@@ -10,7 +10,7 @@ import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import CityField from '../components/CityField.jsx';
 
-const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '' };
+const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '', contactRule: 'anyone' };
 
 export default function NewListing() {
   const { id } = useParams();
@@ -31,7 +31,7 @@ export default function NewListing() {
     api(`/listings/${id}`).then(({ listing: l }) => {
       setForm({
         title: l.title, description: l.description, category: l.category, budgetMin: l.budgetMin ?? '',
-        budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '',
+        budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '', contactRule: l.contactRule ?? 'anyone',
       });
       setExisting(l.photos ?? []);
       setLoaded(true);
@@ -119,6 +119,16 @@ export default function NewListing() {
           <label htmlFor="neededBy">{t('Needed by')} <span className="muted">{t('(optional)')}</span></label>
           <input id="neededBy" type="date" value={form.neededBy} onChange={set('neededBy')} />
         </div>
+      </div>
+      <div className="field">
+        <label htmlFor="contactRule">{t('Who can make offers?')}</label>
+        <select id="contactRule" value={form.contactRule} onChange={set('contactRule')}>
+          <option value="anyone">{t('Any verified seller')}</option>
+          <option value="shops">{t('Only shops')}</option>
+          <option value="rated">{t('Only sellers rated 4★ or more')}</option>
+          <option value="favourites">{t('Only my favourite sellers')}</option>
+        </select>
+        <div className="hint">{t('Sellers who already contacted you can keep talking to you.')}</div>
       </div>
       <div className="field">
         <label htmlFor="images">{t('Reference photos')} <span className="muted">{t('(optional, up to 6)')}</span></label>

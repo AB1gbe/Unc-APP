@@ -15,6 +15,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, requireVerified } from '../middleware/auth.js';
 import { canStillRate, ratingQueries } from '../lib/ratings.js';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { CHAT_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
@@ -25,6 +26,9 @@ import { newOfferEmail } from '../lib/emails.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { blockedBetween } from '../lib/blocks.js';
+import { CONTACT_MESSAGES, contactBlocker } from '../lib/contact.js';
+import { nameFor } from '../../../shared/names.js';
+import { isExpired, offerDetailsView, readOfferDetails } from '../lib/offers.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -33,6 +37,7 @@ export function conversationRoutes(db) {
     SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
            l.budget_min, l.budget_max, l.currency,
            b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
+           b.short_name AND NOT EXISTS (SELECT 1 FROM messages bm WHERE bm.conversation_id = c.id AND bm.sender_id = c.buyer_id) AS buyer_short,
            vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
            b.banned_at AS buyer_banned_at, vu.banned_at AS vendor_banned_at
     FROM conversations c
@@ -83,6 +88,7 @@ export function conversationRoutes(db) {
       theirRating: mine && theirs ? { stars: theirs.stars, comment: theirs.comment } : null,
       canRate: !mine && canStillRate(d.created_at),
       myStory: Boolean(storyBy.get(d.id, meId)),
+      myProblem: db.prepare('SELECT status FROM reports WHERE deal_id = ? AND reporter_id = ? ORDER BY id DESC LIMIT 1').get(d.id, meId)?.status ?? null,
     };
   }
 
@@ -91,7 +97,7 @@ export function conversationRoutes(db) {
     const deal = dealView(c.id, me.id);
     const other = iAmBuyer
       ? { id: c.vendor_id, displayName: c.vendor_name, accountType: c.vendor_type, verified: c.vendor_kyc === 'approved', avatarUrl: avatarUrl(c.vendor_avatar) }
-      : { id: c.buyer_id, displayName: c.buyer_name, accountType: c.buyer_type, verified: true, avatarUrl: avatarUrl(c.buyer_avatar) };
+      : { id: c.buyer_id, displayName: nameFor(c.buyer_name, c.buyer_short), accountType: c.buyer_type, verified: true, avatarUrl: avatarUrl(c.buyer_avatar) };
     other.rating = ratings.summaryFor(other.id);
     return {
       id: c.id,
@@ -123,9 +129,11 @@ export function conversationRoutes(db) {
     return c;
   }
 
-  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null) {
-    db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .run(convId, senderId, body, offerPrice, image, kind, replyTo);
+  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null, details = null) {
+    db.prepare(`INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to, proof,
+        offer_condition, offer_warranty, offer_returns, offer_valid_until) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(convId, senderId, body, offerPrice, image, kind, replyTo, proof,
+        details?.condition ?? null, details?.warranty ?? null, details?.returns ?? null, details?.validUntil ?? null);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
@@ -135,9 +143,19 @@ export function conversationRoutes(db) {
   const messageView = (m, convId, meId) => ({
     id: m.id, mine: m.sender_id === meId, body: m.body, offerPrice: m.offer_price,
     imageUrl: m.image ? `/api/conversations/${convId}/images/${m.image}` : null,
-    kind: m.kind ?? null, replyTo: m.reply_to ?? null,
+    // A "please send a proof photo" request shows like an answer line.
+    kind: m.kind ?? (m.proof === 'ask' ? 'proof-ask' : null), replyTo: m.reply_to ?? null,
+    proof: m.proof === 'photo',
+    details: offerDetailsView(m),
     createdAt: m.created_at, readAt: m.read_at,
   });
+
+  // Proof photos (session 34): each chat has its own short code, e.g.
+  // UNC-4821. The seller writes it on paper next to the item and sends a
+  // photo, which shows the photo was taken now, for this chat (not copied
+  // from the internet). It comes from the chat's id and start time, so it
+  // is known only once the chat exists.
+  const proofCode = (c) => `UNC-${1000 + (crypto.createHash('sha256').update(`unc-proof:${c.id}:${c.created_at}`).digest().readUInt32BE(0) % 9000)}`;
 
   // ---- Start a conversation ABOUT A LISTING (vendor -> buyer) ----
   r.post('/listings/:id/contact', requireVerified, chatUpload.single('image'), (req, res) => {
@@ -148,6 +166,8 @@ export function conversationRoutes(db) {
     if (listing.status !== 'open') throw new HttpError(409, 'This request is no longer accepting offers.');
     if (listing.buyer_id === req.user.id) throw new HttpError(403, 'You cannot make an offer on your own request.');
     if (blockedBetween(db, listing.buyer_id, req.user.id)) throw new HttpError(403, "You can't contact this member.");
+    const rule = contactBlocker(db, listing, req.user);
+    if (rule) throw new HttpError(403, CONTACT_MESSAGES[rule], { rule });
 
     const existing = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(listing.id, req.user.id);
     if (existing) {
@@ -156,6 +176,7 @@ export function conversationRoutes(db) {
 
     const body = v.str(req.body, 'message', { min: 2, max: 2000 });
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
+    const details = readOfferDetails(req.body, { isSeller: true, hasPrice: offerPrice != null });
 
     const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
     let convId;
@@ -164,7 +185,7 @@ export function conversationRoutes(db) {
         const info = db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)')
           .run(listing.id, listing.buyer_id, req.user.id);
         const id = Number(info.lastInsertRowid);
-        insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
+        insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, null, details);
         audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
         notify(db, listing.buyer_id, 'offer', { actorId: req.user.id, listingId: listing.id, conversationId: id });
         return id;
@@ -194,9 +215,10 @@ export function conversationRoutes(db) {
       SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
              l.budget_min, l.budget_max, l.currency,
              b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
+           b.short_name AND NOT EXISTS (SELECT 1 FROM messages bm WHERE bm.conversation_id = c.id AND bm.sender_id = c.buyer_id) AS buyer_short,
              vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
              (SELECT body FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_body,
-             (SELECT kind FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_kind,
+             (SELECT COALESCE(kind, CASE WHEN proof = 'ask' THEN 'proof-ask' END) FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_kind,
              (SELECT offer_price FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_price,
              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id <> ? AND m.read_at IS NULL) AS unread
       FROM conversations c
@@ -220,7 +242,7 @@ export function conversationRoutes(db) {
   // "Compare offers" (session 31): what the buyer needs to choose between
   // sellers, per conversation. Only ever sent to the request's buyer.
   const latestSellerPrice = db.prepare(`
-    SELECT m.offer_price FROM messages m JOIN conversations c ON c.id = m.conversation_id
+    SELECT m.* FROM messages m JOIN conversations c ON c.id = m.conversation_id
     WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.offer_price IS NOT NULL ORDER BY m.id DESC LIMIT 1
   `);
   const agreedPrice = db.prepare(`
@@ -233,18 +255,22 @@ export function conversationRoutes(db) {
     WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id ORDER BY m.id LIMIT 1
   `);
   const unreadIn = db.prepare('SELECT COUNT(*) AS n FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.read_at IS NULL');
+  const proofIn = db.prepare(`SELECT 1 FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.proof = 'photo' LIMIT 1`);
   function compareFor(convId) {
     const c = getConv.get(convId);
     const first = sellerFirst.get(convId);
     const replyTime = activity.replyTime(c.vendor_id);
+    const latest = latestSellerPrice.get(convId);
     return {
-      price: latestSellerPrice.get(convId)?.offer_price ?? null,
+      price: latest?.offer_price ?? null,
+      details: latest ? offerDetailsView(latest) : null,
       agreedPrice: agreedPrice.get(convId)?.offer_price ?? null,
       firstMessage: first?.body ? first.body.slice(0, 140) : null,
       photoUrl: first?.image ? `/api/conversations/${convId}/images/${first.image}` : null,
       replyTime,
       badges: badgesFor(c.vendor_id, replyTime),
       unread: unreadIn.get(convId).n,
+      hasProof: Boolean(proofIn.get(convId)),
     };
   }
 
@@ -260,7 +286,8 @@ export function conversationRoutes(db) {
     const c = participantConv(req);
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
-      SELECT id, sender_id, body, offer_price, image, kind, reply_to, created_at, read_at FROM messages
+      SELECT id, sender_id, body, offer_price, image, kind, reply_to, proof, created_at, read_at,
+             offer_condition, offer_warranty, offer_returns, offer_valid_until FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
     // Opening the conversation marks the other side's messages as read.
@@ -277,7 +304,7 @@ export function conversationRoutes(db) {
         // Blocked: the blocker sees who they blocked; the other side only sees that replies are off.
         const iBlocked = Boolean(db.prepare('SELECT 1 FROM blocks WHERE user_id = ? AND blocked_id = ?').get(req.user.id, otherId));
         const blocked = iBlocked || blockedBetween(db, req.user.id, otherId);
-        return { ...view(c, req.user), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite, blocked, iBlocked };
+        return { ...view(c, req.user), proofCode: proofCode(c), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite, blocked, iBlocked };
       })(),
       messages: messages.map((m) => messageView(m, c.id, req.user.id)),
     });
@@ -295,9 +322,13 @@ export function conversationRoutes(db) {
     // buyer's counter-offer (session 20). Text is optional with a photo or a price.
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
     const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(req.file) || offerPrice != null }) ?? '';
+    // "proof": this photo shows the chat's code (sellers only, with a photo).
+    const proof = ['1', 'true', true].includes(req.body?.proof);
+    const details = readOfferDetails(req.body, { isSeller: req.user.id === c.vendor_id, hasPrice: offerPrice != null });
+    if (proof && (!req.file || req.user.id !== c.vendor_id)) throw new HttpError(400, 'Only the seller can send a proof photo, and it needs a photo.', { field: 'image' });
     const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
     try {
-      insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null);
+      insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, proof ? 'photo' : null, details);
     } catch (err) {
       photo?.discard();
       throw err;
@@ -323,9 +354,26 @@ export function conversationRoutes(db) {
     const newest = db.prepare('SELECT MAX(id) AS id FROM messages WHERE conversation_id = ? AND offer_price IS NOT NULL').get(c.id).id;
     if (newest !== target.id) throw new HttpError(409, 'A newer price has been offered since. Answer that one instead.');
     if (db.prepare('SELECT 1 FROM messages WHERE reply_to = ?').get(target.id)) throw new HttpError(409, 'This price has already been answered.');
+    if (action === 'accept' && isExpired(target)) throw new HttpError(409, 'This price has expired. Ask the seller for a new one.');
     insertMessage(c.id, req.user.id, '', null, null, action, target.id);
     const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
     audit(db, req.user.id, `offer.${action}`, `conversation:${c.id}`, { messageId: target.id, price: target.offer_price });
+    res.status(201).json({ message: messageView(m, c.id, req.user.id) });
+  });
+
+  // The buyer asks for a proof photo (session 34). One open ask at a time:
+  // asking again only works after the seller has sent one.
+  r.post('/conversations/:id/proof-request', requireVerified, (req, res) => {
+    const c = participantConv(req);
+    if (req.user.id !== c.buyer_id) throw new HttpError(403, 'Only the buyer can ask for a proof photo.');
+    if (c.listing_status !== 'open') throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
+    if (blockedBetween(db, c.buyer_id, c.vendor_id)) throw new HttpError(409, "You can't message this member.");
+    const lastAsk = db.prepare(`SELECT MAX(id) AS id FROM messages WHERE conversation_id = ? AND proof = 'ask'`).get(c.id).id;
+    if (lastAsk && !db.prepare(`SELECT 1 FROM messages WHERE conversation_id = ? AND proof = 'photo' AND id > ?`).get(c.id, lastAsk)) {
+      throw new HttpError(409, 'You already asked for a proof photo.');
+    }
+    insertMessage(c.id, req.user.id, '', null, null, null, null, 'ask');
+    const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
     res.status(201).json({ message: messageView(m, c.id, req.user.id) });
   });
 

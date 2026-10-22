@@ -70,6 +70,12 @@ export function Avatar({ name, src, size = 40 }) {
   return <div className="avatar" aria-hidden style={style}>{(name || '?').trim()[0]?.toUpperCase()}</div>;
 }
 
+// "🔒 Shops only" (session 34): who may make offers, when it isn't everyone.
+export function ContactRule({ rule }) {
+  const text = { shops: t('🔒 Shops only'), rated: t('🔒 4★+ sellers only'), favourites: t('🔒 Favourite sellers only') }[rule];
+  return text ? <span className="badge grey">{text}</span> : null;
+}
+
 export function ListingCard({ listing }) {
   return (
     <Link className="card" to={`/requests/${listing.id}`}>
@@ -89,6 +95,7 @@ export function ListingCard({ listing }) {
       <div className="meta">
         <span>📍 <Place city={listing.city} /></span>
         <span>🕒 {ago(listing.createdAt)}</span>
+        <ContactRule rule={listing.contactRule} />
         {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
         {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
       </div>

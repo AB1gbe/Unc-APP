@@ -25,6 +25,7 @@ const Account = lazy(() => import('./pages/Account.jsx'));
 const Welcome = lazy(() => import('./pages/Welcome.jsx'));
 const Notifications = lazy(() => import('./pages/Notifications.jsx'));
 const Alerts = lazy(() => import('./pages/Alerts.jsx'));
+const Demand = lazy(() => import('./pages/Demand.jsx'));
 const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="my-requests" element={<RequireAuth><MyListings /></RequireAuth>} />
         <Route path="notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
         <Route path="alerts" element={<RequireAuth><Alerts /></RequireAuth>} />
+        <Route path="demand" element={<RequireAuth><Demand /></RequireAuth>} />
         <Route path="saved" element={<RequireAuth><Saved /></RequireAuth>} />
         <Route path="messages" element={<RequireAuth><Inbox /></RequireAuth>} />
         <Route path="messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />

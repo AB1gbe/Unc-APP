@@ -71,9 +71,14 @@ async function seedDemo(db) {
   const ps5 = db.prepare(`SELECT id FROM listings WHERE buyer_id = ? AND title LIKE 'Looking for a used PS5%'`).get(buyer)?.id;
   if (ps5 && !db.prepare('SELECT 1 FROM conversations WHERE listing_id = ?').get(ps5)) {
     const finder = db.prepare('SELECT id FROM users WHERE email = ?').get('freelancer@demo.local').id;
-    for (const [seller, text, price] of [[shop, 'Disc edition, 2 controllers, boxed. 6 months old.', 380], [finder, 'I can get a disc edition with 2 controllers by tomorrow.', 340]]) {
+    // With offer details (session 34): the shop gives a warranty, the finder doesn't.
+    for (const [seller, text, price, condition, warranty, returns] of [
+      [shop, 'Disc edition, 2 controllers, boxed. 6 months old.', 380, 'like-new', '3m', '3d'],
+      [finder, 'I can get a disc edition with 2 controllers by tomorrow.', 340, 'good', 'none', 'none'],
+    ]) {
       const conv = Number(db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)').run(ps5, buyer, seller).lastInsertRowid);
-      db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price) VALUES (?, ?, ?, ?)').run(conv, seller, text, price);
+      db.prepare('INSERT INTO messages (conversation_id, sender_id, body, offer_price, offer_condition, offer_warranty, offer_returns) VALUES (?, ?, ?, ?, ?, ?, ?)')
+        .run(conv, seller, text, price, condition, warranty, returns);
     }
   }
   console.log('Demo data ready. Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');

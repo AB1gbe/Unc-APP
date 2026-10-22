@@ -2,7 +2,7 @@
 // LIFE_DAYS, so Browse stays fresh. REMIND_DAYS before that, the buyer gets
 // a 🔔 + push with a one-tap "Keep it open" (POST /api/listings/:id/renew),
 // which starts the 30 days again. Runs hourly (server/src/index.js).
-import { notify } from './notify.js';
+import { notify, thankOtherSellers } from './notify.js';
 import { pushTo } from './push.js';
 
 export const LIFE_DAYS = 30;
@@ -27,6 +27,7 @@ export function runExpiry(db) {
   for (const l of expire) {
     db.prepare(`UPDATE listings SET status = 'closed', expired_at = datetime('now'), updated_at = datetime('now') WHERE id = ?`).run(l.id);
     notify(db, l.buyer_id, 'expired', { listingId: l.id });
+    thankOtherSellers(db, l, 'closed');
   }
   return { reminded: remind.length, expired: expire.length };
 }

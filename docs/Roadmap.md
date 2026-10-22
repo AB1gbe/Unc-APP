@@ -47,6 +47,10 @@ tags: [roadmap]
 - [x] The recommended next five, built in session 31 → [[Choosing, Alerts and Safety]].
 - [ ] More from [[More Ideas for the Vision]] (the rest of the list).
 
+## Fresh ideas (session 33)
+- [x] The recommended next five, built in session 34 → [[Privacy, Demand and Trust]].
+- [ ] More from [[Fresh Ideas for the Vision]] (shopping lists, borrow/rent, swap, group requests, quiet hours…).
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]

@@ -14,6 +14,7 @@ import { StoryForm } from '../components/Stories.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
 import { Place } from '../components/CityField.jsx';
 import { scamSignals } from '../scam.js';
+import { EMPTY_DETAILS, OfferDetailFields, OfferDetailsLine, addDetails } from '../components/OfferDetails.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -25,6 +26,8 @@ export default function Conversation() {
   const [offer, setOffer] = useState('');
   const [sending, setSending] = useState(false);
   const [photo, setPhoto] = useState(null);        // photo to send (already shrunk)
+  const [proof, setProof] = useState(false);       // that photo shows the chat's code
+  const [details, setDetails] = useState(EMPTY_DETAILS); // condition, warranty… with a price
   const [viewing, setViewing] = useState(null);    // photo URL open full-screen
   const lastId = useRef(0);
   const currentId = useRef(id);
@@ -78,12 +81,15 @@ export default function Conversation() {
     try {
       const fd = new FormData();
       if (text.trim()) fd.append('message', text);
-      if (offer !== '') fd.append('offerPrice', offer);
+      if (offer !== '') { fd.append('offerPrice', offer); if (conv.myRole === 'vendor') addDetails(fd, details); }
       if (photo) fd.append('image', photo);
+      if (photo && proof) fd.append('proof', '1');
       await api(`/conversations/${id}/messages`, { method: 'POST', form: fd });
       setText('');
       setOffer('');
       setPhoto(null);
+      setProof(false);
+      setDetails(EMPTY_DETAILS);
       await load();
     } catch (err) {
       setError(err);
@@ -120,8 +126,11 @@ export default function Conversation() {
           </div>
         </div>
         {conv.deal && <DealBanner conv={conv} onRated={load} />}
+        {conv.deal && <DealProblem conv={conv} onDone={load} />}
         <div className="chat-body" ref={bodyRef}>
-          {messages.map((m) => m.kind ? (
+          {messages.map((m) => m.kind === 'proof-ask' ? (
+            <ProofAskLine key={m.id} m={m} conv={conv} />
+          ) : m.kind ? (
             <AnswerLine key={m.id} m={m} conv={conv} price={priceOf(m.replyTo)} />
           ) : (
             <div key={m.id} className={`bubble ${m.mine ? 'mine' : ''}`}>
@@ -132,6 +141,12 @@ export default function Conversation() {
                 <button type="button" className="bubble-photo" onClick={() => setViewing(m.imageUrl)} aria-label={t('Open photo')}>
                   <img src={m.imageUrl} alt="" loading="lazy" />
                 </button>
+              )}
+              {m.proof && (
+                <div className="proof-badge">
+                  {t('✓ Proof photo · {code}', { code: conv.proofCode })}
+                  {!m.mine && <div className="small">{t('Check that the paper in the photo says {code}.', { code: conv.proofCode })}</div>}
+                </div>
               )}
               {m.body && <div dir="auto">{m.body}</div>}
               {!m.mine && scamSignals(m.body).length > 0 && (
@@ -150,7 +165,16 @@ export default function Conversation() {
           </div>
         ) : (
           <>
-          {photo && <PhotoPreview file={photo} onRemove={() => setPhoto(null)} />}
+          {photo && <PhotoPreview file={photo} onRemove={() => { setPhoto(null); setProof(false); }} />}
+          {offer !== '' && conv.myRole === 'vendor' && (
+            <div style={{ padding: '0 1rem' }}><OfferDetailFields value={details} onChange={setDetails} idPrefix="chat" /></div>
+          )}
+          {photo && conv.myRole === 'vendor' && (
+            <label className="proof-check small">
+              <input type="checkbox" checked={proof} onChange={(e) => setProof(e.target.checked)} />
+              {t('This is a proof photo: the code {code} is written on paper next to the item', { code: conv.proofCode })}
+            </label>
+          )}
           {!text && (
             <QuickReplies role={conv.myRole} onPick={(phrase) => { setText(phrase); textRef.current?.focus(); }} />
           )}
@@ -172,6 +196,7 @@ export default function Conversation() {
         )}
       </div>
       <div className="row" style={{ justifyContent: 'center', gap: '1.25rem' }}>
+        {conv.myRole === 'buyer' && !conv.readOnly && !conv.blocked && <ProofAskButton conv={conv} onDone={load} />}
         <ReportLink conversationId={conv.id} />
         {!conv.iBlocked && <BlockLink conv={conv} onChange={load} />}
       </div>
@@ -240,6 +265,66 @@ function DealBanner({ conv, onRated }) {
   );
 }
 
+// "Something went wrong with this deal?" (session 34): goes to the Unc
+// team with this chat; the other person isn't told.
+const PROBLEMS = {
+  'not-as-described': () => t('The item was not as described'),
+  'no-show': () => t("They didn't come or stopped answering"),
+  payment: () => t('A problem with payment'),
+  other: () => t('Something else'),
+};
+function DealProblem({ conv, onDone }) {
+  const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState('');
+  const [details, setDetails] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const status = conv.deal.myProblem;
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`/deals/${conv.deal.id}/problem`, { method: 'POST', body: { kind, details } });
+      setOpen(false);
+      await onDone();
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (status === 'open') return <p className="deal-problem small muted">{t('Thanks for telling us. Our team will read this chat and contact you by email.')}</p>;
+  if (!open) {
+    return (
+      <p className="deal-problem small">
+        <button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('⚠️ Something went wrong with this deal?')}</button>
+      </p>
+    );
+  }
+  return (
+    <form className="deal-problem" onSubmit={submit}>
+      <b>{t('What went wrong?')}</b>
+      <p className="small muted" style={{ margin: 0 }}>{tj('Only the Unc team sees this, together with this chat. {name} is not told.', { name: <bdi>{conv.other.displayName}</bdi> })}</p>
+      <ErrorBox error={error} />
+      {Object.entries(PROBLEMS).map(([k, label]) => (
+        <label key={k} className="choice">
+          <input type="radio" name="problem" value={k} checked={kind === k} onChange={() => setKind(k)} required />
+          <span>{label()}</span>
+        </label>
+      ))}
+      <textarea required minLength={10} maxLength={1000} value={details} onChange={(e) => setDetails(e.target.value)}
+        placeholder={t('What happened? Dates and amounts help.')} aria-label={t('What happened?')} />
+      <div className="row">
+        <button className="btn" disabled={busy || !kind || details.trim().length < 10}>{busy ? t('Sending…') : t('Send to the Unc team')}</button>
+        <button type="button" className="btn secondary" onClick={() => setOpen(false)}>{t('Cancel')}</button>
+      </div>
+    </form>
+  );
+}
+
 // The photo waiting to be sent, with a ✕ to drop it.
 function PhotoPreview({ file, onRemove }) {
   const [url] = useState(() => URL.createObjectURL(file));
@@ -263,6 +348,7 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
   const fromSeller = m.mine ? conv.myRole === 'vendor' : conv.myRole === 'buyer';
   const price = money(m.offerPrice, l.currency);
   const canAnswer = !m.mine && newest && !answer && !conv.readOnly;
+  const expired = Boolean(m.details?.expired);
 
   const run = (fn) => async (e) => {
     e?.preventDefault();
@@ -281,15 +367,16 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
   });
 
   return (
-    <div className="offer-card">
+    <div className={`offer-card ${expired ? 'is-expired' : ''}`}>
       <div className="offer">{fromSeller ? '💰' : '↩️'} {fromSeller ? t('Offer: {price}', { price }) : t('Counter-offer: {price}', { price })}</div>
       {answer === 'accept' && <span className="badge ok">{t('✓ Accepted')}</span>}
       {answer === 'decline' && <span className="badge grey">{t('Declined')}</span>}
+      <OfferDetailsLine details={m.details} />
       {!answer && !newest && <span className="small muted">{t('Replaced by a newer price')}</span>}
       <ErrorBox error={error} />
       {canAnswer && !countering && (
         <div className="offer-actions">
-          <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>
+          {!expired && <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>}
           <button type="button" className="btn sm secondary" disabled={busy} onClick={() => setCountering(true)}>{t('Counter')}</button>
           <button type="button" className="btn sm secondary" disabled={busy} onClick={respond('decline')}>{t('Not for me')}</button>
         </div>
@@ -318,6 +405,36 @@ function AnswerLine({ m, conv, price }) {
       {accepted && conv.myRole === 'buyer' && !conv.readOnly && (
         <> · <Link to={`/requests/${conv.listing.id}`}>{t('Got it? Mark the request as found')} <span className="flip">→</span></Link></>
       )}
+    </div>
+  );
+}
+
+// Proof photos (session 34): the buyer asks; the seller is told how.
+function ProofAskButton({ conv, onDone }) {
+  const [error, setError] = useState(null);
+  async function ask() {
+    setError(null);
+    try {
+      await api(`/conversations/${conv.id}/proof-request`, { method: 'POST' });
+      await onDone();
+    } catch (err) {
+      setError(err);
+    }
+  }
+  return (
+    <p className="small center" style={{ marginTop: '1rem' }}>
+      <button type="button" className="linkish" onClick={ask}>{t('📸 Ask for a proof photo')}</button>
+      {error && <span className="muted"> · {error.message}</span>}
+    </p>
+  );
+}
+
+function ProofAskLine({ m, conv }) {
+  return (
+    <div className="answer-line" role="note">
+      {m.mine
+        ? t('You asked for a proof photo with the code {code}.', { code: conv.proofCode })
+        : <>{tj('{name} asked for a proof photo.', { name: <bdi>{conv.other.displayName}</bdi> })} {t('Write {code} on a piece of paper, put it next to the item, and send a photo of both. Tick “proof photo” before sending.', { code: conv.proofCode })}</>}
     </div>
   );
 }

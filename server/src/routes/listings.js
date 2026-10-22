@@ -10,7 +10,7 @@ import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
-import { notify } from '../lib/notify.js';
+import { notify, thankOtherSellers } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { tellFavourites } from './favourites.js';
@@ -18,6 +18,8 @@ import { tellAlerts } from './alerts.js';
 import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.js';
 import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
 import { EXPIRES_AT_SQL } from '../lib/expiry.js';
+import { CONTACT_ALLOWED_SQL, CONTACT_RULES, contactAllowedParams, contactBlocker } from '../lib/contact.js';
+import { nameFor } from '../../../shared/names.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -36,7 +38,8 @@ export function listingView(row, images = []) {
     status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-    buyer: { id: row.buyer_id, displayName: row.buyer_name, accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
+    contactRule: row.contact_rule ?? 'anyone',
+    buyer: { id: row.buyer_id, displayName: nameFor(row.buyer_name, row.buyer_short), accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
     images: images.map((i) => `/uploads/listings/${i.file}`),
     photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}` })),
     offerCount: row.offer_count ?? undefined,
@@ -44,7 +47,7 @@ export function listingView(row, images = []) {
 }
 
 const BASE_SELECT = `
-  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.banned_at IS NOT NULL AS buyer_banned,
+  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.short_name AS buyer_short, u.banned_at IS NOT NULL AS buyer_banned,
          (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count
   FROM listings l JOIN users u ON u.id = l.buyer_id
 `;
@@ -122,11 +125,12 @@ export function listingRoutes(db) {
     const rows = db.prepare(`
       ${BASE_SELECT}
       WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ? AND ${NOT_BLOCKED_BUYER}
+        AND ${CONTACT_ALLOWED_SQL}
         AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id AND c.vendor_id = ?)
         ${interests.length ? `AND l.category IN (${interests.map(() => '?').join(', ')})` : ''}
       ORDER BY (lower(l.city) = lower(COALESCE(?, ''))) DESC, l.created_at DESC, l.id DESC
       LIMIT 6
-    `).all(req.user.id, req.user.id, req.user.id, ...interests, req.user.city);
+    `).all(req.user.id, req.user.id, ...contactAllowedParams(db, req.user), req.user.id, ...interests, req.user.city);
     res.json({ listings: rows.map(withImages), basedOnInterests: interests.length > 0 });
   });
 
@@ -182,6 +186,8 @@ export function listingRoutes(db) {
       const conv = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, req.user.id);
       listing.myConversationId = conv?.id ?? null;
       listing.saved = Boolean(db.prepare('SELECT 1 FROM saved_listings WHERE user_id = ? AND listing_id = ?').get(req.user.id, row.id));
+      // Which rule stops me making an offer, if any (session 34).
+      listing.contactBlocked = conv ? null : contactBlocker(db, row, req.user);
     }
     res.json({ listing });
   });
@@ -196,10 +202,10 @@ export function listingRoutes(db) {
     try {
       id = tx(db, () => {
         const info = db.prepare(`
-          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by, contact_rule)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(req.user.id, data.title, data.description, data.category, data.budgetMin, data.budgetMax,
-          data.currency, data.city, data.neededBy);
+          data.currency, data.city, data.neededBy, data.contactRule);
         const newId = Number(info.lastInsertRowid);
         for (const name of photos.names) {
           db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(newId, name);
@@ -213,10 +219,10 @@ export function listingRoutes(db) {
     }
     // Sellers who were favourited by this buyer hear about it first.
     // Then everyone whose request alert matches (session 31), once each.
-    const told = tellFavourites(db, req.user, { id, title: data.title, category: data.category });
+    const told = tellFavourites(db, req.user, { id, title: data.title, category: data.category, contact_rule: data.contactRule, buyer_id: req.user.id });
     tellAlerts(db, req.user, {
       id, title: data.title, description: data.description, category: data.category, city: data.city,
-      budget_min: data.budgetMin, budget_max: data.budgetMax,
+      budget_min: data.budgetMin, budget_max: data.budgetMax, contact_rule: data.contactRule, buyer_id: req.user.id,
     }, told);
     res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)) });
   });
@@ -227,9 +233,9 @@ export function listingRoutes(db) {
     const data = readListingBody(req.body);
     db.prepare(`
       UPDATE listings SET title = ?, description = ?, category = ?, budget_min = ?, budget_max = ?, currency = ?,
-        city = ?, needed_by = ?, updated_at = datetime('now') WHERE id = ?
+        city = ?, needed_by = ?, contact_rule = ?, updated_at = datetime('now') WHERE id = ?
     `).run(data.title, data.description, data.category, data.budgetMin, data.budgetMax, data.currency,
-      data.city, data.neededBy, row.id);
+      data.city, data.neededBy, data.contactRule, row.id);
     res.json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(row.id)) });
   });
 
@@ -306,6 +312,8 @@ export function listingRoutes(db) {
       db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
       // Reopening starts a fresh 30 days (session 31).
       if (status === 'open') db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL, expired_at = NULL WHERE id = ?`).run(row.id);
+      // Only when it actually closes (not when a deal is changed later).
+      if (row.status === 'open' && status !== 'open') thankOtherSellers(db, row, status);
       audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);
     });
     res.json({ listing: detailView(row.id, req.user) });
@@ -331,6 +339,7 @@ function readListingBody(body) {
     currency: v.oneOf(body, 'currency', CURRENCIES, { optional: true }) || 'USD',
     city: normalizeCity(v.str(body, 'city', { min: 2, max: 80 })),
     neededBy: v.isoDate(body, 'neededBy', { optional: true }),
+    contactRule: v.oneOf(body, 'contactRule', CONTACT_RULES, { optional: true }) || 'anyone',
   };
   if (data.budgetMin !== null && data.budgetMax !== null && data.budgetMin > data.budgetMax) {
     throw new HttpError(400, 'Minimum budget cannot be higher than maximum budget.', { field: 'budgetMin' });
