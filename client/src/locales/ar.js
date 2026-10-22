@@ -478,7 +478,7 @@ export default {
   'Nothing yet. Offers, deals, ratings and identity check results will show up here.': 'لا شيء بعد. ستظهر هنا العروض والصفقات والتقييمات ونتيجة التحقق من الهوية.',
   // Phone notifications (session 15)
   'Notifications on this phone': 'الإشعارات على هذا الجهاز',
-  'Get a notification the moment a seller makes an offer on one of your requests, even when Unc is closed.': 'يصلك إشعار فور تقديم بائع عرضاً على أحد طلباتك، حتى عندما يكون Unc مغلقاً.',
+  'Get a notification the moment a seller makes an offer on your request, or a member who favourited you posts a request, even when Unc is closed.': 'يصلك إشعار فور تقديم بائع عرضاً على طلبك، أو عندما ينشر عضو أضافك للمفضلة طلباً، حتى عندما يكون Unc مغلقاً.',
   'On iPhone: tap the Share button, then “Add to Home Screen”, open Unc from your home screen, and come back here.': 'على الآيفون: اضغط زر المشاركة، ثم «إضافة إلى الشاشة الرئيسية»، وافتح Unc من الشاشة الرئيسية، ثم عد إلى هنا.',
   'Phone notifications need a secure (https) address. They work once Unc is online, or on this computer at localhost.': 'إشعارات الهاتف تحتاج عنواناً آمناً (https). ستعمل عندما يكون Unc على الإنترنت، أو على هذا الكمبيوتر عبر localhost.',
   "This browser can't show notifications. Try Chrome, Edge, Firefox or Safari.": 'هذا المتصفح لا يدعم الإشعارات. جرّب Chrome أو Edge أو Firefox أو Safari.',
@@ -603,4 +603,14 @@ export default {
   'Happening near you': 'ما يحدث بالقرب منك',
   'Happening on Unc': 'ما يحدث على Unc',
   '{city} first, then the rest of Unc.': '{city} أولاً، ثم بقية Unc.',
+  // Favourite sellers (session 28)
+  "Added to your favourite sellers. They'll hear first when you post in their categories.": 'تمت الإضافة إلى بائعيك المفضّلين. سيعلمون أولاً عندما تنشر طلباً في فئاتهم.',
+  '♥ Favourite seller': '♥ بائع مفضّل',
+  '♡ Add {name} to favourite sellers': '♡ أضف {name} إلى البائعين المفضّلين',
+  '♡ Favourite': '♡ إضافة للمفضلة',
+  '♥ {n} members favourited this seller': { zero: '♥ لم يضفه أحد للمفضلة بعد', one: '♥ أضافه عضو واحد للمفضلة', two: '♥ أضافه عضوان للمفضلة', few: '♥ أضافه {n} أعضاء للمفضلة', many: '♥ أضافه {n} عضوًا للمفضلة', other: '♥ أضافه {n} عضو للمفضلة' },
+  '{name}, who favourited you, is looking for “{title}”. Make an offer?': '{name} الذي أضافك للمفضلة يبحث عن «{title}». تقدّم بعرض؟',
+  '♥ Favourite sellers': '♥ البائعون المفضّلون',
+  'They hear first when you post a request in a category they deal in.': 'يعلمون أولاً عندما تنشر طلباً في فئة يتعاملون بها.',
+  'No favourites yet. Tap ♡ Favourite on a seller you liked.': 'لا يوجد مفضّلون بعد. اضغط ♡ إضافة للمفضلة على بائع أعجبك.',
 };

@@ -240,7 +240,8 @@ export function conversationRoutes(db) {
       conversation: (() => {
         const otherId = c.buyer_id === req.user.id ? c.vendor_id : c.buyer_id;
         const otherActivity = activity.summaryFor(otherId);
-        return { ...view(c, req.user), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime) };
+        const otherFavourite = Boolean(db.prepare('SELECT 1 FROM favourites WHERE user_id = ? AND seller_id = ?').get(req.user.id, otherId));
+        return { ...view(c, req.user), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite };
       })(),
       messages: messages.map((m) => messageView(m, c.id, req.user.id)),
     });

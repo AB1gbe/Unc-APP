@@ -64,6 +64,7 @@ Unc-APP/
 │   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
 │   │       ├── stories.js       /api/stories, /api/deals/:id/story, /api/admin/stories/:id/hide (session 20)
 │   │       ├── feed.js          /api/feed: "Happening near you" (session 26)
+│   │       ├── favourites.js    /api/members/:id/favourite, /api/favourites, tellFavourites() (session 28)
 │   │       └── admin.js         /api/admin/*
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage)
@@ -89,7 +90,8 @@ Unc-APP/
 │       ├── stories-badges.test.js  "Found it" stories + earned badges (session 20)
 │       ├── seasons.test.js         home greeting + seasonal line (client/src/seasons.js) (session 20)
 │       ├── shop.test.js            shop pages, contact-details guard, "open now" (client/src/hours.js) (session 24)
-│       └── feed.test.js            "Happening near you": anonymity, city first, exclusions (session 26)
+│       ├── feed.test.js            "Happening near you": anonymity, city first, exclusions (session 26)
+│       └── favourites.test.js      favourite sellers + the heads-up on new requests (session 28)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -120,6 +122,7 @@ Unc-APP/
         │   ├── ShopEditor.jsx     "Your shop page": cover, area, opening hours (business accounts, session 24)
         │   ├── ShopHours.jsx      Opening-hours card, OpenNow, dayName() (session 24)
         │   ├── Feed.jsx           "Happening near you" card: Home and the landing page (session 26)
+        │   ├── FavouriteButton.jsx ♡ Favourite a seller: profile + deal box (session 28)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
         │   ├── Lightbox.jsx       Full-screen photo viewer: swipe, arrow keys, Esc (session 13)
         │   ├── Celebrate.jsx      celebrate(): toast + confetti; <Celebrations/> sits in Layout (session 20)

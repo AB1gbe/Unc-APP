@@ -70,6 +70,9 @@ test('hot queries use indexes, not full table scans', () => {
   assert.match(plan(`SELECT * FROM listings WHERE status = 'open' AND created_at >= datetime('now', '-7 days') ORDER BY created_at DESC LIMIT 20`), /idx_listings_status/);
   assert.match(plan(`SELECT * FROM users WHERE account_type = 'business' AND created_at >= datetime('now', '-7 days') ORDER BY created_at DESC LIMIT 10`), /idx_users_new_shops/);
   assert.match(plan(`SELECT COUNT(*) FROM conversations WHERE created_at >= datetime('now', '-1 day')`), /idx_conversations_created/);
+  // Session 28: favourite sellers (count on profiles; "my favourites"; heads-up on a new request).
+  assert.match(plan('SELECT COUNT(*) FROM favourites WHERE seller_id = 1'), /idx_favourites_seller/);
+  assert.match(plan('SELECT * FROM favourites WHERE user_id = 1'), /sqlite_autoindex_favourites/);
 });
 
 test('cleanupExpired removes only dead sessions, codes and reset links', async () => {

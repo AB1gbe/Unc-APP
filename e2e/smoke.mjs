@@ -182,6 +182,19 @@ await shot(buyer, '23b-story-form');
 await buyer.click('.story-form button:has-text("Share publicly")');
 await buyer.waitForSelector('.toast:has-text("Story shared")');
 await buyer.waitForSelector('.story-form', { state: 'detached' });
+// Favourite seller: from the deal box; a new Electronics request reaches them first.
+await buyer.click('.deal-banner .fav-btn');
+await buyer.waitForSelector('.deal-banner .fav-btn.on');
+await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'USD', city: 'Austin' }) }));
+const vendorChat = vendor.url();
+await vendor.goto(BASE + '/notifications');
+await vendor.waitForSelector('.inbox-item:has-text("who favourited you, is looking for")');
+await shot(vendor, '30-favourite-notification');
+await vendor.goto(vendorChat); // back to the chat for the seller's rating
+const buyerChat = buyer.url();
+await buyer.goto(BASE + '/saved'); await buyer.waitForSelector('.inbox-item:has-text("Riverside Electronics")');
+await buyer.goto(buyerChat); // back to the chat for the next steps
 
 await vendor.reload();
 await vendor.waitForSelector('text=has already rated you');

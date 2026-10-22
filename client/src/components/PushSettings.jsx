@@ -30,7 +30,7 @@ export default function PushSettings({ hideWhenOn = false }) {
   return (
     <div className="card push-card">
       <h2>{t('Notifications on this phone')}</h2>
-      <p className="muted small">{t('Get a notification the moment a seller makes an offer on one of your requests, even when Unc is closed.')}</p>
+      <p className="muted small">{t('Get a notification the moment a seller makes an offer on your request, or a member who favourited you posts a request, even when Unc is closed.')}</p>
       <ErrorBox error={error} />
       {support === 'ios-install' && (
         <div className="alert info">{t('On iPhone: tap the Share button, then “Add to Home Screen”, open Unc from your home screen, and come back here.')}</div>

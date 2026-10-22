@@ -13,6 +13,7 @@ import { ratingQueries } from '../lib/ratings.js';
 import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
+import { tellFavourites } from './favourites.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -194,6 +195,8 @@ export function listingRoutes(db) {
       photos.discard();
       throw err;
     }
+    // Sellers who were favourited by this buyer hear about it first.
+    tellFavourites(db, req.user, { id, title: data.title, category: data.category });
     res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)) });
   });
 

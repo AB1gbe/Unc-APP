@@ -34,3 +34,5 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-21 | [[2026-10-21 Session 25]] | Pull request #8 (shop pages) merged into `main` |
 | 2026-10-21 | [[2026-10-21 Session 26]] | "Happening near you" feed (anonymous finds, new requests and shops, own city first) |
 | 2026-10-21 | [[2026-10-21 Session 27]] | Pull request #9 ("Happening near you") merged into `main` |
+| 2026-10-21 | [[2026-10-21 Session 28]] | Favourite sellers (heads-up on new requests in their categories) |
+| 2026-10-22 | [[2026-10-22 Session 29]] | Pull request #10 (favourite sellers) merged into `main` |

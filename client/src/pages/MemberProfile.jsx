@@ -9,6 +9,7 @@ import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
 import { StoryCard } from '../components/Stories.jsx';
 import ShopHours, { OpenNow } from '../components/ShopHours.jsx';
+import FavouriteButton from '../components/FavouriteButton.jsx';
 
 export default function MemberProfile() {
   const { id } = useParams();
@@ -34,6 +35,12 @@ export default function MemberProfile() {
               <span>{tn(m.deals, '{n} deal', '{n} deals')}</span>
             </div>
             <Badges badges={m.badges} />
+            {(user && !isMe) || m.favouriteCount > 0 ? (
+              <div className="row" style={{ marginTop: '.4rem', gap: '.5rem' }}>
+                {user && !isMe && <FavouriteButton memberId={m.id} initial={m.favourite} />}
+                {m.favouriteCount > 0 && <span className="muted small">{tn(m.favouriteCount, '♥ {n} member favourited this seller', '♥ {n} members favourited this seller')}</span>}
+              </div>
+            ) : null}
             {m.shopArea ? (
               <div className="muted small" style={{ marginTop: '.3rem' }}>
                 📍 <bdi>{m.shopArea}</bdi> ·{' '}

@@ -11,6 +11,7 @@ import { shrinkImage } from '../images.js';
 import { formatDateTime, t, tj } from '../i18n.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import { StoryForm } from '../components/Stories.jsx';
+import FavouriteButton from '../components/FavouriteButton.jsx';
 
 export default function Conversation() {
   const { id } = useParams();
@@ -200,6 +201,9 @@ function DealBanner({ conv, onRated }) {
           <> · {t('They rated you')} <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> {tj('“{text}”', { text: <bdi>{deal.theirRating.comment}</bdi> })}</>}</>
         ) : (
           <span className="muted"> · {deal.otherHasRated ? t('They rated you too.') : tj('Waiting for {name} to rate you.', { name: <bdi>{other.displayName}</bdi> })} {t("Ratings show on profiles once you've both rated (or after 14 days).")}</span>
+        )}
+        {conv.myRole === 'buyer' && !conv.otherFavourite && (
+          <div style={{ marginTop: '.6rem' }}><FavouriteButton memberId={other.id} name={other.displayName} wide /></div>
         )}
         {!deal.myStory && <StoryForm dealId={deal.id} otherName={other.displayName} onShared={onRated} />}
       </div>

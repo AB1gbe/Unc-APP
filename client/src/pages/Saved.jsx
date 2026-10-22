@@ -1,6 +1,6 @@
 // Requests the member saved with "♡ Save" to come back to later.
 import { Link } from 'react-router-dom';
-import { ErrorBox, ListingCard, CardsLoading, Loading } from '../components/ui.jsx';
+import { Avatar, ErrorBox, ListingCard, CardsLoading } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { t } from '../i18n.jsx';
 
@@ -19,6 +19,34 @@ export default function Saved() {
       ) : (
         <div className="grid">{data?.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
       )}
+      <FavouriteSellers />
     </>
+  );
+}
+
+// "♥ Favourite sellers" (session 28): they hear first when you post in
+// their categories. Tap one to see their profile or shop.
+function FavouriteSellers() {
+  const { data } = useApi('/favourites');
+  return (
+    <section style={{ marginTop: '2rem' }}>
+      <h2 style={{ marginBottom: '.2rem' }}>{t('♥ Favourite sellers')}</h2>
+      <p className="muted small" style={{ marginTop: 0 }}>{t('They hear first when you post a request in a category they deal in.')}</p>
+      {data && data.sellers.length === 0 ? (
+        <div className="card empty">{t('No favourites yet. Tap ♡ Favourite on a seller you liked.')}</div>
+      ) : (
+        <div className="card" style={{ padding: 0 }}>
+          {data?.sellers.map((s) => (
+            <Link key={s.id} to={`/members/${s.id}`} className="inbox-item">
+              <Avatar name={s.displayName} src={s.avatarUrl} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <b><bdi>{s.displayName}</bdi></b> {s.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}
+                {s.city && <div className="muted small">📍 <bdi>{s.city}</bdi></div>}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

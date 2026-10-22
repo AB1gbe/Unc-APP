@@ -51,7 +51,7 @@ npm run dev
 ## Rules
 | Rule | Why | Where |
 |---|---|---|
-| Only **new offers** send a push today | What the owner asked for; messages already have a badge | `conversations.js` contact route |
+| Pushes for **new offers** (buyers) and, since session 28, for a request from a member who **favourited you** (sellers) | The two moments worth interrupting someone for | `conversations.js` contact route; `tellFavourites()` in `routes/favourites.js` |
 | Sent **after** the offer is saved | Never announce an offer that failed | outside `tx()` |
 | A push problem never fails the offer | The offer matters more than the alert | `pushTo()` catches everything |
 | Dead devices (push service says 404/410) are deleted | Phones reset, apps get uninstalled | `pushTo()` |
