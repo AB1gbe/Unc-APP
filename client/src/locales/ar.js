@@ -649,4 +649,12 @@ export default {
   'New request matching your alert: “{title}”': 'طلب جديد يطابق تنبيهك: «{title}»',
   // Areas (session 31)
   'City or governorate': 'المدينة أو المحافظة',
+  // Block + scam warnings (session 31)
+  "⚠️ Be careful: never send money before you've seen the item, and don't open links from strangers. Unc never asks you to pay by transfer.": '⚠️ انتبه: لا ترسل أي مبلغ قبل أن ترى الغرض، ولا تفتح روابط من غرباء. Unc لا يطلب منك أبداً الدفع عبر التحويل.',
+  "Block {name}? They won't be able to contact you or answer your requests, and you won't see their requests. You can unblock them in Account → Privacy.": 'حظر {name}؟ لن يتمكن من التواصل معك أو الرد على طلباتك، ولن ترى طلباته. يمكنك إلغاء الحظر من الحساب ← الخصوصية.',
+  '🚫 Block': '🚫 حظر',
+  "You blocked {name}. They can't contact you or your requests.": 'لقد حظرت {name}. لا يمكنه التواصل معك أو مع طلباتك.',
+  Unblock: 'إلغاء الحظر',
+  "You can't reply in this conversation.": 'لا يمكنك الرد في هذه المحادثة.',
+  'Blocked members': 'الأعضاء المحظورون',
 };

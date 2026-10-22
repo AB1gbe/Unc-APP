@@ -5,6 +5,7 @@
 // written by the app from `kind`, so it shows in the reader's language.
 import { Router } from 'express';
 import { governorateOf } from '../../../shared/areas.js';
+import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
 
 const DAYS = 7;          // how far back the feed looks
 const LIMIT = 8;         // items shown
@@ -23,6 +24,7 @@ export function feedRoutes(db) {
     FROM listings l JOIN users u ON u.id = l.buyer_id
     WHERE l.status = 'open' AND l.created_at >= datetime('now', '-${DAYS} days') AND u.banned_at IS NULL
       AND l.buyer_id <> ? -- not the member's own requests
+      AND ${NOT_BLOCKED_BUYER}
     ORDER BY l.created_at DESC LIMIT 20
   `);
   const shops = db.prepare(`
@@ -43,7 +45,7 @@ export function feedRoutes(db) {
     const myGov = governorateOf(city);
     const near = (item) => Boolean(city && item.city && (item.city.toLowerCase().includes(city.toLowerCase())
       || (myGov && governorateOf(item.city) === myGov)));
-    const items = [...found.all(), ...requests.all(req.user?.id ?? 0), ...shops.all()].map((i) => ({ ...i, near: near(i) }));
+    const items = [...found.all(), ...requests.all(req.user?.id ?? 0, req.user?.id ?? 0), ...shops.all()].map((i) => ({ ...i, near: near(i) }));
     if (city) {
       const busy = offersToday.get(city);
       if (busy.n >= BUSY_OFFERS) items.push({ kind: 'offers-today', at: busy.at, city, count: busy.n, near: true });

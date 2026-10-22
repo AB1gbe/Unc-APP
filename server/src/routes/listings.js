@@ -16,6 +16,7 @@ import { badgeQueries } from '../lib/badges.js';
 import { tellFavourites } from './favourites.js';
 import { tellAlerts } from './alerts.js';
 import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.js';
+import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -75,6 +76,7 @@ export function listingRoutes(db) {
   r.get('/', (req, res) => {
     const where = [`l.status = 'open'`, 'u.banned_at IS NULL'];
     const params = [];
+    if (req.user) { where.push(NOT_BLOCKED_BUYER); params.push(req.user.id); }
     if (req.query.q) {
       where.push('(l.title LIKE ? OR l.description LIKE ?)');
       const like = `%${String(req.query.q).slice(0, 100)}%`;
@@ -116,12 +118,12 @@ export function listingRoutes(db) {
     const interests = parseInterests(req.user.interests).filter((c) => CATEGORIES.includes(c));
     const rows = db.prepare(`
       ${BASE_SELECT}
-      WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ?
+      WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ? AND ${NOT_BLOCKED_BUYER}
         AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id AND c.vendor_id = ?)
         ${interests.length ? `AND l.category IN (${interests.map(() => '?').join(', ')})` : ''}
       ORDER BY (lower(l.city) = lower(COALESCE(?, ''))) DESC, l.created_at DESC, l.id DESC
       LIMIT 6
-    `).all(req.user.id, req.user.id, ...interests, req.user.city);
+    `).all(req.user.id, req.user.id, req.user.id, ...interests, req.user.city);
     res.json({ listings: rows.map(withImages), basedOnInterests: interests.length > 0 });
   });
 

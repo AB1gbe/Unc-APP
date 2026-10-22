@@ -18,6 +18,7 @@ import { storyRoutes } from './routes/stories.js';
 import { feedRoutes } from './routes/feed.js';
 import { favouriteRoutes } from './routes/favourites.js';
 import { alertRoutes } from './routes/alerts.js';
+import { blockRoutes } from './routes/blocks.js';
 import { pushRoutes } from './routes/push.js';
 import { kycRoutes } from './routes/kyc.js';
 import { listingRoutes } from './routes/listings.js';
@@ -56,6 +57,7 @@ export function createApp(db) {
   app.use('/api/feed', feedRoutes(db));
   app.use('/api', favouriteRoutes(db));
   app.use('/api/alerts', alertRoutes(db));
+  app.use('/api', blockRoutes(db));
   app.use('/api', (_req, _res, next) => next(notFound('Unknown API route')));
 
   // Listing photos are public. KYC files are NOT served statically - only

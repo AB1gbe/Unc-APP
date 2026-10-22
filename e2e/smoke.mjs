@@ -196,8 +196,8 @@ await buyer.waitForSelector('.story-form', { state: 'detached' });
 // Favourite seller: from the deal box; a new Electronics request reaches them first.
 await buyer.click('.deal-banner .fav-btn');
 await buyer.waitForSelector('.deal-banner .fav-btn.on');
-await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'USD', city: 'Austin' }) }));
+const controllerId = await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'USD', city: 'Austin' }) }).then((r) => r.json()).then((j) => j.listing.id));
 const vendorChat = vendor.url();
 await vendor.goto(BASE + '/notifications');
 await vendor.waitForSelector('.inbox-item:has-text("who favourited you, is looking for")');
@@ -260,6 +260,18 @@ await buyer.waitForSelector('img.shop-cover');
 await buyer.waitForSelector('.shop-hours .open-now, .shop-hours .closed-now');
 await buyer.waitForSelector('text=Seef, Manama');
 await shot(buyer, '28-shop-page');
+
+// Scam warning + block: a pay-first message gets a warning; the buyer blocks, then unblocks.
+const scamConv = await vendor.evaluate((id) => fetch(`/api/listings/${id}/contact`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: 'I have one. Send a deposit first by bank transfer and I will ship it.' }) }).then((r) => r.json()).then((j) => j.conversation.id), controllerId);
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.waitForSelector('.scam-warning');
+await shot(buyer, '31-scam-warning');
+buyer.once('dialog', (d) => d.accept());
+await buyer.click('button:has-text("Block")');
+await buyer.waitForSelector('.blocked-notice:has-text("You blocked Riverside Electronics")');
+await buyer.goto(BASE + '/account'); await buyer.click('.card:has-text("Blocked members") button:has-text("Unblock")');
+await buyer.waitForSelector('text=Blocked members', { state: 'detached' });
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

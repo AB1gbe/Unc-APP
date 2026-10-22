@@ -321,6 +321,16 @@ const MIGRATIONS = [
   CREATE INDEX idx_alerts_user ON alerts(user_id);
   CREATE INDEX idx_alerts_category ON alerts(category);
   `,
+  // 20: blocking (session 31): user_id blocked blocked_id.
+  `
+  CREATE TABLE blocks (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    blocked_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (user_id, blocked_id)
+  );
+  CREATE INDEX idx_blocks_blocked ON blocks(blocked_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

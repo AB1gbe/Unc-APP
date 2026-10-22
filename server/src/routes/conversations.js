@@ -24,6 +24,7 @@ import { trySendMail } from '../lib/mailer.js';
 import { newOfferEmail } from '../lib/emails.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
+import { blockedBetween } from '../lib/blocks.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -146,6 +147,7 @@ export function conversationRoutes(db) {
     if (!listing || listing.buyer_banned_at) throw notFound('Request not found.');
     if (listing.status !== 'open') throw new HttpError(409, 'This request is no longer accepting offers.');
     if (listing.buyer_id === req.user.id) throw new HttpError(403, 'You cannot make an offer on your own request.');
+    if (blockedBetween(db, listing.buyer_id, req.user.id)) throw new HttpError(403, "You can't contact this member.");
 
     const existing = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(listing.id, req.user.id);
     if (existing) {
@@ -272,7 +274,10 @@ export function conversationRoutes(db) {
         const otherId = c.buyer_id === req.user.id ? c.vendor_id : c.buyer_id;
         const otherActivity = activity.summaryFor(otherId);
         const otherFavourite = Boolean(db.prepare('SELECT 1 FROM favourites WHERE user_id = ? AND seller_id = ?').get(req.user.id, otherId));
-        return { ...view(c, req.user), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite };
+        // Blocked: the blocker sees who they blocked; the other side only sees that replies are off.
+        const iBlocked = Boolean(db.prepare('SELECT 1 FROM blocks WHERE user_id = ? AND blocked_id = ?').get(req.user.id, otherId));
+        const blocked = iBlocked || blockedBetween(db, req.user.id, otherId);
+        return { ...view(c, req.user), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite, blocked, iBlocked };
       })(),
       messages: messages.map((m) => messageView(m, c.id, req.user.id)),
     });
@@ -285,6 +290,7 @@ export function conversationRoutes(db) {
     }
     const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
     if (otherBanned) throw new HttpError(409, 'This member\'s account has been suspended, so you can\'t message them.');
+    if (blockedBetween(db, c.buyer_id, c.vendor_id)) throw new HttpError(409, "You can't message this member.");
     // Either side can put a price on a message: the seller's offer, or the
     // buyer's counter-offer (session 20). Text is optional with a photo or a price.
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
@@ -308,6 +314,7 @@ export function conversationRoutes(db) {
     if (c.listing_status !== 'open') throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
     const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
     if (otherBanned) throw new HttpError(409, 'This member\'s account has been suspended, so you can\'t message them.');
+    if (blockedBetween(db, c.buyer_id, c.vendor_id)) throw new HttpError(409, "You can't message this member.");
     const action = v.oneOf(req.body, 'action', ['accept', 'decline']);
     const target = db.prepare('SELECT * FROM messages WHERE id = ? AND conversation_id = ?').get(Number(req.params.messageId), c.id);
     if (!target) throw notFound('Message not found.');

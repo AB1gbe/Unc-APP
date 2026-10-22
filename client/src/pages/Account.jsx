@@ -7,6 +7,7 @@ import ProfileEditor from '../components/ProfileEditor.jsx';
 import { formatDate, t, tj } from '../i18n.jsx';
 import PushSettings from '../components/PushSettings.jsx';
 import ShopEditor from '../components/ShopEditor.jsx';
+import { useApi } from '../hooks.js';
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -152,6 +153,24 @@ function PrivacySettings() {
       <h2>{t('Privacy')}</h2>
       <ToggleSetting field="hideActivity" label={t("Hide when I'm online")}
         hint={t("Others won't see “Active now” or when you were last here, and Unc stops keeping that time. Your usual reply time and badges still show, because they come from your messages.")} />
+      <BlockedMembers />
+    </div>
+  );
+}
+
+// Members I blocked, with Unblock (session 31).
+function BlockedMembers() {
+  const { data, reload } = useApi('/blocks');
+  if (!data?.members.length) return null;
+  return (
+    <div style={{ marginTop: '1rem' }}>
+      <b>{t('Blocked members')}</b>
+      {data.members.map((m) => (
+        <div key={m.id} className="row spread" style={{ padding: '.4rem 0' }}>
+          <span className="row" style={{ gap: '.5rem' }}><Avatar name={m.displayName} src={m.avatarUrl} size={28} /> <bdi>{m.displayName}</bdi></span>
+          <button type="button" className="linkish" onClick={async () => { await api(`/members/${m.id}/block`, { method: 'DELETE' }); await reload(); }}>{t('Unblock')}</button>
+        </div>
+      ))}
     </div>
   );
 }
