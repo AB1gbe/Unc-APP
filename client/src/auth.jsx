@@ -37,4 +37,5 @@ export function AuthProvider({ children }) {
 
 export const useAuth = () => useContext(AuthContext);
 
-export const isVerified = (u) => Boolean(u && u.emailVerified && u.kycStatus === 'approved');
+// Verified = email confirmed, identity approved and a payment card added (session 40).
+export const isVerified = (u) => Boolean(u && u.emailVerified && u.kycStatus === 'approved' && u.hasCard);

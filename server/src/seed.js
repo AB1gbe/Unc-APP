@@ -4,14 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { openDb } from './db.js';
 import { hashPassword } from './lib/crypto.js';
+import { TERMS_VERSION } from './lib/terms.js';
 
 export async function ensureAdmin(db) {
   const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(config.adminEmail);
   if (exists) return exists.id;
   const info = db.prepare(`
-    INSERT INTO users (email, password_hash, display_name, account_type, role, email_verified_at, kyc_status)
-    VALUES (?, ?, 'Admin', 'individual', 'admin', datetime('now'), 'approved')
-  `).run(config.adminEmail, await hashPassword(config.adminPassword));
+    INSERT INTO users (email, password_hash, display_name, account_type, role, email_verified_at, kyc_status, terms_version, terms_accepted_at)
+    VALUES (?, ?, 'Admin', 'individual', 'admin', datetime('now'), 'approved', ?, datetime('now'))
+  `).run(config.adminEmail, await hashPassword(config.adminPassword), TERMS_VERSION);
   if (!config.isTest) console.log(`Created admin account ${config.adminEmail}`);
   return Number(info.lastInsertRowid);
 }
@@ -22,13 +23,19 @@ async function seedDemo(db) {
     const found = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
     if (found) return found.id;
     return Number(db.prepare(`
-      INSERT INTO users (email, password_hash, display_name, account_type, city, email_verified_at, kyc_status)
-      VALUES (?, ?, ?, ?, ?, datetime('now'), 'approved')
-    `).run(email, pw, name, type, city).lastInsertRowid);
+      INSERT INTO users (email, password_hash, display_name, account_type, city, email_verified_at, kyc_status, terms_version, terms_accepted_at)
+      VALUES (?, ?, ?, ?, ?, datetime('now'), 'approved', ?, datetime('now'))
+    `).run(email, pw, name, type, city, TERMS_VERSION).lastInsertRowid);
   };
   const buyer = mk('buyer@demo.local', 'Sam Buyer', 'individual', 'Juffair');
   mk('vendor@demo.local', 'Riverside Electronics', 'business', 'Seef');
   mk('freelancer@demo.local', 'Alex Finder', 'individual', 'Riffa');
+  // Demo members have a test payment card (session 40), like everyone who joins.
+  for (const email of ['buyer@demo.local', 'vendor@demo.local', 'freelancer@demo.local']) {
+    const id = db.prepare('SELECT id FROM users WHERE email = ?').get(email).id;
+    db.prepare(`INSERT OR IGNORE INTO payment_cards (user_id, provider, provider_ref, brand, last4, exp_month, exp_year) VALUES (?, 'test', 'tok_test_visa_4242_12_39', 'visa', '4242', 12, 2039)`).run(id);
+    db.prepare(`UPDATE users SET card_added_at = COALESCE(card_added_at, datetime('now')) WHERE id = ?`).run(id);
+  }
 
   if (!db.prepare('SELECT 1 FROM listings WHERE buyer_id = ?').get(buyer)) {
     const add = db.prepare(`

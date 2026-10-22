@@ -55,6 +55,16 @@ tags: [roadmap]
 - [x] The recommended next five, built in session 37 → [[Your Data, Dashboard and Care]].
 - [ ] More from [[New Directions for the Vision]] (usually in stock, more languages, hold it for me, WhatsApp alerts…).
 
+## Keeping deals on Unc (session 39)
+- [x] Hide phone numbers/links in chat until a price is agreed + a nudge + count attempts (session 40) → [[Deals, Terms, Cards and Installments]]
+- [x] "Did you get it?" check-in (session 40). Leak measure on the owner dashboard: still open.
+- [x] Terms of use, draft (session 40) → [[ADR-050 Terms of use]]. **A lawyer in Bahrain must review them before launch.**
+- [x] Payment card when joining, showcase mode (session 40) → [[ADR-051 Payment card when joining]]
+- [ ] **Connect Tap Payments** (needs a Tap merchant account): build the `tap` provider and Tap's card form
+- [x] Paying in parts, agreed between buyer and seller (session 40) → [[ADR-052 Paying in parts]]
+- [ ] **Installment partner** (owner's plan, after approval: e.g. Tabby/Tamara if they serve Bahrain): `provider = 'partner'`, seller paid in full
+- [ ] ⚖️ Decide how Unc earns (per offer / shop subscription / commission with payments)
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]

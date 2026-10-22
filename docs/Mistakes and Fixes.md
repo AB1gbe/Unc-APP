@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-22 (session 37)
+updated: 2026-10-22 (session 40)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 94 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94). All fixed.
+**Totals so far:** 100 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -104,6 +104,12 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M92 | Design | Dashboard showed "0 hours" for fast first offers, and very thick bars on the 7-day view | 37 |
 | M93 | Design | Pickup checklist items were bold (the site's general label style) | 37 |
 | M94 | Translation | "Nothing yet." had no Arabic; the coverage test caught it | 37 |
+| M95 | Bug (caught early) | Number hider turned "@riverside.bh" into "@📵" and missed ".biz" links | [[2026-10-22 Session 40]] |
+| M96 | Translation | Card page in Arabic still showed "MM/YY", "Tap Payments" and "VISA" | 40 |
+| M97 | Test | A KYC test posted right after approval; posting now also needs a card | 40 |
+| M98 | Self-review | The chat page and the request page imported each other (for the nudge) | 40 |
+| M99 | Self-review | After agreeing a price, the chat would have kept showing 📵 (polling only fetches new messages) | 40 |
+| M100 | Self-review | Card status first planned as a lookup that most "me" answers would have missed | 40 |
 
 ---
 
@@ -636,4 +642,37 @@ An independent review read every file and reproduced each problem. All fixed; ea
 **Coverage test: "MISSING Nothing yet."**
 - **Cause:** I added "Nothing yet." to the dashboard without Arabic.
 - **Fix:** added the Arabic. The search-before-adding habit from [[Mistakes and Fixes#M84]] prevented duplicates this time.
+
+## M95
+**The new number hider turned "@riverside.bh" into "@📵" and didn't catch "cheap-ps5.biz"**
+- **Found by:** trying a list of examples in the terminal before writing the server code.
+- **Cause:** the link rule ran before the @handle rule, so it ate "riverside.bh" and left the "@"; `.biz` wasn't in the list of endings.
+- **Fix:** handles are checked before links; added biz, info, xyz, online.
+- **Lesson:** for text rules, try a handful of real examples first; the order of rules matters.
+
+## M96
+**Arabic check: "English text on page: MM, YY, Tap, Payments" and "VISA"**
+- **Cause:** the Arabic wording kept "MM/YY" and "Tap Payments", and the card brand wasn't marked as a name.
+- **Fix:** "شهر/سنة", "تاب للمدفوعات", and the brand inside `<bdi>`.
+
+## M97
+**`kyc.test.js`: "rejected users can resubmit; admin approval unlocks posting" failed**
+- **Cause:** not a bug: the test approves a member by hand and then posts, but posting now also needs a payment card (the new rule).
+- **Fix:** the test now checks the new rule too: posting is refused with "payment card" until a card is added.
+
+## M98
+**The chat page and the request page imported each other (for the nudge)**
+- **Found by:** self-review. It works, but each page would pull the other into its download, and import loops break easily.
+- **Fix:** `components/ContactNudge.jsx`, used by both.
+
+## M99
+**After agreeing a price, earlier numbers would have stayed 📵 until a full reload**
+- **Found by:** self-review of the design: the chat polls every 4 s but only asks for *new* messages.
+- **Fix:** the server sends `agreed`; when it turns true, the page fetches the whole chat again once.
+
+## M100
+**Card status: the first plan would have shown "no card" after most account actions**
+- **Found by:** self-review: the plan was to add `has_card` with a join in the login lookup, but 15 places return the member with `SELECT * FROM users`, which wouldn't include it.
+- **Fix:** a `users.card_added_at` column, set when a card is saved, so every answer includes it.
+- **Lesson:** look at every place that builds a value before adding a field to it.
 

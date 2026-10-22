@@ -57,7 +57,7 @@ test('every exact server message has an Arabic version, and every message thrown
 
 test('a member signing up in Arabic is stored as Arabic and gets Arabic emails', async () => {
   const res = await t.request(t.app).post('/api/auth/register').set('Accept-Language', AR).send({
-    email: 'arabic@test.local', password: 'Password123', displayName: 'Sara', accountType: 'individual',
+    email: 'arabic@test.local', password: 'Password123', displayName: 'Sara', accountType: 'individual', acceptTerms: true,
   }).expect(201);
   assert.equal(res.body.user.language, 'ar');
   const mail = outbox.filter((m) => m.to === 'arabic@test.local').at(-1);

@@ -72,7 +72,7 @@ export default function VerifyEmail() {
 
 // The 3-step progress bar shown during onboarding.
 export function Steps({ current }) {
-  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Profile'), t('Photo & interests')], [t('Identity'), t('Verify (KYC)')]];
+  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Profile'), t('Photo & interests')], [t('Identity'), t('Verify (KYC)')], [t('Card'), t('Add a payment card')]];
   return (
     <div className="steps">
       {steps.map(([title, sub], i) => (

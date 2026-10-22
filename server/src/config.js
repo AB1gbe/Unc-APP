@@ -44,6 +44,8 @@ export const config = {
   adminEmail: (process.env.ADMIN_EMAIL || 'admin@unc.local').toLowerCase(),
   adminPassword: process.env.ADMIN_PASSWORD || 'ChangeMe123!',
   kycProvider: process.env.KYC_PROVIDER || 'manual',
+  // Payment cards (session 40): 'test' (showcase, no money moves) or 'tap'.
+  paymentProvider: process.env.PAYMENT_PROVIDER || 'test',
   minAge: 18,
   // Public address of the website, used to build links inside emails.
   appUrl: (process.env.APP_URL || 'http://localhost:5173').replace(/\/+$/, ''),

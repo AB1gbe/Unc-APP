@@ -392,6 +392,70 @@ const MIGRATIONS = [
   ALTER TABLE reports ADD COLUMN outcome TEXT CHECK (outcome IN ('action', 'nothing'));
   ALTER TABLE listings ADD COLUMN budget_raised_at TEXT;
   `,
+  // 29: keeping deals on Unc (session 40): the message had a phone number,
+  // email, link or @handle (hidden from the other person until a price is
+  // agreed; kept so the owner can count attempts later).
+  `
+  ALTER TABLE messages ADD COLUMN had_contact INTEGER NOT NULL DEFAULT 0;
+  `,
+  // 30: "Did you get it?" (session 40): when the buyer was asked, so it's once.
+  `
+  ALTER TABLE conversations ADD COLUMN got_it_asked_at TEXT;
+  `,
+  // 31: the Terms (session 40): which version the member agreed to, and when.
+  `
+  ALTER TABLE users ADD COLUMN terms_version INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE users ADD COLUMN terms_accepted_at TEXT;
+  `,
+  // 32: payment cards (session 40). Never a card number: only the payment
+  // company's token, the brand, the last 4 digits and the expiry.
+  `
+  CREATE TABLE payment_cards (
+    user_id      INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    provider     TEXT NOT NULL,
+    provider_ref TEXT NOT NULL,
+    brand        TEXT NOT NULL,
+    last4        TEXT NOT NULL,
+    exp_month    INTEGER NOT NULL,
+    exp_year     INTEGER NOT NULL,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  ALTER TABLE users ADD COLUMN card_added_at TEXT;
+  `,
+  // 33: paying in parts (session 40). provider 'seller' = a plan the buyer
+  // and seller agree (Unc records and reminds, no money through Unc);
+  // 'partner' is kept for an installment company later.
+  `
+  CREATE TABLE installment_plans (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    buyer_id        INTEGER NOT NULL REFERENCES users(id),
+    vendor_id       INTEGER NOT NULL REFERENCES users(id),
+    proposed_by     INTEGER NOT NULL REFERENCES users(id),
+    provider        TEXT NOT NULL DEFAULT 'seller' CHECK (provider IN ('seller', 'partner')),
+    total           INTEGER NOT NULL,
+    currency        TEXT NOT NULL,
+    parts           INTEGER NOT NULL,
+    every           TEXT NOT NULL CHECK (every IN ('week', '2weeks', 'month')),
+    status          TEXT NOT NULL DEFAULT 'proposed' CHECK (status IN ('proposed', 'active', 'declined', 'cancelled', 'completed')),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    decided_at      TEXT
+  );
+  CREATE INDEX idx_plans_conversation ON installment_plans(conversation_id);
+  CREATE TABLE installment_parts (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    plan_id           INTEGER NOT NULL REFERENCES installment_plans(id) ON DELETE CASCADE,
+    n                 INTEGER NOT NULL,
+    amount            INTEGER NOT NULL,
+    due_on            TEXT NOT NULL,
+    paid_at           TEXT,
+    confirmed_at      TEXT,
+    reminded_at       TEXT,
+    late_notified_at  TEXT,
+    UNIQUE (plan_id, n)
+  );
+  CREATE INDEX idx_parts_due ON installment_parts(due_on);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

@@ -32,7 +32,7 @@ export async function setup() {
     n += 1;
     const agent = request.agent(app);
     const reg = await agent.post('/api/auth/register').send({
-      email: `user${n}@test.local`, password: 'Password123', displayName: `User ${n}`, accountType, city: 'Austin',
+      email: `user${n}@test.local`, password: 'Password123', displayName: `User ${n}`, accountType, city: 'Austin', acceptTerms: true,
     }).expect(201);
     agent.id = reg.body.user.id;
     if (stage === 'registered') return agent;
@@ -43,6 +43,8 @@ export async function setup() {
     const sub = await kyc(agent, { idNumber: `ID-${n}-0000${n}`, ...business }, { businessDoc: accountType === 'business' }).expect(201);
     if (stage === 'pending') return agent;
     await admin.post(`/api/admin/kyc/${sub.body.submission.id}/decision`).send({ decision: 'approved' }).expect(200);
+    // A payment card is part of joining (session 40); the showcase provider accepts test tokens.
+    await agent.post('/api/payments/card').send({ token: 'tok_test_visa_4242_12_39' }).expect(201);
     return agent;
   }
 

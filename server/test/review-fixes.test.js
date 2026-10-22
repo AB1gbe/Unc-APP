@@ -95,7 +95,7 @@ test('unban only accepts a real boolean ("false" as text must not ban)', async (
 });
 
 test('two simultaneous sign-ups with one email: one 201, one 409 (no 500)', async () => {
-  const body = { email: 'race@test.local', password: 'Password123', displayName: 'Racer', accountType: 'individual' };
+  const body = { email: 'race@test.local', password: 'Password123', displayName: 'Racer', accountType: 'individual', acceptTerms: true };
   const results = await Promise.all([1, 2].map(() => t.request(t.app).post('/api/auth/register').send(body)));
   assert.deepEqual(results.map((r) => r.status).sort(), [201, 409]);
 });

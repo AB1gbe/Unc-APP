@@ -27,6 +27,7 @@ async function onboard(name, email, type) {
   await p.goto(BASE + '/register');
   if (type === 'business') await p.check('input[value=business]');
   await p.fill('#displayName', name); await p.fill('#email', email); await p.fill('#password', 'Password123'); await p.fill('#city', 'Austin');
+  await p.check('#acceptTerms'); // the Terms (session 40)
   await shot(p, `01-register-${type}`);
   await p.click('button:has-text("Create account")');
   await p.waitForURL('**/verify-email');
@@ -51,6 +52,15 @@ async function onboard(name, email, type) {
   await p.click('button:has-text("Submit for verification")');
   await p.waitForSelector('text=We\'re checking your documents');
   await shot(p, '04-kyc-pending');
+  // Payment card (session 40), in showcase mode: a declined card first, then a good one.
+  await p.click('.add-card-step a:has-text("Add a payment card")');
+  await p.fill('#cardNumber', '4000 0000 0000 0002'); await p.fill('#cardExpiry', '12/39'); await p.fill('#cardCvc', '123'); await p.fill('#cardName', name);
+  await p.click('button:has-text("Save card")');
+  await p.waitForSelector('.alert.error:has-text("declined")');
+  await p.fill('#cardNumber', '4242 4242 4242 4242');
+  await shot(p, `04b-card-${type}`);
+  await p.click('button:has-text("Save card")');
+  await p.waitForURL('**/verification');
   return p;
 }
 
@@ -232,6 +242,22 @@ await vendor.reload();
 await vendor.click('.pickup summary');
 if (!(await vendor.isChecked('.pickup-item:has-text("Switch it on") input'))) throw new Error('pickup tick was not kept');
 await vendor.locator('.pickup').screenshot({ path: `${OUT}/41-pickup.png` });
+// Paying in parts (session 40): the buyer suggests 3 monthly parts; the shop accepts; part 1 is paid and confirmed.
+await buyer.goto(buyerChat);
+await buyer.click('button:has-text("Pay in parts?")');
+await buyer.selectOption('#planParts', '3');
+await buyer.click('button:has-text("Suggest this plan")');
+await buyer.waitForSelector('.plan:has-text("Waiting for")');
+await vendor.reload();
+await vendor.click('.plan button:has-text("Accept plan")');
+await vendor.waitForSelector('.plan-progress');
+await buyer.reload();
+await buyer.locator('.plan-parts button:has-text("I\'ve paid this")').first().click();
+await buyer.waitForSelector('.plan-parts li:has-text("Paid, waiting for the seller")');
+await vendor.reload();
+await vendor.locator('.plan-parts button:has-text("Received ✓")').first().click();
+await vendor.waitForSelector('.plan-parts li.done');
+await vendor.locator('.plan').screenshot({ path: `${OUT}/45-plan.png` });
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
@@ -310,6 +336,17 @@ await vendor.waitForSelector('.proof-badge');
 await buyer.waitForSelector('.proof-badge:has-text("Check that the paper")', { timeout: 15000 });
 await shot(buyer, '35-proof-photo');
 
+// Keeping deals on Unc (session 40): a number typed before a price is agreed
+// shows a nudge, and the other side sees 📵.
+await buyer.fill('.chat-form textarea', 'Easier on WhatsApp: 3912 3456');
+await buyer.waitForSelector('.contact-nudge');
+await shot(buyer, '43-contact-nudge');
+await buyer.click('.chat-form button:has-text("Send")');
+await buyer.waitForSelector('.hidden-note:has-text("Hidden from")');
+await vendor.reload();
+await vendor.waitForSelector('.bubble:has-text("Easier on WhatsApp: 📵")');
+if (await vendor.locator('text=3912 3456').count()) throw new Error('number shown before agreeing a price');
+
 // Privacy (session 34): first name only, and a request only favourite sellers may answer.
 await buyer.goto(BASE + '/account');
 await buyer.locator('[data-setting=shortName]').check(); await buyer.waitForTimeout(300);
@@ -385,6 +422,11 @@ await buyer.waitForSelector('.delete-banner:has-text("Your account will be delet
 await shot(buyer, '38-delete-pending');
 await buyer.click('.delete-banner button:has-text("Keep my account")');
 await buyer.waitForSelector('.delete-banner', { state: 'detached' });
+
+// The Terms page (session 40), and the reminder next to Accept was shown earlier.
+await buyer.goto(BASE + '/terms');
+await buyer.waitForSelector('h2:has-text("Deals agreed on Unc are finished on Unc")');
+await shot(buyer, '44-terms');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });

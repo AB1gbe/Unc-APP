@@ -13,6 +13,8 @@ import CompareOffers from '../components/CompareOffers.jsx';
 import { Place } from '../components/CityField.jsx';
 import { requestTips } from '../tips.js';
 import { EMPTY_DETAILS, OfferDetailFields, addDetails } from '../components/OfferDetails.jsx';
+import { hasContacts } from '../../../shared/contact-mask.js';
+import ContactNudge from '../components/ContactNudge.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -140,6 +142,7 @@ function OfferPanel({ listing }) {
       <div className="field">
         <label htmlFor="message">{t('Message')}</label>
         <textarea id="message" required maxLength={2000} placeholder={t('Describe what you have: condition, photos available, when you can deliver…')} value={message} onChange={(e) => setMessage(e.target.value)} />
+        {hasContacts(message) && <ContactNudge />}
       </div>
       <div className="field">
         <label>{t('Photo of your item')} <span className="muted">{t('(optional)')}</span></label>
