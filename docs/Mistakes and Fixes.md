@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-22 (session 34)
+updated: 2026-10-22 (session 37)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 87 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87). All fixed.
+**Totals so far:** 94 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -97,6 +97,13 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M85 | Test | New browser-test step waited for a demand row, but the test had only 1 open request per category | 34 |
 | M86 | Translation | "New" and "Good" added to `ar.js` again (repeat of M84) | 34 |
 | M87 | Docs | A docs script broke on quotes inside a heading; the heading was simplified | 34 |
+| M88 | Test | Deletion test expected 200 from the photo upload, which answers 201 | [[2026-10-22 Session 37]] |
+| M89 | Test | Deletion tests guessed members' ID numbers and email from the database id (twice) | 37 |
+| M90 | Test | Arabic browser test waited for the first table on Admin; the dashboard's hidden table now came first | 37 |
+| M91 | Design | Hidden hover labels on the dashboard bars still made the Admin page scroll sideways on phones | 37 |
+| M92 | Design | Dashboard showed "0 hours" for fast first offers, and very thick bars on the 7-day view | 37 |
+| M93 | Design | Pickup checklist items were bold (the site's general label style) | 37 |
+| M94 | Translation | "Nothing yet." had no Arabic; the coverage test caught it | 37 |
 
 ---
 
@@ -590,4 +597,43 @@ An independent review read every file and reproduced each problem. All fixed; ea
 **The script that wrote the decision notes stopped with "SyntaxError"**
 - **Cause:** a heading with double quotes inside ("Something went wrong") was put in a Python string through the shell, and the escaping broke.
 - **Fix:** the heading became "Thank-you note to other sellers, and deal problems", and the script was saved as a file instead of typed inline. Nothing in the app was affected.
+
+## M88
+**`account-deletion.test.js`: "expected 200, got 201" when uploading a profile photo**
+- **Cause:** I assumed the photo upload answers 200; it answers 201 (created).
+- **Fix:** expect 201.
+- **Lesson:** check the real status code of an endpoint before using it in a new test.
+
+## M89
+**Deletion tests failed: the banned member's ID "wasn't blocked", and a deleted member's login "worked"**
+- **Cause:** the tests built ID numbers and emails from the database id (`user${id}@test.local`), but the test helper numbers members with its own counter (the admin is id 1). So the tests used *another member's* ID and email. The app was right; the tests were wrong.
+- **Fix:** a small `verified(idNumber)` helper that verifies a member with a known ID number, and the email is read from `/api/auth/me` before deleting.
+- **Lesson:** never guess test data from ids; read it or set it.
+
+## M90
+**`npm run e2e:ar` timed out on the Admin page waiting for `table`**
+- **Cause:** the dashboard has a hidden "Show as a table" table. It is now the first table on the page, and the test waited for the first one to be visible.
+- **Fix:** `waitForSelector('table:visible')` in `e2e/arabic.mjs`.
+
+## M91
+**Arabic layout check: "admin: horizontal overflow on phone"**
+- **Cause:** the bar labels were hidden with `opacity: 0`. Invisible, but still there: at the right and left edges they reached past the screen, so the page could scroll sideways.
+- **Fix:** `display: none` until hover or focus, and the first and last three days' labels are anchored inside the chart.
+- **Lesson:** to hide something that is positioned outside its box, take it out of the layout (`display: none`), don't just make it see-through.
+
+## M92
+**Dashboard screenshot: "0 hours" to first offer, and very wide bars**
+- **Cause:** a median under one hour rounded to 0; with 7 days each bar filled its whole column.
+- **Fix:** "Under an hour" below 1 hour; bars at most 24 px wide, centred.
+
+## M93
+**Pickup checklist screenshot: every item in bold**
+- **Cause:** the site's general `label` style is bold, and each item is a `<label>`.
+- **Fix:** `.pickup-item { font-weight: 400 }`.
+- **Lesson:** same family as [[Mistakes and Fixes#M80]]: new controls inherit general form styles; check the screenshot.
+
+## M94
+**Coverage test: "MISSING Nothing yet."**
+- **Cause:** I added "Nothing yet." to the dashboard without Arabic.
+- **Fix:** added the Arabic. The search-before-adding habit from [[Mistakes and Fixes#M84]] prevented duplicates this time.
 

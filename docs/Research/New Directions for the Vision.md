@@ -58,6 +58,7 @@ Effort: **S** = a few hours · **M** = a day or two · **L** = several days. ⚖
 | **Speed check page** | Admin: how fast the main pages answer today vs last week | Spots slowdowns early (the app already has performance tests) | S |
 
 ## Recommended next five (most value for the vision, least risk)
+> ✅ All five were built in [[2026-10-22 Session 37]] → [[Your Data, Dashboard and Care]].
 1. **Download my data / delete my account**: needed before a public launch (PDPL), and builds trust.
 2. **Owner dashboard**: lets you see whether the marketplace works (time to first offer is the key number).
 3. **Away mode**: protects good sellers and keeps reply times honest.

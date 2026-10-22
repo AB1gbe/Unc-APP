@@ -6,7 +6,7 @@ tags: [roadmap]
 ## Before public launch
 - [x] Real email sending (SMTP / Resend) → [[Email Sending]] *(session 02)* — still to do: pick a provider and verify your domain
 - [ ] Production env vars + HTTPS + backups → [[Deploying to Production]]
-- [ ] Privacy policy, terms, KYC data-retention policy (auto-delete documents after N days)
+- [ ] Privacy policy, terms, KYC data-retention policy (auto-delete documents after N days). *Download my data + delete my account: done in session 37 ([[ADR-043 Download and delete my data]]).*
 - [x] Password reset by email + change password → [[Password Reset]] *(session 02)*
 - [ ] Decide on automated KYC provider → [[KYC Verification#Adding an automated provider]]
 
@@ -52,7 +52,8 @@ tags: [roadmap]
 - [ ] More from [[Fresh Ideas for the Vision]] (shopping lists, borrow/rent, swap, group requests, quiet hours…).
 
 ## New directions (session 36)
-- [ ] Pick from [[New Directions for the Vision]]. Recommended next: download/delete my account, owner dashboard, away mode, pickup checklist + big-deal safety card, report follow-up + raise my budget.
+- [x] The recommended next five, built in session 37 → [[Your Data, Dashboard and Care]].
+- [ ] More from [[New Directions for the Vision]] (usually in stock, more languages, hold it for me, WhatsApp alerts…).
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
