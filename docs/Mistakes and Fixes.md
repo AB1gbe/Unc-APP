@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-22 (session 31)
+updated: 2026-10-22 (session 34)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 81 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81). All fixed.
+**Totals so far:** 87 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -91,6 +91,12 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M79 | Self-review | First draft of governorate alert matching called a function that didn't exist | 31 |
 | M80 | Design | "Sort by" on Compare offers stretched full width under the general form styles | 31 |
 | M81 | Design | All small text-buttons (Block, Hide…) were full size: `.linkish` undid `.small` | 31 |
+| M82 | Test | Privacy test expected no notifications at all, but every new member gets "identity verified" | [[2026-10-22 Session 34]] |
+| M83 | Test | Demand test expected "controller" in the words, but only one *waiting* request had it | 34 |
+| M84 | Translation | Arabic plurals written as plain text, and "Area" added twice to `ar.js` | 34 |
+| M85 | Test | New browser-test step waited for a demand row, but the test had only 1 open request per category | 34 |
+| M86 | Translation | "New" and "Good" added to `ar.js` again (repeat of M84) | 34 |
+| M87 | Docs | A docs script broke on quotes inside a heading; the heading was simplified | 34 |
 
 ---
 
@@ -549,4 +555,39 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause:** `.linkish` sets `font: inherit` and comes *after* `.small` in `styles.css`, so `className="linkish small"` lost the small size everywhere (the story Hide button too).
 - **Fix:** `.linkish.small { font-size: .875rem; }`.
 - **Lesson:** a shorthand like `font:` resets every font setting. Check combined classes when adding one.
+
+## M82
+**`privacy-contact.test.js`: "expected [] but got ['kyc_approved']"**
+- **Cause:** the test checked that a seller had *no* notifications after a "shops only" request. But every test member gets an "identity verified" notification when the admin approves them.
+- **Fix:** check only that `alert-match` and `favourite-request` are missing.
+- **Lesson:** assert the thing you mean ("not told about this request"), not "nothing at all".
+
+## M83
+**`demand.test.js` expected `['controller', 'ps5']` but got `['ps5']`**
+- **Cause:** I counted "controller" in all three requests, but words come only from requests *still waiting* for an offer. One of the two "controller" requests had an offer.
+- **Fix:** the test expects `['ps5']`, with a comment saying why.
+- **Lesson:** work out expected values from the rule, not from memory of the test data.
+
+## M84
+**Arabic coverage test: "MISSING plural {n} requests" and "ar.js has no duplicate keys"**
+- **Cause:** `tn()` plurals need an object with Arabic forms (`{ one, two, few, other }`), but I wrote plain text. I also added `'Area'`, which already existed.
+- **Fix:** plural objects like `'{n} offers'`; removed the second `'Area'`.
+- **Lesson:** before adding a short key to `ar.js`, search for it first; plurals are always objects. The coverage test catches both.
+
+## M85
+**`npm run e2e` timed out waiting for `.demand-row`**
+- **Cause:** a category shows only with 2+ open requests. By that point in the browser test, the PS5 request was already found, so each category had only 1. The page rightly showed "Not enough requests here yet".
+- **Fix:** the test posts a second furniture request first, then checks for the "Home & Furniture" row with the word "fan".
+- **Lesson:** when a page has a minimum, the test must create enough data for it.
+
+## M86
+**Arabic coverage test: duplicate keys "New" and "Good"**
+- **Cause:** the same slip as [[Mistakes and Fixes#M84]], one step later: both words were already in `ar.js` from earlier sessions.
+- **Fix:** removed the new copies (same Arabic). For step 5 I searched `ar.js` for every short key before adding it, and none were duplicates.
+- **Lesson (again):** search `ar.js` before adding one-word keys.
+
+## M87
+**The script that wrote the decision notes stopped with "SyntaxError"**
+- **Cause:** a heading with double quotes inside ("Something went wrong") was put in a Python string through the shell, and the escaping broke.
+- **Fix:** the heading became "Thank-you note to other sellers, and deal problems", and the script was saved as a file instead of typed inline. Nothing in the app was affected.
 

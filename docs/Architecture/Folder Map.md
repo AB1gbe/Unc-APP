@@ -21,8 +21,9 @@ Unc-APP/
 ├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored)
 ├── shared/                 Plain JS used by BOTH server and client (session 31)
 │   ├── package.json        `{type: module}` only — not a workspace, nothing to install
-│   └── areas.js            Bahrain governorates + areas (English/Arabic/other spellings): normalizeCity(),
+│   ├── areas.js            Bahrain governorates + areas (English/Arabic/other spellings): normalizeCity(),
 │                             governorateOf(), governorateNamed(), areasOf(), placeName()
+│   └── names.js            "Show only my first name": shortName() ("Sam Buyer" → "Sam B."), nameFor() (session 34)
 ├── server/
 │   ├── package.json        Server deps + scripts
 │   ├── data/               (created at runtime, git-ignored) database + uploads/
@@ -33,7 +34,7 @@ Unc-APP/
 │   │   ├── index.js        Starts the server (opens DB, ensures admin, listen); hourly cleanupExpired() + runExpiry() (session 31)
 │   │   ├── app.js          Builds the Express app: security headers, routes, static files, pages with link previews (session 20)
 │   │   ├── config.js       All settings from environment variables
-│   │   ├── db.js           SQLite connection, MIGRATIONS list, tx() and audit() helpers
+│   │   ├── db.js           SQLite connection, MIGRATIONS list (25 since session 34), tx() and audit() helpers
 │   │   ├── seed.js         ensureAdmin() + demo data (npm run seed)
 │   │   ├── mail-test.js    Sends one test email (npm run mail:test -- you@example.com)
 │   │   ├── lib/
@@ -47,14 +48,17 @@ Unc-APP/
 │   │   │   ├── i18n.js         Server messages in Arabic, readable field names (session 12)
 │   │   │   ├── categories.js   CATEGORIES + CURRENCIES lists
 │   │   │   ├── ratings.js      Rating rules: windows, blind visibility, summaries (session 09)
-│   │   │   ├── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*, favourite-request, alert-match, expiring, expired) (session 13, kinds added in 28 and 31)
+│   │   │   ├── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*, favourite-request, alert-match, expiring, expired, found-elsewhere, request-closed) (session 13, kinds added in 28, 31 and 34);
+│   │   │   │                     thankOtherSellers(): thank-you to the sellers not picked when a request closes (session 34)
 │   │   │   ├── contact-guard.js hasContactDetails(): no phones/links/emails/@handles in public text (session 24)
 │   │   │   ├── shop-hours.js   readShopHours(): validates opening hours (session 24)
 │   │   │   ├── push.js         pushTo(): phone notifications via Web Push; VAPID keys (session 15)
 │   │   │   ├── activity.js     "Active now" (last_seen_at) + usual reply time (session 20)
 │   │   │   ├── badges.js       Earned badges: fast, top-finder, trusted, new (session 20)
 │   │   │   ├── blocks.js       blockedBetween(), NOT_BLOCKED_BUYER (session 31)
-│   │   │   ├── expiry.js       runExpiry(): "Still looking?" reminder at day 27, closes at day 30 (session 31)
+│   │   │   ├── expiry.js       runExpiry(): "Still looking?" reminder at day 27, closes at day 30 (session 31); then thanks the other sellers (session 34)
+│   │   │   ├── contact.js      "Who can make offers": CONTACT_RULES, contactBlocker(), isWellRated(), CONTACT_ALLOWED_SQL (session 34)
+│   │   │   ├── offers.js       Offer details: readOfferDetails(), offerDetailsView(), isExpired() (session 34)
 │   │   │   └── previews.js     Open Graph link-preview tags written into index.html (session 20)
 │   │   ├── middleware/auth.js  loadUser (also updates last_seen_at, at most once a minute — session 20), requireAuth, requireVerified, requireAdmin, publicMe
 │   │   ├── kyc/
@@ -64,14 +68,16 @@ Unc-APP/
 │   │       ├── auth.js          /api/auth/* (incl. forgot/reset/change password, profile, avatar, onboarded)
 │   │       ├── kyc.js           /api/kyc (submit + status), sendKycFile()
 │   │       ├── listings.js      /api/listings/* (incl. for-you, saved, photos, renew — session 31)
-│   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/* (incl. private chat photos, accept/decline a price, compare offers — session 31), /api/reports
-│   │       ├── ratings.js       /api/deals/:id/rating, /api/members/:id (session 09)
+│   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/* (incl. private chat photos, accept/decline a price, compare offers — session 31;
+│   │       │                      proof photos + proofCode, offer details — session 34), /api/reports
+│   │       ├── ratings.js       /api/deals/:id/rating, /api/members/:id (session 09), /api/deals/:id/problem "Something went wrong" (session 34)
 │   │       ├── notifications.js /api/notifications/* (session 13)
 │   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
 │   │       ├── stories.js       /api/stories, /api/deals/:id/story, /api/admin/stories/:id/hide (session 20)
 │   │       ├── feed.js          /api/feed: "Happening near you" (session 26)
 │   │       ├── favourites.js    /api/members/:id/favourite, /api/favourites, tellFavourites() (session 28)
 │   │       ├── alerts.js        /api/alerts, alertMatches(), tellAlerts() (session 31)
+│   │       ├── demand.js        /api/demand: "What people are asking for", topWords() (session 34)
 │   │       ├── blocks.js        /api/members/:id/block, /api/blocks (session 31)
 │   │       └── admin.js         /api/admin/*
 │   └── test/
@@ -104,7 +110,12 @@ Unc-APP/
 │       ├── alerts.test.js          request alerts: limits, matching, one notification per request (session 31)
 │       ├── areas.test.js           Bahrain areas: spellings, governorate search, feed "near" (session 31)
 │       ├── blocks-scam.test.js     blocking + scam warnings (client/src/scam.js) (session 31)
-│       └── expiry-tips.test.js     "Still looking?" expiry, renew, tips (client/src/tips.js) (session 31)
+│       ├── expiry-tips.test.js     "Still looking?" expiry, renew, tips (client/src/tips.js) (session 31)
+│       ├── privacy-contact.test.js "Show only my first name" + "who can make offers" (session 34)
+│       ├── demand.test.js          "What people are asking for": counts, words, area (session 34)
+│       ├── proof-photo.test.js     proof photos: code, ask, seller-only (session 34)
+│       ├── offer-details.test.js   condition, warranty, returns, "valid until" (session 34)
+│       └── closing-problems.test.js thank-you to other sellers + "Something went wrong" after a deal (session 34)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -138,29 +149,32 @@ Unc-APP/
         │   ├── ShopHours.jsx      Opening-hours card, OpenNow, dayName() (session 24)
         │   ├── Feed.jsx           "Happening near you" card: Home and the landing page (session 26)
         │   ├── FavouriteButton.jsx ♡ Favourite a seller: profile + deal box (session 28)
-        │   ├── CompareOffers.jsx  "Compare offers" side by side on the buyer's request page (session 31)
+        │   ├── CompareOffers.jsx  "Compare offers" side by side on the buyer's request page (session 31); details + "✓ Proof photo" (session 34)
+        │   ├── OfferDetails.jsx   Offer details: OfferDetailFields (seller picks), OfferDetailsLine (shown with the price), addDetails() (session 34)
         │   ├── CityField.jsx      CityField (city input with Bahrain areas suggested) + Place (area name in the reader's language) (session 31)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
         │   ├── Lightbox.jsx       Full-screen photo viewer: swipe, arrow keys, Esc (session 13)
         │   ├── Celebrate.jsx      celebrate(): toast + confetti; <Celebrations/> sits in Layout (session 20)
         │   ├── ShareButton.jsx    "↗ Share" a request: phone share sheet, or WhatsApp / Copy link (session 20)
         │   ├── Stories.jsx        StoryCard, StoriesStrip, StoryForm — "Found it" stories (session 20)
-        │   └── ui.jsx      ErrorBox, Loading (skeleton) + CardsLoading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards, Activity, Badges (session 20)
+        │   └── ui.jsx      ErrorBox, Loading (skeleton) + CardsLoading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards, Activity, Badges (session 20), ContactRule ("🔒 Shops only" badge, session 34)
         └── pages/
             ├── Browse.jsx          Visitors' home + /browse: hero, search, request grid, paging
-            ├── Home.jsx            Members' home: needs attention, my requests, saved, requests for you (session 13)
+            ├── Home.jsx            Members' home: needs attention, my requests, saved, requests for you (session 13); "📊 What people ask for" link to /demand (session 34)
             ├── Welcome.jsx         Welcome step after email confirm: photo, bio, interests (session 13)
             ├── Saved.jsx           Saved requests (session 13)
-            ├── Notifications.jsx   The 🔔 page; wording per `kind` (session 13)
+            ├── Notifications.jsx   The 🔔 page; wording per `kind` (session 13; found-elsewhere, request-closed in session 34)
             ├── Alerts.jsx          /alerts: request alerts for sellers (session 31)
-            ├── ListingDetail.jsx   Request page: OfferPanel (vendor) / OwnerPanel (buyer), ReportLink
-            ├── NewListing.jsx      Post + edit a request
+            ├── Demand.jsx          /demand: "What people are asking for", for sellers (session 34)
+            ├── ListingDetail.jsx   Request page: OfferPanel (vendor) / OwnerPanel (buyer), ReportLink; offer details, "who can make offers" note (session 34)
+            ├── NewListing.jsx      Post + edit a request; "Who can make offers?" (session 34)
             ├── MyListings.jsx
             ├── Inbox.jsx           Conversations grouped by request, tabs received/sent
-            ├── Conversation.jsx    Chat with polling + photos; OfferCard, AnswerLine, QuickReplies, StoryForm in the deal banner (session 20)
+            ├── Conversation.jsx    Chat with polling + photos; OfferCard, AnswerLine, QuickReplies, StoryForm in the deal banner (session 20);
+            │                         proof photos (ProofAskButton, ProofAskLine), DealProblem "Something went wrong" (session 34)
             ├── Login.jsx  Register.jsx  VerifyEmail.jsx (+ Steps bar)  Verification.jsx (KYC)
             ├── ForgotPassword.jsx  ResetPassword.jsx
-            ├── Account.jsx (profile + change password; blocked members list, session 31)  NotFound.jsx
+            ├── Account.jsx (profile + change password; blocked members list, session 31; "Show only my first name", session 34)  NotFound.jsx
             ├── MemberProfile.jsx   Public profile + reviews (session 09); photo, bio, interests, open requests (session 13)
-            └── admin/AdminHome.jsx (stats, KYC queue, reports)  admin/KycReview.jsx
+            └── admin/AdminHome.jsx (stats, KYC queue, reports; deal problems with their kind, session 34)  admin/KycReview.jsx
 ```

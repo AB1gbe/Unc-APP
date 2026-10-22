@@ -48,7 +48,8 @@ tags: [roadmap]
 - [ ] More from [[More Ideas for the Vision]] (the rest of the list).
 
 ## Fresh ideas (session 33)
-- [ ] Pick from [[Fresh Ideas for the Vision]]. Recommended next: who may contact me + first-name-only, unmet demand board, proof photo with a code, warranty/condition/valid-until on offers, closing note to sellers + "something went wrong" after a deal.
+- [x] The recommended next five, built in session 34 → [[Privacy, Demand and Trust]].
+- [ ] More from [[Fresh Ideas for the Vision]] (shopping lists, borrow/rent, swap, group requests, quiet hours…).
 
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]

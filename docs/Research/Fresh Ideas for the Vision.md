@@ -60,6 +60,7 @@ Effort: **S** = a few hours · **M** = a day or two · **L** = several days. ⚖
 | **Year in review** | In December: "Your 2026 on Unc: 6 requests found, 3 favourite sellers, fastest find 2 hours" — private, shareable if you want | Brings people back once a year, warmly | M |
 
 ## Recommended next five (most value for the vision, least risk)
+> ✅ All five were built in [[2026-10-22 Session 34]] → [[Privacy, Demand and Trust]].
 1. **Who may contact me + first-name-only** — privacy that gets more people posting.
 2. **Unmet demand board** — the reverse-marketplace advantage, made visible to shops.
 3. **Proof photo with a code** — a simple, strong anti-scam tool.

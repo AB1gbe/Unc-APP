@@ -19,9 +19,9 @@ Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (ses
 | POST | `/api/auth/register` | — | `email, password, displayName, accountType, city?` → `201 {user, devCode?}` + cookie |
 | POST | `/api/auth/login` | — | `email, password` → `{user}` + cookie |
 | POST | `/api/auth/logout` | — | clears session |
-| GET | `/api/auth/me` | — | `{user}` or `{user:null}`. `user` includes `avatarUrl, bio, interests, onboarded` (session 13) |
+| GET | `/api/auth/me` | — | `{user}` or `{user:null}`. `user` includes `avatarUrl, bio, interests, onboarded` (session 13), `shortName` true/false (session 34) |
 | PUT | `/api/auth/language` | A | `language: en/ar` — saves the member's language (emails use it). Session 12 |
-| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17), hideActivity (true/false, session 22; true also clears last_seen_at), shopArea (≤80) and shopHours (7 × null or {open, close}) — business accounts only, session 24`. `bio` and `shopArea` are refused (400) if they contain a phone number, link, email or @handle (`lib/contact-guard.js`, session 24) — only the fields sent are changed → `{user}`. Session 13 |
+| PATCH | `/api/auth/me` | A | any of `displayName, city, bio (≤300), interests (≤8 categories), emailOffers (true/false, session 17), hideActivity (true/false, session 22; true also clears last_seen_at), shopArea (≤80) and shopHours (7 × null or {open, close}) — business accounts only, session 24, shortName (true/false, session 34: "Show only my first name"; 400 if not a real true/false, and 400 when a business account tries to turn it on — shops always show their full name)`. `bio` and `shopArea` are refused (400) if they contain a phone number, link, email or @handle (`lib/contact-guard.js`, session 24) — only the fields sent are changed → `{user}`. Session 13 |
 | POST | `/api/auth/avatar` | A | **multipart** file `avatar` → `201 {user}`; replaces (and deletes) the old photo. Session 13 |
 | POST / DELETE | `/api/auth/cover` | A | Business accounts only (400 otherwise). **multipart** file `cover` → `201 {user}` with `coverUrl`; replaces the old one. DELETE removes it. Session 24 |
 | DELETE | `/api/auth/avatar` | A | removes the profile photo → `{user}`. Session 13 |
@@ -46,40 +46,42 @@ Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (ses
 | Method | Path | Gate | Notes |
 |---|---|---|---|
 | GET | `/api/listings?q=&category=&city=&page=` | — | open only, 20/page (page capped at 10,000), `{listings, page, hasMore}`. Session 31: `city` may be a governorate name (`Capital Governorate`, `محافظة العاصمة`…) = all its areas; a known area matches however it is spelled. Logged in: requests from members I blocked are left out |
-| GET | `/api/listings/for-you` | A | Home page: up to 6 open requests in my interests (all if none), not mine, not already answered, not from members I blocked (session 31); my city first → `{listings, basedOnInterests}`. Session 13 |
+| GET | `/api/listings/for-you` | A | Home page: up to 6 open requests in my interests (all if none), not mine, not already answered, not from members I blocked (session 31); my city first → `{listings, basedOnInterests}`. Session 13. Session 34: also leaves out requests whose "who can make offers" rule doesn't let me answer (`CONTACT_ALLOWED_SQL`) |
 | GET | `/api/listings/saved` | A | my saved requests that are still open, newest saved first (≤100). Session 13 |
 | PUT | `/api/listings/:id/save` | A | save → `{saved:true}`; 404 if not open, 400 for your own request. Session 13 |
 | DELETE | `/api/listings/:id/save` | A | unsave → `{saved:false}`. Session 13 |
 | GET | `/api/listings/mine` | A | all statuses; each row has `viewCount` (session 20) |
-| GET | `/api/listings/:id` | — | non-open visible to owner, vendors with a conversation on it, admins; banned buyer's → 404 (except admins); adds `myConversationId` and `saved` for logged-in non-owners. Session 20: `buyer.badges` (everyone), `buyer.activity` (logged-in only), `viewCount` (owner only); a logged-in non-owner opening it is counted once in `listing_views`. Session 31: the owner also gets `expiresAt` (30 days after posting / last renewal) and `expiredAt` (set if it closed by itself) |
-| POST | `/api/listings` | V | multipart: `title, description, category, budgetMin?, budgetMax?, currency?, city, neededBy?` + up to 6 `images`. `city` is tidied by `normalizeCity()` (session 31, also on PATCH). Afterwards `tellFavourites()` then `tellAlerts()` (session 31) — one notification per member per request |
+| GET | `/api/listings/:id` | — | non-open visible to owner, vendors with a conversation on it, admins; banned buyer's → 404 (except admins); adds `myConversationId` and `saved` for logged-in non-owners. Session 20: `buyer.badges` (everyone), `buyer.activity` (logged-in only), `viewCount` (owner only); a logged-in non-owner opening it is counted once in `listing_views`. Session 31: the owner also gets `expiresAt` (30 days after posting / last renewal) and `expiredAt` (set if it closed by itself). Session 34: logged-in non-owners also get `contactBlocked` = the rule that stops them making an offer (`shops` / `rated` / `favourites`) or null — always null once they have a conversation on it |
+| POST | `/api/listings` | V | multipart: `title, description, category, budgetMin?, budgetMax?, currency?, city, neededBy?` + up to 6 `images`. `city` is tidied by `normalizeCity()` (session 31, also on PATCH). Afterwards `tellFavourites()` then `tellAlerts()` (session 31) — one notification per member per request. Session 34: optional `contactRule` (`anyone` default, `shops`, `rated`, `favourites`; also on PATCH); both heads-ups skip sellers the request isn't open to |
 | PATCH | `/api/listings/:id` | V owner | JSON, open only |
 | POST | `/api/listings/:id/images` | V owner | **multipart** `images`, open only, at most 6 in total → `201 {listing}`. Session 13 |
 | DELETE | `/api/listings/:id/images/:imageId` | A owner | removes one photo (row + file) → `{listing}`. Session 13 |
 | POST | `/api/listings/:id/renew` | A owner | "Keep it open": another 30 days (sets `renewed_at`, clears the reminder) → `{listing}`; 409 if not open. Session 31 |
-| POST | `/api/listings/:id/status` | A owner | `status: open/fulfilled/closed`, optional `conversationId` with `fulfilled` = record the deal. 409 if changing a deal that was already rated. Reopening (`open`) starts a fresh 30 days (session 31) |
+| POST | `/api/listings/:id/status` | A owner | `status: open/fulfilled/closed`, optional `conversationId` with `fulfilled` = record the deal. 409 if changing a deal that was already rated. Reopening (`open`) starts a fresh 30 days (session 31). Session 34: when an **open** request becomes fulfilled or closed, `thankOtherSellers()` sends every seller who made an offer and wasn't picked a 🔔 `found-elsewhere` (fulfilled) or `request-closed` (closed) — not when a finished deal is changed later |
 
 ## Conversations — `server/src/routes/conversations.js`
 | Method | Path | Gate | Notes |
 |---|---|---|---|
-| POST | `/api/listings/:id/contact` | V, not owner | `message, offerPrice?` (JSON, or multipart with optional file `image`) → **the only way to start a conversation**. 409 + `conversationId` if exists. 403 if either member blocked the other (session 31) |
-| GET | `/api/conversations` | A | my inbox with `lastMessage`, `lastKind`, `lastPrice` (session 20), `unread`, `myRole` |
+| POST | `/api/listings/:id/contact` | V, not owner | `message, offerPrice?` (JSON, or multipart with optional file `image`) → **the only way to start a conversation**. 409 + `conversationId` if exists. 403 if either member blocked the other (session 31). Session 34: 403 with the rule's message and `rule` when the request's "who can make offers" rule doesn't allow me; the first message may carry the offer details below |
+| GET | `/api/conversations` | A | my inbox with `lastMessage`, `lastKind`, `lastPrice` (session 20), `unread`, `myRole`. Session 34: `lastKind` may be `proof-ask` |
 | GET | `/api/conversations/unread-count` | A | `{unread}` |
-| GET | `/api/listings/:id/conversations` | A owner | offers on my request. Session 31: each also has `compare: {price, agreedPrice, firstMessage (≤140), photoUrl, replyTime, badges, unread}` for "Compare offers" — buyer only |
-| GET | `/api/conversations/:id?after=<msgId>` | A participant | messages (only newer than `after`), each with `imageUrl` or null, `kind` (`accept/decline/null`) and `replyTo` (session 20); marks other side's as read. `conversation` also has `otherActivity` and `otherBadges` (session 20), `blocked` (a block either way) and `iBlocked` (I blocked them) (session 31). Outsiders → 404 |
+| GET | `/api/listings/:id/conversations` | A owner | offers on my request. Session 31: each also has `compare: {price, agreedPrice, firstMessage (≤140), photoUrl, replyTime, badges, unread}` for "Compare offers" — buyer only. Session 34: also `details` (of the seller's newest price, or null) and `hasProof` (the seller sent a proof photo) |
+| GET | `/api/conversations/:id?after=<msgId>` | A participant | messages (only newer than `after`), each with `imageUrl` or null, `kind` (`accept/decline/null`) and `replyTo` (session 20); marks other side's as read. `conversation` also has `otherActivity` and `otherBadges` (session 20), `blocked` (a block either way) and `iBlocked` (I blocked them) (session 31). Session 34: `conversation.proofCode` (e.g. `UNC-4821`, made from a hash of the chat's id and start time); each message also has `proof` (true = a proof photo), `details` (`{condition, warranty, returns, validUntil, expired}` or null) and `kind` may be `proof-ask` (the buyer asked for a proof photo); `deal.myProblem` = `open` / `resolved` / null. Outsiders → 404 |
 | GET | `/api/conversations/:id/images/:file` | A participant | streams a chat photo — **private**: only the two participants, and only a file that belongs to a message in this conversation (else 404). Session 13 |
-| POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` — either side may send a price (seller's offer or buyer's counter-offer, session 20; before that vendor only); multipart with optional file `image`. `message` may be empty when a photo or a price is sent. 409 if request not open, the other member is suspended, or either blocked the other (session 31) |
-| POST | `/api/conversations/:id/messages/:messageId/respond` | V participant | `action: accept/decline` → `201 {message}` (a `kind` message with `replyTo`). Only the other side's **newest** price, only once: 400 no price / own price, 409 newer price exists, already answered, request not open, other member suspended or a block either way (session 31). Audited `offer.accept/decline`. Session 20 |
+| POST | `/api/conversations/:id/messages` | V participant | `message, offerPrice?` — either side may send a price (seller's offer or buyer's counter-offer, session 20; before that vendor only); multipart with optional file `image`. `message` may be empty when a photo or a price is sent. 409 if request not open, the other member is suspended, or either blocked the other (session 31). Session 34: `proof=1` marks a photo as a proof photo (seller only, and only with a photo, else 400); `condition, warranty, returns, validUntil` = offer details (seller only, and only with a price, else 400; `validUntil` from today up to 60 days ahead) |
+| POST | `/api/conversations/:id/messages/:messageId/respond` | V participant | `action: accept/decline` → `201 {message}` (a `kind` message with `replyTo`). Only the other side's **newest** price, only once: 400 no price / own price, 409 newer price exists, already answered, request not open, other member suspended or a block either way (session 31). Audited `offer.accept/decline`. Session 20. Session 34: `accept` on a price whose `validUntil` has passed → 409 |
+| POST | `/api/conversations/:id/proof-request` | V participant | The **buyer** asks for a proof photo → `201 {message}` (a message with `kind: 'proof-ask'`). 403 for the seller; 409 if the request isn't open, a block either way, or my earlier ask has no proof photo after it yet. Session 34 |
 | POST | `/api/reports` | A | `reason, listingId? / conversationId?` |
 
 ## Ratings & profiles — `server/src/routes/ratings.js` (session 09)
 | Method | Path | Gate | Notes |
 |---|---|---|---|
 | POST | `/api/deals/:id/rating` | A, deal participant | `stars` 1–5, `comment?` (≤500). 404 for outsiders, 409 if already rated or after 30 days |
-| GET | `/api/members/:id` | — | verified, non-banned members only: `{member: {id, displayName, accountType, memberSince, avatarUrl, bio, city, interests, deals, rating, activity, badges}, stories (≤6), openRequests (≤6), reviews}` — no email, no contact (city/bio/photo added in session 13; `activity` (logged-in only), `badges`, `stories` in session 20) |
+| POST | `/api/deals/:id/problem` | A, deal participant | "Something went wrong with this deal": `kind` (`not-as-described / no-show / payment / other`), `details` (10–1000 chars) → `201 {ok}`. Saved as a report on the deal's conversation (with `deal_id` and `kind`), so an admin can read that chat. 404 for outsiders, 409 if I already have an open one for this deal. Audited `deal.problem`. Session 34 |
+| GET | `/api/members/:id` | — | verified, non-banned members only: `{member: {id, displayName, accountType, memberSince, avatarUrl, bio, city, interests, deals, rating, activity, badges}, stories (≤6), openRequests (≤6), reviews}` — no email, no contact (city/bio/photo added in session 13; `activity` (logged-in only), `badges`, `stories` in session 20). Session 34: `displayName` follows "Show only my first name" for everyone except the member themself |
 
 Conversation objects also carry `other.rating`, `other.avatarUrl`, `deal` (with `myStory: true/false`, session 20) and `needsRating`; request details carry `buyer.rating` (+ `dealConversationId` for the owner).
-Request objects (session 13) carry `photos: [{id, url}]` (use `id` to delete one), `buyer.avatarUrl`, and still the old `images: [url]` list. Reviews carry `from.avatarUrl`.
+Request objects (session 13) carry `photos: [{id, url}]` (use `id` to delete one), `buyer.avatarUrl`, and still the old `images: [url]` list. Reviews carry `from.avatarUrl`. Session 34: request objects also carry `contactRule`.
 
 Session 20 shapes: `activity` = `{lastSeenAt, replyTime}` with `replyTime` = `hour/hours/day/days/null` (median over the member's 50 newest conversations, needs at least 3) — `server/src/lib/activity.js`. `badges` = list of `fast`, `top-finder`, `trusted`, `new` — rules in `server/src/lib/badges.js`.
 
@@ -98,7 +100,7 @@ Session 20 shapes: `activity` = `{lastSeenAt, replyTime}` with `replyTime` = `ho
 | GET | `/api/notifications/unread-count` | A | `{unread}` (the 🔔 badge) |
 | POST | `/api/notifications/read` | A | marks all as read → `{unread:0}` |
 
-Created by `notify()` in `server/src/lib/notify.js`: `offer` (new conversation on my request), `deal` (buyer picked my offer; removed if the deal is undone), `rating` (someone rated me), `kyc_approved` / `kyc_rejected`, `favourite-request` (session 28), `alert-match` (a new request matched my alert), `expiring` (my request closes in 3 days), `expired` (it closed by itself) (session 31). New chat messages are **not** notifications (the Messages badge covers them).
+Created by `notify()` in `server/src/lib/notify.js`: `offer` (new conversation on my request), `deal` (buyer picked my offer; removed if the deal is undone), `rating` (someone rated me), `kyc_approved` / `kyc_rejected`, `favourite-request` (session 28), `alert-match` (a new request matched my alert), `expiring` (my request closes in 3 days), `expired` (it closed by itself) (session 31), `found-elsewhere` (the buyer found it with another seller) and `request-closed` (the request I made an offer on was closed, by the buyer or after 30 days) (session 34, from `thankOtherSellers()`). New chat messages are **not** notifications (the Messages badge covers them).
 
 ## Push (phone notifications) — `server/src/routes/push.js` (session 15)
 | Method | Path | Gate | Notes |
@@ -108,7 +110,7 @@ Created by `notify()` in `server/src/lib/notify.js`: `offer` (new conversation o
 | POST | `/api/push/unsubscribe` | A | `{endpoint}`: removes this device (also called on log out) |
 | POST | `/api/push/test` | A | sends "Notifications are on" to all my devices → `{sent}`; 409 if none |
 
-Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buyer (`newOfferEmail`) when `users.email_offers` = 1 (session 17). Push: today only on a **new offer** (`POST /api/listings/:id/contact`, after the transaction), to the buyer, in their language. Push service answers 404/410 → that device is deleted. Also pushed: `favourite-request` (session 28), `alert-match` and `expiring` (session 31); `expired` is 🔔 only.
+Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buyer (`newOfferEmail`) when `users.email_offers` = 1 (session 17). Push: today only on a **new offer** (`POST /api/listings/:id/contact`, after the transaction), to the buyer, in their language. Push service answers 404/410 → that device is deleted. Also pushed: `favourite-request` (session 28), `alert-match` and `expiring` (session 31); `expired` is 🔔 only, and so are `found-elsewhere` and `request-closed` (session 34).
 
 ## Admin — `server/src/routes/admin.js` (all ADM)
 | Method | Path | Notes |
@@ -118,7 +120,7 @@ Sent by `pushTo()` in `server/src/lib/push.js`. A new offer also emails the buye
 | GET | `/api/admin/kyc/:id` | details + file URLs + previous attempts |
 | GET | `/api/admin/kyc/:id/file/:field` | streams private file (`doc_front, doc_back, selfie, business_doc`), logged |
 | POST | `/api/admin/kyc/:id/decision` | `decision: approved/rejected, note` (note required to reject) |
-| GET | `/api/admin/reports` | open reports |
+| GET | `/api/admin/reports` | open reports. Session 34: each also has `deal_id` and `kind` (set for "Something went wrong" deal reports) |
 | GET | `/api/admin/reports/:id/conversation` | read reported conversation (messages have `imageUrl`), logged |
 | GET | `/api/admin/reports/:id/images/:file` | a photo from the reported conversation only; logged (`report.image_viewed`), `no-store`. Session 13 |
 | POST | `/api/admin/reports/:id/resolve` | |
@@ -166,3 +168,17 @@ A block works both ways for contact (`blockedBetween()`): `contact` → 403, `me
 
 ## Request expiry — `server/src/lib/expiry.js` (session 31)
 `runExpiry(db)` runs at start-up and hourly (`server/src/index.js`). Day 27 of an open request (counted from `COALESCE(renewed_at, created_at)`): notification + push kind `expiring`, once. Day 30: status → `closed`, `expired_at` set, notification kind `expired`. "Keep it open" = `POST /api/listings/:id/renew`; reopening via `/status` also restarts the 30 days.
+
+## Names shown to others — `shared/names.js` (session 34)
+Not an endpoint: shared code used by the server and the website. `shortName("Sam Buyer")` → `Sam B.` (one word stays as it is). `nameFor(name, short)` gives the short form when the member turned on "Show only my first name" (`users.short_name`). It is used for every name other members see: requests (`buyer.displayName`), conversations and the inbox, profiles (my own profile still shows my full name), reviews, stories, notifications (`actor`), favourites, the blocked list, and the favourite-seller push. In a chat, the buyer's full name shows to the seller once the buyer has sent a message in that chat.
+
+## Who can make offers — `server/src/lib/contact.js` (session 34)
+`CONTACT_RULES` = `anyone`, `shops`, `rated`, `favourites` (saved in `listings.contact_rule`). `contactBlocker(db, listing, seller)` returns the rule that stops a seller, or null; `isWellRated()` = at least one visible rating and an average of 4★ or more. `CONTACT_ALLOWED_SQL` + `contactAllowedParams()` apply the same rule inside a list query (for-you). Used by `contact` (403), the request page (`contactBlocked`), for-you, `tellFavourites()` and `tellAlerts()`. Sellers who already have a conversation keep talking.
+
+## Proof photos and offer details — `server/src/lib/offers.js` (session 34)
+Proof photo: the seller writes the chat's `proofCode` on paper next to the item and sends a photo with `proof=1`; the buyer can ask with `POST /api/conversations/:id/proof-request`. Offer details: `readOfferDetails()` reads `condition, warranty, returns, validUntil` (all optional; seller's price only; `validUntil` at most 60 days ahead), `offerDetailsView()` turns a message into `{condition, warranty, returns, validUntil, expired}`, `isExpired()` = `validUntil` is before today.
+
+## What people are asking for — `server/src/routes/demand.js` (session 34)
+| Method | Path | Gate | Notes |
+|---|---|---|---|
+| GET | `/api/demand?area=` | V | `{days: 30, area, categories: [{category, requests, waiting, words}]}`: open requests from the last 30 days (buyer not banned), grouped by category. `waiting` = no offer yet; `words` = up to 3 words used in the titles of 2+ waiting requests. A category shows only with 2+ requests; most waiting first. `area` = a governorate key from `shared/areas.js` (`Capital`, `Muharraq`, `Northern`, `Southern`; anything else is ignored). Looks at the newest 5000 requests at most, using `idx_listings_status`. Counts only — no names, no single request's words |

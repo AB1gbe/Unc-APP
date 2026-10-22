@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-22 (session 31)
+updated: 2026-10-22 (session 34)
 ---
 # Unc — Project Vault
 
@@ -64,10 +64,15 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 35 - Bahrain areas]]
 - [[Step 36 - Block and scam warnings]]
 - [[Step 37 - Expiry and tips]]
+- [[Step 38 - Who may contact me and first name only]]
+- [[Step 39 - Unmet demand board]]
+- [[Step 40 - Proof photos]]
+- [[Step 41 - Offer details]]
+- [[Step 42 - Closing note and deal problems]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -82,7 +87,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-22, after session 31)
+## Status (2026-10-22, after session 34)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -110,6 +115,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | "Happening near you" feed | ✅ done — in `main` since session 27 → [[Social Touches]] |
 | Favourite sellers (heads-up on new requests) | ✅ done — in `main` since session 29 → [[Social Touches]] |
 | Compare offers, request alerts, Bahrain areas, block + scam warnings, expiry + tips | ✅ done — on branch (session 31) → [[Choosing, Alerts and Safety]] |
-| API tests | ✅ 136 passing |
+| Who may contact me + first name only, unmet demand board, proof photos, offer details, closing note + deal problems | ✅ done — on branch (session 34) → [[Privacy, Demand and Trust]] |
+| API tests | ✅ 148 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
