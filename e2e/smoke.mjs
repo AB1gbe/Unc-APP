@@ -310,6 +310,17 @@ await vendor.waitForSelector('.proof-badge');
 await buyer.waitForSelector('.proof-badge:has-text("Check that the paper")', { timeout: 15000 });
 await shot(buyer, '35-proof-photo');
 
+// Keeping deals on Unc (session 40): a number typed before a price is agreed
+// shows a nudge, and the other side sees 📵.
+await buyer.fill('.chat-form textarea', 'Easier on WhatsApp: 3912 3456');
+await buyer.waitForSelector('.contact-nudge');
+await shot(buyer, '43-contact-nudge');
+await buyer.click('.chat-form button:has-text("Send")');
+await buyer.waitForSelector('.hidden-note:has-text("Hidden from")');
+await vendor.reload();
+await vendor.waitForSelector('.bubble:has-text("Easier on WhatsApp: 📵")');
+if (await vendor.locator('text=3912 3456').count()) throw new Error('number shown before agreeing a price');
+
 // Privacy (session 34): first name only, and a request only favourite sellers may answer.
 await buyer.goto(BASE + '/account');
 await buyer.locator('[data-setting=shortName]').check(); await buyer.waitForTimeout(300);

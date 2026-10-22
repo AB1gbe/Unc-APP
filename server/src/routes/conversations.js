@@ -29,6 +29,7 @@ import { blockedBetween } from '../lib/blocks.js';
 import { CONTACT_MESSAGES, contactBlocker } from '../lib/contact.js';
 import { nameFor } from '../../../shared/names.js';
 import { isExpired, offerDetailsView, readOfferDetails } from '../lib/offers.js';
+import { hasContacts, maskContacts } from '../../../shared/contact-mask.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -112,7 +113,7 @@ export function conversationRoutes(db) {
       readOnly: c.listing_status !== 'open',
       createdAt: c.created_at,
       lastMessageAt: c.last_message_at,
-      lastMessage: c.last_body ?? undefined,
+      lastMessage: c.last_body == null ? undefined : c.agreed ? c.last_body : maskContacts(c.last_body).text,
       lastKind: c.last_kind ?? undefined,
       lastPrice: c.last_price ?? undefined,
       unread: c.unread ?? undefined,
@@ -131,17 +132,26 @@ export function conversationRoutes(db) {
 
   function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null, details = null) {
     db.prepare(`INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to, proof,
-        offer_condition, offer_warranty, offer_returns, offer_valid_until) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        offer_condition, offer_warranty, offer_returns, offer_valid_until, had_contact) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(convId, senderId, body, offerPrice, image, kind, replyTo, proof,
-        details?.condition ?? null, details?.warranty ?? null, details?.returns ?? null, details?.validUntil ?? null);
+        details?.condition ?? null, details?.warranty ?? null, details?.returns ?? null, details?.validUntil ?? null,
+        hasContacts(body) ? 1 : 0);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
   // One optional photo per message (multipart field "image"). JSON requests
   // pass straight through multer untouched.
   const chatUpload = memoryUpload(1);
-  const messageView = (m, convId, meId) => ({
-    id: m.id, mine: m.sender_id === meId, body: m.body, offerPrice: m.offer_price,
+  // Keeping deals on Unc (session 40): until a price is accepted in this
+  // chat, phone numbers, emails, links and @handles from the OTHER person
+  // show as 📵. The sender sees their own text, with hiddenForOther.
+  const agreedStmt = db.prepare(`SELECT 1 FROM messages WHERE conversation_id = ? AND kind = 'accept' LIMIT 1`);
+  const agreedIn = (convId) => Boolean(agreedStmt.get(convId));
+  const shownBody = (m, meId, agreed) => (m.had_contact && !agreed && m.sender_id !== meId ? maskContacts(m.body).text : m.body);
+  const messageView = (m, convId, meId, agreed = agreedIn(convId)) => ({
+    id: m.id, mine: m.sender_id === meId, body: shownBody(m, meId, agreed), offerPrice: m.offer_price,
+    hiddenContact: Boolean(m.had_contact && !agreed && m.sender_id !== meId),
+    hiddenForOther: Boolean(m.had_contact && !agreed && m.sender_id === meId),
     imageUrl: m.image ? `/api/conversations/${convId}/images/${m.image}` : null,
     // A "please send a proof photo" request shows like an answer line.
     kind: m.kind ?? (m.proof === 'ask' ? 'proof-ask' : null), replyTo: m.reply_to ?? null,
@@ -202,7 +212,7 @@ export function conversationRoutes(db) {
     const buyer = db.prepare('SELECT email, language, email_offers FROM users WHERE id = ?').get(listing.buyer_id);
     if (buyer.email_offers) {
       trySendMail({ to: buyer.email, ...newOfferEmail({
-        sellerName: req.user.display_name, title: listing.title, message: body,
+        sellerName: req.user.display_name, title: listing.title, message: maskContacts(body).text,
         offerPrice, currency: listing.currency, conversationId: convId,
       }, buyer.language) });
     }
@@ -218,6 +228,7 @@ export function conversationRoutes(db) {
            b.short_name AND NOT EXISTS (SELECT 1 FROM messages bm WHERE bm.conversation_id = c.id AND bm.sender_id = c.buyer_id) AS buyer_short,
              vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
              (SELECT body FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_body,
+             EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id AND m.kind = 'accept') AS agreed,
              (SELECT COALESCE(kind, CASE WHEN proof = 'ask' THEN 'proof-ask' END) FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_kind,
              (SELECT offer_price FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_price,
              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id <> ? AND m.read_at IS NULL) AS unread
@@ -265,7 +276,7 @@ export function conversationRoutes(db) {
       price: latest?.offer_price ?? null,
       details: latest ? offerDetailsView(latest) : null,
       agreedPrice: agreedPrice.get(convId)?.offer_price ?? null,
-      firstMessage: first?.body ? first.body.slice(0, 140) : null,
+      firstMessage: first?.body ? (agreedIn(convId) ? first.body : maskContacts(first.body).text).slice(0, 140) : null,
       photoUrl: first?.image ? `/api/conversations/${convId}/images/${first.image}` : null,
       replyTime,
       badges: badgesFor(c.vendor_id, replyTime),
@@ -287,7 +298,7 @@ export function conversationRoutes(db) {
     const c = participantConv(req);
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
-      SELECT id, sender_id, body, offer_price, image, kind, reply_to, proof, created_at, read_at,
+      SELECT id, sender_id, body, offer_price, image, kind, reply_to, proof, had_contact, created_at, read_at,
              offer_condition, offer_warranty, offer_returns, offer_valid_until FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
@@ -305,9 +316,9 @@ export function conversationRoutes(db) {
         // Blocked: the blocker sees who they blocked; the other side only sees that replies are off.
         const iBlocked = Boolean(db.prepare('SELECT 1 FROM blocks WHERE user_id = ? AND blocked_id = ?').get(req.user.id, otherId));
         const blocked = iBlocked || blockedBetween(db, req.user.id, otherId);
-        return { ...view(c, req.user), proofCode: proofCode(c), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite, blocked, iBlocked };
+        return { ...view(c, req.user), agreed: agreedIn(c.id), proofCode: proofCode(c), otherActivity, otherBadges: badgesFor(otherId, otherActivity.replyTime), otherFavourite, blocked, iBlocked };
       })(),
-      messages: messages.map((m) => messageView(m, c.id, req.user.id)),
+      messages: (() => { const agreed = agreedIn(c.id); return messages.map((m) => messageView(m, c.id, req.user.id, agreed)); })(),
     });
   });
 

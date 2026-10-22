@@ -392,6 +392,12 @@ const MIGRATIONS = [
   ALTER TABLE reports ADD COLUMN outcome TEXT CHECK (outcome IN ('action', 'nothing'));
   ALTER TABLE listings ADD COLUMN budget_raised_at TEXT;
   `,
+  // 29: keeping deals on Unc (session 40): the message had a phone number,
+  // email, link or @handle (hidden from the other person until a price is
+  // agreed; counted for the owner dashboard).
+  `
+  ALTER TABLE messages ADD COLUMN had_contact INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

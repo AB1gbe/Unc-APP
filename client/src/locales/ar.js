@@ -832,4 +832,8 @@ export default {
   'Raise': 'ارفع',
   'Sellers who looked at or saved your request are told. Once a day.': 'سيُبلَّغ البائعون الذين شاهدوا طلبك أو حفظوه. مرة واحدة في اليوم.',
   'Budget raised. We told {n} sellers who looked at it.': { zero: 'رُفعت الميزانية. لم يشاهد أحد الطلب بعد.', one: 'رُفعت الميزانية. أبلغنا بائعاً واحداً شاهده.', two: 'رُفعت الميزانية. أبلغنا بائعَين شاهداه.', few: 'رُفعت الميزانية. أبلغنا {n} بائعين شاهدوه.', other: 'رُفعت الميزانية. أبلغنا {n} بائعاً شاهدوه.' },
+  // Keeping deals on Unc (session 40)
+  '📵 Contact details are hidden until you agree a price.': '📵 بيانات التواصل مخفية حتى تتفقا على سعر.',
+  '📵 Hidden from {name} until you agree a price.': '📵 مخفية عن {name} حتى تتفقا على سعر.',
+  '📵 Numbers, emails and links stay hidden until you agree a price. Keep talking here: your rating, proof photos and our help only work for deals on Unc.': '📵 الأرقام والبريد والروابط تبقى مخفية حتى تتفقا على سعر. أكملا الحديث هنا: تقييمك وصور الإثبات ومساعدتنا تعمل فقط للصفقات على Unc.',
 };

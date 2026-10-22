@@ -14,6 +14,8 @@ import { StoryForm } from '../components/Stories.jsx';
 import FavouriteButton from '../components/FavouriteButton.jsx';
 import { Place } from '../components/CityField.jsx';
 import { scamSignals } from '../scam.js';
+import { hasContacts } from '../../../shared/contact-mask.js';
+import ContactNudge from '../components/ContactNudge.jsx';
 import PickupCard from '../components/PickupCard.jsx';
 import { EMPTY_DETAILS, OfferDetailFields, OfferDetailsLine, addDetails } from '../components/OfferDetails.jsx';
 
@@ -32,6 +34,7 @@ export default function Conversation() {
   const [viewing, setViewing] = useState(null);    // photo URL open full-screen
   const lastId = useRef(0);
   const currentId = useRef(id);
+  const agreedRef = useRef(null);  // when a price gets accepted, reload so hidden numbers show
   const bodyRef = useRef(null);
   const textRef = useRef(null);
 
@@ -42,6 +45,16 @@ export default function Conversation() {
       if (currentId.current !== id) return;
       setConv(r.conversation);
       setPollError(null);
+      if (agreedRef.current === false && r.conversation.agreed) {
+        // A price was just accepted: fetch the whole chat again, unhidden.
+        agreedRef.current = true;
+        const all = await api(`/conversations/${id}?after=0`);
+        if (currentId.current !== id) return;
+        lastId.current = all.messages.at(-1)?.id ?? 0;
+        setMessages(all.messages);
+        return;
+      }
+      agreedRef.current = r.conversation.agreed;
       if (r.messages.some((m) => !m.mine)) window.dispatchEvent(new Event('unc:read'));
       if (r.messages.length) {
         lastId.current = Math.max(lastId.current, r.messages.at(-1).id);
@@ -61,6 +74,7 @@ export default function Conversation() {
   useEffect(() => {
     currentId.current = id;
     lastId.current = 0;
+    agreedRef.current = null;
     setMessages([]);
     setConv(null);
     setError(null);
@@ -154,6 +168,8 @@ export default function Conversation() {
                 </div>
               )}
               {m.body && <div dir="auto">{m.body}</div>}
+              {m.hiddenContact && <div className="hidden-note">{t('📵 Contact details are hidden until you agree a price.')}</div>}
+              {m.hiddenForOther && <div className="hidden-note">{tj('📵 Hidden from {name} until you agree a price.', { name: <bdi>{conv.other.displayName}</bdi> })}</div>}
               {!m.mine && scamSignals(m.body).length > 0 && (
                 <div className="scam-warning" role="note">{t("⚠️ Be careful: never send money before you've seen the item, and don't open links from strangers. Unc never asks you to pay by transfer.")}</div>
               )}
@@ -183,6 +199,7 @@ export default function Conversation() {
           {!text && (
             <QuickReplies role={conv.myRole} onPick={(phrase) => { setText(phrase); textRef.current?.focus(); }} />
           )}
+          {!conv.agreed && hasContacts(text) && <ContactNudge />}
           <form className="chat-form" onSubmit={send}>
             <label className="attach" title={t('Add a photo')} aria-label={t('Add a photo')}>
               📷
