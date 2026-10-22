@@ -279,6 +279,24 @@ await buyer.waitForSelector('.blocked-notice:has-text("You blocked Riverside Ele
 await buyer.goto(BASE + '/account'); await buyer.click('.card:has-text("Blocked members") button:has-text("Unblock")');
 await buyer.waitForSelector('text=Blocked members', { state: 'detached' });
 
+// Privacy (session 34): first name only, and a request only favourite sellers may answer.
+await buyer.goto(BASE + '/account');
+await buyer.locator('[data-setting=shortName]').check(); await buyer.waitForTimeout(300);
+await buyer.goto(BASE + '/requests/new');
+await buyer.fill('#title', 'Looking for a quiet desk fan');
+await buyer.selectOption('#category', 'Home & Furniture');
+await buyer.fill('#description', 'Small, quiet, for a bedroom. Any colour.');
+await buyer.selectOption('#contactRule', 'favourites');
+await buyer.click('button:has-text("Post request")');
+await buyer.waitForURL(/\/requests\/\d+$/);
+const fanUrl = buyer.url();
+await vendor.goto(fanUrl);
+await vendor.waitForSelector('text=Sam B.');
+await vendor.waitForSelector('text=The buyer chose to hear only from their favourite sellers.');
+await shot(vendor, '33-favourites-only');
+await buyer.goto(BASE + '/account');
+await buyer.locator('[data-setting=shortName]').uncheck(); await buyer.waitForTimeout(300);
+
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.feed li'); /* visitors see "Happening on Unc" */ await shot(mp, '14-mobile-home');

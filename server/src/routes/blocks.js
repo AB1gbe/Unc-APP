@@ -4,6 +4,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import { avatarUrl } from '../lib/uploads.js';
 import { audit } from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
+import { nameFor } from '../../../shared/names.js';
 
 export function blockRoutes(db) {
   const r = Router();
@@ -26,10 +27,10 @@ export function blockRoutes(db) {
 
   r.get('/blocks', requireAuth, (req, res) => {
     const rows = db.prepare(`
-      SELECT u.id, u.display_name, u.avatar FROM blocks b JOIN users u ON u.id = b.blocked_id
+      SELECT u.id, u.display_name, u.short_name, u.avatar FROM blocks b JOIN users u ON u.id = b.blocked_id
       WHERE b.user_id = ? ORDER BY b.created_at DESC
     `).all(req.user.id);
-    res.json({ members: rows.map((u) => ({ id: u.id, displayName: u.display_name, avatarUrl: avatarUrl(u.avatar) })) });
+    res.json({ members: rows.map((u) => ({ id: u.id, displayName: nameFor(u.display_name, u.short_name), avatarUrl: avatarUrl(u.avatar) })) });
   });
 
   return r;

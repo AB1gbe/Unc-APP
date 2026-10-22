@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Activity, Avatar, Badges, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
@@ -42,6 +42,7 @@ export default function ListingDetail() {
           <span>📍 <Place city={l.city} /></span>
           <span>🕒 {t('Posted {time}', { time: ago(l.createdAt) })}</span>
           {l.neededBy && <span>📅 {t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
+          <ContactRule rule={l.contactRule} />
         </div>
         <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{l.description}</p>
         {l.images.length > 0 && (
@@ -95,6 +96,14 @@ function OfferPanel({ listing }) {
     );
   }
   if (!isVerified(user)) return <div className="card"><h2>{t('Have this?')}</h2><VerifyPrompt action="contact" /></div>;
+  if (listing.contactBlocked) {
+    const why = {
+      shops: t('The buyer chose to hear from shops only.'),
+      rated: t('The buyer chose to hear from sellers rated 4★ or more. Finish a few deals well and you can answer requests like this.'),
+      favourites: t("The buyer chose to hear only from their favourite sellers."),
+    }[listing.contactBlocked];
+    return <div className="card"><h2>{t('Have this?')}</h2><p className="muted">{why}</p></div>;
+  }
 
   async function submit(e) {
     e.preventDefault();

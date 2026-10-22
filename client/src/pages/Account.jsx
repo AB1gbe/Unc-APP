@@ -8,6 +8,7 @@ import { formatDate, t, tj } from '../i18n.jsx';
 import PushSettings from '../components/PushSettings.jsx';
 import ShopEditor from '../components/ShopEditor.jsx';
 import { useApi } from '../hooks.js';
+import { shortName } from '../../../shared/names.js';
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -146,13 +147,19 @@ function EmailSettings() {
   );
 }
 
-// "Hide when I'm online" (session 22, ADR-029).
+// "Hide when I'm online" (session 22, ADR-029) and "Show only my first
+// name" (session 34, personal accounts only).
 function PrivacySettings() {
+  const { user } = useAuth();
   return (
     <div className="card">
       <h2>{t('Privacy')}</h2>
       <ToggleSetting field="hideActivity" label={t("Hide when I'm online")}
         hint={t("Others won't see “Active now” or when you were last here, and Unc stops keeping that time. Your usual reply time and badges still show, because they come from your messages.")} />
+      {user.accountType !== 'business' && (
+        <ToggleSetting field="shortName" label={t('Show only my first name')}
+          hint={tj('Other members see {name} instead of your full name. In a chat, your full name shows once you send a message there.', { name: <b><bdi>{shortName(user.displayName)}</bdi></b> })} />
+      )}
       <BlockedMembers />
     </div>
   );

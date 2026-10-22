@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { avatarUrl } from '../lib/uploads.js';
+import { nameFor } from '../../../shared/names.js';
 
 export function notificationRoutes(db) {
   const r = Router();
@@ -9,7 +10,7 @@ export function notificationRoutes(db) {
 
   r.get('/', requireAuth, (req, res) => {
     const rows = db.prepare(`
-      SELECT n.*, a.display_name AS actor_name, a.avatar AS actor_avatar, l.title AS listing_title
+      SELECT n.*, a.display_name AS actor_name, a.short_name AS actor_short, a.avatar AS actor_avatar, l.title AS listing_title
       FROM notifications n
       LEFT JOIN users a ON a.id = n.actor_id
       LEFT JOIN listings l ON l.id = n.listing_id
@@ -21,7 +22,7 @@ export function notificationRoutes(db) {
       notifications: rows.map((n) => ({
         id: n.id,
         kind: n.kind,
-        actor: n.actor_id ? { id: n.actor_id, displayName: n.actor_name, avatarUrl: avatarUrl(n.actor_avatar) } : null,
+        actor: n.actor_id ? { id: n.actor_id, displayName: nameFor(n.actor_name, n.actor_short), avatarUrl: avatarUrl(n.actor_avatar) } : null,
         listing: n.listing_id ? { id: n.listing_id, title: n.listing_title } : null,
         conversationId: n.conversation_id,
         createdAt: n.created_at,

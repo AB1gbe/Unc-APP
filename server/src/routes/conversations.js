@@ -25,6 +25,8 @@ import { newOfferEmail } from '../lib/emails.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { blockedBetween } from '../lib/blocks.js';
+import { CONTACT_MESSAGES, contactBlocker } from '../lib/contact.js';
+import { nameFor } from '../../../shared/names.js';
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -33,6 +35,7 @@ export function conversationRoutes(db) {
     SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
            l.budget_min, l.budget_max, l.currency,
            b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
+           b.short_name AND NOT EXISTS (SELECT 1 FROM messages bm WHERE bm.conversation_id = c.id AND bm.sender_id = c.buyer_id) AS buyer_short,
            vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
            b.banned_at AS buyer_banned_at, vu.banned_at AS vendor_banned_at
     FROM conversations c
@@ -91,7 +94,7 @@ export function conversationRoutes(db) {
     const deal = dealView(c.id, me.id);
     const other = iAmBuyer
       ? { id: c.vendor_id, displayName: c.vendor_name, accountType: c.vendor_type, verified: c.vendor_kyc === 'approved', avatarUrl: avatarUrl(c.vendor_avatar) }
-      : { id: c.buyer_id, displayName: c.buyer_name, accountType: c.buyer_type, verified: true, avatarUrl: avatarUrl(c.buyer_avatar) };
+      : { id: c.buyer_id, displayName: nameFor(c.buyer_name, c.buyer_short), accountType: c.buyer_type, verified: true, avatarUrl: avatarUrl(c.buyer_avatar) };
     other.rating = ratings.summaryFor(other.id);
     return {
       id: c.id,
@@ -148,6 +151,8 @@ export function conversationRoutes(db) {
     if (listing.status !== 'open') throw new HttpError(409, 'This request is no longer accepting offers.');
     if (listing.buyer_id === req.user.id) throw new HttpError(403, 'You cannot make an offer on your own request.');
     if (blockedBetween(db, listing.buyer_id, req.user.id)) throw new HttpError(403, "You can't contact this member.");
+    const rule = contactBlocker(db, listing, req.user);
+    if (rule) throw new HttpError(403, CONTACT_MESSAGES[rule], { rule });
 
     const existing = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(listing.id, req.user.id);
     if (existing) {
@@ -194,6 +199,7 @@ export function conversationRoutes(db) {
       SELECT c.*, l.title AS listing_title, l.status AS listing_status, l.city AS listing_city,
              l.budget_min, l.budget_max, l.currency,
              b.display_name AS buyer_name, b.account_type AS buyer_type, b.avatar AS buyer_avatar,
+           b.short_name AND NOT EXISTS (SELECT 1 FROM messages bm WHERE bm.conversation_id = c.id AND bm.sender_id = c.buyer_id) AS buyer_short,
              vu.display_name AS vendor_name, vu.account_type AS vendor_type, vu.kyc_status AS vendor_kyc, vu.avatar AS vendor_avatar,
              (SELECT body FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_body,
              (SELECT kind FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_kind,

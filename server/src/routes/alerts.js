@@ -6,6 +6,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import { CATEGORIES } from '../lib/categories.js';
 import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
+import { contactBlocker } from '../lib/contact.js';
 import * as v from '../lib/validate.js';
 import { requireAuth } from '../middleware/auth.js';
 import { governorateNamed, governorateOf, normalizeCity } from '../../../shared/areas.js';
@@ -68,7 +69,7 @@ export function alertMatches(a, l) {
 // (favourite sellers), so nobody gets two notifications for one request.
 export function tellAlerts(db, buyer, listing, skip = new Set()) {
   const alerts = db.prepare(`
-    SELECT a.* FROM alerts a JOIN users u ON u.id = a.user_id
+    SELECT a.*, u.account_type FROM alerts a JOIN users u ON u.id = a.user_id
     WHERE (a.category IS NULL OR a.category = ?) AND a.user_id <> ?
       AND u.kyc_status = 'approved' AND u.banned_at IS NULL
       AND NOT EXISTS (SELECT 1 FROM blocks b WHERE (b.user_id = ? AND b.blocked_id = u.id) OR (b.user_id = u.id AND b.blocked_id = ?))
@@ -76,6 +77,7 @@ export function tellAlerts(db, buyer, listing, skip = new Set()) {
   const told = new Set(skip);
   for (const a of alerts) {
     if (told.has(a.user_id) || !alertMatches(a, listing)) continue;
+    if (contactBlocker(db, listing, { id: a.user_id, account_type: a.account_type })) continue;
     told.add(a.user_id);
     notify(db, a.user_id, 'alert-match', { listingId: listing.id });
     pushTo(db, a.user_id, 'alert-match', { title: listing.title, city: listing.city }, `/requests/${listing.id}`)

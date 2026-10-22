@@ -11,6 +11,7 @@ import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { storiesAbout } from './stories.js';
+import { nameFor } from '../../../shared/names.js';
 
 export function ratingRoutes(db) {
   const r = Router();
@@ -50,7 +51,7 @@ export function ratingRoutes(db) {
       throw notFound('Member not found.');
     }
     const reviews = db.prepare(`
-      SELECT r.stars, r.comment, r.created_at, u.id AS from_id, u.display_name AS from_name, u.avatar AS from_avatar,
+      SELECT r.stars, r.comment, r.created_at, u.id AS from_id, u.display_name AS from_name, u.short_name AS from_short, u.avatar AS from_avatar,
              l.title AS listing_title, CASE WHEN d.vendor_id = r.ratee_id THEN 'vendor' ELSE 'buyer' END AS role
       FROM ratings r JOIN deals d ON d.id = r.deal_id
       JOIN users u ON u.id = r.rater_id
@@ -70,7 +71,8 @@ export function ratingRoutes(db) {
     res.json({
       member: {
         id: m.id,
-        displayName: m.display_name,
+        // "Show only my first name" (session 34): everyone but the member sees "Sam B.".
+        displayName: req.user?.id === m.id ? m.display_name : nameFor(m.display_name, m.short_name),
         accountType: m.account_type,
         verified: true,
         memberSince: m.created_at,
@@ -93,7 +95,7 @@ export function ratingRoutes(db) {
         comment: x.comment,
         createdAt: x.created_at,
         role: x.role, // what the reviewed member was in that deal
-        from: { id: x.from_id, displayName: x.from_name, avatarUrl: avatarUrl(x.from_avatar) },
+        from: { id: x.from_id, displayName: nameFor(x.from_name, x.from_short), avatarUrl: avatarUrl(x.from_avatar) },
         listingTitle: x.listing_title,
       })),
     });

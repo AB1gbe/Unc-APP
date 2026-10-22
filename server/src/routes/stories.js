@@ -9,11 +9,12 @@ import { HttpError, notFound } from '../lib/http.js';
 import { STORY_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import * as v from '../lib/validate.js';
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
+import { nameFor } from '../../../shared/names.js';
 
 const STORY_SELECT = `
-  SELECT s.*, a.display_name AS author_name, a.avatar AS author_avatar,
+  SELECT s.*, a.display_name AS author_name, a.short_name AS author_short, a.avatar AS author_avatar,
          CASE WHEN a.id = d.buyer_id THEN d.vendor_id ELSE d.buyer_id END AS other_id,
-         o.display_name AS other_name, l.title AS listing_title
+         o.display_name AS other_name, o.short_name AS other_short, l.title AS listing_title
   FROM stories s
   JOIN deals d ON d.id = s.deal_id
   JOIN users a ON a.id = s.author_id
@@ -27,8 +28,8 @@ export const storyView = (s) => ({
   body: s.body,
   imageUrl: s.image ? `/uploads/stories/${s.image}` : null,
   createdAt: s.created_at,
-  author: { id: s.author_id, displayName: s.author_name, avatarUrl: avatarUrl(s.author_avatar) },
-  other: { id: s.other_id, displayName: s.other_name },
+  author: { id: s.author_id, displayName: nameFor(s.author_name, s.author_short), avatarUrl: avatarUrl(s.author_avatar) },
+  other: { id: s.other_id, displayName: nameFor(s.other_name, s.other_short) },
   listingTitle: s.listing_title,
 });
 
