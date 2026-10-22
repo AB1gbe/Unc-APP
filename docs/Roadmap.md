@@ -51,6 +51,9 @@ tags: [roadmap]
 - [x] The recommended next five, built in session 34 → [[Privacy, Demand and Trust]].
 - [ ] More from [[Fresh Ideas for the Vision]] (shopping lists, borrow/rent, swap, group requests, quiet hours…).
 
+## New directions (session 36)
+- [ ] Pick from [[New Directions for the Vision]]. Recommended next: download/delete my account, owner dashboard, away mode, pickup checklist + big-deal safety card, report follow-up + raise my budget.
+
 ## Scale-up (only when needed)
 - [ ] PostgreSQL → [[ADR-003 Database]]
 - [ ] S3-compatible storage with signed URLs → [[ADR-008 File storage]]

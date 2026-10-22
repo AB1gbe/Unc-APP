@@ -42,3 +42,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-22 | [[2026-10-22 Session 33]] | Fresh ideas that fit the vision (research note, no code) |
 | 2026-10-22 | [[2026-10-22 Session 34]] | Who may contact me + first name only, unmet demand board, proof photos, offer details, closing note + deal problems |
 | 2026-10-22 | [[2026-10-22 Session 35]] | Pull request #12 (privacy, demand board, proof photos, offer details, closing note) merged into `main` |
+| 2026-10-22 | [[2026-10-22 Session 36]] | New directions that fit the vision (research note, no code) |
