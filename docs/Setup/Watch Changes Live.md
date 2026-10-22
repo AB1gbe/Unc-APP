@@ -36,7 +36,7 @@ and the browser updates a moment later. Stop it with **Ctrl + C**.
 | Symptom | Fix |
 |---|---|
 | Browser shows an old page | Refresh (F5) once. |
-| You can't type anything in the window | Normal: that window is busy running the app and syncing. To type commands (`pull`, `push`, `npm run seed`…), open a **second** Command Prompt, go to the `Unc-APP` folder (`cd` to it), and type there. Leave the first window running. |
+| You can't type anything in the window | Normal: that window is busy running the app and syncing. To type commands (`pull`, `push`, `npm run seed`…), open a **second** Command Prompt, type `cd Unc-APP` (it opens in `C:\Users\<you>`, where the app was cloned; type `dir` to see the folders if that fails), and type there. Leave the first window running. |
 | `api` shows a crash after a sync that changed `package.json` | The sync runs `npm install` itself; once it finishes, press Ctrl + C and run `npm run live` again. |
 | Red `[web] http proxy error: /api/... ECONNREFUSED` lines right after `Restarting 'src/index.js'` | Harmless. A sync changed server files, so the API restarts for a few seconds; the page's requests during that gap fail. When `[api] Unc API listening on http://localhost:4000` appears, it works again (refresh if the page looks empty). Only a problem if that "listening" line never comes. |
 | `[api] ../.env not found. Continuing without it.` | Normal: no `.env` means emails are printed in this window instead of sent. See [[Email Sending]]. |
