@@ -483,3 +483,11 @@ form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bott
 
 /* Away mode (session 37) */
 .activity.away { color: var(--warn); font-weight: 600; }
+
+/* Pickup checklist + big-deal card (session 37) */
+.pickup { padding: .5rem 1rem; border-bottom: 1px solid var(--border); display: grid; gap: .5rem; }
+.pickup summary { cursor: pointer; }
+.pickup-item { display: flex; gap: .5rem; align-items: flex-start; padding: .25rem 0; font-size: .9rem; font-weight: 400; }
+.pickup-item input { width: auto; margin-top: .2rem; }
+.big-deal { background: var(--warn-soft); border-radius: 10px; padding: .6rem .8rem; font-size: .9rem; }
+.big-deal ul { margin: .3rem 0 0; padding-inline-start: 1.2rem; }

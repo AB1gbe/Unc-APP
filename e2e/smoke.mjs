@@ -225,6 +225,13 @@ await vendor.fill('form.deal-problem textarea', 'The buyer paid only half and pr
 await shot(vendor, '37-deal-problem');
 await vendor.click('button:has-text("Send to the Unc team")');
 await vendor.waitForSelector('.deal-problem:has-text("Thanks for telling us")');
+// Pickup checklist (session 37): ticks stay after a reload (kept on this device).
+await vendor.click('.pickup summary');
+await vendor.check('.pickup-item:has-text("Switch it on") input');
+await vendor.reload();
+await vendor.click('.pickup summary');
+if (!(await vendor.isChecked('.pickup-item:has-text("Switch it on") input'))) throw new Error('pickup tick was not kept');
+await vendor.locator('.pickup').screenshot({ path: `${OUT}/41-pickup.png` });
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
