@@ -357,6 +357,13 @@ const MIGRATIONS = [
   ALTER TABLE messages ADD COLUMN offer_returns TEXT;
   ALTER TABLE messages ADD COLUMN offer_valid_until TEXT;
   `,
+  // 25: "Something went wrong" after a deal (session 34): a report about a
+  // deal, with what kind of problem it was.
+  `
+  ALTER TABLE reports ADD COLUMN deal_id INTEGER REFERENCES deals(id) ON DELETE SET NULL;
+  ALTER TABLE reports ADD COLUMN kind TEXT;
+  CREATE INDEX idx_reports_deal ON reports(deal_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

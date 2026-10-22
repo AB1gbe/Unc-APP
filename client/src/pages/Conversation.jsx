@@ -126,6 +126,7 @@ export default function Conversation() {
           </div>
         </div>
         {conv.deal && <DealBanner conv={conv} onRated={load} />}
+        {conv.deal && <DealProblem conv={conv} onDone={load} />}
         <div className="chat-body" ref={bodyRef}>
           {messages.map((m) => m.kind === 'proof-ask' ? (
             <ProofAskLine key={m.id} m={m} conv={conv} />
@@ -260,6 +261,66 @@ function DealBanner({ conv, onRated }) {
         <button className="btn" disabled={!stars || busy}>{busy ? t('Saving…') : t('Submit rating')}</button>
       </div>
       <p className="hint" style={{ margin: 0 }}>{t("Ratings are hidden until you've both rated, so nobody can retaliate. You can't change it later.")}</p>
+    </form>
+  );
+}
+
+// "Something went wrong with this deal?" (session 34): goes to the Unc
+// team with this chat; the other person isn't told.
+const PROBLEMS = {
+  'not-as-described': () => t('The item was not as described'),
+  'no-show': () => t("They didn't come or stopped answering"),
+  payment: () => t('A problem with payment'),
+  other: () => t('Something else'),
+};
+function DealProblem({ conv, onDone }) {
+  const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState('');
+  const [details, setDetails] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const status = conv.deal.myProblem;
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`/deals/${conv.deal.id}/problem`, { method: 'POST', body: { kind, details } });
+      setOpen(false);
+      await onDone();
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (status === 'open') return <p className="deal-problem small muted">{t('Thanks for telling us. Our team will read this chat and contact you by email.')}</p>;
+  if (!open) {
+    return (
+      <p className="deal-problem small">
+        <button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('⚠️ Something went wrong with this deal?')}</button>
+      </p>
+    );
+  }
+  return (
+    <form className="deal-problem" onSubmit={submit}>
+      <b>{t('What went wrong?')}</b>
+      <p className="small muted" style={{ margin: 0 }}>{tj('Only the Unc team sees this, together with this chat. {name} is not told.', { name: <bdi>{conv.other.displayName}</bdi> })}</p>
+      <ErrorBox error={error} />
+      {Object.entries(PROBLEMS).map(([k, label]) => (
+        <label key={k} className="choice">
+          <input type="radio" name="problem" value={k} checked={kind === k} onChange={() => setKind(k)} required />
+          <span>{label()}</span>
+        </label>
+      ))}
+      <textarea required minLength={10} maxLength={1000} value={details} onChange={(e) => setDetails(e.target.value)}
+        placeholder={t('What happened? Dates and amounts help.')} aria-label={t('What happened?')} />
+      <div className="row">
+        <button className="btn" disabled={busy || !kind || details.trim().length < 10}>{busy ? t('Sending…') : t('Send to the Unc team')}</button>
+        <button type="button" className="btn secondary" onClick={() => setOpen(false)}>{t('Cancel')}</button>
+      </div>
     </form>
   );
 }

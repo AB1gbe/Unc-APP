@@ -10,7 +10,7 @@ import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
 import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
-import { notify } from '../lib/notify.js';
+import { notify, thankOtherSellers } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { tellFavourites } from './favourites.js';
@@ -312,6 +312,8 @@ export function listingRoutes(db) {
       db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
       // Reopening starts a fresh 30 days (session 31).
       if (status === 'open') db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL, expired_at = NULL WHERE id = ?`).run(row.id);
+      // Only when it actually closes (not when a deal is changed later).
+      if (row.status === 'open' && status !== 'open') thankOtherSellers(db, row, status);
       audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);
     });
     res.json({ listing: detailView(row.id, req.user) });

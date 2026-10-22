@@ -447,3 +447,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .offer-card.is-expired .offer { text-decoration: line-through; opacity: .7; }
 .bubble.mine .offer-details .badge { background: rgba(255,255,255,.2); color: #fff; }
 .bubble.mine .offer-details .muted { color: rgba(255,255,255,.85); }
+
+/* "Something went wrong with this deal?" (session 34) */
+.deal-problem { margin: 0; padding: .4rem 1rem; }
+form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface); }

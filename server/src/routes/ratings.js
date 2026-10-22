@@ -13,6 +13,8 @@ import { badgeQueries } from '../lib/badges.js';
 import { storiesAbout } from './stories.js';
 import { nameFor } from '../../../shared/names.js';
 
+export const DEAL_PROBLEMS = ['not-as-described', 'no-show', 'payment', 'other'];
+
 export function ratingRoutes(db) {
   const r = Router();
   const ratings = ratingQueries(db);
@@ -41,6 +43,23 @@ export function ratingRoutes(db) {
     }
     audit(db, me, 'rating.created', `deal:${deal.id}`, { stars });
     notify(db, ratee, 'rating', { actorId: me, listingId: deal.listing_id, conversationId: deal.conversation_id });
+    res.status(201).json({ ok: true });
+  });
+
+  // "Something went wrong with this deal" (session 34): either side tells
+  // the team. It becomes a report on the deal's conversation, so an admin
+  // can read that chat (and only that one). One open report per person.
+  r.post('/deals/:id/problem', requireAuth, (req, res) => {
+    const deal = db.prepare('SELECT * FROM deals WHERE id = ?').get(Number(req.params.id));
+    if (!deal || (deal.buyer_id !== req.user.id && deal.vendor_id !== req.user.id)) throw notFound('Deal not found.');
+    const kind = v.oneOf(req.body, 'kind', DEAL_PROBLEMS);
+    const details = v.str(req.body, 'details', { min: 10, max: 1000 });
+    if (db.prepare(`SELECT 1 FROM reports WHERE deal_id = ? AND reporter_id = ? AND status = 'open'`).get(deal.id, req.user.id)) {
+      throw new HttpError(409, 'You already told us about this deal. Our team will be in touch by email.');
+    }
+    db.prepare('INSERT INTO reports (reporter_id, conversation_id, deal_id, kind, reason) VALUES (?, ?, ?, ?, ?)')
+      .run(req.user.id, deal.conversation_id, deal.id, kind, details);
+    audit(db, req.user.id, 'deal.problem', `deal:${deal.id}`, { kind });
     res.status(201).json({ ok: true });
   });
 

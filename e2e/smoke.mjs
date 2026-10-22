@@ -218,6 +218,13 @@ await vendor.click('.star-input label:nth-of-type(4)');
 await vendor.click('button:has-text("Submit rating")');
 await vendor.waitForSelector('text=They rated you');
 await shot(vendor, '24-both-rated');
+// "Something went wrong with this deal?" (session 34): the seller tells the team.
+await vendor.click('button:has-text("Something went wrong with this deal?")');
+await vendor.check('form.deal-problem input[value=payment]');
+await vendor.fill('form.deal-problem textarea', 'The buyer paid only half and promised the rest by Monday.');
+await shot(vendor, '37-deal-problem');
+await vendor.click('button:has-text("Send to the Unc team")');
+await vendor.waitForSelector('.deal-problem:has-text("Thanks for telling us")');
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');

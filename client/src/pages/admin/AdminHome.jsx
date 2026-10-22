@@ -72,10 +72,11 @@ function ReportRow({ report: r, onDone }) {
       <div className="row spread">
         <div>
           {tj('{kind} on “{title}” · reported by {name} ({email})', {
-            kind: <b>{r.conversation_id ? t('Conversation') : t('Request')}</b>,
+            kind: <b>{r.deal_id ? t('Deal problem') : r.conversation_id ? t('Conversation') : t('Request')}</b>,
             title: <bdi>{r.listing_title}</bdi>, name: <bdi>{r.reporter_name}</bdi>, email: <span className="ltr">{r.reporter_email}</span>,
           })}
           <div className="muted small">{formatDateTime(toDate(r.created_at))}</div>
+          {r.kind && <span className="badge warn">{{ 'not-as-described': t('Not as described'), 'no-show': t('No-show'), payment: t('Payment'), other: t('Other') }[r.kind]}</span>}
           <p style={{ margin: '.3rem 0 0' }}>{tj('“{text}”', { text: <bdi>{r.reason}</bdi> })}</p>
         </div>
         <div className="row" style={{ gap: '.4rem' }}>

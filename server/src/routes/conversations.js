@@ -88,6 +88,7 @@ export function conversationRoutes(db) {
       theirRating: mine && theirs ? { stars: theirs.stars, comment: theirs.comment } : null,
       canRate: !mine && canStillRate(d.created_at),
       myStory: Boolean(storyBy.get(d.id, meId)),
+      myProblem: db.prepare('SELECT status FROM reports WHERE deal_id = ? AND reporter_id = ? ORDER BY id DESC LIMIT 1').get(d.id, meId)?.status ?? null,
     };
   }
 

@@ -21,13 +21,15 @@ function describe(n) {
     case 'alert-match': return [tj('New request matching your alert: “{title}”', { title }), `/requests/${n.listing?.id}`];
     case 'expiring': return [tj('Still looking for “{title}”? It closes in 3 days. Open it to keep it going.', { title }), `/requests/${n.listing?.id}`];
     case 'expired': return [tj('“{title}” closed after 30 days. You can reopen it any time.', { title }), `/requests/${n.listing?.id}`];
+    case 'found-elsewhere': return [tj('{name} found what they needed for “{title}”. Thanks for your offer 🙏', { name, title }), chat];
+    case 'request-closed': return [tj('“{title}” is closed now. Thanks for your offer 🙏', { title }), chat];
     case 'kyc_approved': return [t('Your identity is verified ✓ You can now post requests and make offers.'), '/'];
     case 'kyc_rejected': return [t('Your identity check was not approved. See why and try again.'), '/verification'];
     default: return [n.kind, '/'];
   }
 }
 
-const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳' };
+const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳', 'found-elsewhere': '🙏', 'request-closed': '🙏' };
 
 export default function Notifications() {
   const { data, error, loading } = useApi('/notifications');
