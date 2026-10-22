@@ -47,3 +47,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-22 | [[2026-10-22 Session 38]] | Pull request #13 (your data, owner dashboard, away mode, pickup safety, follow-ups) merged into `main` |
 | 2026-10-22 | [[2026-10-22 Session 39]] | Keeping deals on Unc: why people swap numbers and what to do (research note, no code) |
 | 2026-10-22 | [[2026-10-22 Session 40]] | Hidden numbers until a price is agreed, "Did you get it?", Terms (draft), card when joining (showcase), paying in parts |
+| 2026-10-22 | [[2026-10-22 Session 41]] | Pull request #14 (keeping deals on Unc, Terms, card, paying in parts) merged into `main` |
