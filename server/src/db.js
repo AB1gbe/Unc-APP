@@ -331,6 +331,13 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_blocks_blocked ON blocks(blocked_id);
   `,
+  // 21: "Still looking?" expiry (session 31): when the 30 days restarted
+  // (renewed or reopened), when the reminder went out, and when it expired.
+  `
+  ALTER TABLE listings ADD COLUMN renewed_at TEXT;
+  ALTER TABLE listings ADD COLUMN expiry_reminded_at TEXT;
+  ALTER TABLE listings ADD COLUMN expired_at TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

@@ -87,6 +87,7 @@ const AR = {
   'Opening hours are not valid. Use a time like 09:00 for each open day.': 'ساعات العمل غير صالحة. استخدم وقتاً مثل 09:00 لكل يوم عمل.',
   'Choose at least one thing to watch for: words, a category, a city or a budget.': 'اختر شيئاً واحداً على الأقل للمتابعة: كلمات أو فئة أو مدينة أو ميزانية.',
   'Alert not found.': 'التنبيه غير موجود.',
+  'Only open requests can be kept open. Reopen it instead.': 'يمكن إبقاء الطلبات المفتوحة فقط. أعد فتحه بدلاً من ذلك.',
   "You can't contact this member.": 'لا يمكنك التواصل مع هذا العضو.',
   "You can't message this member.": 'لا يمكنك مراسلة هذا العضو.',
   "You can't block yourself.": 'لا يمكنك حظر نفسك.',

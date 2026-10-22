@@ -4,7 +4,7 @@
 // 28) a member who favourited you posting a request in your categories.
 // The text is written by the app (client/src/pages/Notifications.jsx) from
 // `kind`, so it shows in the reader's language.
-export const KINDS = ['offer', 'deal', 'rating', 'kyc_approved', 'kyc_rejected', 'favourite-request', 'alert-match'];
+export const KINDS = ['offer', 'deal', 'rating', 'kyc_approved', 'kyc_rejected', 'favourite-request', 'alert-match', 'expiring', 'expired'];
 
 export function notify(db, userId, kind, { actorId = null, listingId = null, conversationId = null } = {}) {
   if (!KINDS.includes(kind)) throw new Error(`unknown notification kind: ${kind}`);

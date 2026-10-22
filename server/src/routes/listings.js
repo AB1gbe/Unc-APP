@@ -17,6 +17,7 @@ import { tellFavourites } from './favourites.js';
 import { tellAlerts } from './alerts.js';
 import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.js';
 import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
+import { EXPIRES_AT_SQL } from '../lib/expiry.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -67,6 +68,8 @@ export function listingRoutes(db) {
     if (me) listing.buyer.activity = activity.summaryFor(listing.buyer.id);
     if (me?.id === listing.buyer.id) {
       listing.viewCount = viewCount.get(id).n;
+      listing.expiresAt = db.prepare(`SELECT ${EXPIRES_AT_SQL} AS at FROM listings WHERE id = ?`).get(id).at;
+      listing.expiredAt = db.prepare('SELECT expired_at FROM listings WHERE id = ?').get(id).expired_at;
       listing.dealConversationId = db.prepare('SELECT conversation_id FROM deals WHERE listing_id = ?').get(id)?.conversation_id ?? null;
     }
     return listing;
@@ -266,6 +269,14 @@ export function listingRoutes(db) {
   // When marking "fulfilled" the buyer may say which conversation the deal
   // came from (conversationId). That records a DEAL, which both sides can
   // then rate. Leave it out if they found the item elsewhere.
+  // "Keep it open" (session 31): another 30 days for an open request.
+  r.post('/:id/renew', requireAuth, (req, res) => {
+    const row = ownListing(db, req);
+    if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be kept open. Reopen it instead.');
+    db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL WHERE id = ?`).run(row.id);
+    res.json({ listing: detailView(row.id, req.user) });
+  });
+
   r.post('/:id/status', requireAuth, (req, res) => {
     const row = ownListing(db, req);
     const status = v.oneOf(req.body, 'status', ['open', 'fulfilled', 'closed']);
@@ -293,6 +304,8 @@ export function listingRoutes(db) {
         notify(db, conv.vendor_id, 'deal', { actorId: req.user.id, listingId: row.id, conversationId: conv.id });
       }
       db.prepare(`UPDATE listings SET status = ?, updated_at = datetime('now') WHERE id = ?`).run(status, row.id);
+      // Reopening starts a fresh 30 days (session 31).
+      if (status === 'open') db.prepare(`UPDATE listings SET renewed_at = datetime('now'), expiry_reminded_at = NULL, expired_at = NULL WHERE id = ?`).run(row.id);
       audit(db, req.user.id, `listing.${status}`, `listing:${row.id}`);
     });
     res.json({ listing: detailView(row.id, req.user) });

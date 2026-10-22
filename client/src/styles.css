@@ -423,3 +423,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 /* Scam warning under a message (session 31) */
 .scam-warning { margin-top: .4rem; padding: .45rem .6rem; border-radius: 8px; background: #fff7e6; color: #8a5a00; border: 1px solid #f5d28a; font-size: .8rem; }
 .linkish.small { font-size: .875rem; } /* .linkish's 'font: inherit' came after .small and undid it (session 31) */
+
+/* Expiry + tips on your own request (session 31) */
+.expiry-soon { color: #b45309; font-weight: 600; }
+.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; font-size: .9rem; }
+.tips ul { margin: .35rem 0 .4rem; padding-inline-start: 1.1rem; }

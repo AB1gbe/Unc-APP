@@ -95,6 +95,7 @@ await shot(buyer, '07-new-request');
 await buyer.click('button:has-text("Post request")');
 await buyer.waitForSelector('text=Your request');
 await buyer.waitForSelector('.toast:has-text("Posted!")'); // celebration message
+await buyer.waitForSelector('text=Open until'); // "Still looking?" expiry date
 // Share: on a computer, a WhatsApp link with the request's address.
 await buyer.click('.share > button');
 const wa = await buyer.getAttribute('.share-menu a.whatsapp', 'href');
@@ -260,6 +261,11 @@ await buyer.waitForSelector('img.shop-cover');
 await buyer.waitForSelector('.shop-hours .open-now, .shop-hours .closed-now');
 await buyer.waitForSelector('text=Seef, Manama');
 await shot(buyer, '28-shop-page');
+
+// Tips: the controller request has no photo, so the buyer is told to add one.
+await buyer.goto(`${BASE}/requests/${controllerId}`);
+await buyer.waitForSelector('.tips:has-text("Add a photo")');
+await buyer.locator('.tips').screenshot({ path: `${OUT}/32-tips.png` });
 
 // Scam warning + block: a pay-first message gets a warning; the buyer blocks, then unblocks.
 const scamConv = await vendor.evaluate((id) => fetch(`/api/listings/${id}/contact`, { method: 'POST', headers: { 'Content-Type': 'application/json' },

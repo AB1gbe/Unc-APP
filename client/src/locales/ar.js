@@ -657,4 +657,18 @@ export default {
   Unblock: 'إلغاء الحظر',
   "You can't reply in this conversation.": 'لا يمكنك الرد في هذه المحادثة.',
   'Blocked members': 'الأعضاء المحظورون',
+  // Expiry + tips (session 31)
+  'This request closed by itself after 30 days. Reopen it if you are still looking.': 'أُغلق هذا الطلب تلقائياً بعد 30 يوماً. أعد فتحه إن كنت ما زلت تبحث.',
+  'Kept open for another 30 days.': 'سيبقى مفتوحاً 30 يوماً أخرى.',
+  'Open until {date}': 'مفتوح حتى {date}',
+  'Keep it open': 'أبقِه مفتوحاً',
+  'Add a photo: requests with one get more offers.': 'أضف صورة: الطلبات التي فيها صورة تحصل على عروض أكثر.',
+  'Add a few more details (size, model, condition) so sellers know exactly what you want.': 'أضف تفاصيل أكثر (المقاس، الموديل، الحالة) ليعرف البائعون بالضبط ما تريده.',
+  'Add a budget: sellers answer faster when they know what you can spend.': 'أضف ميزانية: يرد البائعون أسرع عندما يعرفون ما يمكنك إنفاقه.',
+  'No offers yet? Try a wider budget or area, or share it.': 'لا عروض بعد؟ جرّب ميزانية أو منطقة أوسع، أو شارك الطلب.',
+  'Nobody has looked yet. Share it on WhatsApp to reach more sellers.': 'لم يشاهده أحد بعد. شاركه على واتساب لتصل إلى بائعين أكثر.',
+  '💡 Tips to get more offers': '💡 نصائح لتحصل على عروض أكثر',
+  'Edit request': 'تعديل الطلب',
+  'Still looking for “{title}”? It closes in 3 days. Open it to keep it going.': 'ما زلت تبحث عن «{title}»؟ يُغلق خلال 3 أيام. افتحه لإبقائه مستمراً.',
+  '“{title}” closed after 30 days. You can reopen it any time.': 'أُغلق «{title}» بعد 30 يوماً. يمكنك إعادة فتحه في أي وقت.',
 };
