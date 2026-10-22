@@ -44,6 +44,10 @@ const TEXT = {
     en: { title: 'A customer is looking for something', body: (v) => `${v.actor}, who favourited you, is looking for “${v.title}”` },
     ar: { title: 'أحد عملائك يبحث عن شيء', body: (v) => `${v.actor} الذي أضافك للمفضلة يبحث عن «${v.title}»` },
   },
+  'alert-match': {
+    en: { title: 'New request for you', body: (v) => `“${v.title}” in ${v.city}` },
+    ar: { title: 'طلب جديد يناسبك', body: (v) => `«${v.title}» في ${v.city}` },
+  },
   test: {
     en: { title: 'Unc', body: () => 'Notifications are on. You will get one for every new offer.' },
     ar: { title: 'Unc', body: () => 'الإشعارات مفعّلة. سيصلك إشعار مع كل عرض جديد.' },

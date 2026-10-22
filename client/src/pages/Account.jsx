@@ -27,6 +27,7 @@ export default function Account() {
           <span>{t('Identity:')} <KycBadge status={user.kycStatus} /></span>
           {user.kycStatus === 'approved' && <Link to={`/members/${user.id}`}>{t('View my public profile & ratings')} <span className="flip">→</span></Link>}
           <Link to="/saved">{t('♥ Saved requests')} <span className="flip">→</span></Link>
+          <Link to="/alerts">{t('🔔 Request alerts')} <span className="flip">→</span></Link>
         </div>
         {user.kycStatus !== 'approved' && user.emailVerified && (
           <p style={{ marginTop: '.75rem' }}><Link className="btn sm" to="/verification">{t('Go to verification')}</Link></p>

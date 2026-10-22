@@ -48,6 +48,7 @@ export function favouriteRoutes(db) {
 // Called after a request is created: tell the buyer's favourite sellers
 // whose interests include the category (or who chose no interests).
 export function tellFavourites(db, buyer, listing) {
+  const told = new Set();
   const sellers = db.prepare(`
     SELECT u.id, u.interests FROM favourites f JOIN users u ON u.id = f.seller_id
     WHERE f.user_id = ? AND u.kyc_status = 'approved' AND u.banned_at IS NULL
@@ -55,8 +56,10 @@ export function tellFavourites(db, buyer, listing) {
   for (const s of sellers) {
     const interests = parseInterests(s.interests);
     if (interests.length && !interests.includes(listing.category)) continue;
+    told.add(s.id);
     notify(db, s.id, 'favourite-request', { actorId: buyer.id, listingId: listing.id });
     pushTo(db, s.id, 'favourite-request', { actor: buyer.display_name, title: listing.title }, `/requests/${listing.id}`)
       .catch((err) => console.warn('[push]', err.message));
   }
+  return told;
 }

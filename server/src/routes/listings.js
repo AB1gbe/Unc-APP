@@ -14,6 +14,7 @@ import { notify } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
 import { badgeQueries } from '../lib/badges.js';
 import { tellFavourites } from './favourites.js';
+import { tellAlerts } from './alerts.js';
 
 export const MAX_PHOTOS = 6;
 
@@ -196,7 +197,12 @@ export function listingRoutes(db) {
       throw err;
     }
     // Sellers who were favourited by this buyer hear about it first.
-    tellFavourites(db, req.user, { id, title: data.title, category: data.category });
+    // Then everyone whose request alert matches (session 31), once each.
+    const told = tellFavourites(db, req.user, { id, title: data.title, category: data.category });
+    tellAlerts(db, req.user, {
+      id, title: data.title, description: data.description, category: data.category, city: data.city,
+      budget_min: data.budgetMin, budget_max: data.budgetMax,
+    }, told);
     res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)) });
   });
 

@@ -73,6 +73,8 @@ test('hot queries use indexes, not full table scans', () => {
   // Session 28: favourite sellers (count on profiles; "my favourites"; heads-up on a new request).
   assert.match(plan('SELECT COUNT(*) FROM favourites WHERE seller_id = 1'), /idx_favourites_seller/);
   assert.match(plan('SELECT * FROM favourites WHERE user_id = 1'), /sqlite_autoindex_favourites/);
+  // Session 31: request alerts are looked up by category for every new request.
+  assert.match(plan("SELECT * FROM alerts WHERE category IS NULL OR category = 'Electronics'"), /idx_alerts_category/);
 });
 
 test('cleanupExpired removes only dead sessions, codes and reset links', async () => {

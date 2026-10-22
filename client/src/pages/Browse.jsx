@@ -56,6 +56,13 @@ export default function Browse() {
         <button className="btn">{t('Search')}</button>
       </form>
       <ErrorBox error={error} />
+      {user && (
+        <p className="small" style={{ marginTop: 0 }}>
+          <Link to={`/alerts?${new URLSearchParams(Object.fromEntries(Object.entries(draft).filter(([, v]) => v)))}`}>
+            {t('🔔 Alert me about new requests like these')}
+          </Link>
+        </p>
+      )}
       {loading ? <CardsLoading /> : result.listings.length === 0 ? (
         <div className="card empty">
           <p>{t("Nobody's asked for that yet. Looking for it yourself? Post it and let sellers come to you.")}</p>

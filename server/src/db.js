@@ -306,6 +306,21 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_favourites_seller ON favourites(seller_id);
   `,
+  // 19: request alerts (session 31): saved searches that tell a seller
+  // about matching new requests. Any field may be empty (= any).
+  `
+  CREATE TABLE alerts (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    q          TEXT,
+    category   TEXT,
+    city       TEXT,
+    min_budget INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX idx_alerts_user ON alerts(user_id);
+  CREATE INDEX idx_alerts_category ON alerts(category);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

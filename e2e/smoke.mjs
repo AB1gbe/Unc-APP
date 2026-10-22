@@ -76,6 +76,14 @@ const buyer = await onboard('Sam Buyer', 'sam@x.test', 'individual');
 const vendor = await onboard('Riverside Electronics', 'shop@x.test', 'business');
 const admin = await adminApproveAll();
 
+// Request alert: the seller watches Electronics before the buyer posts.
+await vendor.goto(BASE + '/browse'); await vendor.selectOption('.searchbar select', 'Electronics');
+await vendor.click('text=Alert me about new requests like these');
+await vendor.waitForURL('**/alerts?category=Electronics');
+await vendor.click('button:has-text("Save alert")');
+await vendor.waitForSelector('.alert-row:has-text("Electronics")');
+await shot(vendor, '06b-alerts');
+
 await buyer.reload(); await buyer.goto(BASE + '/requests/new');
 await buyer.fill('#title', 'Looking for a used PS5 with two controllers');
 await buyer.selectOption('#category', 'Electronics');
@@ -95,6 +103,9 @@ await shot(buyer, '08b-share');
 await buyer.click('.share > button'); // close the menu
 await shot(buyer, '08-request-owner-view');
 const listingUrl = buyer.url();
+// The seller's alert fired for the new request.
+await vendor.goto(BASE + '/notifications');
+await vendor.waitForSelector('.inbox-item:has-text("New request matching your alert")');
 
 await vendor.goto(BASE + '/');
 await vendor.waitForSelector('.card h3');

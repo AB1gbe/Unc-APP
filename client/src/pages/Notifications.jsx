@@ -18,13 +18,14 @@ function describe(n) {
     case 'deal': return [tj('{name} picked your offer for “{title}”. Deal done! 🤝', { name, title }), chat];
     case 'rating': return [tj('{name} rated your deal on “{title}”.', { name, title }), chat];
     case 'favourite-request': return [tj('{name}, who favourited you, is looking for “{title}”. Make an offer?', { name, title }), `/requests/${n.listing?.id}`];
+    case 'alert-match': return [tj('New request matching your alert: “{title}”', { title }), `/requests/${n.listing?.id}`];
     case 'kyc_approved': return [t('Your identity is verified ✓ You can now post requests and make offers.'), '/'];
     case 'kyc_rejected': return [t('Your identity check was not approved. See why and try again.'), '/verification'];
     default: return [n.kind, '/'];
   }
 }
 
-const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥' };
+const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔' };
 
 export default function Notifications() {
   const { data, error, loading } = useApi('/notifications');
