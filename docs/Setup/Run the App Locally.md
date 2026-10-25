@@ -97,3 +97,18 @@ Stop the app (Ctrl + C) and delete the `server/data` folder (database + uploads)
 | Website loads but every action says "Please log in" | You opened `:4000` while running `npm run dev`; use `:5173`, or run `npm run build` first. |
 | Lost the email code / reset link | Click *Send a new code* / request a new link; without real email both are printed in the terminal. |
 | Real emails don't arrive | Run `npm run mail:test -- you@example.com` and read the hint. See [[Email Sending]]. |
+
+## Can't find the Unc-APP folder on your PC? (session 48)
+1. **Search your user folder** for it (in any Command Prompt):
+   ```
+   dir /s /b /ad C:\Users\a.baqer\*Unc*
+   ```
+   Each line is a folder whose name contains "Unc". The app folder is the one with `client`, `server` and `docs` inside. Go there with `cd "<that path>"`.
+2. **Ask a running app window:** if `npm run live` or `npm run dev` is running somewhere, click that window, press Ctrl + C, type `Y`, then type `cd` and Enter. It prints the folder it was running in.
+3. **Not there at all?** Download a fresh copy (it's free, and nothing on GitHub is lost):
+   ```
+   cd C:\Users\a.baqer
+   git clone https://github.com/AB1gbe/Unc-APP.git
+   cd Unc-APP
+   npm install
+   ```
