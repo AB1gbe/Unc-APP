@@ -15,6 +15,10 @@ step: 53
   winget install --id Cloudflare.cloudflared
   ```
   Close and reopen the Command Prompt afterwards so it knows the new command.
+  The first time you use `winget`, it may ask **"Do you agree to all the source agreements terms? [Y] Yes [N] No"** about the `msstore` source (the Microsoft Store's terms, and sending your country code). That's Windows' own installer asking once; type `Y` and press Enter. To skip that question, use the community source only:
+  ```
+  winget install --id Cloudflare.cloudflared --source winget
+  ```
 
 ## 1. Run Unc the way it runs online (window 1)
 Stop `npm run live` first if it's running (click it, **Ctrl + C**, then `Y`): it uses the same port. Then:
