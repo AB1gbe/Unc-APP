@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-22 (session 42)
+updated: 2026-10-25 (session 48)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 101 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101). All fixed.
+**Totals so far:** 102 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -111,6 +111,7 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M99 | Self-review | After agreeing a price, the chat would have kept showing 📵 (polling only fetches new messages) | 40 |
 | M100 | Self-review | Card status first planned as a lookup that most "me" answers would have missed | 40 |
 | M101 | Instructions | Told the owner `cd path\to\Unc-APP`; a placeholder typed as written fails | [[2026-10-22 Session 42]] |
+| M102 | Instructions | Folder search `*Unc*` listed hundreds of "function" folders | [[2026-10-25 Session 48]] |
 
 ---
 
@@ -682,4 +683,10 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Cause:** my answer used a placeholder (`path\to`) instead of the real folder. The owner typed it exactly as given, which is the right thing to do with instructions.
 - **Fix:** the real command, `cd Unc-APP` (a new Command Prompt opens in `C:\Users\a.baqer`, where the app was cloned), with `dir` as the fallback. [[Watch Changes Live]] says the same.
 - **Lesson:** never give placeholders in commands for the owner. Use the real path (the clone location is known from [[Mistakes and Fixes#M14]]), or say exactly how to find it.
+
+## M102
+**The folder search filled the screen with `node_modules\…\function` folders**
+- **Cause:** I gave `dir /s /b /ad C:\Users\a.baqer\*Unc*`. Windows file names ignore upper/lower case, so `*Unc*` also matches "f**unc**tion", and `node_modules` folders have hundreds of those.
+- **Fix:** `dir /s /b /ad C:\Users\a.baqer\Unc-APP*` (names that *start* with Unc-APP), in [[Run the App Locally]].
+- **Lesson:** search patterns for the owner must be specific; think about what else a short pattern matches, especially inside `node_modules`.
 
