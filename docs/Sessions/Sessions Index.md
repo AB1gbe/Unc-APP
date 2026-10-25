@@ -57,3 +57,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-25 | [[2026-10-25 Session 48]] | Finding the Unc-APP folder on the PC (search, ask the live window, or clone again) |
 | 2026-10-25 | [[2026-10-25 Session 49]] | Fix: npm start printed "listening" and quit when port 4000 was taken (clear message now) |
 | 2026-10-25 | [[2026-10-25 Session 50]] | Port 4000 still in use: run the phone test on port 4001 |
+| 2026-10-25 | [[2026-10-25 Session 51]] | Phone test works; which windows to keep open, and next time |
