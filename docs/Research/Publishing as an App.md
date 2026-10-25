@@ -52,6 +52,13 @@ A store app is only a shell around Unc's website and server. **Before any store,
 ## Free testing first
 To try it on a phone without paying anything: [[Step 53 - Test as an app on your phone for free]] (a free Cloudflare tunnel, and a test Android `.apk` from PWABuilder).
 
+## "Can't it go on the Play Store for free?" (session 45)
+No. Anything on the Play Store, even a private test, needs:
+1. **A Google Play developer account: $25, paid once** (no yearly fee). There is no free way around it. Even "internal testing", where only the people you invite can install it from the Play Store, needs this account.
+2. **A fixed https address.** The Play Store app opens one address forever, so the free tunnel (a new address every time) doesn't fit. Free option: a free hosting tier gives a fixed address like `unc.onrender.com` (it sleeps when unused, and its data resets on restart, which is fine for testing).
+
+Cheapest real Play Store test: **$25 once** + free hosting → PWABuilder package → Play Console **Internal testing** (up to 100 testers you invite by email, quick review). Before a public release, a new *personal* account must also run a closed test (about 12 testers for 14 days).
+
 ## Recommended order
 1. **Go live on the web** (hosting, domain, email, backups, production settings) + a **privacy policy** + a lawyer's look at Terms and privacy. Members on iPhone and Android can already install it from the website.
 2. **Google Play** with PWABuilder: cheapest and fastest; the same website keeps updating the app without new store releases.

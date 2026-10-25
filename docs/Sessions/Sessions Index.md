@@ -51,3 +51,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-22 | [[2026-10-22 Session 42]] | "I can't type anything" in the live window (normal; use a second window) |
 | 2026-10-25 | [[2026-10-25 Session 43]] | What it takes to publish Unc as an app (research note, no code) |
 | 2026-10-25 | [[2026-10-25 Session 44]] | Test the app on a phone for free (Cloudflare tunnel + PWABuilder test APK) |
+| 2026-10-25 | [[2026-10-25 Session 45]] | Can it go on the Play Store for free? (no: $25 account + a fixed address) |
