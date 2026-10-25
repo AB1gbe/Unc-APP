@@ -53,3 +53,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-25 | [[2026-10-25 Session 44]] | Test the app on a phone for free (Cloudflare tunnel + PWABuilder test APK) |
 | 2026-10-25 | [[2026-10-25 Session 45]] | Can it go on the Play Store for free? (no: $25 account + a fixed address) |
 | 2026-10-25 | [[2026-10-25 Session 46]] | winget's "source agreements" question when installing cloudflared: safe |
+| 2026-10-25 | [[2026-10-25 Session 47]] | "Could not read package.json": commands ran outside the app folder; cd Unc-APP first |
