@@ -31,7 +31,7 @@ npm start
 - Check the line before the `>` says `C:\Users\a.baqer\Unc-APP`. A new Command Prompt always starts in `C:\Users\a.baqer`, and there npm says *"Could not read package.json"* ([[Mistakes and Fixes#M14]]). If `cd Unc-APP` says it can't find the path, type `dir` to see where the folder is.
 - `npm run build` makes the finished website (`client/dist`), which the server then serves on port 4000.
 - `npm run seed` is optional: it adds the demo members (password `Password123`), so you can log in straight away on the phone.
-- Wait for `Unc API listening on http://localhost:4000`.
+- Wait for `Unc API listening on http://localhost:4000`, and the window must **stay busy** (no new `>` prompt). If it says *"Could not start Unc: Port 4000 is already in use"*, another Unc window (`npm run live`, `npm run dev`) is still running: stop that one with Ctrl + C first ([[Mistakes and Fixes#M103]]).
 
 ## 2. Give it a public https address (window 2)
 ```
