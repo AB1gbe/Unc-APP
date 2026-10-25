@@ -49,3 +49,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-22 | [[2026-10-22 Session 40]] | Hidden numbers until a price is agreed, "Did you get it?", Terms (draft), card when joining (showcase), paying in parts |
 | 2026-10-22 | [[2026-10-22 Session 41]] | Pull request #14 (keeping deals on Unc, Terms, card, paying in parts) merged into `main` |
 | 2026-10-22 | [[2026-10-22 Session 42]] | "I can't type anything" in the live window (normal; use a second window) |
+| 2026-10-25 | [[2026-10-25 Session 43]] | What it takes to publish Unc as an app (research note, no code) |
