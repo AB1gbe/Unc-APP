@@ -79,6 +79,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 50 - Terms of use]]
 - [[Step 51 - Payment card when joining]]
 - [[Step 52 - Paying in parts]]
+- [[Step 53 - Test as an app on your phone for free]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]

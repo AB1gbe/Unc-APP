@@ -49,6 +49,9 @@ A store app is only a shell around Unc's website and server. **Before any store,
 - Physical goods and services paid between people **don't** need Apple's in-app purchase. Cards through Tap are fine.
 - ID/selfie checks: explain why in the review notes.
 
+## Free testing first
+To try it on a phone without paying anything: [[Step 53 - Test as an app on your phone for free]] (a free Cloudflare tunnel, and a test Android `.apk` from PWABuilder).
+
 ## Recommended order
 1. **Go live on the web** (hosting, domain, email, backups, production settings) + a **privacy policy** + a lawyer's look at Terms and privacy. Members on iPhone and Android can already install it from the website.
 2. **Google Play** with PWABuilder: cheapest and fastest; the same website keeps updating the app without new store releases.

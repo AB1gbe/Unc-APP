@@ -59,5 +59,6 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 050 | [[ADR-050 Terms of use]] | Draft Terms with "deals agreed on Unc are finished on Unc"; tick at sign-up, banner for existing members, reminder at Accept; versioned | footer link only, final text without a lawyer |
 | 051 | [[ADR-051 Payment card when joining]] | Everyone adds a card after KYC; token only (never the number); Tap Payments, showcase test provider until approved; nothing charged | card only for installments, storing numbers, Stripe |
 | 052 | [[ADR-052 Paying in parts]] | Seller-agreed plan now (2–6 parts, both confirm each, reminders); `provider` ready for an installment partner later | Unc lends (licence), partner now |
+| 053 | [[ADR-053 Free phone testing with a tunnel]] | Free test on a phone: `npm run build` + `npm start` + Cloudflare quick tunnel (https); PWABuilder for a test APK | same Wi-Fi http, free hosting, ngrok |
 
 Template for new ADRs: copy any ADR and keep the same headings.
