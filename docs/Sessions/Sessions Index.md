@@ -48,3 +48,14 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-22 | [[2026-10-22 Session 39]] | Keeping deals on Unc: why people swap numbers and what to do (research note, no code) |
 | 2026-10-22 | [[2026-10-22 Session 40]] | Hidden numbers until a price is agreed, "Did you get it?", Terms (draft), card when joining (showcase), paying in parts |
 | 2026-10-22 | [[2026-10-22 Session 41]] | Pull request #14 (keeping deals on Unc, Terms, card, paying in parts) merged into `main` |
+| 2026-10-22 | [[2026-10-22 Session 42]] | "I can't type anything" in the live window (normal; use a second window) |
+| 2026-10-25 | [[2026-10-25 Session 43]] | What it takes to publish Unc as an app (research note, no code) |
+| 2026-10-25 | [[2026-10-25 Session 44]] | Test the app on a phone for free (Cloudflare tunnel + PWABuilder test APK) |
+| 2026-10-25 | [[2026-10-25 Session 45]] | Can it go on the Play Store for free? (no: $25 account + a fixed address) |
+| 2026-10-25 | [[2026-10-25 Session 46]] | winget's "source agreements" question when installing cloudflared: safe |
+| 2026-10-25 | [[2026-10-25 Session 47]] | "Could not read package.json": commands ran outside the app folder; cd Unc-APP first |
+| 2026-10-25 | [[2026-10-25 Session 48]] | Finding the Unc-APP folder on the PC (search, ask the live window, or clone again) |
+| 2026-10-25 | [[2026-10-25 Session 49]] | Fix: npm start printed "listening" and quit when port 4000 was taken (clear message now) |
+| 2026-10-25 | [[2026-10-25 Session 50]] | Port 4000 still in use: run the phone test on port 4001 |
+| 2026-10-25 | [[2026-10-25 Session 51]] | Phone test works; which windows to keep open, and next time |
+| 2026-10-25 | [[2026-10-25 Session 52]] | Pull request #15 (app publishing research, free phone test, port fix) merged into `main` |

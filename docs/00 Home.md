@@ -23,7 +23,7 @@ This vault is the complete record of the project: **how** everything was built, 
 
 ### Market
 - [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
-- Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]] · [[Keeping Deals on Unc]]
+- Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]] · [[Keeping Deals on Unc]] · [[Publishing as an App]]
 - [[Glossary]] — every technical word used here, explained
 
 ### Rebuild it from zero (step by step)
@@ -79,6 +79,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 50 - Terms of use]]
 - [[Step 51 - Payment card when joining]]
 - [[Step 52 - Paying in parts]]
+- [[Step 53 - Test as an app on your phone for free]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
