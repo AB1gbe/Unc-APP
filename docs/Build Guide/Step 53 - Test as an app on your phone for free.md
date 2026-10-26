@@ -36,12 +36,13 @@ npm start
   set PORT=4001
   npm start
   ```
-  and in step 2 use `cloudflared tunnel --url http://localhost:4001`. To see what holds port 4000: `netstat -ano | findstr :4000` (the last number is the program's PID; `taskkill /PID <that number> /F` stops it).
+  and in step 2 use `cloudflared tunnel --url http://127.0.0.1:4001`. To see what holds port 4000: `netstat -ano | findstr :4000` (the last number is the program's PID; `taskkill /PID <that number> /F` stops it).
 
 ## 2. Give it a public https address (window 2)
 ```
-cloudflared tunnel --url http://localhost:4000
+cloudflared tunnel --url http://127.0.0.1:4000
 ```
+Use `127.0.0.1`, not `localhost`: cloudflared may try the IPv6 form of localhost (`[::1]`), and if the server only answers on IPv4 the phone gets **"Bad gateway, error 502"** ([[Mistakes and Fixes#M104]]).
 After a few seconds it prints an address like `https://something-words.trycloudflare.com`. Copy it. Keep both windows open while testing.
 
 ## 3. Install it on your phone
@@ -58,6 +59,11 @@ Unc now opens from its own icon, full screen, like an app. Log in as `buyer@demo
 That is the same kind of package that would go to Google Play later. Two limits:
 - this test app shows a thin address bar at the top, because the domain isn't verified (`assetlinks.json` comes with a real domain);
 - it only works while this tunnel address is running.
+
+## "Bad gateway, error 502" on the phone
+The tunnel works but can't reach the server on your PC. The tunnel window shows *"Unable to reach the origin service … actively refused it"*.
+1. Look at the `npm start` window: is it still busy after "listening"? If it shows a `>` prompt or was closed (e.g. the PC slept or restarted), start it again: `cd C:\Users\a.baqer\Documents\Unc-APP`, `set PORT=4001`, `npm start`.
+2. Check the tunnel points at the **same port** and uses `127.0.0.1` (not `localhost`). Stop it (Ctrl + C) and start it again; then open the **new** address it prints.
 
 ## Limits of this free test
 - Your PC must stay on with both windows open. Closing them stops the app.
