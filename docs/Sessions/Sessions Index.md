@@ -60,3 +60,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-25 | [[2026-10-25 Session 51]] | Phone test works; which windows to keep open, and next time |
 | 2026-10-25 | [[2026-10-25 Session 52]] | Pull request #15 (app publishing research, free phone test, port fix) merged into `main` |
 | 2026-10-26 | [[2026-10-26 Session 53]] | "Bad gateway 502" on the phone: restart the server, tunnel to 127.0.0.1 |
+| 2026-11-04 | [[2026-11-04 Session 54]] | Example photos in the demo data (requests, offers, profiles, shop cover, story) |

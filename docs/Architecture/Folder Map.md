@@ -18,6 +18,7 @@ Unc-APP/
 ├── e2e/arabic.mjs        `npm run e2e:ar`: Arabic journey + RTL/overflow/English-leak checks (session 12); skips member text in <bdi> / dir="auto" (session 20)
 ├── e2e/devices.mjs       `npm run e2e:devices`: 5 screen sizes × English/Arabic — no sideways scroll, touch targets ≥ 40 px (session 13); also checks /terms (session 40)
 ├── scripts/make-icons.mjs  Draws the app icons into client/public/icons/ (`node scripts/make-icons.mjs`, session 13)
+├── scripts/make-demo-photos.mjs  Draws the example photos into server/demo-photos/ (`node scripts/make-demo-photos.mjs`, session 54)
 ├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored); session 40: ticks the Terms box, adds a card (a declined one first), checks a number shows as 📵
 ├── shared/                 Plain JS used by BOTH server and client (session 31)
 │   ├── package.json        `{type: module}` only — not a workspace, nothing to install
@@ -27,6 +28,7 @@ Unc-APP/
 │   └── contact-mask.js     Hides numbers, emails, links and @handles as 📵 until a price is agreed: maskContacts(), hasContacts(), HIDDEN (session 40)
 ├── server/
 │   ├── package.json        Server deps + scripts
+│   ├── demo-photos/        11 example JPEGs used by `npm run seed` (made by scripts/make-demo-photos.mjs, session 54)
 │   ├── data/               (created at runtime, git-ignored) database + uploads/
 │   │                         uploads/listings (public), uploads/avatars (public, session 13),
 │   │                         uploads/stories (public, session 20), uploads/covers (public shop covers, session 24),
@@ -36,7 +38,7 @@ Unc-APP/
 │   │   ├── app.js          Builds the Express app: security headers, routes, static files, pages with link previews (session 20)
 │   │   ├── config.js       All settings from environment variables (paymentProvider = PAYMENT_PROVIDER, `test` or `tap`, session 40)
 │   │   ├── db.js           SQLite connection, MIGRATIONS list (33 since session 40), tx() and audit() helpers
-│   │   ├── seed.js         ensureAdmin() + demo data (npm run seed); demo members have agreed to the Terms and have a test card (session 40)
+│   │   ├── seed.js         ensureAdmin() + demo data (npm run seed); demo members have agreed to the Terms and have a test card (session 40); addDemoPhotos() attaches the example photos (session 54)
 │   │   ├── mail-test.js    Sends one test email (npm run mail:test -- you@example.com)
 │   │   ├── lib/
 │   │   │   ├── crypto.js       scrypt passwords, tokens, sha256, peppered HMAC, 6-digit codes
@@ -136,7 +138,8 @@ Unc-APP/
 │       ├── did-you-get-it.test.js  "Did you get it?" 3 days after agreeing, only once (session 40)
 │       ├── terms.test.js           Terms needed to sign up and to post/offer; POST /api/auth/terms (session 40)
 │       ├── payment-card.test.js    payment card: test tokens, declined/expired cards, card needed to post (client/src/cards.js) (session 40)
-│       └── installments.test.js    paying in parts: split, dates, propose/accept/paid/confirm, reminders (session 40)
+│       ├── installments.test.js    paying in parts: split, dates, propose/accept/paid/confirm, reminders (session 40)
+│       └── demo-photos.test.js     the demo data's example photos: counts, no duplicates, who can see them (session 54)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
