@@ -54,3 +54,5 @@ How a member adds photos (nothing new; this is where to find it):
 
 Test: `server/test/demo-photos.test.js`.
 
+## Short videos (session 58)
+Chats and offers can also carry a short video (≤ 1 minute, 25 MB), private like chat photos → [[Orders, Wallet, Invites and Video#3. Short videos with offers and in chats]].

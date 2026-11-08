@@ -62,5 +62,8 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 053 | [[ADR-053 Free phone testing with a tunnel]] | Free test on a phone: `npm run build` + `npm start` + Cloudflare quick tunnel (https); PWABuilder for a test APK | same Wi-Fi http, free hosting, ngrok |
 | 054 | [[ADR-054 Example photos in the demo data]] | Our own drawn pictures (script), committed JPEGs, stored by seed via `saveFiles`, only filling gaps | stock photos, AI photos, made at seed time |
 | 055 | [[ADR-055 Live counters and closing badge]] | Real counts (active 15 min, requests/offers 24 h), zeros hidden, cached 1 min; closing badge in the last 3 days, rounded to the nearest day | fake/rounded-up numbers, since-midnight, always-on countdown |
+| 056 | [[ADR-056 Orders and wallet credit]] | Orders = chats with an accepted price or a deal, fixed stages; wallet = Unc credit ledger in fils, not money until Tap | deals only, real money now, one balance number |
+| 057 | [[ADR-057 Refer a friend]] | Reward both (BD 1 / BD 0.5) once the friend is fully verified; counts only; random 8-letter code; link from the page address | reward at sign-up or first deal, show names |
+| 058 | [[ADR-058 Short videos in chats]] | Chat/offer only, ≤1 min and 25 MB, MP4/MOV/WebM by first bytes, members only | public videos, re-encoding, any file |
 
 Template for new ADRs: copy any ADR and keep the same headings.

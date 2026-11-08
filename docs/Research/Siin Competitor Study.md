@@ -116,6 +116,7 @@ The buyer is in charge, the search is done by the sellers, and every contact is 
 > Siin is where **collectors** go to **watch and win**. Unc is where **anyone** goes to **ask and get** what they need: everyday items, parts, furniture, services, from verified people in Bahrain.
 
 ## 9. Ideas worth borrowing (fit Unc's rules)
+> ✅ Ideas 3–5 were built in [[2026-11-08 Session 58]] → [[Orders, Wallet, Invites and Video]].
 > ✅ Ideas 1 and 2 were built in [[2026-11-08 Session 56]] → [[Social Touches#8. Live counters and "Closes in N days" (session 56)]].
 1. **Live counters on Home and Browse:** "12 sellers active now · 5 requests posted today" (real numbers only).
 2. **Countdown on requests** that close soon ("closes in 2 days"): Unc already has expiry ([[ADR-037 Expiry and tips]]); show it on cards.
