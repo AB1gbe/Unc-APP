@@ -100,6 +100,23 @@ The five "recommended first" ideas from [[Social Marketplace Ideas]], all built 
 - Your favourites are listed on the **Saved** page.
 - Profiles show "♥ 12 members favourited this seller": a count, never names.
 
+## 8. Live counters and "Closes in N days" (session 56)
+**Why:** [[ADR-055 Live counters and closing badge]] · **Build:** [[Step 55 - Live counters and closing badge]] · idea from [[Siin Competitor Study]]
+**Where:** `GET /api/feed/pulse` in `server/src/routes/feed.js`, `client/src/components/LivePulse.jsx` (top of Browse and Home), `ClosesBadge` in `client/src/components/ui.jsx`, `client/src/closing.js`
+
+| Computer | Phone |
+|---|---|
+| ![[s56-pulse-closing-desktop.png]] | ![[s56-pulse-closing-phone.png]] |
+
+- **Live counters** at the top of Browse and Home: "🟢 3 members active now · 📝 5 requests posted today · 💬 2 offers made today".
+  - **Real numbers only:** members seen in the last 15 minutes (people with "Hide when I'm online" aren't counted), and requests and offers from the last 24 hours.
+  - A count of 0 isn't shown, and the strip hides when everything is 0.
+  - Counts only, never names. Cached for a minute on the server.
+- **"⏳ Closes in 2 days"** (or "⏳ Closes today") on request cards and the request page, in a request's **last 3 days** before it closes by itself ([[ADR-037 Expiry and tips]]). Days are rounded to the nearest day.
+  - The buyer's own request page keeps its "Open until … · Keep it open" line instead.
+  - In the demo data, the wardrobe request is 28 days old so the badge shows.
+
 ## Tests
 - `npm test`: `favourites.test.js` (3, session 28), `feed.test.js` (2, session 26), `offer-responses.test.js` (3), `activity.test.js` (3), `previews.test.js` (2), `stories-badges.test.js` (3), `seasons.test.js` (2), and index checks in `performance.test.js`.
 - `e2e/smoke.mjs` now covers all five features.
+- `server/test/pulse-closing.test.js`: the counters, the closing date, and the rounding rule (session 56).

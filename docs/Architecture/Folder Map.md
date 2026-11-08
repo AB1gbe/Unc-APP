@@ -85,7 +85,7 @@ Unc-APP/
 │   │       ├── notifications.js /api/notifications/* (session 13)
 │   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
 │   │       ├── stories.js       /api/stories, /api/deals/:id/story, /api/admin/stories/:id/hide (session 20)
-│   │       ├── feed.js          /api/feed: "Happening near you" (session 26)
+│   │       ├── feed.js          /api/feed: "Happening near you" (session 26); /api/feed/pulse live counters (session 56)
 │   │       ├── favourites.js    /api/members/:id/favourite, /api/favourites, tellFavourites() (session 28)
 │   │       ├── alerts.js        /api/alerts, alertMatches(), tellAlerts() (session 31)
 │   │       ├── demand.js        /api/demand: "What people are asking for", topWords() (session 34)
@@ -139,7 +139,8 @@ Unc-APP/
 │       ├── terms.test.js           Terms needed to sign up and to post/offer; POST /api/auth/terms (session 40)
 │       ├── payment-card.test.js    payment card: test tokens, declined/expired cards, card needed to post (client/src/cards.js) (session 40)
 │       ├── installments.test.js    paying in parts: split, dates, propose/accept/paid/confirm, reminders (session 40)
-│       └── demo-photos.test.js     the demo data's example photos: counts, no duplicates, who can see them (session 54)
+│       ├── demo-photos.test.js     the demo data's example photos: counts, no duplicates, who can see them (session 54)
+│       └── pulse-closing.test.js   live counters, closesAt, rounding of "Closes in N days" (session 56)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -162,6 +163,7 @@ Unc-APP/
         ├── hours.js        openState(): "Open now" from a shop's hours, incl. past midnight (session 24)
         ├── scam.js         Scam warnings on the other person's chat messages (session 31)
         ├── tips.js         Tips to get more offers on a quiet request (session 31)
+        ├── closing.js      closingDays(): "Closes in N days" in a request's last 3 days (session 56)
         ├── pickup.js       Pickup checklist per category: checklistFor(), isBigDeal(), BIG_DEAL limits per currency (session 37)
         ├── cards.js        Showcase card form helpers: luhnOk(), brandOf(), readExpiry(), testToken() — the card number never leaves the browser (session 40)
         ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
@@ -188,7 +190,8 @@ Unc-APP/
         │   ├── ContactNudge.jsx   "📵 Numbers, emails and links stay hidden until you agree a price" note while typing (chat + first offer) (session 40)
         │   ├── TermsAccept.jsx    "I agree" to the Terms for members who joined before them: banner in Layout + on the Terms page (session 40)
         │   ├── PlanCard.jsx       "💳 Paying in parts" card in a chat after a price is accepted: suggest, accept/decline, "I've paid" / "Received" (session 40)
-        │   └── ui.jsx      ErrorBox, Loading (skeleton) + CardsLoading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards, Activity, Badges (session 20), ContactRule ("🔒 Shops only" badge, session 34); Activity shows "🌴 Away until …" (session 37); VerifyPrompt asks for a payment card (session 40)
+        │   ├── LivePulse.jsx  live counters strip on Browse and Home (session 56)
+        │   └── ui.jsx      ErrorBox, Loading (skeleton) + CardsLoading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards, Activity, Badges (session 20), ContactRule ("🔒 Shops only" badge, session 34); Activity shows "🌴 Away until …" (session 37); VerifyPrompt asks for a payment card (session 40); ClosesBadge (session 56)
         └── pages/
             ├── Browse.jsx          Visitors' home + /browse: hero, search, request grid, paging
             ├── Home.jsx            Members' home: needs attention, my requests, saved, requests for you (session 13); "📊 What people ask for" link to /demand (session 34)

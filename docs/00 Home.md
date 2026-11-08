@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-04 (session 54)
+updated: 2026-11-08 (session 56)
 ---
 # Unc — Project Vault
 
@@ -82,6 +82,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 52 - Paying in parts]]
 - [[Step 53 - Test as an app on your phone for free]]
 - [[Step 54 - Example photos in the demo data]]
+- [[Step 55 - Live counters and closing badge]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -100,7 +101,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-04, after session 54)
+## Status (2026-11-08, after session 56)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -132,6 +133,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Download/delete my data, owner dashboard, away mode, pickup checklist + big-deal card, report follow-up + raise my budget | ✅ done — on branch (session 37) → [[Your Data, Dashboard and Care]] |
 | Hidden numbers until a price is agreed, "Did you get it?", Terms (draft), card when joining (showcase), paying in parts | ✅ done — on branch (session 40) → [[Deals, Terms, Cards and Installments]] |
 | Example photos in the demo data (requests, offers, profiles, shop cover, story) | ✅ done — on branch (session 54) → [[Photos]] |
-| API tests | ✅ 172 passing |
+| Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
+| API tests | ✅ 175 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

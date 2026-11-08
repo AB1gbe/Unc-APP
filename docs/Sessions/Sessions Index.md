@@ -62,3 +62,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-10-26 | [[2026-10-26 Session 53]] | "Bad gateway 502" on the phone: restart the server, tunnel to 127.0.0.1 |
 | 2026-11-04 | [[2026-11-04 Session 54]] | Example photos in the demo data (requests, offers, profiles, shop cover, story) |
 | 2026-11-08 | [[2026-11-08 Session 55]] | Siin competitor study; Siin's position vs Unc's (research note, no code) |
+| 2026-11-08 | [[2026-11-08 Session 56]] | Live counters (real numbers) and "Closes in N days" on request cards |

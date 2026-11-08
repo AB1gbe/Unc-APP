@@ -141,6 +141,7 @@ Only when the built website exists (`client/dist`, or `CLIENT_DIST`). Every non-
 ## Feed — `server/src/routes/feed.js` (session 26)
 | Method | Path | Gate | Notes |
 |---|---|---|---|
+| GET | `/api/feed/pulse` | — | `{ requests, offers, active }`: requests and offers (conversations) created in the last 24 h, members seen in the last 15 min (not banned; people hiding their activity aren't counted). Counts only, cached 60 s (session 56). |
 | GET | `/api/feed` | — | `{city, items: [{kind, at, city, near, category?, listing?{id,title}, shop?{id,displayName}, count?}]}`, at most 8, from the last 7 days. The member's city comes first (`near`). Kinds: `found` (anonymous: city + category only), `request` (open, not your own), `shop` (new verified business), `offers-today` (2+ new conversations on requests in your city in 24 h). Private people are never named; banned members are left out. Works logged out (no `near`). |
 
 ## Favourite sellers — `server/src/routes/favourites.js` (session 28)
@@ -228,3 +229,7 @@ Only the two people in the chat (others → 404 "Conversation not found." / "Pla
 | POST | `/api/plans/:id/parts/:n/confirm` | A participant | The **seller**: "Received" → `{plan}` (also marks it paid if the buyer hadn't). 403 for the buyer, 409 if not active or already confirmed. When every part is confirmed the plan becomes `completed`. The buyer gets a 🔔 `part-confirmed` |
 
 `plan` = `{id, status, provider, total, currency, parts: [{n, amount, dueOn, paidAt, confirmedAt, late}], every, proposedByMe, createdAt, paid}`; `late` = an active plan's part past its date and not marked paid; `paid` = the sum of confirmed parts. `splitAmount()` makes equal parts (the remainder goes on the first); `dueDates()` counts from `firstDue` (monthly dates stay on the same day, or the month's last day). `runInstallmentReminders(db)` runs at start-up and hourly: a 🔔 `part-due` to the buyer the day before a part is due, and `part-late` to both when it is 3 days late (`LATE_DAYS`), each once per part. No money goes through Unc. See [[ADR-052 Paying in parts]] and [[Deals, Terms, Cards and Installments]].
+
+## Closing date on requests (session 56)
+Every request object for an **open** request has `closesAt` (`'YYYY-MM-DD HH:MM:SS'`, UTC): the day it closes by itself (`COALESCE(renewed_at, created_at)` + 30 days, see `server/src/lib/expiry.js`). The website shows "⏳ Closes in N days" from 3 days before (`client/src/closing.js`).
+
