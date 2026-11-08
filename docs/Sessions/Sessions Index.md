@@ -63,3 +63,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-04 | [[2026-11-04 Session 54]] | Example photos in the demo data (requests, offers, profiles, shop cover, story) |
 | 2026-11-08 | [[2026-11-08 Session 55]] | Siin competitor study; Siin's position vs Unc's (research note, no code) |
 | 2026-11-08 | [[2026-11-08 Session 56]] | Live counters (real numbers) and "Closes in N days" on request cards |
+| 2026-11-08 | [[2026-11-08 Session 57]] | Pull request #16 (demo photos, Siin study, live counters, closing badge) merged into `main` |
