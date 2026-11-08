@@ -102,8 +102,9 @@ export function adminRoutes(db) {
       SELECT c.*, b.display_name AS buyer_name, b.email AS buyer_email, vu.display_name AS vendor_name, vu.email AS vendor_email
       FROM conversations c JOIN users b ON b.id = c.buyer_id JOIN users vu ON vu.id = c.vendor_id WHERE c.id = ?
     `).get(rep.conversation_id);
-    const messages = db.prepare('SELECT id, sender_id, body, offer_price, image, created_at FROM messages WHERE conversation_id = ? ORDER BY id').all(rep.conversation_id)
-      .map((m) => ({ ...m, image: undefined, imageUrl: m.image ? `/api/admin/reports/${rep.id}/images/${m.image}` : null }));
+    const messages = db.prepare('SELECT id, sender_id, body, offer_price, image, video, created_at FROM messages WHERE conversation_id = ? ORDER BY id').all(rep.conversation_id)
+      .map((m) => ({ ...m, image: undefined, video: undefined, imageUrl: m.image ? `/api/admin/reports/${rep.id}/images/${m.image}` : null,
+        videoUrl: m.video ? `/api/admin/reports/${rep.id}/videos/${m.video}` : null }));
     audit(db, req.user.id, 'report.conversation_viewed', `report:${rep.id}`);
     res.json({ conversation: conv, messages });
   });
@@ -115,6 +116,17 @@ export function adminRoutes(db) {
     const full = path.join(CHAT_DIR(), path.basename(req.params.file));
     if (!owned || !fs.existsSync(full)) throw notFound('File not found');
     audit(db, req.user.id, 'report.image_viewed', `report:${rep.id}`, { file: req.params.file });
+    res.set('Cache-Control', 'no-store');
+    res.sendFile(full);
+  });
+
+  // Videos in a reported conversation (session 58): same rules as photos.
+  r.get('/reports/:id/videos/:file', (req, res) => {
+    const rep = db.prepare('SELECT * FROM reports WHERE id = ?').get(Number(req.params.id));
+    const owned = rep?.conversation_id && db.prepare('SELECT 1 FROM messages WHERE conversation_id = ? AND video = ?').get(rep.conversation_id, req.params.file);
+    const full = path.join(CHAT_DIR(), path.basename(req.params.file));
+    if (!owned || !fs.existsSync(full)) throw notFound('File not found');
+    audit(db, req.user.id, 'report.video_viewed', `report:${rep.id}`, { file: req.params.file });
     res.set('Cache-Control', 'no-store');
     res.sendFile(full);
   });

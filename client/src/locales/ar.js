@@ -976,4 +976,13 @@ export default {
   '🎁 Invite friends': '🎁 ادعُ أصدقاءك',
   '🎁 Invite friends to earn credit': '🎁 ادعُ أصدقاءك لتكسب رصيداً',
   'A friend you invited is now verified. Unc credit was added to your wallet 🎉': 'صديق دعوته أصبح موثّقاً. أُضيف رصيد Unc إلى محفظتك 🎉',
+  // Short videos (session 58)
+  'Please choose an MP4, MOV or WebM video.': 'يرجى اختيار فيديو بصيغة MP4 أو MOV أو WebM.',
+  'That video is over {mb} MB. Please choose a shorter one.': 'هذا الفيديو أكبر من {mb} ميغابايت. يرجى اختيار فيديو أقصر.',
+  'Videos can be up to 1 minute long.': 'يمكن أن يصل طول الفيديو إلى دقيقة واحدة.',
+  'Add a short video': 'أضف فيديو قصيراً',
+  'Short video of your item': 'فيديو قصير لغرضك',
+  '(optional, up to 1 minute)': '(اختياري، حتى دقيقة واحدة)',
+  'Show it working: only this buyer can watch it.': 'أظهره وهو يعمل: هذا المشتري فقط يمكنه مشاهدته.',
+  '🎬 Video': '🎬 فيديو',
 };

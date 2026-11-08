@@ -356,6 +356,17 @@ await vendor.waitForSelector('.proof-badge');
 await buyer.waitForSelector('.proof-badge:has-text("Check that the paper")', { timeout: 15000 });
 await shot(buyer, '35-proof-photo');
 
+// Short video (session 58): the shop sends a clip; the buyer sees a player.
+await vendor.goto(`${BASE}/messages/${scamConv}`);
+await vendor.setInputFiles('[data-testid=chat-video]', { name: 'clip.mp4', mimeType: 'video/mp4',
+  buffer: Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypisom'), Buffer.alloc(256)]) });
+await vendor.waitForSelector('.video-preview video');
+await vendor.click('.chat-form button:has-text("Send")');
+await vendor.waitForSelector('.bubble video.bubble-video');
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.waitForSelector('.bubble video.bubble-video');
+await shot(buyer, '53-chat-video');
+
 // Keeping deals on Unc (session 40): a number typed before a price is agreed
 // shows a nudge, and the other side sees 📵.
 await buyer.fill('.chat-form textarea', 'Easier on WhatsApp: 3912 3456');

@@ -18,7 +18,8 @@ import { canStillRate, ratingQueries } from '../lib/ratings.js';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHAT_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { CHAT_DIR, VIDEO_MAX_BYTES, avatarUrl, memoryUpload, saveFiles, saveVideo } from '../lib/uploads.js';
+import { config } from '../config.js';
 import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
 import { trySendMail } from '../lib/mailer.js';
@@ -116,6 +117,7 @@ export function conversationRoutes(db) {
       lastMessage: c.last_body == null ? undefined : c.agreed ? c.last_body : maskContacts(c.last_body).text,
       lastKind: c.last_kind ?? undefined,
       lastPrice: c.last_price ?? undefined,
+      lastVideo: c.last_video ? true : undefined,
       unread: c.unread ?? undefined,
     };
   }
@@ -130,18 +132,32 @@ export function conversationRoutes(db) {
     return c;
   }
 
-  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null, details = null) {
+  function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null, details = null, video = null) {
     db.prepare(`INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to, proof,
-        offer_condition, offer_warranty, offer_returns, offer_valid_until, had_contact) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        offer_condition, offer_warranty, offer_returns, offer_valid_until, had_contact, video) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(convId, senderId, body, offerPrice, image, kind, replyTo, proof,
         details?.condition ?? null, details?.warranty ?? null, details?.returns ?? null, details?.validUntil ?? null,
-        hasContacts(body) ? 1 : 0);
+        hasContacts(body) ? 1 : 0, video);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
   // One optional photo per message (multipart field "image"). JSON requests
   // pass straight through multer untouched.
-  const chatUpload = memoryUpload(1);
+  // A photo (max 5 MB) and/or a short video (max 25 MB, session 58).
+  const chatUpload = memoryUpload(2, VIDEO_MAX_BYTES).fields([{ name: 'image', maxCount: 1 }, { name: 'video', maxCount: 1 }]);
+  function chatFiles(req) {
+    const image = req.files?.image?.[0] ?? null;
+    const video = req.files?.video?.[0] ?? null;
+    if (image && image.size > config.maxUploadBytes) throw new HttpError(413, 'File is too large (max 5 MB).');
+    return { image, video };
+  }
+  // Saves the photo and video (checked first); discard() removes both again.
+  function saveChatFiles({ image, video }) {
+    const photo = image ? saveFiles(CHAT_DIR(), [{ file: image }]) : null;
+    let clip = null;
+    try { clip = video ? saveVideo(CHAT_DIR(), video) : null; } catch (err) { photo?.discard(); throw err; }
+    return { image: photo?.names[0] ?? null, video: clip?.name ?? null, discard() { photo?.discard(); clip?.discard(); } };
+  }
   // Keeping deals on Unc (session 40): until a price is accepted in this
   // chat, phone numbers, emails, links and @handles from the OTHER person
   // show as 📵. The sender sees their own text, with hiddenForOther.
@@ -153,6 +169,7 @@ export function conversationRoutes(db) {
     hiddenContact: Boolean(m.had_contact && !agreed && m.sender_id !== meId),
     hiddenForOther: Boolean(m.had_contact && !agreed && m.sender_id === meId),
     imageUrl: m.image ? `/api/conversations/${convId}/images/${m.image}` : null,
+    videoUrl: m.video ? `/api/conversations/${convId}/videos/${m.video}` : null,
     // A "please send a proof photo" request shows like an answer line.
     kind: m.kind ?? (m.proof === 'ask' ? 'proof-ask' : null), replyTo: m.reply_to ?? null,
     proof: m.proof === 'photo',
@@ -168,7 +185,7 @@ export function conversationRoutes(db) {
   const proofCode = (c) => `UNC-${1000 + (crypto.createHash('sha256').update(`unc-proof:${c.id}:${c.created_at}`).digest().readUInt32BE(0) % 9000)}`;
 
   // ---- Start a conversation ABOUT A LISTING (vendor -> buyer) ----
-  r.post('/listings/:id/contact', requireVerified, chatUpload.single('image'), (req, res) => {
+  r.post('/listings/:id/contact', requireVerified, chatUpload, (req, res) => {
     const listing = db.prepare(`
       SELECT l.*, u.banned_at AS buyer_banned_at FROM listings l JOIN users u ON u.id = l.buyer_id WHERE l.id = ?
     `).get(Number(req.params.id));
@@ -188,20 +205,20 @@ export function conversationRoutes(db) {
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
     const details = readOfferDetails(req.body, { isSeller: true, hasPrice: offerPrice != null });
 
-    const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
+    const photo = saveChatFiles(chatFiles(req));
     let convId;
     try {
       convId = tx(db, () => {
         const info = db.prepare('INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (?, ?, ?)')
           .run(listing.id, listing.buyer_id, req.user.id);
         const id = Number(info.lastInsertRowid);
-        insertMessage(id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, null, details);
+        insertMessage(id, req.user.id, body, offerPrice, photo.image, null, null, null, details, photo.video);
         audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
         notify(db, listing.buyer_id, 'offer', { actorId: req.user.id, listingId: listing.id, conversationId: id });
         return id;
       });
     } catch (err) {
-      photo?.discard();
+      photo.discard();
       throw err;
     }
     // After the transaction, so a push never announces an offer that was rolled back.
@@ -231,6 +248,7 @@ export function conversationRoutes(db) {
              EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id AND m.kind = 'accept') AS agreed,
              (SELECT COALESCE(kind, CASE WHEN proof = 'ask' THEN 'proof-ask' END) FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_kind,
              (SELECT offer_price FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_price,
+             (SELECT video IS NOT NULL FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_video,
              (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.sender_id <> ? AND m.read_at IS NULL) AS unread
       FROM conversations c
       JOIN listings l ON l.id = c.listing_id
@@ -267,6 +285,7 @@ export function conversationRoutes(db) {
   `);
   const unreadIn = db.prepare('SELECT COUNT(*) AS n FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.read_at IS NULL');
   const proofIn = db.prepare(`SELECT 1 FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.proof = 'photo' LIMIT 1`);
+  const videoIn = db.prepare(`SELECT 1 FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE m.conversation_id = ? AND m.sender_id = c.vendor_id AND m.video IS NOT NULL LIMIT 1`);
   function compareFor(convId) {
     const c = getConv.get(convId);
     const first = sellerFirst.get(convId);
@@ -282,6 +301,7 @@ export function conversationRoutes(db) {
       badges: badgesFor(c.vendor_id, replyTime),
       unread: unreadIn.get(convId).n,
       hasProof: Boolean(proofIn.get(convId)),
+      hasVideo: Boolean(videoIn.get(convId)),
       awayUntil: activity.summaryFor(c.vendor_id).awayUntil,
     };
   }
@@ -298,7 +318,7 @@ export function conversationRoutes(db) {
     const c = participantConv(req);
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
-      SELECT id, sender_id, body, offer_price, image, kind, reply_to, proof, had_contact, created_at, read_at,
+      SELECT id, sender_id, body, offer_price, image, video, kind, reply_to, proof, had_contact, created_at, read_at,
              offer_condition, offer_warranty, offer_returns, offer_valid_until FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
@@ -322,7 +342,7 @@ export function conversationRoutes(db) {
     });
   });
 
-  r.post('/conversations/:id/messages', requireVerified, chatUpload.single('image'), (req, res) => {
+  r.post('/conversations/:id/messages', requireVerified, chatUpload, (req, res) => {
     const c = participantConv(req);
     if (c.listing_status !== 'open') {
       throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
@@ -333,16 +353,17 @@ export function conversationRoutes(db) {
     // Either side can put a price on a message: the seller's offer, or the
     // buyer's counter-offer (session 20). Text is optional with a photo or a price.
     const offerPrice = v.int(req.body, 'offerPrice', { optional: true });
-    const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(req.file) || offerPrice != null }) ?? '';
+    const files = chatFiles(req);
+    const body = v.str(req.body, 'message', { min: 1, max: 2000, optional: Boolean(files.image || files.video) || offerPrice != null }) ?? '';
     // "proof": this photo shows the chat's code (sellers only, with a photo).
     const proof = ['1', 'true', true].includes(req.body?.proof);
     const details = readOfferDetails(req.body, { isSeller: req.user.id === c.vendor_id, hasPrice: offerPrice != null });
-    if (proof && (!req.file || req.user.id !== c.vendor_id)) throw new HttpError(400, 'Only the seller can send a proof photo, and it needs a photo.', { field: 'image' });
-    const photo = req.file ? saveFiles(CHAT_DIR(), [{ file: req.file }]) : null;
+    if (proof && (!files.image || req.user.id !== c.vendor_id)) throw new HttpError(400, 'Only the seller can send a proof photo, and it needs a photo.', { field: 'image' });
+    const photo = saveChatFiles(files);
     try {
-      insertMessage(c.id, req.user.id, body, offerPrice, photo?.names[0] ?? null, null, null, proof ? 'photo' : null, details);
+      insertMessage(c.id, req.user.id, body, offerPrice, photo.image, null, null, proof ? 'photo' : null, details, photo.video);
     } catch (err) {
-      photo?.discard();
+      photo.discard();
       throw err;
     }
     const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
@@ -387,6 +408,17 @@ export function conversationRoutes(db) {
     insertMessage(c.id, req.user.id, '', null, null, null, null, 'ask');
     const m = db.prepare('SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 1').get(c.id);
     res.status(201).json({ message: messageView(m, c.id, req.user.id) });
+  });
+
+  // Chat videos (session 58): the same rules as chat photos. sendFile
+  // answers "Range" requests, so phones can play and skip through them.
+  r.get('/conversations/:id/videos/:file', requireAuth, (req, res) => {
+    const c = participantConv(req);
+    const owned = db.prepare('SELECT 1 FROM messages WHERE conversation_id = ? AND video = ?').get(c.id, req.params.file);
+    const full = path.join(CHAT_DIR(), path.basename(req.params.file));
+    if (!owned || !fs.existsSync(full)) throw notFound('File not found');
+    res.set('Cache-Control', 'private, max-age=31536000, immutable');
+    res.sendFile(full);
   });
 
   // Chat photos: only for the two people in the conversation, and only

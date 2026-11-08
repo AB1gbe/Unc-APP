@@ -15,6 +15,7 @@ import { requestTips } from '../tips.js';
 import { EMPTY_DETAILS, OfferDetailFields, addDetails } from '../components/OfferDetails.jsx';
 import { hasContacts } from '../../../shared/contact-mask.js';
 import ContactNudge from '../components/ContactNudge.jsx';
+import { VideoPreview, pickVideo } from '../components/VideoPicker.jsx';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -87,6 +88,7 @@ function OfferPanel({ listing }) {
   const [offerPrice, setOfferPrice] = useState('');
   const [photos, setPhotos] = useState([]); // optional photo of the item (max 1)
   const [details, setDetails] = useState(EMPTY_DETAILS);
+  const [video, setVideo] = useState(null); // optional short video of the item (session 58)
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -119,6 +121,7 @@ function OfferPanel({ listing }) {
       fd.append('message', message);
       if (offerPrice !== '') { fd.append('offerPrice', offerPrice); addDetails(fd, details); }
       if (photos[0]) fd.append('image', photos[0]);
+      if (video) fd.append('video', video);
       const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
       celebrate({ text: t("Offer sent! You'll be notified when they reply.") });
       navigate(`/messages/${conversation.id}`);
@@ -148,6 +151,19 @@ function OfferPanel({ listing }) {
       <div className="field">
         <label>{t('Photo of your item')} <span className="muted">{t('(optional)')}</span></label>
         <PhotoPicker id="offerPhoto" files={photos} onChange={setPhotos} max={1} />
+      </div>
+      <div className="field">
+        <label htmlFor="offerVideo">{t('Short video of your item')} <span className="muted">{t('(optional, up to 1 minute)')}</span></label>
+        {video ? <VideoPreview file={video} onRemove={() => setVideo(null)} /> : (
+          <input id="offerVideo" type="file" accept="video/mp4,video/quicktime,video/webm"
+            onChange={async (e) => {
+              const f = e.target.files[0]; e.target.value = '';
+              if (!f) return;
+              const picked = await pickVideo(f);
+              if (picked.error) setError(new Error(picked.error)); else { setError(null); setVideo(picked.file); }
+            }} />
+        )}
+        <div className="hint">{t('Show it working: only this buyer can watch it.')}</div>
       </div>
       <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send offer')}</button>
       <p className="hint">{t('Never pay or ask for payment outside a method you trust. Report anything suspicious.')}</p>

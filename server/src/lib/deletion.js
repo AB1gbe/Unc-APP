@@ -46,6 +46,10 @@ export function deleteNow(db, u) {
       files.push([CHAT_DIR, m.image]);
       db.prepare('UPDATE messages SET image = NULL WHERE id = ?').run(m.id);
     }
+    for (const m of db.prepare('SELECT id, video FROM messages WHERE sender_id = ? AND video IS NOT NULL').all(u.id)) {
+      files.push([CHAT_DIR, m.video]);
+      db.prepare('UPDATE messages SET video = NULL WHERE id = ?').run(m.id);
+    }
     for (const s of db.prepare('SELECT image FROM stories WHERE author_id = ? AND image IS NOT NULL').all(u.id)) files.push([STORY_DIR, s.image]);
     db.prepare('DELETE FROM stories WHERE author_id = ?').run(u.id);
     files.push([AVATAR_DIR, u.avatar], [COVER_DIR, u.cover]);

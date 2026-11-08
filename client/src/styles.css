@@ -545,3 +545,7 @@ p.plan { display: block; }
 .invite-stats { margin-bottom: 1rem; }
 @media (max-width: 480px) { .invite-link { flex-wrap: wrap; } .invite-link input { flex-basis: 100%; } }
 .invite-stats .stat-value { font-size: 1.3rem; white-space: nowrap; }
+
+/* Short videos in chats (session 58) */
+.bubble-video { display: block; width: 100%; max-width: 320px; max-height: 360px; border-radius: 10px; background: #000; margin-bottom: .3rem; }
+.video-preview video { height: 64px; width: 96px; object-fit: cover; border-radius: 8px; background: #000; display: block; }

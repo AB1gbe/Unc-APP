@@ -484,6 +484,10 @@ const MIGRATIONS = [
   CREATE UNIQUE INDEX idx_users_referral_code ON users(referral_code);
   CREATE INDEX idx_users_referred_by ON users(referred_by);
   `,
+  // 37: short videos in chats (session 58), private like chat photos.
+  `
+  ALTER TABLE messages ADD COLUMN video TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
