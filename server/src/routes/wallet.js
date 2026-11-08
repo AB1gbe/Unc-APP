@@ -7,6 +7,8 @@ import { avatarUrl } from '../lib/uploads.js';
 import { canStillRate } from '../lib/ratings.js';
 import { planView } from '../lib/installments.js';
 import { CREDIT_CURRENCY, balanceOf } from '../lib/wallet.js';
+import { REFERRAL_REWARD, WELCOME_CREDIT, referralCodeOf } from '../lib/referrals.js';
+import { config } from '../config.js';
 import { nameFor } from '../../../shared/names.js';
 
 export function walletRoutes(db) {
@@ -18,6 +20,23 @@ export function walletRoutes(db) {
       currency: CREDIT_CURRENCY,
       balance: balanceOf(db, req.user.id),
       entries: entries.map((e) => ({ amount: e.amount, reason: e.reason, createdAt: e.created_at })),
+    });
+  });
+
+  // Refer a friend (session 58): my invite link and how it's going. Counts
+  // only: the inviter doesn't see who joined.
+  r.get('/referrals', requireAuth, (req, res) => {
+    const code = referralCodeOf(db, req.user.id);
+    const stats = db.prepare(`
+      SELECT COUNT(*) AS joined,
+             COALESCE(SUM(email_verified_at IS NOT NULL AND kyc_status = 'approved' AND card_added_at IS NOT NULL), 0) AS verified
+      FROM users WHERE referred_by = ? AND deleted_at IS NULL
+    `).get(req.user.id);
+    const earned = db.prepare(`SELECT COALESCE(SUM(amount), 0) AS n FROM wallet_entries WHERE user_id = ? AND reason = 'referral'`).get(req.user.id).n;
+    res.json({
+      code, link: `${config.appUrl}/register?ref=${code}`,
+      joined: stats.joined, verified: stats.verified, earned,
+      reward: REFERRAL_REWARD, welcome: WELCOME_CREDIT, currency: CREDIT_CURRENCY,
     });
   });
 

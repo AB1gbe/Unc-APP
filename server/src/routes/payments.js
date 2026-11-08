@@ -4,6 +4,7 @@ import { audit } from '../db.js';
 import { config } from '../config.js';
 import { requireAuth } from '../middleware/auth.js';
 import { paymentProvider } from '../lib/payments.js';
+import { rewardReferral } from '../lib/referrals.js';
 
 export const cardView = (c) => (c ? { brand: c.brand, last4: c.last4, expMonth: c.exp_month, expYear: c.exp_year, addedAt: c.created_at } : null);
 
@@ -23,6 +24,7 @@ export function paymentRoutes(db) {
         last4 = excluded.last4, exp_month = excluded.exp_month, exp_year = excluded.exp_year, created_at = datetime('now')
     `).run(req.user.id, config.paymentProvider, card.providerRef, card.brand, card.last4, card.expMonth, card.expYear);
     db.prepare(`UPDATE users SET card_added_at = datetime('now') WHERE id = ?`).run(req.user.id);
+    rewardReferral(db, req.user.id); // refer a friend: the card can be the last step (session 58)
     audit(db, req.user.id, 'card.added', `user:${req.user.id}`, { brand: card.brand, last4: card.last4 });
     res.status(201).json({ card: cardView(db.prepare('SELECT * FROM payment_cards WHERE user_id = ?').get(req.user.id)) });
   });

@@ -476,6 +476,14 @@ const MIGRATIONS = [
     UNIQUE (user_id, reason, ref)
   );
   `,
+  // 36: refer a friend (session 58): each member's invite code (made the
+  // first time they open the invite page) and who invited them.
+  `
+  ALTER TABLE users ADD COLUMN referral_code TEXT;
+  ALTER TABLE users ADD COLUMN referred_by INTEGER REFERENCES users(id) ON DELETE SET NULL;
+  CREATE UNIQUE INDEX idx_users_referral_code ON users(referral_code);
+  CREATE INDEX idx_users_referred_by ON users(referred_by);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

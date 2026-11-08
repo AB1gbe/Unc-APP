@@ -538,3 +538,10 @@ p.plan { display: block; }
 .wallet-entry:first-child { border-top: 0; }
 .wallet-entry .plus { color: var(--ok); }
 .wallet-entry .minus { color: var(--bad); }
+
+/* Refer a friend (session 58) */
+.invite-link { flex-wrap: nowrap; gap: .5rem; margin: .3rem 0 1rem; }
+.invite-link input { flex: 1; min-width: 0; }
+.invite-stats { margin-bottom: 1rem; }
+@media (max-width: 480px) { .invite-link { flex-wrap: wrap; } .invite-link input { flex-basis: 100%; } }
+.invite-stats .stat-value { font-size: 1.3rem; white-space: nowrap; }

@@ -220,6 +220,19 @@ await shot(vendor, '30-favourite-notification');
 await vendor.goto(vendorChat); // back to the chat for the seller's rating
 const buyerChat = buyer.url();
 await buyer.goto(BASE + '/saved'); await buyer.waitForSelector('.inbox-item:has-text("Riverside Electronics")');
+// Refer a friend (session 58): the invite link and the friend's sign-up note.
+await buyer.goto(BASE + '/invite');
+await buyer.waitForSelector('#inviteLink');
+const inviteLink = await buyer.inputValue('#inviteLink');
+if (!/\/register\?ref=[A-Z2-9]{8}$/.test(inviteLink)) throw new Error(`bad invite link ${inviteLink}`);
+await shot(buyer, '52-invite');
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const friend = await ctx.newPage();
+  await friend.goto(BASE + '/register?ref=' + inviteLink.split('ref=')[1]);
+  await friend.waitForSelector('.alert.info:has-text("A friend invited you")');
+  await ctx.close();
+}
 await buyer.goto(buyerChat); // back to the chat for the next steps
 
 await vendor.reload();
