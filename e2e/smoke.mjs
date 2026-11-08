@@ -258,6 +258,13 @@ await vendor.reload();
 await vendor.locator('.plan-parts button:has-text("Received ✓")').first().click();
 await vendor.waitForSelector('.plan-parts li.done');
 await vendor.locator('.plan').screenshot({ path: `${OUT}/45-plan.png` });
+// Orders (session 58): the PS5 deal is listed, with its payment plan.
+await buyer.goto(BASE + '/orders');
+await buyer.waitForSelector('.order-row:has-text("PS5")');
+await shot(buyer, '51-orders');
+await buyer.goto(BASE + '/wallet');
+await buyer.waitForSelector('.wallet-amount');
+await buyer.goto(buyerChat); // back to the chat for the next steps
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');

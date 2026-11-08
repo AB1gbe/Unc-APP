@@ -51,7 +51,7 @@ export function deleteNow(db, u) {
     files.push([AVATAR_DIR, u.avatar], [COVER_DIR, u.cover]);
 
     db.prepare(`UPDATE listings SET status = 'closed', updated_at = datetime('now') WHERE buyer_id = ? AND status = 'open'`).run(u.id);
-    for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views', 'payment_cards']) {
+    for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views', 'payment_cards', 'wallet_entries']) {
       db.prepare(`DELETE FROM ${table} WHERE user_id = ?`).run(u.id);
     }
     db.prepare('DELETE FROM favourites WHERE user_id = ? OR seller_id = ?').run(u.id, u.id);
@@ -100,6 +100,7 @@ export function exportData(db, u) {
     favouriteSellers: all('SELECT seller_id AS memberId, created_at AS createdAt FROM favourites WHERE user_id = ? ORDER BY created_at', u.id),
     savedRequests: all('SELECT listing_id AS requestId, created_at AS createdAt FROM saved_listings WHERE user_id = ? ORDER BY created_at', u.id),
     blockedMembers: all('SELECT blocked_id AS memberId, created_at AS createdAt FROM blocks WHERE user_id = ? ORDER BY created_at', u.id),
+    walletEntries: all('SELECT amount, reason, created_at AS createdAt FROM wallet_entries WHERE user_id = ? ORDER BY id', u.id),
     reportsMade: all('SELECT reason, kind, status, created_at AS createdAt FROM reports WHERE reporter_id = ? ORDER BY id', u.id),
   };
 }

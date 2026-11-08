@@ -28,6 +28,8 @@ const Alerts = lazy(() => import('./pages/Alerts.jsx'));
 const Demand = lazy(() => import('./pages/Demand.jsx'));
 const Terms = lazy(() => import('./pages/Terms.jsx'));
 const PaymentCard = lazy(() => import('./pages/PaymentCard.jsx'));
+const Orders = lazy(() => import('./pages/Orders.jsx'));
+const Wallet = lazy(() => import('./pages/Wallet.jsx'));
 const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
@@ -54,6 +56,8 @@ export default function App() {
         <Route path="demand" element={<RequireAuth><Demand /></RequireAuth>} />
         <Route path="terms" element={<Terms />} />
         <Route path="payment-card" element={<RequireAuth><PaymentCard /></RequireAuth>} />
+        <Route path="orders" element={<RequireAuth><Orders /></RequireAuth>} />
+        <Route path="wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
         <Route path="saved" element={<RequireAuth><Saved /></RequireAuth>} />
         <Route path="messages" element={<RequireAuth><Inbox /></RequireAuth>} />
         <Route path="messages/:id" element={<RequireAuth><Conversation /></RequireAuth>} />

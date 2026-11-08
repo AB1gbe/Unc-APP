@@ -462,6 +462,20 @@ const MIGRATIONS = [
   CREATE INDEX idx_listings_created ON listings(created_at);
   CREATE INDEX idx_users_last_seen ON users(last_seen_at);
   `,
+  // 35: the wallet (session 58): Unc credit, one row per change (amount in
+  // fils/cents, + or -). Not real money yet: it can't be withdrawn. The
+  // UNIQUE rule stops the same reward being given twice.
+  `
+  CREATE TABLE wallet_entries (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    amount     INTEGER NOT NULL,
+    reason     TEXT NOT NULL,
+    ref        TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (user_id, reason, ref)
+  );
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
