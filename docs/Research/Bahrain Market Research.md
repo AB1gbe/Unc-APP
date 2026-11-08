@@ -188,3 +188,5 @@ Similar Gulf apps **not confirmed to operate in Bahrain**: Maqas (Saudi Arabia),
 - [GDN: H1 digital payments](https://www.gdnonline.com/Details/1405074/Digital-payments-hit-BD193bn-in-H1)
 - [DataReportal 2026 Bahrain](https://datareportal.com/reports/digital-2026-bahrain)
 - [Internet Society Pulse](https://pulse.internetsociety.org/en/reports/BH/)
+
+See also: [[Siin Competitor Study]] (session 55), a Bahrain-born live-shopping app and how Unc differs.
