@@ -7,7 +7,7 @@ step: 58
 **What/why:** [[Orders, Wallet, Invites and Video#3. Short videos with offers and in chats]], [[ADR-058 Short videos in chats]].
 
 1. Migration 37: `ALTER TABLE messages ADD COLUMN video TEXT;`
-2. `server/src/lib/uploads.js`: `memoryUpload(maxFiles, maxBytes)`, `VIDEO_MAX_BYTES` (25 MB), `sniffVideo()` (`ftyp` → MP4/MOV, `1A 45 DF A3` → WebM), `saveVideo()`. `server/src/lib/http.js`: its own "too large (max 25 MB)" message for videos.
+2. `server/src/lib/uploads.js`: `memoryUpload(maxFiles, maxBytes)`, `VIDEO_MAX_BYTES` (25 MB), `sniffVideo()` (`ftyp` + a known video brand → MP4/MOV, `1A 45 DF A3` → WebM; HEIC photos and M4A audio are refused, [[Mistakes and Fixes#M110]]), `saveVideo()`. `server/src/lib/http.js`: its own "too large (max 25 MB)" message for videos.
 3. `server/src/routes/conversations.js`:
    - the chat upload takes the fields `image` (5 MB, checked by hand) and `video`;
    - `saveChatFiles()` saves both, or neither;

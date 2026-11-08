@@ -44,3 +44,16 @@ test('only real videos, and a photo still may not be over 5 MB', async () => {
   const bigVideo = Buffer.concat([MP4, Buffer.alloc(26 * 1024 * 1024)]);
   await seller.post(`/api/conversations/${conv.id}/messages`).attach('video', bigVideo, 'big.mp4').expect(413, /25 MB/);
 });
+
+test('photos and audio from the same file family are not videos (M110)', async () => {
+  const { sniffVideo } = await import('../src/lib/uploads.js');
+  const head = (brand) => Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftyp' + brand), Buffer.alloc(16)]);
+  assert.equal(sniffVideo(head('heic')), null, 'iPhone HEIC photo');
+  assert.equal(sniffVideo(head('mif1')), null, 'HEIF photo');
+  assert.equal(sniffVideo(head('M4A ')), null, 'M4A audio');
+  assert.equal(sniffVideo(head('avif')), null, 'AVIF photo');
+  assert.equal(sniffVideo(head('isom')).ext, '.mp4');
+  assert.equal(sniffVideo(head('mp42')).ext, '.mp4');
+  assert.equal(sniffVideo(head('qt  ')).ext, '.mov');
+});
+

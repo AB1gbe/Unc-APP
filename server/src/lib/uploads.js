@@ -43,9 +43,15 @@ export function memoryUpload(maxFiles, maxBytes = config.maxUploadBytes) {
 // their first bytes like photos, up to VIDEO_MAX_BYTES. Saved in the private
 // chat folder; served only to that chat's two members.
 export const VIDEO_MAX_BYTES = 25 * 1024 * 1024;
+// MP4 and MOV start with "ftyp" + a "brand". Only video brands count: the
+// same family also holds HEIC photos ("heic") and M4A audio ("M4A "),
+// which must not pass as videos (session 58, M110).
+const VIDEO_BRANDS = new Set(['isom', 'iso2', 'iso3', 'iso4', 'iso5', 'iso6', 'mp41', 'mp42', 'avc1', 'M4V ', 'mmp4', '3gp4', '3gp5', '3gp6', '3g2a', 'qt  ']);
 export function sniffVideo(buffer) {
   if (buffer.length >= 12 && buffer.toString('ascii', 4, 8) === 'ftyp') {
-    return buffer.toString('ascii', 8, 12) === 'qt  ' ? { ext: '.mov', mime: 'video/quicktime' } : { ext: '.mp4', mime: 'video/mp4' };
+    const brand = buffer.toString('ascii', 8, 12);
+    if (!VIDEO_BRANDS.has(brand)) return null;
+    return brand === 'qt  ' ? { ext: '.mov', mime: 'video/quicktime' } : { ext: '.mp4', mime: 'video/mp4' };
   }
   if ([0x1a, 0x45, 0xdf, 0xa3].every((b, i) => buffer[i] === b)) return { ext: '.webm', mime: 'video/webm' };
   return null;

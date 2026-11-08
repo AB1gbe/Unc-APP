@@ -138,6 +138,6 @@ This vault is the complete record of the project: **how** everything was built, 
 | Example photos in the demo data (requests, offers, profiles, shop cover, story) | ✅ done — on branch (session 54) → [[Photos]] |
 | Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
 | Orders + wallet (Unc credit), refer a friend, short videos in chats | ✅ done — on branch (session 58) → [[Orders, Wallet, Invites and Video]] |
-| API tests | ✅ 182 passing |
+| API tests | ✅ 183 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
