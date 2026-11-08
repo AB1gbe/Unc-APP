@@ -9,6 +9,7 @@ import { useApi } from '../hooks.js';
 import { t, tj, tn } from '../i18n.jsx';
 import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
+import LivePulse from '../components/LivePulse.jsx';
 
 // Written out in full so the translation test can find every text.
 const GREETING = {
@@ -49,6 +50,7 @@ export default function Home() {
         <Link className="btn hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
       </div>
 
+      <LivePulse />
       <ProfileChecklist user={user} />
 
       <section className="card" style={{ padding: 0 }}>

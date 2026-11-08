@@ -89,6 +89,8 @@ export async function seedDemo(db) {
     add.run(buyer, 'Need a solid oak dining table for 6', 'Rectangular, around 180cm. Light scratches are fine.', 'Home & Furniture', 200, 600, 'Juffair', null);
     add.run(buyer, 'Someone to assemble IKEA wardrobe', 'PAX wardrobe, 2 doors. This Saturday if possible.', 'Services', 50, 120, 'Juffair', null);
   }
+  // The wardrobe request is 28 days old, so the demo shows "⏳ Closes in 2 days" (session 56).
+  db.prepare(`UPDATE listings SET created_at = datetime('now', '-28 days') WHERE buyer_id = ? AND title LIKE 'Someone to assemble IKEA wardrobe%' AND renewed_at IS NULL AND created_at > datetime('now', '-27 days')`).run(buyer);
   // Profiles: a few words and interests, so demo profiles aren't empty.
   const profile = db.prepare(`UPDATE users SET bio = COALESCE(bio, ?), interests = CASE WHEN interests = '[]' THEN ? ELSE interests END, onboarded_at = COALESCE(onboarded_at, datetime('now')) WHERE email = ?`);
   profile.run('Always hunting for good second-hand electronics and furniture.', JSON.stringify(['Electronics', 'Home & Furniture']), 'buyer@demo.local');

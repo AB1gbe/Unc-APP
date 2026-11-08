@@ -17,7 +17,7 @@ import { tellFavourites } from './favourites.js';
 import { tellAlerts } from './alerts.js';
 import { areasOf, governorateNamed, normalizeCity } from '../../../shared/areas.js';
 import { NOT_BLOCKED_BUYER } from '../lib/blocks.js';
-import { EXPIRES_AT_SQL } from '../lib/expiry.js';
+import { EXPIRES_AT_SQL, LIFE_DAYS } from '../lib/expiry.js';
 import { CONTACT_ALLOWED_SQL, CONTACT_RULES, contactAllowedParams, contactBlocker } from '../lib/contact.js';
 import { NOT_AWAY } from '../lib/activity.js';
 import { nameFor } from '../../../shared/names.js';
@@ -44,12 +44,15 @@ export function listingView(row, images = []) {
     images: images.map((i) => `/uploads/listings/${i.file}`),
     photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}` })),
     offerCount: row.offer_count ?? undefined,
+    // When an open request closes by itself (session 56: "Closes in 2 days" on cards).
+    closesAt: row.status === 'open' && row.closes_at ? row.closes_at : undefined,
   };
 }
 
 const BASE_SELECT = `
   SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.short_name AS buyer_short, u.banned_at IS NOT NULL AS buyer_banned,
-         (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count
+         (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count,
+         datetime(COALESCE(l.renewed_at, l.created_at), '+${LIFE_DAYS} days') AS closes_at
   FROM listings l JOIN users u ON u.id = l.buyer_id
 `;
 

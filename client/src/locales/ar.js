@@ -925,4 +925,10 @@ export default {
   '{name} confirmed your payment ✓': 'أكّد {name} استلام دفعتك ✓',
   'A payment to {name} is due tomorrow.': 'دفعة إلى {name} مستحقة غداً.',
   'A payment with {name} is late.': 'دفعة مع {name} متأخرة.',
+  // Live counters + closing badge (session 56)
+  '{n} members active now': { one: 'عضو واحد نشط الآن', two: 'عضوان نشطان الآن', few: '{n} أعضاء نشطون الآن', other: '{n} عضواً نشطاً الآن' },
+  '{n} requests posted today': { one: 'طلب واحد نُشر اليوم', two: 'طلبان نُشرا اليوم', few: '{n} طلبات نُشرت اليوم', other: '{n} طلباً نُشر اليوم' },
+  '{n} offers made today': { one: 'عرض واحد قُدّم اليوم', two: 'عرضان قُدّما اليوم', few: '{n} عروض قُدّمت اليوم', other: '{n} عرضاً قُدّم اليوم' },
+  '⏳ Closes in {n} days': { one: '⏳ يُغلق خلال يوم', two: '⏳ يُغلق خلال يومين', few: '⏳ يُغلق خلال {n} أيام', other: '⏳ يُغلق خلال {n} يوماً' },
+  '⏳ Closes today': '⏳ يُغلق اليوم',
 };

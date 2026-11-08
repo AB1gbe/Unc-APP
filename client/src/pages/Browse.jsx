@@ -8,6 +8,7 @@ import { t } from '../i18n.jsx';
 import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
+import LivePulse from '../components/LivePulse.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -47,6 +48,7 @@ export default function Browse() {
       )}
       {!user && <div style={{ marginBottom: '1.5rem' }}><StoriesStrip /></div>}
       {!user && <div style={{ marginBottom: '1.5rem' }}><Feed title={t('Happening on Unc')} /></div>}
+      <LivePulse />
       <form className="searchbar" onSubmit={search}>
         <input placeholder={t('What are people looking for?')} value={draft.q} onChange={(e) => setDraft({ ...draft, q: e.target.value })} aria-label={t('Search')} />
         <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} aria-label={t('Category')}>

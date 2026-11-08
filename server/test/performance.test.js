@@ -75,6 +75,9 @@ test('hot queries use indexes, not full table scans', () => {
   assert.match(plan('SELECT * FROM favourites WHERE user_id = 1'), /sqlite_autoindex_favourites/);
   // Session 31: request alerts are looked up by category for every new request.
   assert.match(plan("SELECT * FROM alerts WHERE category IS NULL OR category = 'Electronics'"), /idx_alerts_category/);
+  // Session 56: live counters.
+  assert.match(plan(`SELECT COUNT(*) FROM listings WHERE created_at >= datetime('now', '-1 day')`), /idx_listings_created/);
+  assert.match(plan(`SELECT COUNT(*) FROM users WHERE last_seen_at >= datetime('now', '-15 minutes') AND banned_at IS NULL`), /idx_users_last_seen/);
   // Session 34: "What people are asking for" reads the last 30 days of open requests.
   assert.match(plan(`SELECT l.category FROM listings l WHERE l.status = 'open' AND l.created_at >= datetime('now', '-30 days') ORDER BY l.created_at DESC LIMIT 5000`), /idx_listings_status/);
 });
