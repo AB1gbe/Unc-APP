@@ -60,5 +60,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 051 | [[ADR-051 Payment card when joining]] | Everyone adds a card after KYC; token only (never the number); Tap Payments, showcase test provider until approved; nothing charged | card only for installments, storing numbers, Stripe |
 | 052 | [[ADR-052 Paying in parts]] | Seller-agreed plan now (2–6 parts, both confirm each, reminders); `provider` ready for an installment partner later | Unc lends (licence), partner now |
 | 053 | [[ADR-053 Free phone testing with a tunnel]] | Free test on a phone: `npm run build` + `npm start` + Cloudflare quick tunnel (https); PWABuilder for a test APK | same Wi-Fi http, free hosting, ngrok |
+| 054 | [[ADR-054 Example photos in the demo data]] | Our own drawn pictures (script), committed JPEGs, stored by seed via `saveFiles`, only filling gaps | stock photos, AI photos, made at seed time |
+| 055 | [[ADR-055 Live counters and closing badge]] | Real counts (active 15 min, requests/offers 24 h), zeros hidden, cached 1 min; closing badge in the last 3 days, rounded to the nearest day | fake/rounded-up numbers, since-midnight, always-on countdown |
 
 Template for new ADRs: copy any ADR and keep the same headings.

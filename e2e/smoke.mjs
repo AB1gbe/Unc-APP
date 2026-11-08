@@ -365,6 +365,16 @@ await shot(vendor, '33-favourites-only');
 await buyer.goto(BASE + '/account');
 await buyer.locator('[data-setting=shortName]').uncheck(); await buyer.waitForTimeout(300);
 
+// Live counters (session 56): real numbers on Browse.
+// The server caches the counts for a minute, so reload until fresh ones arrive.
+for (let i = 0; ; i++) {
+  await vendor.goto(BASE + '/browse');
+  if (await vendor.locator('.live-pulse:has-text("posted today"):has-text("active now")').count()) break;
+  if (i > 15) throw new Error('live counters never showed');
+  await vendor.waitForTimeout(5000);
+}
+await vendor.locator('.live-pulse').screenshot({ path: `${OUT}/48-live-pulse.png` });
+
 // What people are asking for (session 34): with 2 furniture requests, the shop sees that category.
 await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ title: 'Looking for a standing fan', description: 'Tall, quiet, with a remote.', category: 'Home & Furniture', city: 'Austin' }) }));

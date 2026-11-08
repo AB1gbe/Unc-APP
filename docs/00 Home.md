@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-10-22 (session 40)
+updated: 2026-11-08 (session 56)
 ---
 # Unc — Project Vault
 
@@ -23,6 +23,7 @@ This vault is the complete record of the project: **how** everything was built, 
 
 ### Market
 - [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
+- [[Siin Competitor Study]] — Siin (live-stream shopping) vs Unc: offering and position
 - Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]] · [[Keeping Deals on Unc]] · [[Publishing as an App]]
 - [[Glossary]] — every technical word used here, explained
 
@@ -80,6 +81,8 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 51 - Payment card when joining]]
 - [[Step 52 - Paying in parts]]
 - [[Step 53 - Test as an app on your phone for free]]
+- [[Step 54 - Example photos in the demo data]]
+- [[Step 55 - Live counters and closing badge]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -98,7 +101,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-10-22, after session 40)
+## Status (2026-11-08, after session 56)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -129,6 +132,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Who may contact me + first name only, unmet demand board, proof photos, offer details, closing note + deal problems | ✅ done — on branch (session 34) → [[Privacy, Demand and Trust]] |
 | Download/delete my data, owner dashboard, away mode, pickup checklist + big-deal card, report follow-up + raise my budget | ✅ done — on branch (session 37) → [[Your Data, Dashboard and Care]] |
 | Hidden numbers until a price is agreed, "Did you get it?", Terms (draft), card when joining (showcase), paying in parts | ✅ done — on branch (session 40) → [[Deals, Terms, Cards and Installments]] |
-| API tests | ✅ 170 passing |
+| Example photos in the demo data (requests, offers, profiles, shop cover, story) | ✅ done — on branch (session 54) → [[Photos]] |
+| Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
+| API tests | ✅ 175 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

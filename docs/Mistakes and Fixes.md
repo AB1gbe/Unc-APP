@@ -1,12 +1,12 @@
 ---
 tags: [mistakes, log]
-updated: 2026-10-25 (session 49)
+updated: 2026-11-08 (session 56)
 ---
 # Mistakes and Fixes
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 103 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103). All fixed.
+**Totals so far:** 106 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -113,6 +113,9 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M101 | Instructions | Told the owner `cd path\to\Unc-APP`; a placeholder typed as written fails | [[2026-10-22 Session 42]] |
 | M102 | Instructions | Folder search `*Unc*` listed hundreds of "function" folders | [[2026-10-25 Session 48]] |
 | M103 | Bug | `npm start` printed "listening" and then quit when port 4000 was already taken | [[2026-10-25 Session 49]] |
+| M104 | Instructions | Tunnel told to use `localhost`; cloudflared tried IPv6 `[::1]` and the phone got "Bad gateway 502" | [[2026-10-26 Session 53]] |
+| M105 | Design | The first demo "oak table" picture was a tree stump (wood emoji) | [[2026-11-04 Session 54]] |
+| M106 | Bug | "Closes in 1 day" shown with almost 2 days left (rounded down) | [[2026-11-08 Session 56]] |
 
 ---
 
@@ -698,4 +701,29 @@ An independent review read every file and reproduced each problem. All fixed; ea
 - **Fix:** `server/src/lib/listen.js` turns the callback into a clear error, and `index.js` prints *"Could not start Unc: Port 4000 is already in use: another Unc window … Stop it there with Ctrl + C, or start this one on another port (set PORT=4001 first)"* and exits with an error code.
 - **Test:** `server/test/listen.test.js` (fails without the fix: the helper doesn't exist; checked with `git stash push -u -- src`). Also checked for real by starting `npm start` twice.
 - **Lesson:** a start-up message must come from the real success, not just from the callback being called. With Express 5, always look at the `err` argument of `listen`.
+
+## M104
+**Phone: "Bad gateway, error 502"; tunnel window: "dial tcp [::1]:4001 … actively refused it"**
+- **Cause:** two things can give exactly this, and both were possible:
+  1. the `npm start` window wasn't running any more (the next morning; the PC may have slept);
+  2. my instructions said `cloudflared tunnel --url http://localhost:4001`. cloudflared turned `localhost` into the IPv6 address `[::1]`, and the server may only answer on IPv4 (`127.0.0.1`), depending on the PC's network settings.
+- **Fix:** the guide now uses `http://127.0.0.1:<port>` and has a "Bad gateway 502" section: check the server window is busy, restart it, restart the tunnel and use the new address.
+- **Lesson:** with tunnels and proxies, write `127.0.0.1` instead of `localhost`; "localhost" can mean two different addresses.
+
+## M105
+**The demo photo for "solid oak dining table" showed a tree stump**
+- **Found by:** looking at each generated picture before using it.
+- **Cause:** there is no table emoji; I used 🪵 (wood), which draws a log.
+- **Fix:** `scripts/make-demo-photos.mjs` draws a real table with shapes (an oak top and four legs) for the `'TABLE'` entry; the chairs stay emoji.
+- **Lesson:** check every generated image by eye; an emoji's name isn't what it looks like.
+
+## M106
+**The demo wardrobe request said "⏳ Closes in 1 day", but it had almost 2 days left**
+- **Found by:** the screenshot after seeding (the request was made 28 days old, so 2 days minus a few seconds were left).
+- **Cause:** `closingDays()` in `client/src/closing.js` rounded the days *down* (`Math.floor`), so 1 day 23 hours became "1 day".
+- **Fix:** under 24 hours → "Closes today"; otherwise round to the nearest day (`Math.round`).
+- **Test:** `server/test/pulse-closing.test.js` ("1 day 23 hours is 2 days"); it fails with the old rule (checked by putting the old line back, because the file wasn't committed yet so `git stash` couldn't swap it).
+- **Lesson:** for "time left", think about what a person expects to read; round to the nearest unit, and look at a real example.
+
+Also in session 56 (not a bug in the app): the first browser-test check for the counters failed because the counts are cached for a minute and "1 request posted today" doesn't contain "requests posted today". The test now reloads until fresh counts show and matches "posted today".
 

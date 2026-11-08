@@ -1,10 +1,13 @@
 // Creates the admin account (always) and, when run directly with
 // `npm run seed`, some demo users and requests so the app isn't empty.
+import fs from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { openDb } from './db.js';
 import { hashPassword } from './lib/crypto.js';
 import { TERMS_VERSION } from './lib/terms.js';
+import { AVATAR_DIR, CHAT_DIR, COVER_DIR, LISTING_DIR, STORY_DIR, saveFiles } from './lib/uploads.js';
 
 export async function ensureAdmin(db) {
   const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(config.adminEmail);
@@ -17,7 +20,47 @@ export async function ensureAdmin(db) {
   return Number(info.lastInsertRowid);
 }
 
-async function seedDemo(db) {
+// Example photos (session 54): illustrations in server/demo-photos/ (made by
+// scripts/make-demo-photos.mjs), stored exactly like a member's upload:
+// checked, and saved under a new random name.
+const DEMO_PHOTOS = fileURLToPath(new URL('../demo-photos/', import.meta.url));
+const demoPhoto = (dir, name) => saveFiles(dir(), [{ file: { buffer: fs.readFileSync(path.join(DEMO_PHOTOS, name)), fieldname: 'image' } }]).names[0];
+
+function addDemoPhotos(db) {
+  const userId = (email) => db.prepare('SELECT id FROM users WHERE email = ?').get(email).id;
+  // Profile photos and the shop's cover, unless already set.
+  for (const [email, file] of [['buyer@demo.local', 'avatar-sam.jpg'], ['vendor@demo.local', 'avatar-riverside.jpg'], ['freelancer@demo.local', 'avatar-alex.jpg']]) {
+    if (!db.prepare('SELECT avatar FROM users WHERE email = ?').get(email).avatar) {
+      db.prepare('UPDATE users SET avatar = ? WHERE email = ?').run(demoPhoto(AVATAR_DIR, file), email);
+    }
+  }
+  if (!db.prepare('SELECT cover FROM users WHERE email = ?').get('vendor@demo.local').cover) {
+    db.prepare('UPDATE users SET cover = ? WHERE email = ?').run(demoPhoto(COVER_DIR, 'cover-riverside.jpg'), 'vendor@demo.local');
+  }
+  // A photo on each demo request that has none.
+  const buyer = userId('buyer@demo.local');
+  for (const [title, file] of [['Looking for a used PS5%', 'ps5-wanted.jpg'], ['Need a solid oak dining table%', 'oak-table.jpg'],
+    ['Someone to assemble IKEA wardrobe%', 'wardrobe.jpg'], ['Wanted: iPhone 13 charger%', 'charger-case.jpg']]) {
+    const l = db.prepare('SELECT id FROM listings WHERE buyer_id = ? AND title LIKE ?').get(buyer, title);
+    if (l && !db.prepare('SELECT 1 FROM listing_images WHERE listing_id = ?').get(l.id)) {
+      db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(l.id, demoPhoto(LISTING_DIR, file));
+    }
+  }
+  // The two PS5 offers each come with a photo of the item (private to that chat).
+  for (const [email, file] of [['vendor@demo.local', 'offer-ps5-boxed.jpg'], ['freelancer@demo.local', 'offer-ps5-disc.jpg']]) {
+    const m = db.prepare(`
+      SELECT m.id FROM messages m JOIN conversations c ON c.id = m.conversation_id JOIN listings l ON l.id = c.listing_id
+      WHERE l.buyer_id = ? AND l.title LIKE 'Looking for a used PS5%' AND m.sender_id = ? AND m.offer_price IS NOT NULL AND m.image IS NULL
+      ORDER BY m.id LIMIT 1
+    `).get(buyer, userId(email));
+    if (m) db.prepare('UPDATE messages SET image = ? WHERE id = ?').run(demoPhoto(CHAT_DIR, file), m.id);
+  }
+  // And the "found it" story gets its photo.
+  const story = db.prepare('SELECT id FROM stories WHERE author_id = ? AND image IS NULL').get(buyer);
+  if (story) db.prepare('UPDATE stories SET image = ? WHERE id = ?').run(demoPhoto(STORY_DIR, 'story-found-it.jpg'), story.id);
+}
+
+export async function seedDemo(db) {
   const pw = await hashPassword('Password123');
   const mk = (email, name, type, city) => {
     const found = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
@@ -46,6 +89,8 @@ async function seedDemo(db) {
     add.run(buyer, 'Need a solid oak dining table for 6', 'Rectangular, around 180cm. Light scratches are fine.', 'Home & Furniture', 200, 600, 'Juffair', null);
     add.run(buyer, 'Someone to assemble IKEA wardrobe', 'PAX wardrobe, 2 doors. This Saturday if possible.', 'Services', 50, 120, 'Juffair', null);
   }
+  // The wardrobe request is 28 days old, so the demo shows "⏳ Closes in 2 days" (session 56).
+  db.prepare(`UPDATE listings SET created_at = datetime('now', '-28 days') WHERE buyer_id = ? AND title LIKE 'Someone to assemble IKEA wardrobe%' AND renewed_at IS NULL AND created_at > datetime('now', '-27 days')`).run(buyer);
   // Profiles: a few words and interests, so demo profiles aren't empty.
   const profile = db.prepare(`UPDATE users SET bio = COALESCE(bio, ?), interests = CASE WHEN interests = '[]' THEN ? ELSE interests END, onboarded_at = COALESCE(onboarded_at, datetime('now')) WHERE email = ?`);
   profile.run('Always hunting for good second-hand electronics and furniture.', JSON.stringify(['Electronics', 'Home & Furniture']), 'buyer@demo.local');
@@ -88,7 +133,8 @@ async function seedDemo(db) {
         .run(conv, seller, text, price, condition, warranty, returns);
     }
   }
-  console.log('Demo data ready. Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');
+  addDemoPhotos(db);
+  console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

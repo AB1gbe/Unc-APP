@@ -8,6 +8,7 @@ import { useAuth, isVerified } from '../auth.jsx';
 import { budget, ago, toDate } from '../api.js';
 import { t, tj, tn, formatDate } from '../i18n.jsx';
 import { Place } from './CityField.jsx';
+import { closingDays } from '../closing.js';
 
 export function ErrorBox({ error }) {
   if (!error) return null;
@@ -70,6 +71,13 @@ export function Avatar({ name, src, size = 40 }) {
   return <div className="avatar" aria-hidden style={style}>{(name || '?').trim()[0]?.toUpperCase()}</div>;
 }
 
+// "⏳ Closes in 2 days" (session 56): only in a request's last 3 days.
+export function ClosesBadge({ closesAt }) {
+  const days = closingDays(closesAt);
+  if (days === null) return null;
+  return <span className="badge warn">{days === 0 ? t('⏳ Closes today') : tn(days, '⏳ Closes in {n} day', '⏳ Closes in {n} days')}</span>;
+}
+
 // "🔒 Shops only" (session 34): who may make offers, when it isn't everyone.
 export function ContactRule({ rule }) {
   const text = { shops: t('🔒 Shops only'), rated: t('🔒 4★+ sellers only'), favourites: t('🔒 Favourite sellers only') }[rule];
@@ -96,6 +104,7 @@ export function ListingCard({ listing }) {
         <span>📍 <Place city={listing.city} /></span>
         <span>🕒 {ago(listing.createdAt)}</span>
         <ContactRule rule={listing.contactRule} />
+        <ClosesBadge closesAt={listing.closesAt} />
         {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
         {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
       </div>

@@ -11,8 +11,26 @@ const DAYS = 7;          // how far back the feed looks
 const LIMIT = 8;         // items shown
 const BUSY_OFFERS = 2;   // "N offers in Riffa today" from this many
 
+// Live counters (session 56): real numbers only, never made up or rounded
+// up. Shown only when there is something to show.
+export const ACTIVE_MINUTES = 15;
+const PULSE_CACHE_MS = 60_000;
+
 export function feedRoutes(db) {
   const r = Router();
+  const pulseCounts = db.prepare(`
+    SELECT
+      (SELECT COUNT(*) FROM listings WHERE created_at >= datetime('now', '-1 day')) AS requests,
+      (SELECT COUNT(*) FROM conversations WHERE created_at >= datetime('now', '-1 day')) AS offers,
+      (SELECT COUNT(*) FROM users WHERE last_seen_at >= datetime('now', '-${ACTIVE_MINUTES} minutes') AND banned_at IS NULL) AS active
+  `);
+  let pulseCache = null;
+  // GET /api/feed/pulse: requests and offers in the last 24 hours, members
+  // active in the last 15 minutes. Counts only; public. Cached for a minute.
+  r.get('/pulse', (_req, res) => {
+    if (!pulseCache || Date.now() - pulseCache.at > PULSE_CACHE_MS) pulseCache = { at: Date.now(), counts: { ...pulseCounts.get() } };
+    res.json(pulseCache.counts);
+  });
   const found = db.prepare(`
     SELECT 'found' AS kind, d.created_at AS at, l.city, l.category
     FROM deals d JOIN listings l ON l.id = d.listing_id JOIN users b ON b.id = d.buyer_id JOIN users v ON v.id = d.vendor_id

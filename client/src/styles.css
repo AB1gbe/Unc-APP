@@ -518,3 +518,11 @@ p.plan { display: block; }
 .plan-parts li.late { color: var(--bad); }
 .plan-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .5rem; }
 .plan-fields label { display: grid; gap: .2rem; font-size: .85rem; }
+
+/* Live counters (session 56) */
+.live-pulse { display: flex; flex-wrap: wrap; gap: .4rem .9rem; align-items: center; margin-bottom: 1rem; font-size: .85rem; color: var(--muted); }
+.pulse-item { display: inline-flex; align-items: center; gap: .35rem; }
+.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(19, 138, 75, .5); } 70% { box-shadow: 0 0 0 6px rgba(19, 138, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(19, 138, 75, 0); } }
+@media (prefers-reduced-motion: reduce) { .pulse-dot { animation: none; } }
+.stack > .live-pulse { margin-bottom: 0; }

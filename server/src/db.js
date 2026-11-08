@@ -456,6 +456,12 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_parts_due ON installment_parts(due_on);
   `,
+  // 34: live counters (session 56): "requests posted today" and "members
+  // active now" look up recent rows by time.
+  `
+  CREATE INDEX idx_listings_created ON listings(created_at);
+  CREATE INDEX idx_users_last_seen ON users(last_seen_at);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
