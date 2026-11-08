@@ -6,7 +6,7 @@ date: 2026-11-08
 
 **Asked (session 55):** "Study the application called Siin, all the details, what it looks like, their unique offering and position, and then tell me mine."
 
-**Method and limits:** web searches only. The App Store page and news articles couldn't be opened from this session (network block), so **the look of the app is not yet described from real screens**. The owner offered screenshots; the list of screens to send is at the end. Facts below come from search summaries of the sources listed; treat company claims as claims.
+**Method and limits:** web searches (the App Store page and news articles couldn't be opened from this session: network block), then **5 screenshots of the app sent by the owner** (section 6). Company figures are their own claims.
 
 ## 1. What Siin is
 | | Siin |
@@ -63,17 +63,66 @@ The buyer is in charge, the search is done by the sellers, and every contact is 
 4. **Use Unc's demand data as the pitch to shops:** "Siin gives you an audience; Unc gives you buyers who already asked."
 5. **Possible partnership instead of fight:** Siin sellers answering Unc requests, or "can't find it on a stream? Ask on Unc".
 
-## 6. To finish the "what it looks like" part, send these screenshots
-1. The first screen after opening (home / feed of live streams).
-2. A live stream in progress (bidding, chat, buttons).
-3. An item or product page (price, seller, delivery).
-4. A seller's profile/shop.
-5. The checkout or payment screen.
-6. The sell / "go live" screen for sellers.
-7. Search or categories.
-8. Sign-up / verification screens.
-9. Any page with fees or seller terms.
-Put them in `docs/attachments/` as `siin-01-home.png`, `siin-02-live.png` … (or send them in the chat), and the study will be finished with a screen-by-screen comparison.
+## 6. What Siin looks like (owner's screenshots, 2026-11-08)
+| Lives (home) | Marketplace | Sell | Orders | Account |
+|---|---|---|---|---|
+| ![[siin-01-lives.webp]] | ![[siin-02-marketplace.webp]] | ![[siin-03-sell.webp]] | ![[siin-04-orders.webp]] | ![[siin-05-account.webp]] |
+
+**Overall look:** dark theme (near-black), **purple** accent, bold white text, red "Live" badges. It feels like a gaming or streaming app (Twitch-like), not a shop. Two-column picture grids everywhere. Bottom tabs: **Lives · Marketplace · Sell (+) · Orders · Account**.
+
+**1. Lives (the home screen)**
+- Top: "Search Siin", a purple 🎁 **Drops** button (rewards), chat, notifications, cart.
+- Category tiles with **live counters**: "All, 7 Lives Now", "TCG, 6 Lives Now", "Currencies & Stamps, 1 Live Now", "Gaming".
+- A grid of live shows: seller **@handle + country flag** (mostly 🇸🇦 Saudi, 🇦🇪 UAE), a big thumbnail with a red **Live** badge, extras like "🔥 On fire" and "🎁 Cashback giveaways", a show title ("30th Anniversary Celebration 🎉", "Daily Show: Rayquaza Hunt") and its category.
+- Content seen: **Pokémon and One Piece trading cards (TCG), coins and stamps** (an Arabic coin-auction shop "متجر مزاد الباسل للعملات").
+
+**2. Marketplace (listings, when not live)**
+- Tabs: **For You, Gaming, Comics, Tickets, TCG, Currencies**. Filters: Type, Sort, **Auction 🔥**, **Ending soon**.
+- Cards: seller @handle + flag, photo, ♡ save, a Drops badge on some, an orange **countdown** ("24:31") for auctions, title (Arabic or English), price **in the viewer's currency (BHD)**, "No bids".
+- Items seen: a children's magazine issue, a One Piece promo card, PS5/PS4 games (Elden Ring, Sleeping Dogs).
+- Header: favourites, recently viewed, cart.
+
+**3. Sell**
+- A bottom sheet "Start Selling on Siin": *Easy to Start (no selling experience needed) · Go Live or Sell on Marketplace (live shows or a shop) · Start Earning (convert your inventory into income)* → **Get Started**.
+
+**4. Orders**
+- In Progress / Completed. Siin handles the order end to end (payment, then delivery).
+
+**5. Account**
+- An auto-made username ("ancient_box180"), no real name. **Get Help → WhatsApp**.
+- A banner for an event partnership: **TCG Con Arabia**, Riyadh, 4–5 Dec 2026 (tickets).
+- Tiles: **My Wallet** (balance BHD 0), **Offers** ("manage & track your offers": buyers can offer below a seller's price), **Drops** ("3 Drops available"), **My Bids** (outbids / winning).
+- **Refer a Friend**, Category preferences, **Following** (sellers), **My Clips** (short videos from shows).
+
+## 7. What the screens change in the picture
+- **Siin is a collectors' community**, not a general marketplace: trading cards, coins and stamps, video games, comics, event tickets. Its users are hobbyists who come back daily for shows ("Daily Show"), drops and bids. **Even less overlap with Unc** than the news suggested.
+- **Identity is light on the surface:** handles and flags, no real names or "verified" badges visible on cards. Unc shows real (or first) names, ✓ Verified, ratings and badges everywhere.
+- **Siin's "Offers" go the other way from Unc's:** a buyer offers a lower price on a seller's item. On Unc, sellers make offers on a buyer's need.
+- **Money stays inside:** wallet, cart, orders, cashback. Unc has none of that yet (Tap is planned).
+- **Support is on WhatsApp**, outside the app; Unc has in-app reports and "Something went wrong".
+- **Habits:** live counters, countdowns, drops, cashback, referrals, following, clips. These are all ways to bring people back every day.
+
+## 8. Unc vs Siin, the look
+| | Siin | Unc |
+|---|---|---|
+| Feel | Dark, purple, loud, game/stream-like | Light (dark mode follows the phone), blue, calm, clean |
+| Home | Live shows to watch | Your requests, requests you can help with, what's happening near you |
+| Centre tab | **Sell** (+) | **Post a request** (+) |
+| Cards | Thumbnail + @handle + flag + price/countdown | Photo + category + budget + area + offers count |
+| People | Handles | Names (or "Sam B."), ✓ Verified, ★ ratings, badges |
+| Languages | English UI with Arabic content | Full English **and Arabic (right-to-left)** |
+
+**Where Unc's position is sharper after seeing Siin:**
+> Siin is where **collectors** go to **watch and win**. Unc is where **anyone** goes to **ask and get** what they need: everyday items, parts, furniture, services, from verified people in Bahrain.
+
+## 9. Ideas worth borrowing (fit Unc's rules)
+1. **Live counters on Home and Browse:** "12 sellers active now · 5 requests posted today" (real numbers only).
+2. **Countdown on requests** that close soon ("closes in 2 days"): Unc already has expiry ([[ADR-037 Expiry and tips]]); show it on cards.
+3. **Refer a friend**, with a small reward once Unc earns money.
+4. **A wallet and orders** once Tap is connected (paying in parts, protection).
+5. **Short video with an offer** (like Siin's clips), private to the request's chat.
+6. **Get Help** button, but in-app (Unc already has reports and deal help).
+7. Don't copy: public live chat between strangers, or handles instead of verified names. Both go against Unc's trust promise.
 
 ## Sources (searched 2026-11-08)
 - [Siin on the App Store](https://apps.apple.com/app/id6451072889) · [Google Play](https://play.google.com/store/apps/details?id=com.siinshop.app&hl=en) · [mwm.ai app profile](https://mwm.ai/apps/siin-syn/6451072889)
