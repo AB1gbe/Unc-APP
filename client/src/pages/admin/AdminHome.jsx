@@ -100,6 +100,7 @@ function ReportRow({ report: r, onDone }) {
             <p key={m.id} className="small">
               <b>{m.sender_id === thread.conversation.buyer_id ? t('Buyer:') : t('Vendor:')}</b> <bdi>{m.body}</bdi>
               {m.imageUrl && <> <a href={m.imageUrl} target="_blank" rel="noreferrer">{t('📷 Photo')}</a></>}
+              {m.videoUrl && <> <a href={m.videoUrl} target="_blank" rel="noreferrer">{t('🎬 Video')}</a></>}
               {m.offer_price !== null && ` [${t('offer {price}', { price: m.offer_price })}]`}
             </p>
           ))}

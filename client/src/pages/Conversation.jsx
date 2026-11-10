@@ -18,6 +18,7 @@ import { hasContacts } from '../../../shared/contact-mask.js';
 import ContactNudge from '../components/ContactNudge.jsx';
 import PickupCard from '../components/PickupCard.jsx';
 import PlanCard from '../components/PlanCard.jsx';
+import { VideoPreview, pickVideo } from '../components/VideoPicker.jsx';
 import { EMPTY_DETAILS, OfferDetailFields, OfferDetailsLine, addDetails } from '../components/OfferDetails.jsx';
 
 export default function Conversation() {
@@ -31,6 +32,7 @@ export default function Conversation() {
   const [sending, setSending] = useState(false);
   const [photo, setPhoto] = useState(null);        // photo to send (already shrunk)
   const [proof, setProof] = useState(false);       // that photo shows the chat's code
+  const [video, setVideo] = useState(null);        // short video to send (session 58)
   const [details, setDetails] = useState(EMPTY_DETAILS); // condition, warranty… with a price
   const [viewing, setViewing] = useState(null);    // photo URL open full-screen
   const lastId = useRef(0);
@@ -91,7 +93,7 @@ export default function Conversation() {
     e.preventDefault();
     // Enter can be pressed again (or held down) while a send is in progress;
     // the button is disabled but the keyboard shortcut isn't.
-    if ((!text.trim() && !photo) || sending) return;
+    if ((!text.trim() && !photo && !video) || sending) return;
     setSending(true);
     setError(null);
     try {
@@ -100,10 +102,12 @@ export default function Conversation() {
       if (offer !== '') { fd.append('offerPrice', offer); if (conv.myRole === 'vendor') addDetails(fd, details); }
       if (photo) fd.append('image', photo);
       if (photo && proof) fd.append('proof', '1');
+      if (video) fd.append('video', video);
       await api(`/conversations/${id}/messages`, { method: 'POST', form: fd });
       setText('');
       setOffer('');
       setPhoto(null);
+      setVideo(null);
       setProof(false);
       setDetails(EMPTY_DETAILS);
       await load();
@@ -163,6 +167,7 @@ export default function Conversation() {
                   <img src={m.imageUrl} alt="" loading="lazy" />
                 </button>
               )}
+              {m.videoUrl && <video className="bubble-video" src={m.videoUrl} controls playsInline preload="metadata" />}
               {m.proof && (
                 <div className="proof-badge">
                   {t('✓ Proof photo · {code}', { code: conv.proofCode })}
@@ -189,6 +194,7 @@ export default function Conversation() {
         ) : (
           <>
           {photo && <PhotoPreview file={photo} onRemove={() => { setPhoto(null); setProof(false); }} />}
+          {video && <VideoPreview file={video} onRemove={() => setVideo(null)} />}
           {offer !== '' && conv.myRole === 'vendor' && (
             <div style={{ padding: '0 1rem' }}><OfferDetailFields value={details} onChange={setDetails} idPrefix="chat" /></div>
           )}
@@ -208,13 +214,23 @@ export default function Conversation() {
               <input type="file" accept="image/jpeg,image/png,image/webp" hidden
                 onChange={async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(await shrinkImage(f)); }} />
             </label>
+            <label className="attach" title={t('Add a short video')} aria-label={t('Add a short video')}>
+              🎬
+              <input type="file" accept="video/mp4,video/quicktime,video/webm" hidden data-testid="chat-video"
+                onChange={async (e) => {
+                  const f = e.target.files[0]; e.target.value = '';
+                  if (!f) return;
+                  const picked = await pickVideo(f);
+                  if (picked.error) setError(new Error(picked.error)); else { setError(null); setVideo(picked.file); }
+                }} />
+            </label>
             <textarea ref={textRef} placeholder={t('Message about “{title}”…', { title: l.title })} value={text} maxLength={2000}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) send(e); }} />
             {conv.myRole === 'vendor' && (
               <input type="number" min="0" placeholder={t('Price')} value={offer} onChange={(e) => setOffer(e.target.value)} aria-label={t('Offer price')} />
             )}
-            <button className="btn" disabled={sending || (!text.trim() && !photo)}>{t('Send')}</button>
+            <button className="btn" disabled={sending || (!text.trim() && !photo && !video)}>{t('Send')}</button>
           </form>
           </>
         )}

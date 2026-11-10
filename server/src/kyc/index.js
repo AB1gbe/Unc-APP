@@ -2,6 +2,7 @@ import { config } from '../config.js';
 import { audit, tx } from '../db.js';
 import { manualProvider } from './providers/manual.js';
 import { notify } from '../lib/notify.js';
+import { rewardReferral } from '../lib/referrals.js';
 
 const PROVIDERS = { manual: manualProvider };
 
@@ -28,6 +29,7 @@ export function applyDecision(db, submissionId, decision, note, reviewerId = nul
     if (latest === submissionId) {
       db.prepare('UPDATE users SET kyc_status = ? WHERE id = ?').run(decision, sub.user_id);
       notify(db, sub.user_id, decision === 'approved' ? 'kyc_approved' : 'kyc_rejected');
+      if (decision === 'approved') rewardReferral(db, sub.user_id); // refer a friend (session 58)
     }
     audit(db, reviewerId, `kyc.${decision}`, `kyc_submission:${submissionId}`, { userId: sub.user_id, note });
     return sub;

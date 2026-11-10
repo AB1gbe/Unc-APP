@@ -526,3 +526,26 @@ p.plan { display: block; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(19, 138, 75, .5); } 70% { box-shadow: 0 0 0 6px rgba(19, 138, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(19, 138, 75, 0); } }
 @media (prefers-reduced-motion: reduce) { .pulse-dot { animation: none; } }
 .stack > .live-pulse { margin-bottom: 0; }
+
+/* Orders and wallet (session 58) */
+.tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+.tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: .6rem .9rem; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; }
+.tab.on { color: var(--brand); border-bottom-color: var(--brand); }
+.order-photo { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+.order-row .badge { margin-top: .3rem; }
+.wallet-amount { font-size: 2rem; font-weight: 800; margin: .2rem 0 .4rem; }
+.wallet-entry { padding: .75rem 1rem; border-top: 1px solid var(--border); }
+.wallet-entry:first-child { border-top: 0; }
+.wallet-entry .plus { color: var(--ok); }
+.wallet-entry .minus { color: var(--bad); }
+
+/* Refer a friend (session 58) */
+.invite-link { flex-wrap: nowrap; gap: .5rem; margin: .3rem 0 1rem; }
+.invite-link input { flex: 1; min-width: 0; }
+.invite-stats { margin-bottom: 1rem; }
+@media (max-width: 480px) { .invite-link { flex-wrap: wrap; } .invite-link input { flex-basis: 100%; } }
+.invite-stats .stat-value { font-size: 1.3rem; white-space: nowrap; }
+
+/* Short videos in chats (session 58) */
+.bubble-video { display: block; width: 100%; max-width: 320px; max-height: 360px; border-radius: 10px; background: #000; margin-bottom: .3rem; }
+.video-preview video { height: 64px; width: 96px; object-fit: cover; border-radius: 8px; background: #000; display: block; }

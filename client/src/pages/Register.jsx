@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox } from '../components/ui.jsx';
@@ -9,6 +9,8 @@ import CityField from '../components/CityField.jsx';
 export default function Register() {
   const { setUser } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const ref = params.get('ref') || undefined; // invited by a friend (session 58)
   const [form, setForm] = useState({ displayName: '', email: '', password: '', accountType: 'individual', city: '', acceptTerms: false });
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -19,7 +21,7 @@ export default function Register() {
     setBusy(true);
     setError(null);
     try {
-      const { user, devCode, emailSent } = await api('/auth/register', { method: 'POST', body: form });
+      const { user, devCode, emailSent } = await api('/auth/register', { method: 'POST', body: { ...form, ref } });
       setUser(user);
       navigate('/verify-email', { state: { devCode, emailFailed: emailSent === false } });
     } catch (err) {
@@ -33,6 +35,7 @@ export default function Register() {
     <div className="narrow card">
       <h1>{t('Create your account')}</h1>
       <p className="muted">{t("Post what you're looking for, or find buyers for what you sell.")}</p>
+      {ref && <p className="alert info">{t('🎁 A friend invited you. Once you are verified, you both get Unc credit.')}</p>}
       <ErrorBox error={error} />
       <form onSubmit={submit}>
         <div className="field">

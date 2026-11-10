@@ -34,7 +34,9 @@ export function errorHandler(err, req, res, next) {
 function handleError(err, req, res, _next) {
   // Upload problems (multer) are the user's mistake, not a server error.
   if (UPLOAD_ERRORS[err?.code]) {
-    const [status, message] = UPLOAD_ERRORS[err.code];
+    const [status, message] = err.code === 'LIMIT_FILE_SIZE' && err.field === 'video'
+      ? [413, 'The video is too large (max 25 MB).'] // videos have their own limit (session 58)
+      : UPLOAD_ERRORS[err.code];
     return res.status(status).json({ error: message });
   }
   if (err instanceof HttpError) {

@@ -5,7 +5,8 @@
 // The text is written by the app (client/src/pages/Notifications.jsx) from
 // `kind`, so it shows in the reader's language.
 export const KINDS = ['offer', 'deal', 'rating', 'kyc_approved', 'kyc_rejected', 'favourite-request', 'alert-match', 'expiring', 'expired', 'found-elsewhere', 'request-closed', 'report-action', 'report-no-action', 'budget-raised', 'did-you-get-it',
-  'plan-proposed', 'plan-accepted', 'plan-declined', 'part-paid', 'part-confirmed', 'part-due', 'part-late'];
+  'plan-proposed', 'plan-accepted', 'plan-declined', 'part-paid', 'part-confirmed', 'part-due', 'part-late',
+  'referral-reward'];
 
 export function notify(db, userId, kind, { actorId = null, listingId = null, conversationId = null } = {}) {
   if (!KINDS.includes(kind)) throw new Error(`unknown notification kind: ${kind}`);

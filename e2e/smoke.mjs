@@ -220,6 +220,19 @@ await shot(vendor, '30-favourite-notification');
 await vendor.goto(vendorChat); // back to the chat for the seller's rating
 const buyerChat = buyer.url();
 await buyer.goto(BASE + '/saved'); await buyer.waitForSelector('.inbox-item:has-text("Riverside Electronics")');
+// Refer a friend (session 58): the invite link and the friend's sign-up note.
+await buyer.goto(BASE + '/invite');
+await buyer.waitForSelector('#inviteLink');
+const inviteLink = await buyer.inputValue('#inviteLink');
+if (!/\/register\?ref=[A-Z2-9]{8}$/.test(inviteLink)) throw new Error(`bad invite link ${inviteLink}`);
+await shot(buyer, '52-invite');
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const friend = await ctx.newPage();
+  await friend.goto(BASE + '/register?ref=' + inviteLink.split('ref=')[1]);
+  await friend.waitForSelector('.alert.info:has-text("A friend invited you")');
+  await ctx.close();
+}
 await buyer.goto(buyerChat); // back to the chat for the next steps
 
 await vendor.reload();
@@ -258,6 +271,13 @@ await vendor.reload();
 await vendor.locator('.plan-parts button:has-text("Received ✓")').first().click();
 await vendor.waitForSelector('.plan-parts li.done');
 await vendor.locator('.plan').screenshot({ path: `${OUT}/45-plan.png` });
+// Orders (session 58): the PS5 deal is listed, with its payment plan.
+await buyer.goto(BASE + '/orders');
+await buyer.waitForSelector('.order-row:has-text("PS5")');
+await shot(buyer, '51-orders');
+await buyer.goto(BASE + '/wallet');
+await buyer.waitForSelector('.wallet-amount');
+await buyer.goto(buyerChat); // back to the chat for the next steps
 
 await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('text=Exactly as described');
@@ -335,6 +355,17 @@ await vendor.click('.chat-form button:has-text("Send")');
 await vendor.waitForSelector('.proof-badge');
 await buyer.waitForSelector('.proof-badge:has-text("Check that the paper")', { timeout: 15000 });
 await shot(buyer, '35-proof-photo');
+
+// Short video (session 58): the shop sends a clip; the buyer sees a player.
+await vendor.goto(`${BASE}/messages/${scamConv}`);
+await vendor.setInputFiles('[data-testid=chat-video]', { name: 'clip.mp4', mimeType: 'video/mp4',
+  buffer: Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypisom'), Buffer.alloc(256)]) });
+await vendor.waitForSelector('.video-preview video');
+await vendor.click('.chat-form button:has-text("Send")');
+await vendor.waitForSelector('.bubble video.bubble-video');
+await buyer.goto(`${BASE}/messages/${scamConv}`);
+await buyer.waitForSelector('.bubble video.bubble-video');
+await shot(buyer, '53-chat-video');
 
 // Keeping deals on Unc (session 40): a number typed before a price is agreed
 // shows a nudge, and the other side sees 📵.

@@ -462,6 +462,32 @@ const MIGRATIONS = [
   CREATE INDEX idx_listings_created ON listings(created_at);
   CREATE INDEX idx_users_last_seen ON users(last_seen_at);
   `,
+  // 35: the wallet (session 58): Unc credit, one row per change (amount in
+  // fils/cents, + or -). Not real money yet: it can't be withdrawn. The
+  // UNIQUE rule stops the same reward being given twice.
+  `
+  CREATE TABLE wallet_entries (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    amount     INTEGER NOT NULL,
+    reason     TEXT NOT NULL,
+    ref        TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (user_id, reason, ref)
+  );
+  `,
+  // 36: refer a friend (session 58): each member's invite code (made the
+  // first time they open the invite page) and who invited them.
+  `
+  ALTER TABLE users ADD COLUMN referral_code TEXT;
+  ALTER TABLE users ADD COLUMN referred_by INTEGER REFERENCES users(id) ON DELETE SET NULL;
+  CREATE UNIQUE INDEX idx_users_referral_code ON users(referral_code);
+  CREATE INDEX idx_users_referred_by ON users(referred_by);
+  `,
+  // 37: short videos in chats (session 58), private like chat photos.
+  `
+  ALTER TABLE messages ADD COLUMN video TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

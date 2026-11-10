@@ -19,6 +19,7 @@ import { normalizeCity } from '../../../shared/areas.js';
 import { DELETE_AFTER_DAYS, exportData } from '../lib/deletion.js';
 import { MAX_AWAY_DAYS, setAway } from '../lib/activity.js';
 import { TERMS_VERSION } from '../lib/terms.js';
+import { inviterByCode } from '../lib/referrals.js';
 
 const sqlTime = (d) => d.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -90,6 +91,8 @@ export function authRoutes(db) {
     const language = langOf(req);
     // Agreeing to the Terms is part of signing up (session 40).
     if (req.body?.acceptTerms !== true) throw new HttpError(400, 'Please read and accept the Terms to create an account.', { field: 'acceptTerms' });
+    // Invited by a friend (session 58)? An unknown code is simply ignored.
+    const invitedBy = inviterByCode(db, typeof req.body?.ref === 'string' ? req.body.ref.slice(0, 20) : null);
 
     if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
       throw new HttpError(409, 'An account with this email already exists.', { field: 'email' });
@@ -98,9 +101,9 @@ export function authRoutes(db) {
     let info;
     try {
       info = db.prepare(`
-        INSERT INTO users (email, password_hash, display_name, account_type, city, language, terms_version, terms_accepted_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
-      `).run(email, hash, displayName, accountType, city, language, TERMS_VERSION);
+        INSERT INTO users (email, password_hash, display_name, account_type, city, language, terms_version, terms_accepted_at, referred_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), ?)
+      `).run(email, hash, displayName, accountType, city, language, TERMS_VERSION, invitedBy);
     } catch (err) {
       // Two sign-ups with the same email at the same moment: the check above
       // passed for both, the database's UNIQUE rule stops the second.

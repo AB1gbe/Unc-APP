@@ -32,11 +32,37 @@ export function sniff(buffer) {
 }
 
 // Keep files in memory first so we can inspect the bytes before saving.
-export function memoryUpload(maxFiles) {
+export function memoryUpload(maxFiles, maxBytes = config.maxUploadBytes) {
   return multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: config.maxUploadBytes, files: maxFiles },
+    limits: { fileSize: maxBytes, files: maxFiles },
   });
+}
+
+// Short videos in chats (session 58): MP4, MOV (iPhone) or WebM, checked by
+// their first bytes like photos, up to VIDEO_MAX_BYTES. Saved in the private
+// chat folder; served only to that chat's two members.
+export const VIDEO_MAX_BYTES = 25 * 1024 * 1024;
+// MP4 and MOV start with "ftyp" + a "brand". Only video brands count: the
+// same family also holds HEIC photos ("heic") and M4A audio ("M4A "),
+// which must not pass as videos (session 58, M110).
+const VIDEO_BRANDS = new Set(['isom', 'iso2', 'iso3', 'iso4', 'iso5', 'iso6', 'mp41', 'mp42', 'avc1', 'M4V ', 'mmp4', '3gp4', '3gp5', '3gp6', '3g2a', 'qt  ']);
+export function sniffVideo(buffer) {
+  if (buffer.length >= 12 && buffer.toString('ascii', 4, 8) === 'ftyp') {
+    const brand = buffer.toString('ascii', 8, 12);
+    if (!VIDEO_BRANDS.has(brand)) return null;
+    return brand === 'qt  ' ? { ext: '.mov', mime: 'video/quicktime' } : { ext: '.mp4', mime: 'video/mp4' };
+  }
+  if ([0x1a, 0x45, 0xdf, 0xa3].every((b, i) => buffer[i] === b)) return { ext: '.webm', mime: 'video/webm' };
+  return null;
+}
+export function saveVideo(dir, file) {
+  const kind = sniffVideo(file.buffer);
+  if (!kind) throw new HttpError(400, 'The video must be an MP4, MOV or WebM file.', { field: 'video' });
+  fs.mkdirSync(dir, { recursive: true });
+  const name = randomToken(18) + kind.ext;
+  fs.writeFileSync(path.join(dir, name), file.buffer);
+  return { name, discard: () => fs.rmSync(path.join(dir, name), { force: true }) };
 }
 
 // Checks EVERY file first and only then writes them, so a bad second file

@@ -39,6 +39,13 @@ export function money(n, currency = 'USD') {
   return new Intl.NumberFormat(locale(), { style: 'currency', currency, currencyDisplay: display, maximumFractionDigits: 0 }).format(n);
 }
 
+// Exact amounts with the currency's own decimals (BD 1.500), for wallet credit (session 58).
+export function moneyExact(n, currency = 'USD') {
+  if (n === null || n === undefined) return null;
+  const display = getLang() === 'ar' ? 'code' : 'symbol';
+  return new Intl.NumberFormat(locale(), { style: 'currency', currency, currencyDisplay: display }).format(n);
+}
+
 export function budget(l) {
   const min = money(l.budgetMin, l.currency);
   const max = money(l.budgetMax, l.currency);

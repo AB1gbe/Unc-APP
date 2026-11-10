@@ -16,10 +16,10 @@ Unc-APP/
 ├── scripts/git-helper.mjs  The pull/push logic (session 10)
 ├── scripts/live-sync.mjs  `npm run live` / `npm run sync`: auto-pull pushed changes (session 09)
 ├── e2e/arabic.mjs        `npm run e2e:ar`: Arabic journey + RTL/overflow/English-leak checks (session 12); skips member text in <bdi> / dir="auto" (session 20)
-├── e2e/devices.mjs       `npm run e2e:devices`: 5 screen sizes × English/Arabic — no sideways scroll, touch targets ≥ 40 px (session 13); also checks /terms (session 40)
+├── e2e/devices.mjs       `npm run e2e:devices`: 5 screen sizes × English/Arabic — no sideways scroll, touch targets ≥ 40 px (session 13); also checks /terms (session 40) and /orders, /wallet, /invite (session 58)
 ├── scripts/make-icons.mjs  Draws the app icons into client/public/icons/ (`node scripts/make-icons.mjs`, session 13)
 ├── scripts/make-demo-photos.mjs  Draws the example photos into server/demo-photos/ (`node scripts/make-demo-photos.mjs`, session 54)
-├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored); session 40: ticks the Terms box, adds a card (a declined one first), checks a number shows as 📵
+├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored); session 40: ticks the Terms box, adds a card (a declined one first), checks a number shows as 📵; session 58: invite link + the friend's sign-up note, orders, wallet, a seller's chat video
 ├── shared/                 Plain JS used by BOTH server and client (session 31)
 │   ├── package.json        `{type: module}` only — not a workspace, nothing to install
 │   ├── areas.js            Bahrain governorates + areas (English/Arabic/other spellings): normalizeCity(),
@@ -32,27 +32,28 @@ Unc-APP/
 │   ├── data/               (created at runtime, git-ignored) database + uploads/
 │   │                         uploads/listings (public), uploads/avatars (public, session 13),
 │   │                         uploads/stories (public, session 20), uploads/covers (public shop covers, session 24),
-│   │                         uploads/kyc (PRIVATE), uploads/chat (PRIVATE, session 13)
+│   │                         uploads/kyc (PRIVATE), uploads/chat (PRIVATE, session 13; chat videos too, session 58)
 │   ├── src/
 │   │   ├── index.js        Starts the server (opens DB, ensures admin, listen); hourly cleanupExpired() + runExpiry() (session 31) + runDeletions() (session 37) + askDidYouGetIt() and runInstallmentReminders() (session 40)
 │   │   ├── app.js          Builds the Express app: security headers, routes, static files, pages with link previews (session 20)
 │   │   ├── config.js       All settings from environment variables (paymentProvider = PAYMENT_PROVIDER, `test` or `tap`, session 40)
-│   │   ├── db.js           SQLite connection, MIGRATIONS list (33 since session 40), tx() and audit() helpers
+│   │   ├── db.js           SQLite connection, MIGRATIONS list (37 since session 58), tx() and audit() helpers
 │   │   ├── seed.js         ensureAdmin() + demo data (npm run seed); demo members have agreed to the Terms and have a test card (session 40); addDemoPhotos() attaches the example photos (session 54)
 │   │   ├── mail-test.js    Sends one test email (npm run mail:test -- you@example.com)
 │   │   ├── lib/
 │   │   │   ├── crypto.js       scrypt passwords, tokens, sha256, peppered HMAC, 6-digit codes
-│   │   │   ├── http.js         HttpError + JSON error handler
+│   │   │   ├── http.js         HttpError + JSON error handler (a video over the limit → "The video is too large (max 25 MB).", session 58)
 │   │   │   ├── validate.js     Input validators (str, int, email, isoDate, password, ageOn…)
 │   │   │   ├── uploads.js      Multer in-memory uploads, magic-byte sniffing, saveFiles() (all-or-nothing),
-│   │   │   │                     KYC_DIR / LISTING_DIR / AVATAR_DIR / CHAT_DIR / STORY_DIR, avatarUrl()
+│   │   │   │                     KYC_DIR / LISTING_DIR / AVATAR_DIR / CHAT_DIR / STORY_DIR, avatarUrl();
+│   │   │   │                     memoryUpload(maxFiles, maxBytes), VIDEO_MAX_BYTES (25 MB), sniffVideo(), saveVideo() (session 58)
 │   │   │   ├── mailer.js       sendMail()/trySendMail(): console | memory | smtp (nodemailer) | resend
 │   │   │   ├── emails.js       Text + HTML of every email, English + Arabic (session 12)
 │   │   │   ├── i18n.js         Server messages in Arabic, readable field names (session 12)
 │   │   │   ├── categories.js   CATEGORIES + CURRENCIES lists
 │   │   │   ├── ratings.js      Rating rules: windows, blind visibility, summaries (session 09)
 │   │   │   ├── notify.js       notify(): writes a 🔔 notification (offer, deal, rating, kyc_*, favourite-request, alert-match, expiring, expired, found-elsewhere, request-closed, report-action, report-no-action, budget-raised,
-│   │   │   │                     did-you-get-it, plan-proposed, plan-accepted, plan-declined, part-paid, part-confirmed, part-due, part-late) (session 13, kinds added in 28, 31, 34, 37 and 40);
+│   │   │   │                     did-you-get-it, plan-proposed, plan-accepted, plan-declined, part-paid, part-confirmed, part-due, part-late, referral-reward) (session 13, kinds added in 28, 31, 34, 37, 40 and 58);
 │   │   │   │                     thankOtherSellers(): thank-you to the sellers not picked when a request closes (session 34);
 │   │   │   │                     askDidYouGetIt() (hourly): "Did you get it?" to the buyer 3 days after a price was accepted, GOT_IT_DAYS (session 40)
 │   │   │   ├── contact-guard.js hasContactDetails(): no phones/links/emails/@handles in public text (session 24)
@@ -70,17 +71,20 @@ Unc-APP/
 │   │   │   ├── terms.js        TERMS_VERSION (raise it when the Terms change) + termsAccepted() (session 40)
 │   │   │   ├── payments.js     Payment cards: paymentProvider() → verifyCard(token); providers `test` (showcase, card ending 0002 is declined) and `tap` (not connected yet) (session 40)
 │   │   │   ├── installments.js Paying in parts: splitAmount(), dueDates(), planView(), runInstallmentReminders() (hourly), MIN_PARTS 2 / MAX_PARTS 6, EVERY, LATE_DAYS 3 (session 40)
+│   │   │   ├── wallet.js       Unc credit: CREDIT_CURRENCY 'BHD', balanceOf(), addCredit() (once per reason + ref) (session 58)
+│   │   │   ├── referrals.js    Refer a friend: REFERRAL_REWARD 1000, WELCOME_CREDIT 500 (fils), referralCodeOf(), inviterByCode(), rewardReferral() (session 58)
 │   │   │   └── previews.js     Open Graph link-preview tags written into index.html (session 20)
 │   │   ├── middleware/auth.js  loadUser (also updates last_seen_at, at most once a minute — session 20), requireAuth, requireVerified (also needs a card + the current Terms, session 40), requireAdmin, publicMe (termsAccepted, hasCard — session 40)
 │   │   ├── kyc/
-│   │   │   ├── index.js        getProvider(), applyDecision()
+│   │   │   ├── index.js        getProvider(), applyDecision() (on approval also calls rewardReferral(), session 58)
 │   │   │   └── providers/      manual.js (+ README on adding Stripe/Persona…)
 │   │   └── routes/
-│   │       ├── auth.js          /api/auth/* (incl. forgot/reset/change password, profile, avatar, onboarded; me/export, me/delete, away mode — session 37; acceptTerms on register + POST /api/auth/terms — session 40)
+│   │       ├── auth.js          /api/auth/* (incl. forgot/reset/change password, profile, avatar, onboarded; me/export, me/delete, away mode — session 37; acceptTerms on register + POST /api/auth/terms — session 40; invite code `ref` on register — session 58)
 │   │       ├── kyc.js           /api/kyc (submit + status), sendKycFile(); refuses IDs in banned_id_hashes (session 37)
 │   │       ├── listings.js      /api/listings/* (incl. for-you, saved, photos, renew — session 31; raise the budget — session 37)
 │   │       ├── conversations.js /api/listings/:id/contact, /api/conversations/* (incl. private chat photos, accept/decline a price, compare offers — session 31;
-│   │       │                      proof photos + proofCode, offer details — session 34; contact details hidden as 📵 until a price is agreed, `agreed` — session 40), /api/reports
+│   │       │                      proof photos + proofCode, offer details — session 34; contact details hidden as 📵 until a price is agreed, `agreed` — session 40;
+│   │       │                      short videos + /api/conversations/:id/videos/:file, lastVideo, hasVideo — session 58), /api/reports
 │   │       ├── ratings.js       /api/deals/:id/rating, /api/members/:id (session 09), /api/deals/:id/problem "Something went wrong" (session 34)
 │   │       ├── notifications.js /api/notifications/* (session 13)
 │   │       ├── push.js          /api/push/* turn phone notifications on/off, test (session 15)
@@ -90,9 +94,10 @@ Unc-APP/
 │   │       ├── alerts.js        /api/alerts, alertMatches(), tellAlerts() (session 31)
 │   │       ├── demand.js        /api/demand: "What people are asking for", topWords() (session 34)
 │   │       ├── blocks.js        /api/members/:id/block, /api/blocks (session 31)
-│   │       ├── payments.js      /api/payments/card: see or add the payment card, cardView() (session 40)
+│   │       ├── payments.js      /api/payments/card: see or add the payment card, cardView() (session 40); calls rewardReferral() after a card is saved (session 58)
 │   │       ├── installments.js  /api/conversations/:id/plan, /api/plans/:id/respond|cancel|parts/:n/paid|parts/:n/confirm — paying in parts (session 40)
-│   │       └── admin.js         /api/admin/* (metrics for the owner dashboard, report outcome — session 37)
+│   │       ├── wallet.js        /api/wallet, /api/referrals, /api/orders (session 58)
+│   │       └── admin.js         /api/admin/* (metrics for the owner dashboard, report outcome — session 37; videos in a reported chat — session 58)
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage; verified users also accept the Terms and add a test card — session 40)
 │       ├── kyc.test.js
@@ -140,7 +145,10 @@ Unc-APP/
 │       ├── payment-card.test.js    payment card: test tokens, declined/expired cards, card needed to post (client/src/cards.js) (session 40)
 │       ├── installments.test.js    paying in parts: split, dates, propose/accept/paid/confirm, reminders (session 40)
 │       ├── demo-photos.test.js     the demo data's example photos: counts, no duplicates, who can see them (session 54)
-│       └── pulse-closing.test.js   live counters, closesAt, rounding of "Closes in N days" (session 56)
+│       ├── pulse-closing.test.js   live counters, closesAt, rounding of "Closes in N days" (session 56)
+│       ├── wallet-orders.test.js   wallet credit never given twice; orders stages agreed → paying → rate → done (session 58)
+│       ├── referrals.test.js       invite code + link; reward only when the friend is fully verified, only once; unknown code ignored (session 58)
+│       └── chat-video.test.js      videos with an offer, only the chat's two members can watch; only real videos; photo still ≤ 5 MB (session 58)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -152,7 +160,7 @@ Unc-APP/
     └── src/
         ├── main.jsx        Mounts <App/> with Router + AuthProvider
         ├── App.jsx         All page routes + guards (`/` = Home for members, Browse for visitors)
-        ├── api.js          api() fetch wrapper, money/budget/date helpers
+        ├── api.js          api() fetch wrapper, money/budget/date helpers; moneyExact() with the currency's decimals for wallet credit (session 58)
         ├── auth.jsx        AuthProvider, useAuth(), isVerified() (also needs hasCard, session 40)
         ├── i18n.jsx        t(), tj(), tn(), LanguageProvider, date helpers (session 12)
         ├── locales/ar.js   All Arabic text, keyed by the English
@@ -165,6 +173,7 @@ Unc-APP/
         ├── tips.js         Tips to get more offers on a quiet request (session 31)
         ├── closing.js      closingDays(): "Closes in N days" in a request's last 3 days (session 56)
         ├── pickup.js       Pickup checklist per category: checklistFor(), isBigDeal(), BIG_DEAL limits per currency (session 37)
+        ├── videos.js       Short videos: VIDEO_TYPES, VIDEO_MAX_MB 25, VIDEO_MAX_SECONDS 60, videoProblem(), videoLength() (session 58)
         ├── cards.js        Showcase card form helpers: luhnOk(), brandOf(), readExpiry(), testToken() — the card number never leaves the browser (session 40)
         ├── hooks.js        useApi(path), useMeta(), usePolling(fn, ms, enabled)
         ├── styles.css      The whole design system
@@ -177,7 +186,7 @@ Unc-APP/
         │   ├── ShopHours.jsx      Opening-hours card, OpenNow, dayName() (session 24)
         │   ├── Feed.jsx           "Happening near you" card: Home and the landing page (session 26)
         │   ├── FavouriteButton.jsx ♡ Favourite a seller: profile + deal box (session 28)
-        │   ├── CompareOffers.jsx  "Compare offers" side by side on the buyer's request page (session 31); details + "✓ Proof photo" (session 34); "🌴 Away until" (session 37)
+        │   ├── CompareOffers.jsx  "Compare offers" side by side on the buyer's request page (session 31); details + "✓ Proof photo" (session 34); "🌴 Away until" (session 37); "🎬 Video" badge (session 58)
         │   ├── OfferDetails.jsx   Offer details: OfferDetailFields (seller picks), OfferDetailsLine (shown with the price), addDetails() (session 34)
         │   ├── CityField.jsx      CityField (city input with Bahrain areas suggested) + Place (area name in the reader's language) (session 31)
         │   ├── PhotoPicker.jsx    Choose photos with previews, shrinks them first (session 13)
@@ -191,28 +200,34 @@ Unc-APP/
         │   ├── TermsAccept.jsx    "I agree" to the Terms for members who joined before them: banner in Layout + on the Terms page (session 40)
         │   ├── PlanCard.jsx       "💳 Paying in parts" card in a chat after a price is accepted: suggest, accept/decline, "I've paid" / "Received" (session 40)
         │   ├── LivePulse.jsx  live counters strip on Browse and Home (session 56)
+        │   ├── VideoPicker.jsx    pickVideo() (checks type, size, length) + VideoPreview with ✕: first offer + chat (session 58)
         │   └── ui.jsx      ErrorBox, Loading (skeleton) + CardsLoading, badges, Avatar (photo or first letter), ListingCard, VerifyPrompt, route guards, Activity, Badges (session 20), ContactRule ("🔒 Shops only" badge, session 34); Activity shows "🌴 Away until …" (session 37); VerifyPrompt asks for a payment card (session 40); ClosesBadge (session 56)
         └── pages/
             ├── Browse.jsx          Visitors' home + /browse: hero, search, request grid, paging
             ├── Home.jsx            Members' home: needs attention, my requests, saved, requests for you (session 13); "📊 What people ask for" link to /demand (session 34)
             ├── Welcome.jsx         Welcome step after email confirm: photo, bio, interests (session 13)
             ├── Saved.jsx           Saved requests (session 13)
-            ├── Notifications.jsx   The 🔔 page; wording per `kind` (session 13; found-elsewhere, request-closed in session 34; report-action, report-no-action, budget-raised in session 37; did-you-get-it and the plan-*/part-* kinds in session 40)
+            ├── Notifications.jsx   The 🔔 page; wording per `kind` (session 13; found-elsewhere, request-closed in session 34; report-action, report-no-action, budget-raised in session 37; did-you-get-it and the plan-*/part-* kinds in session 40; referral-reward in session 58)
             ├── Alerts.jsx          /alerts: request alerts for sellers (session 31)
             ├── Demand.jsx          /demand: "What people are asking for", for sellers (session 34)
-            ├── ListingDetail.jsx   Request page: OfferPanel (vendor) / OwnerPanel (buyer), ReportLink; offer details, "who can make offers" note (session 34); RaiseBudget "Raise my budget" in OwnerPanel (session 37); ContactNudge under the first offer (session 40)
+            ├── ListingDetail.jsx   Request page: OfferPanel (vendor) / OwnerPanel (buyer), ReportLink; offer details, "who can make offers" note (session 34); RaiseBudget "Raise my budget" in OwnerPanel (session 37); ContactNudge under the first offer (session 40); "Short video of your item" in OfferPanel (session 58)
             ├── NewListing.jsx      Post + edit a request; "Who can make offers?" (session 34)
             ├── MyListings.jsx
-            ├── Inbox.jsx           Conversations grouped by request, tabs received/sent
+            ├── Inbox.jsx           Conversations grouped by request, tabs received/sent; "🎬 Video" as the last message (session 58)
             ├── Conversation.jsx    Chat with polling + photos; OfferCard, AnswerLine, QuickReplies, StoryForm in the deal banner (session 20);
             │                         proof photos (ProofAskButton, ProofAskLine), DealProblem "Something went wrong" (session 34); PickupCard (session 37);
-            │                         📵 hidden-contact notes + ContactNudge, reload when a price is accepted, Terms line under Accept, PlanCard (session 40)
+            │                         📵 hidden-contact notes + ContactNudge, reload when a price is accepted, Terms line under Accept, PlanCard (session 40);
+            │                         🎬 send a short video, video player in the bubble (session 58)
             ├── Login.jsx  Register.jsx  VerifyEmail.jsx (+ Steps bar)  Verification.jsx (KYC)
             │                         session 40: "I agree to the Terms" box on Register; 5th step "Card" in the Steps bar; "Add a payment card" step on Verification
+            │                         session 58: Register reads ?ref= and shows "🎁 A friend invited you…"
             ├── Terms.jsx           /terms: Terms of use (a plain-words DRAFT for a lawyer to check), with "I agree" when needed (session 40)
             ├── PaymentCard.jsx     /payment-card: add or replace the payment card (showcase card form makes a test token) (session 40)
+            ├── Orders.jsx          /orders: "In progress" / "Completed" tabs, each order's stage, links to its chat (session 58)
+            ├── Wallet.jsx          /wallet: Unc credit balance and history (session 58)
+            ├── Invite.jsx          /invite: invite link, Copy / Share, joined / verified / credit earned counts (session 58)
             ├── ForgotPassword.jsx  ResetPassword.jsx
-            ├── Account.jsx (profile + change password; blocked members list, session 31; "Show only my first name", session 34; AwayMode + YourData "Download my data" / "Delete my account", session 37; CardSettings "Payment card", session 40)  NotFound.jsx
+            ├── Account.jsx (profile + change password; blocked members list, session 31; "Show only my first name", session 34; AwayMode + YourData "Download my data" / "Delete my account", session 37; CardSettings "Payment card", session 40; links to Orders, My wallet, Invite friends, session 58)  NotFound.jsx
             ├── MemberProfile.jsx   Public profile + reviews (session 09); photo, bio, interests, open requests (session 13)
             ├── admin/AdminHome.jsx (stats, KYC queue, reports; deal problems with their kind, session 34; "✓ Took action" / "Nothing wrong", session 37)  admin/KycReview.jsx
             └── admin/Dashboard.jsx  Owner dashboard "How the marketplace is doing" (7/30/90 days, charts + table), shown on AdminHome (session 37)

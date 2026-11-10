@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-08 (session 56)
+updated: 2026-11-08 (session 58)
 ---
 # Unc — Project Vault
 
@@ -83,10 +83,13 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 53 - Test as an app on your phone for free]]
 - [[Step 54 - Example photos in the demo data]]
 - [[Step 55 - Live counters and closing badge]]
+- [[Step 56 - Orders and wallet]]
+- [[Step 57 - Refer a friend]]
+- [[Step 58 - Short videos in chats]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Your Data, Dashboard and Care]] · [[Deals, Terms, Cards and Installments]] · [[Admin and Moderation]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Your Data, Dashboard and Care]] · [[Deals, Terms, Cards and Installments]] · [[Orders, Wallet, Invites and Video]] · [[Admin and Moderation]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -101,7 +104,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-08, after session 56)
+## Status (2026-11-08, after session 58)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -134,6 +137,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Hidden numbers until a price is agreed, "Did you get it?", Terms (draft), card when joining (showcase), paying in parts | ✅ done — on branch (session 40) → [[Deals, Terms, Cards and Installments]] |
 | Example photos in the demo data (requests, offers, profiles, shop cover, story) | ✅ done — on branch (session 54) → [[Photos]] |
 | Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
-| API tests | ✅ 175 passing |
+| Orders + wallet (Unc credit), refer a friend, short videos in chats | ✅ done — on branch (session 58) → [[Orders, Wallet, Invites and Video]] |
+| API tests | ✅ 183 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
