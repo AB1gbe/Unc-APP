@@ -66,3 +66,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-08 | [[2026-11-08 Session 57]] | Pull request #16 (demo photos, Siin study, live counters, closing badge) merged into `main` |
 | 2026-11-08 | [[2026-11-08 Session 58]] | Orders + wallet (Unc credit), refer a friend, short videos in chats |
 | 2026-11-10 | [[2026-11-10 Session 59]] | Pull request #17 (orders, wallet, refer a friend, short videos) merged into `main` |
+| 2026-11-10 | [[2026-11-10 Session 60]] | Get Help inside the app (common questions + questions to the Unc team) |
