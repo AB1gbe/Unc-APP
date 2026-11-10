@@ -39,6 +39,9 @@ export function supportRoutes(db) {
   r.post('/admin/:id/reply', requireAdmin, (req, res) => {
     const t = db.prepare('SELECT * FROM support_tickets WHERE id = ?').get(Number(req.params.id));
     if (!t) throw notFound();
+    // A closed question stays closed: answering it would reopen it behind the
+    // member's back and could take them past MAX_OPEN_TICKETS.
+    if (t.status === 'closed') throw new HttpError(409, 'This question is closed. Please ask a new one.');
     const body = v.str(req.body, 'message', { min: 2, max: 4000 });
     tx(db, () => {
       addMessage(t.id, true, body, 'answered');

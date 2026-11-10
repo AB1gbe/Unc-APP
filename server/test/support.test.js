@@ -53,6 +53,9 @@ test('checks the topic, the length and the number of open questions', async () =
   const first = (await m.get('/api/support')).body.tickets.at(-1);
   await m.post(`/api/support/${first.id}/close`).expect(200);
   await ask(m).expect(201);
+  // Admins can't reopen the closed one either: that would make it 4 open.
+  await t.admin.post(`/api/support/admin/${first.id}/reply`).send({ message: 'Late answer' }).expect(409);
+  assert.equal(t.db.prepare(`SELECT COUNT(*) AS n FROM support_tickets WHERE user_id = ? AND status <> 'closed'`).get(m.id).n, 3);
 });
 
 test('questions are in "Download my data" and go when the account is deleted', async () => {

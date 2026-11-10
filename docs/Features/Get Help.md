@@ -22,7 +22,7 @@ date: 2026-11-10
 ## Rules
 - This is **member ↔ Unc team only**. Members never see each other's questions, so the rule "no messaging outside a request's chat" still holds ([[ADR-059 Get Help inside the app]]).
 - At most **3 open questions** per member (open or answered), to stop flooding.
-- A closed question can't get new messages; the member asks a new one.
+- A closed question can't get new messages, from the member or the team; the member asks a new one.
 - "Download my data" includes the questions (`helpQuestions`). Deleting the account removes them.
 
 ## Where the code is
