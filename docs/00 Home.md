@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-10 (session 60)
+updated: 2026-11-10 (session 62)
 ---
 # Unc — Project Vault
 
@@ -87,6 +87,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 57 - Refer a friend]]
 - [[Step 58 - Short videos in chats]]
 - [[Step 59 - Get Help]]
+- [[Step 60 - The new look]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -105,7 +106,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-10, after session 60)
+## Status (2026-11-10, after session 62)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -140,6 +141,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
 | Orders + wallet (Unc credit), refer a friend, short videos in chats | ✅ done — on branch (session 58) → [[Orders, Wallet, Invites and Video]] |
 | Get Help: common questions + questions to the Unc team, answered on the Admin page | ✅ done — in `main` since session 61 → [[Get Help]] |
+| New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — on branch (session 62) → [[Design System#The new look (session 62)]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

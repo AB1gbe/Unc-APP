@@ -236,3 +236,10 @@ Unc-APP/
             ├── admin/AdminHome.jsx (stats, KYC queue, reports; deal problems with their kind, session 34; "✓ Took action" / "Nothing wrong", session 37; "Help questions" count + HelpQueue to answer or close questions, session 60)  admin/KycReview.jsx
             └── admin/Dashboard.jsx  Owner dashboard "How the marketplace is doing" (7/30/90 days, charts + table), shown on AdminHome (session 37)
 ```
+
+## Added in session 62 (the new look)
+- `client/public/art/` — the app's pictures (steps, category tiles, Help topics), drawn by `scripts/make-art.mjs`. See [[Design System#The new look (session 62)]].
+- `client/src/art.js` — `categoryArt(category)` and `art(name)`: picture paths.
+- `client/src/components/Showcase.jsx` — `HeroStack` (newest requests in the banner), `HowItWorks`, `CategoryTiles`.
+- `scripts/make-art.mjs` — re-draws the pictures (`node scripts/make-art.mjs`).
+- Fonts come from `@fontsource-variable/fraunces`, `inter` and `noto-kufi-arabic` (client packages), imported in `client/src/main.jsx`.
