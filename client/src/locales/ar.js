@@ -1041,4 +1041,14 @@ export default {
   "Waiting": "بانتظار الرد",
   "Your answer": "ردّك",
   "Send answer": "أرسل الرد",
+  // Pictures (session 62)
+  "How Unc works": "كيف يعمل Unc",
+  "1. Post what you need": "1. انشر ما تحتاجه",
+  "A used phone, a sofa, a part. Add a photo and your budget.": "هاتف مستعمل، كنبة، قطعة غيار. أضف صورة وميزانيتك.",
+  "2. Offers come to you": "2. تأتيك العروض",
+  "Verified shops and finders reply privately, only about your request.": "يرد عليك أصحاب المحلات والباحثون الموثّقون بشكل خاص، وفقط بخصوص طلبك.",
+  "3. Pick the best deal": "3. اختر أفضل صفقة",
+  "Compare prices and ratings, agree in the chat, and rate each other.": "قارن الأسعار والتقييمات، واتفقا في المحادثة، ثم قيّما بعضكما.",
+  "Browse by category": "تصفّح حسب الفئة",
+  "Help topics": "مواضيع المساعدة",
 };

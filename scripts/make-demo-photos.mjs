@@ -12,17 +12,17 @@ const OUT = new URL('../server/demo-photos/', import.meta.url).pathname;
 
 // [file, width, height, background colours, objects: [emoji, size %, x %, y %, turn°]]
 const PHOTOS = [
-  ['ps5-wanted.jpg', 1200, 900, ['#eef2ff', '#c7d2fe'], [['🎮', 34, 36, 54, -12], ['🎮', 26, 66, 60, 10], ['💿', 18, 62, 30, 0]]],
-  ['oak-table.jpg', 1200, 900, ['#fff7ed', '#fed7aa'], [['TABLE', 0, 50, 62, 0], ['🪑', 24, 17, 64, 0], ['🪑', 24, 83, 64, 0]]],
-  ['wardrobe.jpg', 1200, 900, ['#f0fdf4', '#bbf7d0'], [['🚪', 34, 38, 52, 0], ['🚪', 34, 62, 52, 0], ['🧰', 14, 84, 80, 0]]],
-  ['offer-ps5-boxed.jpg', 1200, 900, ['#f8fafc', '#cbd5e1'], [['📦', 40, 40, 58, 0], ['🎮', 24, 70, 62, -8], ['🎮', 18, 74, 36, 14]]],
-  ['offer-ps5-disc.jpg', 1200, 900, ['#fdf4ff', '#f5d0fe'], [['🎮', 32, 42, 56, 8], ['💿', 22, 70, 52, 0]]],
-  ['charger-case.jpg', 1200, 900, ['#f0f9ff', '#bae6fd'], [['📱', 36, 40, 54, -6], ['🔌', 24, 68, 60, 12]]],
-  ['story-found-it.jpg', 1200, 900, ['#fefce8', '#fde68a'], [['🛍️', 34, 40, 56, -6], ['📱', 22, 66, 50, 10], ['🎉', 16, 76, 24, 0]]],
-  ['avatar-sam.jpg', 512, 512, ['#e0e7ff', '#a5b4fc'], [['🧑🏽', 62, 50, 54, 0]]],
-  ['avatar-riverside.jpg', 512, 512, ['#dbeafe', '#93c5fd'], [['🏪', 60, 50, 54, 0]]],
-  ['avatar-alex.jpg', 512, 512, ['#dcfce7', '#86efac'], [['🧑🏻‍🔧', 62, 50, 54, 0]]],
-  ['cover-riverside.jpg', 1600, 600, ['#1e3a8a', '#2f6fed'], [['📱', 22, 18, 56, -8], ['🎮', 24, 38, 56, 6], ['💻', 24, 60, 56, 0], ['🎧', 22, 82, 56, -6]]],
+  ['ps5-wanted.jpg', 1200, 900, ['#3d5180', '#1b2540'], [['🎮', 34, 36, 54, -12], ['🎮', 26, 66, 60, 10], ['💿', 18, 62, 30, 0]]],
+  ['oak-table.jpg', 1200, 900, ['#a8835a', '#5e4430'], [['TABLE', 0, 50, 62, 0], ['🪑', 24, 17, 64, 0], ['🪑', 24, 83, 64, 0]]],
+  ['wardrobe.jpg', 1200, 900, ['#3d6a64', '#1a3433'], [['🚪', 34, 38, 52, 0], ['🚪', 34, 62, 52, 0], ['🧰', 14, 84, 80, 0]]],
+  ['offer-ps5-boxed.jpg', 1200, 900, ['#4a586c', '#232a35'], [['📦', 40, 40, 58, 0], ['🎮', 24, 70, 62, -8], ['🎮', 18, 74, 36, 14]]],
+  ['offer-ps5-disc.jpg', 1200, 900, ['#6c4868', '#33233a'], [['🎮', 32, 42, 56, 8], ['💿', 22, 70, 52, 0]]],
+  ['charger-case.jpg', 1200, 900, ['#3d5180', '#1b2540'], [['📱', 36, 40, 54, -6], ['🔌', 24, 68, 60, 12]]],
+  ['story-found-it.jpg', 1200, 900, ['#b39d7a', '#6d5d47'], [['🛍️', 34, 40, 56, -6], ['📱', 22, 66, 50, 10], ['🎉', 16, 76, 24, 0]]],
+  ['avatar-sam.jpg', 512, 512, ['#4a586c', '#232a35'], [['🧑🏽', 62, 50, 54, 0]]],
+  ['avatar-riverside.jpg', 512, 512, ['#9a5a40', '#4f261b'], [['🏪', 60, 50, 54, 0]]],
+  ['avatar-alex.jpg', 512, 512, ['#3d6a64', '#1a3433'], [['🧑🏻‍🔧', 62, 50, 54, 0]]],
+  ['cover-riverside.jpg', 1600, 600, ['#2a1d16', '#5e4430'], [['📱', 22, 18, 56, -8], ['🎮', 24, 38, 56, 6], ['💻', 24, 60, 56, 0], ['🎧', 22, 82, 56, -6]]],
 ];
 
 // No emoji looks like a dining table, so 'TABLE' draws one: an oak top and four legs.
@@ -36,7 +36,7 @@ const scene = ([, w, h, [c1, c2], objects]) => `
   <div id="photo" style="position:relative;width:${w}px;height:${h}px;overflow:hidden;
        background:radial-gradient(ellipse at 50% 30%, ${c1} 0%, ${c2} 100%)">
     <div style="position:absolute;left:10%;right:10%;bottom:${h > w ? 10 : 9}%;height:9%;border-radius:50%;
-         background:radial-gradient(ellipse, rgba(0,0,0,.18), rgba(0,0,0,0) 70%)"></div>
+         background:radial-gradient(ellipse, rgba(0,0,0,.35), rgba(0,0,0,0) 70%)"></div>
     ${objects.map(([emoji, size, x, y, turn]) => `
       <div style="position:absolute;left:${x}%;top:${y}%;transform:translate(-50%,-50%) rotate(${turn}deg);
            font:${Math.round((Math.min(w, h) * size) / 100)}px 'Noto Color Emoji','Segoe UI Emoji',sans-serif;line-height:1;

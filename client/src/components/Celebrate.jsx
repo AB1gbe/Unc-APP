@@ -9,7 +9,7 @@ export function celebrate({ text, confetti = false }) {
   window.dispatchEvent(new CustomEvent('unc:celebrate', { detail: { text, confetti } }));
 }
 
-const COLORS = ['#2f6fed', '#ffd166', '#06d6a0', '#ef476f', '#118ab2'];
+const COLORS = ['#ff7a4d', '#ffd166', '#06d6a0', '#ef476f', '#118ab2'];
 
 export default function Celebrations() {
   const [toast, setToast] = useState(null);

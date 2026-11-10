@@ -3,6 +3,7 @@
 // dir="auto" or <bdi>, so English text inside the Arabic layout (and the
 // other way round) keeps its own direction and punctuation.
 import { useState } from 'react';
+import { categoryArt } from '../art.js';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
 import { budget, ago, toDate } from '../api.js';
@@ -87,9 +88,10 @@ export function ContactRule({ rule }) {
 export function ListingCard({ listing }) {
   return (
     <Link className="card" to={`/requests/${listing.id}`}>
-      {listing.images?.[0] && (
-        <div className="card-photo"><img src={listing.images[0]} alt="" loading="lazy" /></div>
-      )}
+      {/* No photo? The category's picture, so every card has an image (session 62). */}
+      <div className={`card-photo${listing.images?.[0] ? '' : ' card-art'}`}>
+        <img src={listing.images?.[0] || categoryArt(listing.category)} alt="" loading="lazy" />
+      </div>
       <div className="row spread" style={{ marginBottom: '.4rem' }}>
         <span className="badge">{t(listing.category)}</span>
         <span className="price">{budget(listing)}</span>
