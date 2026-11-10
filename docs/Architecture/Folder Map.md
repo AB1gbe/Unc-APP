@@ -16,10 +16,10 @@ Unc-APP/
 ├── scripts/git-helper.mjs  The pull/push logic (session 10)
 ├── scripts/live-sync.mjs  `npm run live` / `npm run sync`: auto-pull pushed changes (session 09)
 ├── e2e/arabic.mjs        `npm run e2e:ar`: Arabic journey + RTL/overflow/English-leak checks (session 12); skips member text in <bdi> / dir="auto" (session 20)
-├── e2e/devices.mjs       `npm run e2e:devices`: 5 screen sizes × English/Arabic — no sideways scroll, touch targets ≥ 40 px (session 13); also checks /terms (session 40) and /orders, /wallet, /invite (session 58)
+├── e2e/devices.mjs       `npm run e2e:devices`: 5 screen sizes × English/Arabic — no sideways scroll, touch targets ≥ 40 px (session 13); also checks /terms (session 40) and /orders, /wallet, /invite (session 58) and /help (session 60)
 ├── scripts/make-icons.mjs  Draws the app icons into client/public/icons/ (`node scripts/make-icons.mjs`, session 13)
 ├── scripts/make-demo-photos.mjs  Draws the example photos into server/demo-photos/ (`node scripts/make-demo-photos.mjs`, session 54)
-├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored); session 40: ticks the Terms box, adds a card (a declined one first), checks a number shows as 📵; session 58: invite link + the friend's sign-up note, orders, wallet, a seller's chat video
+├── e2e/smoke.mjs           Playwright browser test (screenshots → e2e/screenshots/, git-ignored); session 40: ticks the Terms box, adds a card (a declined one first), checks a number shows as 📵; session 58: invite link + the friend's sign-up note, orders, wallet, a seller's chat video; session 60: a member asks on /help, an admin answers, the member sees the answer
 ├── shared/                 Plain JS used by BOTH server and client (session 31)
 │   ├── package.json        `{type: module}` only — not a workspace, nothing to install
 │   ├── areas.js            Bahrain governorates + areas (English/Arabic/other spellings): normalizeCity(),
@@ -37,7 +37,7 @@ Unc-APP/
 │   │   ├── index.js        Starts the server (opens DB, ensures admin, listen); hourly cleanupExpired() + runExpiry() (session 31) + runDeletions() (session 37) + askDidYouGetIt() and runInstallmentReminders() (session 40)
 │   │   ├── app.js          Builds the Express app: security headers, routes, static files, pages with link previews (session 20)
 │   │   ├── config.js       All settings from environment variables (paymentProvider = PAYMENT_PROVIDER, `test` or `tap`, session 40)
-│   │   ├── db.js           SQLite connection, MIGRATIONS list (37 since session 58), tx() and audit() helpers
+│   │   ├── db.js           SQLite connection, MIGRATIONS list (38 since session 60), tx() and audit() helpers
 │   │   ├── seed.js         ensureAdmin() + demo data (npm run seed); demo members have agreed to the Terms and have a test card (session 40); addDemoPhotos() attaches the example photos (session 54)
 │   │   ├── mail-test.js    Sends one test email (npm run mail:test -- you@example.com)
 │   │   ├── lib/
@@ -97,7 +97,8 @@ Unc-APP/
 │   │       ├── payments.js      /api/payments/card: see or add the payment card, cardView() (session 40); calls rewardReferral() after a card is saved (session 58)
 │   │       ├── installments.js  /api/conversations/:id/plan, /api/plans/:id/respond|cancel|parts/:n/paid|parts/:n/confirm — paying in parts (session 40)
 │   │       ├── wallet.js        /api/wallet, /api/referrals, /api/orders (session 58)
-│   │       └── admin.js         /api/admin/* (metrics for the owner dashboard, report outcome — session 37; videos in a reported chat — session 58)
+│   │       ├── support.js       /api/support/*: Get Help questions to the Unc team; members see only their own, admins answer at /api/support/admin/* (session 60)
+│   │       └── admin.js         /api/admin/* (metrics for the owner dashboard, report outcome — session 37; videos in a reported chat — session 58; openHelp in /stats — session 60)
 │   └── test/
 │       ├── helpers.js          In-memory app + user factory (any verification stage; verified users also accept the Terms and add a test card — session 40)
 │       ├── kyc.test.js
@@ -148,7 +149,8 @@ Unc-APP/
 │       ├── pulse-closing.test.js   live counters, closesAt, rounding of "Closes in N days" (session 56)
 │       ├── wallet-orders.test.js   wallet credit never given twice; orders stages agreed → paying → rate → done (session 58)
 │       ├── referrals.test.js       invite code + link; reward only when the friend is fully verified, only once; unknown code ignored (session 58)
-│       └── chat-video.test.js      videos with an offer, only the chat's two members can watch; only real videos; photo still ≤ 5 MB (session 58)
+│       ├── chat-video.test.js      videos with an offer, only the chat's two members can watch; only real videos; photo still ≤ 5 MB (session 58)
+│       └── support.test.js         Get Help: ask, admin answers + 🔔, follow-up, close; only my own questions, only admins answer; 3 open at most; in the data export, gone on deletion (session 60)
 └── client/
     ├── package.json
     ├── index.html          The single HTML page React mounts into (+ manifest, theme colour, iPhone icon)
@@ -207,7 +209,7 @@ Unc-APP/
             ├── Home.jsx            Members' home: needs attention, my requests, saved, requests for you (session 13); "📊 What people ask for" link to /demand (session 34)
             ├── Welcome.jsx         Welcome step after email confirm: photo, bio, interests (session 13)
             ├── Saved.jsx           Saved requests (session 13)
-            ├── Notifications.jsx   The 🔔 page; wording per `kind` (session 13; found-elsewhere, request-closed in session 34; report-action, report-no-action, budget-raised in session 37; did-you-get-it and the plan-*/part-* kinds in session 40; referral-reward in session 58)
+            ├── Notifications.jsx   The 🔔 page; wording per `kind` (session 13; found-elsewhere, request-closed in session 34; report-action, report-no-action, budget-raised in session 37; did-you-get-it and the plan-*/part-* kinds in session 40; referral-reward in session 58; support-reply in session 60)
             ├── Alerts.jsx          /alerts: request alerts for sellers (session 31)
             ├── Demand.jsx          /demand: "What people are asking for", for sellers (session 34)
             ├── ListingDetail.jsx   Request page: OfferPanel (vendor) / OwnerPanel (buyer), ReportLink; offer details, "who can make offers" note (session 34); RaiseBudget "Raise my budget" in OwnerPanel (session 37); ContactNudge under the first offer (session 40); "Short video of your item" in OfferPanel (session 58)
@@ -221,14 +223,16 @@ Unc-APP/
             ├── Login.jsx  Register.jsx  VerifyEmail.jsx (+ Steps bar)  Verification.jsx (KYC)
             │                         session 40: "I agree to the Terms" box on Register; 5th step "Card" in the Steps bar; "Add a payment card" step on Verification
             │                         session 58: Register reads ?ref= and shows "🎁 A friend invited you…"
+            │                         session 60: "Trouble signing in? Get help" link on Login
             ├── Terms.jsx           /terms: Terms of use (a plain-words DRAFT for a lawyer to check), with "I agree" when needed (session 40)
             ├── PaymentCard.jsx     /payment-card: add or replace the payment card (showcase card form makes a test token) (session 40)
             ├── Orders.jsx          /orders: "In progress" / "Completed" tabs, each order's stage, links to its chat (session 58)
             ├── Wallet.jsx          /wallet: Unc credit balance and history (session 58)
             ├── Invite.jsx          /invite: invite link, Copy / Share, joined / verified / credit earned counts (session 58)
+            ├── Help.jsx            /help: Get Help — common questions and answers (public), then "Contact the Unc team" (needs sign-in): my questions, follow-ups, close; topicLabel() also used by AdminHome (session 60). See [[Get Help]]
             ├── ForgotPassword.jsx  ResetPassword.jsx
-            ├── Account.jsx (profile + change password; blocked members list, session 31; "Show only my first name", session 34; AwayMode + YourData "Download my data" / "Delete my account", session 37; CardSettings "Payment card", session 40; links to Orders, My wallet, Invite friends, session 58)  NotFound.jsx
+            ├── Account.jsx (profile + change password; blocked members list, session 31; "Show only my first name", session 34; AwayMode + YourData "Download my data" / "Delete my account", session 37; CardSettings "Payment card", session 40; links to Orders, My wallet, Invite friends, session 58; "❓ Get help" link, session 60)  NotFound.jsx
             ├── MemberProfile.jsx   Public profile + reviews (session 09); photo, bio, interests, open requests (session 13)
-            ├── admin/AdminHome.jsx (stats, KYC queue, reports; deal problems with their kind, session 34; "✓ Took action" / "Nothing wrong", session 37)  admin/KycReview.jsx
+            ├── admin/AdminHome.jsx (stats, KYC queue, reports; deal problems with their kind, session 34; "✓ Took action" / "Nothing wrong", session 37; "Help questions" count + HelpQueue to answer or close questions, session 60)  admin/KycReview.jsx
             └── admin/Dashboard.jsx  Owner dashboard "How the marketplace is doing" (7/30/90 days, charts + table), shown on AdminHome (session 37)
 ```

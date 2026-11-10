@@ -49,6 +49,7 @@ export default function Login() {
         <button className="btn block" disabled={busy}>{busy ? t('Logging in…') : t('Log in')}</button>
       </form>
       <p className="muted small center" style={{ marginTop: '1rem' }}>{tj('New here? {link}', { link: <Link to="/register">{t('Create an account')}</Link> })}</p>
+      <p className="muted small center">{tj('Trouble signing in? {link}', { link: <Link to="/help">{t('Get help')}</Link> })}</p>
     </div>
   );
 }

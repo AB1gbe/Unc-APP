@@ -34,6 +34,7 @@ function describe(n) {
     case 'part-confirmed': return [tj('{name} confirmed your payment ✓', { name }), chat];
     case 'part-due': return [tj('A payment to {name} is due tomorrow.', { name }), chat];
     case 'part-late': return [tj('A payment with {name} is late.', { name }), chat];
+    case 'support-reply': return [t('The Unc team answered your question.'), '/help'];
     case 'referral-reward': return [t('A friend you invited is now verified. Unc credit was added to your wallet 🎉'), '/wallet'];
     case 'kyc_approved': return [t('Your identity is verified ✓ You can now post requests and make offers.'), '/'];
     case 'kyc_rejected': return [t('Your identity check was not approved. See why and try again.'), '/verification'];
@@ -41,7 +42,7 @@ function describe(n) {
   }
 }
 
-const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳', 'found-elsewhere': '🙏', 'request-closed': '🙏', 'report-action': '⚑', 'report-no-action': '⚑', 'budget-raised': '💸', 'did-you-get-it': '🤔', 'plan-proposed': '💳', 'plan-accepted': '💳', 'plan-declined': '💳', 'part-paid': '💳', 'part-confirmed': '💳', 'part-due': '⏰', 'part-late': '⚠️', 'referral-reward': '🎁' };
+const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳', 'found-elsewhere': '🙏', 'request-closed': '🙏', 'report-action': '⚑', 'report-no-action': '⚑', 'budget-raised': '💸', 'did-you-get-it': '🤔', 'plan-proposed': '💳', 'plan-accepted': '💳', 'plan-declined': '💳', 'part-paid': '💳', 'part-confirmed': '💳', 'part-due': '⏰', 'part-late': '⚠️', 'referral-reward': '🎁', 'support-reply': '❓' };
 
 export default function Notifications() {
   const { data, error, loading } = useApi('/notifications');

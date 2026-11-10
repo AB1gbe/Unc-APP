@@ -6,7 +6,7 @@ updated: 2026-11-08 (session 58)
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 110 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106) + 3 in session 58: 1 browser-test slip (repeat of M77), 1 found by a screenshot, 1 translation self-review, 1 found by the docs review (M107–M110). All fixed.
+**Totals so far:** 114 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106) + 3 in session 58: 1 browser-test slip (repeat of M77), 1 found by a screenshot, 1 translation self-review, 1 found by the docs review (M107–M110) + 3 self-review catches and 1 found by the docs review in session 60 (M111–M114). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -120,6 +120,10 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M108 | Bug | Invite link showed `http://localhost:5173` (the server's APP_URL), wrong on a phone test address | 58 |
 | M109 | Translation | First Arabic for "Orders" (الطلبات المنجزة) clashed with «الطلبات» = requests | 58 |
 | M110 | Bug | The video check let HEIC photos and M4A audio through as ".mp4" | 58 |
+| M111 | Layout | A "Get help" link put inside the password label row would have squeezed it | 60 |
+| M112 | Content | First FAQ answers promised things the app doesn't do | 60 |
+| M113 | Code | Help page used a `setData` that `useApi` doesn't have | 60 |
+| M114 | Bug | An admin answer reopened a closed help question (past the 3-question limit) | 60 |
 
 ---
 
@@ -757,4 +761,33 @@ Also in session 56 (not a bug in the app): the first browser-test check for the 
 - **Fix:** only known video "brands" pass (`isom`, `mp41`, `mp42`, `avc1`, `M4V `, `3gp…`, and `qt  ` for MOV). The admin page now also links videos in a reported chat.
 - **Test:** `server/test/chat-video.test.js` ("photos and audio from the same file family are not videos"); it fails on the old code (checked with `git stash push -- server/src/lib/uploads.js`).
 - **Lesson:** a file "family" signature isn't enough; check the exact sub-type.
+
+## M111
+**A "Get help" link squeezed into the sign-in password row**
+- **Found by:** self-review of `Login.jsx` before testing.
+- **Cause:** the link was added next to "Forgot password?" inside a `row spread` line that is meant to hold just two things (the label and one link), so on a phone it would wrap badly.
+- **Fix:** a separate line under the form: "Trouble signing in? Get help".
+- **Lesson:** look at the layout a line belongs to before adding to it.
+
+## M112
+**The first FAQ answers promised things the app doesn't do**
+- **Found by:** checking each answer against the code before translating.
+- **Cause:** written from memory: "you get an email when verification is done" (there is only a 🔔), "Compare offers shows distance" (it shows price, rating and reply speed), "Report on a profile" (Report is on the request and in the chat), and "change my email" (only the password can be changed).
+- **Fix:** each answer reworded to match the app; the question became "How do I change my password?".
+- **Lesson:** help text is a promise; check every sentence against the real screens.
+
+## M113
+**The Help page called `setData`, which `useApi` doesn't have**
+- **Found by:** reading `client/src/hooks.js` before the first build.
+- **Cause:** assumed the data hook could update its data directly. It only offers `reload()`.
+- **Fix:** after sending, the page calls `reload()`.
+- **Lesson:** check a helper's real return value before using it.
+
+## M114
+**An admin's answer could reopen a closed help question**
+- **Found by:** the helper that updated the Architecture notes.
+- **Cause:** `POST /api/support/admin/:id/reply` didn't check the status, so it set a closed question back to *answered*. A member with 3 open questions plus that one would then have 4, past the limit. (The Admin page hides the reply box on closed questions, so only a direct API call could do it.)
+- **Fix:** the route refuses closed questions with 409 "This question is closed."
+- **Test:** `server/test/support.test.js` ("checks the topic, the length and the number of open questions"); it fails on the old code (checked with `git stash push -- server/src`).
+- **Lesson:** every route that changes a status must check the starting status, not just the screen that calls it.
 

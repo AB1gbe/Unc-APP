@@ -123,7 +123,7 @@ The buyer is in charge, the search is done by the sellers, and every contact is 
 3. **Refer a friend**, with a small reward once Unc earns money.
 4. **A wallet and orders** once Tap is connected (paying in parts, protection).
 5. **Short video with an offer** (like Siin's clips), private to the request's chat.
-6. **Get Help** button, but in-app (Unc already has reports and deal help).
+6. **Get Help** button, but in-app (Unc already has reports and deal help). ✅ Built in [[2026-11-10 Session 60]] → [[Get Help]].
 7. Don't copy: public live chat between strangers, or handles instead of verified names. Both go against Unc's trust promise.
 
 ## Sources (searched 2026-11-08)

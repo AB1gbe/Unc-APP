@@ -65,6 +65,10 @@ tags: [roadmap]
 - [ ] **Installment partner** (owner's plan, after approval: e.g. Tabby/Tamara if they serve Bahrain): `provider = 'partner'`, seller paid in full
 - [ ] ⚖️ Decide how Unc earns (per offer / shop subscription / commission with payments)
 
+## From the Siin study (session 55)
+- [x] Ideas 1–5 (sessions 56 and 58) → [[Social Touches]], [[Orders, Wallet, Invites and Video]]
+- [x] Idea 6: Get Help inside the app (session 60) → [[Get Help]]
+
 ## Publishing as an app (session 43) → [[Publishing as an App]]
 - [x] Free test on a phone (session 44) → [[Step 53 - Test as an app on your phone for free]]
 - [ ] Go live on the web (hosting, domain, real email, backups, production settings)

@@ -6,6 +6,7 @@ import { useApi } from '../../hooks.js';
 import { ACCOUNT_TYPE, ID_TYPE, KYC_STATUS, label } from '../../kycReasons.js';
 import { formatDateTime, t, tj } from '../../i18n.jsx';
 import Dashboard from './Dashboard.jsx';
+import { topicLabel } from '../Help.jsx';
 
 export default function AdminHome() {
   const stats = useApi('/admin/stats');
@@ -18,7 +19,7 @@ export default function AdminHome() {
       <h1>{t('Admin')}</h1>
       {stats.data && (
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
-          {[[t('Users'), 'users'], [t('Pending KYC'), 'pendingKyc'], [t('Open requests'), 'openListings'], [t('Conversations'), 'conversations'], [t('Open reports'), 'openReports']].map(([label, k]) => (
+          {[[t('Users'), 'users'], [t('Pending KYC'), 'pendingKyc'], [t('Open requests'), 'openListings'], [t('Conversations'), 'conversations'], [t('Open reports'), 'openReports'], [t('Help questions'), 'openHelp']].map(([label, k]) => (
             <div key={k} className="card"><div className="muted small">{label}</div><div style={{ fontSize: '1.6rem', fontWeight: 700 }}>{stats.data[k]}</div></div>
           ))}
         </div>
@@ -60,6 +61,64 @@ export default function AdminHome() {
           reports.data?.reports.map((r) => <ReportRow key={r.id} report={r} onDone={() => { reports.reload(); stats.reload(); }} />)
         )}
       </section>
+
+      <HelpQueue onChange={() => stats.reload()} />
+    </div>
+  );
+}
+
+// Get Help (session 60): members' questions to the Unc team. Oldest first.
+function HelpQueue({ onChange }) {
+  const [status, setStatus] = useState('open');
+  const help = useApi(`/support/admin?status=${status}`);
+  const done = () => { help.reload(); onChange(); };
+  const STATUS = { open: t('Waiting'), answered: t('Answered'), closed: t('Closed') };
+  return (
+    <section className="card" id="help-questions">
+      <div className="row spread">
+        <h2>{t('Help questions')}</h2>
+        <div className="row" style={{ gap: '.4rem' }}>
+          {Object.keys(STATUS).map((s) => (
+            <button key={s} className={`btn sm ${status === s ? '' : 'secondary'}`} onClick={() => setStatus(s)}>{STATUS[s]}</button>
+          ))}
+        </div>
+      </div>
+      {help.loading ? <Loading /> : help.data?.tickets.length === 0 ? <p className="muted">{t('Nothing here.')}</p>
+        : help.data?.tickets.map((tk) => <HelpTicket key={tk.id} ticket={tk} onDone={done} />)}
+      <ErrorBox error={help.error} />
+    </section>
+  );
+}
+
+function HelpTicket({ ticket: tk, onDone }) {
+  const [reply, setReply] = useState('');
+  const [error, setError] = useState(null);
+  async function send(e) {
+    e.preventDefault();
+    try { await api(`/support/admin/${tk.id}/reply`, { method: 'POST', body: { message: reply } }); setReply(''); onDone(); } catch (err) { setError(err); }
+  }
+  async function close() {
+    try { await api(`/support/admin/${tk.id}/close`, { method: 'POST' }); onDone(); } catch (err) { setError(err); }
+  }
+  return (
+    <div className="help-ticket" style={{ borderTop: '1px solid var(--border)', paddingTop: '.75rem', marginTop: '.75rem' }}>
+      <div className="small muted"><bdi>{tk.member.displayName}</bdi> · <span className="ltr">{tk.member.email}</span> · {topicLabel(tk.topic)} · {formatDateTime(toDate(tk.createdAt))}</div>
+      {tk.messages.map((m, i) => (
+        <div key={i} className={`help-msg ${m.fromTeam ? 'team' : ''}`}>
+          <div className="small muted">{m.fromTeam ? t('Unc team') : <bdi>{tk.member.displayName}</bdi>} · {formatDateTime(toDate(m.createdAt))}</div>
+          <div dir="auto" className="help-body">{m.body}</div>
+        </div>
+      ))}
+      <ErrorBox error={error} />
+      {tk.status !== 'closed' && (
+        <form onSubmit={send} className="stack" style={{ gap: '.5rem' }}>
+          <textarea aria-label={t('Your answer')} rows={2} maxLength={4000} value={reply} onChange={(e) => setReply(e.target.value)} placeholder={t('Your answer')} />
+          <div className="row">
+            <button className="btn sm" disabled={reply.trim().length < 2}>{t('Send answer')}</button>
+            <button type="button" className="btn sm secondary" onClick={close}>{t('Close')}</button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
