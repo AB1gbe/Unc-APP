@@ -469,6 +469,26 @@ await buyer.goto(BASE + '/terms');
 await buyer.waitForSelector('h2:has-text("Deals agreed on Unc are finished on Unc")');
 await shot(buyer, '44-terms');
 
+// Get Help (session 60): the buyer asks the Unc team, the admin answers,
+// the buyer sees the answer and a 🔔.
+await buyer.goto(BASE + '/help');
+await buyer.click('summary:has-text("Why are phone numbers hidden in chat?")');
+await buyer.waitForSelector('details[open] p:has-text("Until a price is agreed")');
+await buyer.selectOption('#helpTopic', 'payments');
+await buyer.fill('#helpMessage', 'How do I change the card on my account?');
+await buyer.click('button:has-text("Send to the Unc team")');
+await buyer.waitForSelector('.help-ticket:has-text("Waiting for the team")');
+await admin.goto(BASE + '/admin');
+const q = admin.locator('#help-questions .help-ticket:has-text("change the card")');
+await q.locator('textarea').fill('Go to Account, then Payment card, and add the new one.');
+await q.locator('button:has-text("Send answer")').click();
+await admin.waitForSelector('#help-questions .help-ticket:has-text("change the card")', { state: 'detached' });
+await buyer.goto(BASE + '/notifications');
+await buyer.click('text=The Unc team answered your question.');
+await buyer.waitForURL('**/help');
+await buyer.waitForSelector('.help-msg.team:has-text("Payment card")');
+await shot(buyer, '53-help');
+
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.feed li'); /* visitors see "Happening on Unc" */ await shot(mp, '14-mobile-home');

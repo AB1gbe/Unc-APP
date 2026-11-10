@@ -488,6 +488,28 @@ const MIGRATIONS = [
   `
   ALTER TABLE messages ADD COLUMN video TEXT;
   `,
+  // 38: Get Help (session 60): a member's question to the Unc team and the
+  // thread of answers. Members never see each other's questions.
+  `
+  CREATE TABLE support_tickets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    topic      TEXT NOT NULL,
+    status     TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'answered', 'closed')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX idx_support_user ON support_tickets(user_id);
+  CREATE INDEX idx_support_status ON support_tickets(status, updated_at);
+  CREATE TABLE support_messages (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticket_id  INTEGER NOT NULL REFERENCES support_tickets(id) ON DELETE CASCADE,
+    from_admin INTEGER NOT NULL DEFAULT 0,
+    body       TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX idx_support_messages ON support_messages(ticket_id);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

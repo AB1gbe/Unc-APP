@@ -58,6 +58,8 @@ export function deleteNow(db, u) {
     for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views', 'payment_cards', 'wallet_entries']) {
       db.prepare(`DELETE FROM ${table} WHERE user_id = ?`).run(u.id);
     }
+    db.prepare('DELETE FROM support_messages WHERE ticket_id IN (SELECT id FROM support_tickets WHERE user_id = ?)').run(u.id);
+    db.prepare('DELETE FROM support_tickets WHERE user_id = ?').run(u.id);
     db.prepare('DELETE FROM favourites WHERE user_id = ? OR seller_id = ?').run(u.id, u.id);
     db.prepare('DELETE FROM blocks WHERE user_id = ? OR blocked_id = ?').run(u.id, u.id);
     db.prepare(`
@@ -105,6 +107,8 @@ export function exportData(db, u) {
     savedRequests: all('SELECT listing_id AS requestId, created_at AS createdAt FROM saved_listings WHERE user_id = ? ORDER BY created_at', u.id),
     blockedMembers: all('SELECT blocked_id AS memberId, created_at AS createdAt FROM blocks WHERE user_id = ? ORDER BY created_at', u.id),
     walletEntries: all('SELECT amount, reason, created_at AS createdAt FROM wallet_entries WHERE user_id = ? ORDER BY id', u.id),
+    helpQuestions: all(`SELECT t.topic, t.status, m.body, m.from_admin AS fromTeam, m.created_at AS createdAt FROM support_tickets t
+      JOIN support_messages m ON m.ticket_id = t.id WHERE t.user_id = ? ORDER BY m.id`, u.id),
     reportsMade: all('SELECT reason, kind, status, created_at AS createdAt FROM reports WHERE reporter_id = ? ORDER BY id', u.id),
   };
 }

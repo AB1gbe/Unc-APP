@@ -23,6 +23,7 @@ export function adminRoutes(db) {
       openListings: one(`SELECT COUNT(*) n FROM listings WHERE status = 'open'`),
       conversations: one('SELECT COUNT(*) n FROM conversations'),
       openReports: one(`SELECT COUNT(*) n FROM reports WHERE status = 'open'`),
+      openHelp: one(`SELECT COUNT(*) n FROM support_tickets WHERE status = 'open'`),
     });
   });
 
