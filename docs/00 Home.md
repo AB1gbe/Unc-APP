@@ -139,7 +139,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Example photos in the demo data (requests, offers, profiles, shop cover, story) | ✅ done — on branch (session 54) → [[Photos]] |
 | Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
 | Orders + wallet (Unc credit), refer a friend, short videos in chats | ✅ done — on branch (session 58) → [[Orders, Wallet, Invites and Video]] |
-| Get Help: common questions + questions to the Unc team, answered on the Admin page | ✅ done — on branch (session 60) → [[Get Help]] |
+| Get Help: common questions + questions to the Unc team, answered on the Admin page | ✅ done — in `main` since session 61 → [[Get Help]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
