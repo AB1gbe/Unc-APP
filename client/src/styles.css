@@ -662,3 +662,12 @@ html, body { overflow-x: clip; }
 .feed { margin-bottom: 1.5rem; }
 .attention .inbox-item { padding-inline: 0; border-top: 1px solid var(--border); }
 .attention { border-bottom: 1px solid var(--border); padding-bottom: .25rem; }
+
+/* Category bar (session 72): one slim row, scrolls sideways. */
+.cat-bar { display: flex; gap: .4rem; overflow-x: auto; padding: .25rem 0 .6rem; margin-bottom: 1rem; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+.cat-bar::-webkit-scrollbar { display: none; }
+.cat-chip { display: flex; align-items: center; gap: .5rem; flex: none; padding: .3rem .75rem .3rem .3rem; border-radius: 6px; color: var(--muted); font-size: .85rem; font-weight: 500; white-space: nowrap; text-decoration: none; }
+.cat-chip:hover { color: var(--text); background: var(--surface); text-decoration: none; }
+.cat-chip.on { color: var(--text); background: var(--surface-2); }
+.cat-chip img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; flex: none; }
+.cat-chip:first-child { padding-inline: .9rem; }

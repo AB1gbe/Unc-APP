@@ -9,7 +9,7 @@ import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
 import LivePulse from '../components/LivePulse.jsx';
-import { CategoryTiles, HeroStack, HowItWorks } from '../components/Showcase.jsx';
+import { CategoryBar, HeroStack } from '../components/Showcase.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -50,8 +50,6 @@ export default function Browse() {
           <HeroStack listings={result.listings} />
         </section>
       )}
-      {!user && <HowItWorks />}
-      {params.toString() === '' && <CategoryTiles categories={categories} />}
       {!user && <div style={{ marginBottom: '1.5rem' }}><StoriesStrip /></div>}
       {!user && <div style={{ marginBottom: '1.5rem' }}><Feed title={t('Happening on Unc')} /></div>}
       <LivePulse />
@@ -64,6 +62,7 @@ export default function Browse() {
         <CityField governorates placeholder={t('City or governorate')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
         <button className="btn">{t('Search')}</button>
       </form>
+      <CategoryBar categories={categories} active={params.get('category')} />
       <ErrorBox error={error} />
       {user && (
         <p className="small" style={{ marginTop: 0 }}>

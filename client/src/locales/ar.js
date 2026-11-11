@@ -1053,4 +1053,6 @@ export default {
   "Only checked shops and finders, only about your request.": "محلات وباحثون موثّقون فقط، وفقط بخصوص طلبك.",
   "You choose": "أنت تختار",
   "Agree in the chat, then rate each other.": "اتفقا في المحادثة، ثم قيّما بعضكما.",
+  // Session 72
+  "Categories": "الفئات",
 };
