@@ -93,6 +93,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 62 - Photo-first marketplace look]]
 - [[Step 63 - Less AI-looking details]]
 - [[Step 64 - Shops first and fewer categories]]
+- [[Step 65 - Calm home page and tabs]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -151,6 +152,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Smaller corners + back-glow behind photo cards (square redesign tried and reverted) | ✅ done — in `main` since session 69 → [[ADR-063 Smaller corners and back-glow]] |
 | Less AI-looking: line icons, local wording, Readex Pro + IBM Plex, fewer frames, glow on categories | ✅ done — in `main` since session 71 → [[ADR-064 Less AI-looking details]] |
 | Shops first (Verified shops, /shops), 4 categories + /categories, softer glow, Plus Jakarta Sans + Almarai | ✅ done — on branch (session 72) → [[ADR-065 Shops first and fewer categories]] |
+| Example requests in every category; calm home page; tabs Home · Requests · Shops · Categories | ✅ done — on branch (session 72) → [[ADR-066 Calm home page and tabs]] |
 | API tests | ✅ 188 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

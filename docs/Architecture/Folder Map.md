@@ -250,4 +250,6 @@ Unc-APP/
 - `client/src/pages/Categories.jsx` (`/categories`) and `client/src/pages/Shops.jsx` (`/shops`).
 - `client/src/components/Showcase.jsx` now holds `ShopCard`, `ShopsPreview`, `CategoryTile`, `CategoryPreview` (and `HeroStack`).
 - `client/src/components/Icon.jsx` (session 70) — line icons.
+- `client/src/pages/Landing.jsx` (session 72) — the calm home page for visitors.
+- `server/src/demo-requests.js` (session 72) — example requests and demo buyers used by `npm run seed` and `scripts/fetch-photos.mjs`.
 

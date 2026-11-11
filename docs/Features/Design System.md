@@ -75,3 +75,8 @@ Front page: banner → **Verified shops** → **4 categories + All categories** 
 
 ![[shops-first-home.png]]
 
+## Calm home page and tabs (session 72)
+Tabs **Home · Requests · Shops · Categories** in the top bar, and on phones in the bottom tab bar (now for visitors too). The visitors' home is calm: banner, 4 shops, 4 categories, 3 newest requests. Requests tab = search + all requests + activity; Shops tab = shops + stories. See [[ADR-066 Calm home page and tabs]].
+
+![[calm-home.png]]
+
