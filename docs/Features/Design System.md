@@ -89,4 +89,7 @@ Computers: a side bar instead of a top bar, with a toggle that folds it into an 
 Search = field + small icon button (word "Search" only on computers); no auto-focus; phone category tiles show the name on the photo. See [[2026-11-11 Session 74]].
 
 ![[phone-categories-app.png]]
+Phone tab bar (session 74): floating glass bar (blur, see-through, rounded), tabs spread evenly. Theme colour for the phone's bars: `#0b0c0f` (`client/index.html`, `client/public/manifest.webmanifest`).
+
+![[phone-glass-tabbar.png]]
 
