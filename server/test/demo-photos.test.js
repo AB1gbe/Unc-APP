@@ -9,7 +9,12 @@ const { seedDemo } = await import('../src/seed.js');
 test('npm run seed gives the demo requests, offers, profiles and story real photos, once', async () => {
   await seedDemo(t.db);
   await seedDemo(t.db); // seeding again adds nothing
-  assert.equal(t.db.prepare('SELECT COUNT(*) AS n FROM listing_images').get().n, 4);
+  // 4 original demo requests + one photo for each example request in server/src/demo-requests.js (session 72).
+  const { DEMO_REQUESTS } = await import('../src/demo-requests.js');
+  assert.equal(t.db.prepare('SELECT COUNT(*) AS n FROM listing_images').get().n, 4 + DEMO_REQUESTS.length);
+  // Every category has at least one open example request.
+  const { CATEGORIES } = await import('../src/lib/categories.js');
+  for (const c of CATEGORIES) assert.ok(t.db.prepare("SELECT 1 FROM listings WHERE category = ? AND status = 'open'").get(c), `no open demo request in ${c}`);
   assert.equal(t.db.prepare('SELECT COUNT(*) AS n FROM messages WHERE image IS NOT NULL').get().n, 2);
   // 3 members + 3 more demo shops (session 72), each with a profile photo; all 4 shops have a cover.
   assert.equal(t.db.prepare("SELECT COUNT(*) AS n FROM users WHERE email LIKE '%@demo.local' AND avatar IS NOT NULL").get().n, 6);

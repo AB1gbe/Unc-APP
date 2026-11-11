@@ -6,6 +6,7 @@ import { useApi } from '../hooks.js';
 import { t } from '../i18n.jsx';
 import { ShopCard } from '../components/Showcase.jsx';
 import { CardsLoading } from '../components/ui.jsx';
+import { StoriesStrip } from '../components/Stories.jsx';
 
 export default function Shops() {
   const [q, setQ] = useState('');
@@ -22,6 +23,7 @@ export default function Shops() {
       {loading ? <CardsLoading /> : data?.shops.length === 0
         ? <p className="muted">{t('No shops match that yet.')}</p>
         : <div className="shop-grid shop-grid-all">{data?.shops.map((s) => <ShopCard key={s.id} shop={s} />)}</div>}
+      <div style={{ marginTop: '2rem' }}><StoriesStrip /></div>
     </div>
   );
 }

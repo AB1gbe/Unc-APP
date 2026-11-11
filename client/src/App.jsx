@@ -34,6 +34,7 @@ const Invite = lazy(() => import('./pages/Invite.jsx'));
 const Help = lazy(() => import('./pages/Help.jsx'));
 const Categories = lazy(() => import('./pages/Categories.jsx'));
 const Shops = lazy(() => import('./pages/Shops.jsx'));
+const Landing = lazy(() => import('./pages/Landing.jsx'));
 const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
@@ -42,7 +43,7 @@ const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
 // Members land on their personal home; visitors see the request list.
 function HomeOrBrowse() {
   const { user } = useAuth();
-  return user ? <Home /> : <Browse />;
+  return user ? <Home /> : <Landing />;
 }
 
 export default function App() {

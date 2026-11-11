@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { Loading } from './ui.jsx';
@@ -14,8 +14,7 @@ import TermsAccept from './TermsAccept.jsx';
 const tabbed = ({ isActive }) => `hide-phone${isActive ? ' active' : ''}`;
 
 export default function Layout() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [unread, setUnread] = useState(0);
   const [bell, setBell] = useState(0); // unread notifications
   const { pathname } = useLocation();
@@ -57,8 +56,10 @@ export default function Layout() {
         <div className="topbar-inner">
           <Link to="/" className="logo">un<span>c</span></Link>
           <nav className="nav">
-            {user && <NavLink to="/" end className={tabbed}>{t('Home')}</NavLink>}
-            <NavLink to={user ? '/browse' : '/'} end className={tabbed}>{t('Browse')}</NavLink>
+            <NavLink to="/" end className={tabbed}>{t('Home')}</NavLink>
+            <NavLink to="/browse" className={tabbed}>{t('Requests')}</NavLink>
+            <NavLink to="/shops" className={tabbed}>{t('Shops')}</NavLink>
+            <NavLink to="/categories" className={tabbed}>{t('Categories')}</NavLink>
             {user && <NavLink to="/my-requests" className={tabbed}>{t('My requests')}</NavLink>}
             {user && (
               <NavLink to="/messages" className={tabbed}>
@@ -75,7 +76,6 @@ export default function Layout() {
                   {bell > 0 && <span className="unread-dot">{bell > 99 ? '99+' : bell}</span>}
                 </NavLink>
                 <NavLink to="/account" className={tabbed}>{t('Account')}</NavLink>
-                <button className="btn sm secondary hide-phone" onClick={async () => { await logout(); navigate('/'); }}>{t('Log out')}</button>
               </>
             ) : (
               <>
@@ -102,12 +102,12 @@ export default function Layout() {
       {user?.deleteAt && (
         <div className="container" style={{ paddingBottom: 0 }}><DeletePending banner /></div>
       )}
-      <main className={`container ${user ? 'with-tabbar' : ''}`}>
+      <main className="container with-tabbar">
         <Suspense fallback={<Loading />}>
           <Outlet />
         </Suspense>
       </main>
-      {user && <TabBar unread={unread} />}
+      <TabBar unread={unread} loggedIn={loggedIn} />
       <Celebrations />
     </>
   );

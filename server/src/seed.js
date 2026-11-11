@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { openDb } from './db.js';
 import { hashPassword } from './lib/crypto.js';
+import { DEMO_BUYERS, DEMO_REQUESTS } from './demo-requests.js';
 import { TERMS_VERSION } from './lib/terms.js';
 import { AVATAR_DIR, CHAT_DIR, COVER_DIR, LISTING_DIR, STORY_DIR, saveFiles } from './lib/uploads.js';
 
@@ -80,8 +81,9 @@ export async function seedDemo(db) {
     ['phonefix@demo.local', 'Manama Phone Fix', 'Manama', 'Manama Souq', 'Screens, batteries and repairs for all phones, same day. Original and tested parts.', ['Phones & Tablets', 'Electronics', 'Services'], 'cover-phonefix.jpg', 'avatar-phonefix.jpg'],
   ];
   for (const [email, name, city] of DEMO_SHOPS) mk(email, name, 'business', city);
+  for (const [email, name, city] of DEMO_BUYERS) mk(email, name, 'individual', city);
   // Demo members have a test payment card (session 40), like everyone who joins.
-  for (const email of ['buyer@demo.local', 'vendor@demo.local', 'freelancer@demo.local', ...DEMO_SHOPS.map((x) => x[0])]) {
+  for (const email of ['buyer@demo.local', 'vendor@demo.local', 'freelancer@demo.local', ...DEMO_SHOPS.map((x) => x[0]), ...DEMO_BUYERS.map((x) => x[0])]) {
     const id = db.prepare('SELECT id FROM users WHERE email = ?').get(email).id;
     db.prepare(`INSERT OR IGNORE INTO payment_cards (user_id, provider, provider_ref, brand, last4, exp_month, exp_year) VALUES (?, 'test', 'tok_test_visa_4242_12_39', 'visa', '4242', 12, 2039)`).run(id);
     db.prepare(`UPDATE users SET card_added_at = COALESCE(card_added_at, datetime('now')) WHERE id = ?`).run(id);
@@ -147,8 +149,20 @@ export async function seedDemo(db) {
         .run(conv, seller, text, price, condition, warranty, returns);
     }
   }
+  // Example requests in every category (session 72), each with a photo,
+  // spread over the last two weeks and over three demo buyers.
+  const buyers = DEMO_BUYERS.map(([email]) => db.prepare('SELECT id FROM users WHERE email = ?').get(email).id);
+  DEMO_REQUESTS.forEach(([title, description, category, min, max, city, daysAgo, photo], n) => {
+    const who = buyers[n % buyers.length];
+    if (db.prepare('SELECT 1 FROM listings WHERE buyer_id = ? AND title = ?').get(who, title)) return;
+    const id = Number(db.prepare(`
+      INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, city, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now', ?), datetime('now', ?))
+    `).run(who, title, description, category, min, max, city, `-${daysAgo} days`, `-${daysAgo} days`).lastInsertRowid);
+    db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(id, demoPhoto(LISTING_DIR, photo));
+  });
   addDemoPhotos(db);
-  console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local, furniture@demo.local, autoparts@demo.local, phonefix@demo.local');
+  console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local, furniture@demo.local, autoparts@demo.local, phonefix@demo.local, fatima@demo.local, hussain@demo.local, noor@demo.local');
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

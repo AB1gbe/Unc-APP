@@ -1064,4 +1064,9 @@ export default {
   "No shops match that yet.": "لا توجد محلات مطابقة بعد.",
   "A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and verified shops send you their best price.": "بلايستيشن في الرفاع، كنبة للمجلس، قطعة لا يبيعها أحد. اكتب ما تريد وميزانيتك، وترسل لك المحلات الموثّقة أفضل سعر.",
   '{n} sales': { zero: 'لا مبيعات', one: 'عملية بيع واحدة', two: 'عمليتا بيع', few: '{n} عمليات بيع', many: '{n} عملية بيع', other: '{n} عملية بيع' },
+  "Requests": "الطلبات",
+  "Shops": "المحلات",
+  "Latest requests": "أحدث الطلبات",
+  "All requests": "كل الطلبات",
+  "What people in Bahrain are looking for right now. Shops and finders answer with offers.": "ما يبحث عنه الناس في البحرين الآن. ترد المحلات والباحثون بعروضهم.",
 };

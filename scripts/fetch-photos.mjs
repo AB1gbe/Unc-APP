@@ -12,6 +12,7 @@
 // (Uses Playwright's browser for cropping, like scripts/make-art.mjs.)
 import fs from 'node:fs';
 import { chromium } from 'playwright';
+import { DEMO_REQUESTS } from '../server/src/demo-requests.js';
 
 const KEY = process.env.PEXELS_API_KEY;
 if (!KEY) { console.error('Set PEXELS_API_KEY first (see the top of this file).'); process.exit(1); }
@@ -39,6 +40,8 @@ const PHOTOS = [
   [DEMO, 'avatar-autoparts.jpg', 512, 512, 'mechanic portrait', 9112798],
   [DEMO, 'cover-phonefix.jpg', 1600, 600, 'phone repair workbench', 31862953],
   [DEMO, 'avatar-phonefix.jpg', 512, 512, 'smartphone repair technician', 19518397],
+  // One example request per line of server/src/demo-requests.js (session 72)
+  ...DEMO_REQUESTS.map((r) => [DEMO, r[7], 1200, 900, r[8], r[9]]),
   // How Unc works
   [ART, 'step-post.jpg', 480, 360, 'person typing on smartphone', 6260105],
   [ART, 'step-offers.jpg', 480, 360, 'shop owner using phone counter', 6612691],

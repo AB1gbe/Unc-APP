@@ -5,11 +5,9 @@ import { useAuth } from '../auth.jsx';
 import { ErrorBox, ListingCard, CardsLoading, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
 import { t } from '../i18n.jsx';
-import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
 import LivePulse from '../components/LivePulse.jsx';
-import { CategoryPreview, HeroStack, ShopsPreview } from '../components/Showcase.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -40,20 +38,10 @@ export default function Browse() {
 
   return (
     <>
-      {!user && (
-        <section className="hero hero-art">
-          <div className="hero-text">
-            <h1>{t('Need something? Post it. Bahrain’s shops come to you.')}</h1>
-            <p>{t('A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and verified shops send you their best price.')}</p>
-            <Link className="btn" to="/register">{t('Post what you need')}</Link>
-          </div>
-          <HeroStack listings={result.listings} />
-        </section>
-      )}
-      {params.toString() === '' && <ShopsPreview />}
-      {params.toString() === '' && <CategoryPreview />}
-      {!user && <div style={{ marginBottom: '1.5rem' }}><StoriesStrip /></div>}
-      {!user && <div style={{ marginBottom: '1.5rem' }}><Feed title={t('Happening on Unc')} /></div>}
+      <div className="page-head">
+        <h1>{t('Requests')}</h1>
+        <p className="muted">{t('What people in Bahrain are looking for right now. Shops and finders answer with offers.')}</p>
+      </div>
       <LivePulse />
       <form className="searchbar" onSubmit={search}>
         <input placeholder={t('What are people looking for?')} value={draft.q} onChange={(e) => setDraft({ ...draft, q: e.target.value })} aria-label={t('Search')} />
@@ -90,6 +78,7 @@ export default function Browse() {
           <button className="btn secondary" disabled={!result.hasMore} onClick={() => goPage(page + 1)}>{t('Older')} <span className="flip">→</span></button>
         </div>
       )}
+      <div style={{ marginTop: '2.5rem' }}><Feed title={t('Happening on Unc')} /></div>
     </>
   );
 }

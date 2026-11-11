@@ -41,7 +41,7 @@ export default function Demand() {
               </p>
               {c.words.length > 0 && (
                 <p className="small muted" style={{ margin: '.35rem 0 0' }}>
-                  {t('Often asked for:')} {c.words.map((w) => <span key={w} className="chip"><bdi>{w}</bdi></span>)}
+                  {t('Often asked for:')} {c.words.map((w) => <span key={w} className="word-tag"><bdi>{w}</bdi></span>)}
                 </p>
               )}
             </div>
