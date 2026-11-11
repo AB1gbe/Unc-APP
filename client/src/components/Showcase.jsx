@@ -58,10 +58,13 @@ export function CategoryTiles({ categories }) {
       <h2 id="catTitle">{t('Browse by category')}</h2>
       <div className="cat-tiles">
         {categories.map((c) => (
-          <Link key={c} className="cat-tile" to={`/browse?category=${encodeURIComponent(c)}`}>
-            <img src={categoryArt(c)} alt="" loading="lazy" width="360" height="270" />
-            <span>{t(c)}</span>
-          </Link>
+          <div key={c} className="glow-wrap">
+            <img className="glow" src={categoryArt(c)} alt="" aria-hidden="true" loading="lazy" />
+            <Link className="cat-tile" to={`/browse?category=${encodeURIComponent(c)}`}>
+              <img src={categoryArt(c)} alt="" loading="lazy" width="360" height="270" />
+              <span>{t(c)}</span>
+            </Link>
+          </div>
         ))}
       </div>
     </section>
