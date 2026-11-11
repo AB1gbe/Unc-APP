@@ -148,7 +148,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — in `main` since session 63 → [[Design System#The new look (session 62)]] |
 | Real photos from Pexels (demo data, steps, categories, Help) | ✅ done — in `main` since session 65 → [[Photo Credits]] |
 | Smaller corners + back-glow behind photo cards (square redesign tried and reverted) | ✅ done — in `main` since session 69 → [[ADR-063 Smaller corners and back-glow]] |
-| Less AI-looking: line icons, local wording, Readex Pro + IBM Plex, fewer frames, glow on categories | ✅ done — on branch (session 70) → [[ADR-064 Less AI-looking details]] |
+| Less AI-looking: line icons, local wording, Readex Pro + IBM Plex, fewer frames, glow on categories | ✅ done — in `main` since session 71 → [[ADR-064 Less AI-looking details]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
