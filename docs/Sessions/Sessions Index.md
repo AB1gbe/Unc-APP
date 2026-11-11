@@ -78,3 +78,5 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-11 | [[2026-11-11 Session 69]] | Pull request #22 (smaller corners, back-glow) merged into `main` |
 | 2026-11-11 | [[2026-11-11 Session 70]] | Stronger glow + categories; emoji, wording, fonts, boxes made less AI-looking |
 | 2026-11-11 | [[2026-11-11 Session 71]] | Pull request #23 (less AI-looking) merged into `main` |
+| 2026-11-11 | [[2026-11-11 Session 72]] | Shops first, 4 categories + Categories page, softer glow, owner-chosen font, example requests in every category, calm home + tabs, app-style side bar (opens and folds) |
+| 2026-11-11 | [[2026-11-11 Session 73]] | Pull request #24 (shops first, tabs, side bar) merged into `main` |

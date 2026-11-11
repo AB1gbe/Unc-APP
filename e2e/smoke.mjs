@@ -284,8 +284,10 @@ await buyer.waitForSelector('text=Exactly as described');
 await buyer.waitForSelector('.story:has-text("Got my PS5")'); // the story, on the seller's profile
 await buyer.waitForSelector('.earned .badge'); // earned badges (🌱 New member)
 await shot(buyer, '25-profile');
-await buyer.goto(BASE + '/'); await buyer.waitForSelector('.story:has-text("Got my PS5")');
+// Stories live on the Shops tab, the activity list on the Requests tab (session 72).
+await buyer.goto(BASE + '/shops'); await buyer.waitForSelector('.story:has-text("Got my PS5")');
 await shot(buyer, '26-home-stories');
+await buyer.goto(BASE + '/browse');
 // "Happening near you": the deal shows up anonymously, Austin first.
 await buyer.waitForSelector('.feed li.near:has-text("Someone in Austin found what they needed in Electronics")');
 if (await buyer.locator('.feed:has-text("Sam Buyer")').count()) throw new Error('the feed named a private member');
@@ -491,6 +493,6 @@ await shot(buyer, '53-help');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
-const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.feed li'); /* visitors see "Happening on Unc" */ await shot(mp, '14-mobile-home');
+const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.hero'); await mp.waitForSelector('.shop-card'); /* the calm home: banner, verified shops… */ await mp.waitForSelector('.tabbar a[href="/shops"]'); /* …and the visitor tab bar */ await shot(mp, '14-mobile-home');
 console.log('E2E OK');
 await browser.close();

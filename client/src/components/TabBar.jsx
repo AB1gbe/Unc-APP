@@ -1,5 +1,5 @@
 // Bottom tab bar for phones (shown by CSS under 900 px wide, logged-in
-// members only: phones and tablets) - like a native app: the main places one thumb-tap away.
+// phones and tablets; visitors get Home, Requests, Shops and Categories) - like a native app: the main places one thumb-tap away.
 import { NavLink } from 'react-router-dom';
 import { t } from '../i18n.jsx';
 
@@ -10,6 +10,8 @@ const ICONS = {
   post: 'M12 5v14M5 12h14',
   messages: 'M4 5h16v11H8l-4 4z',
   account: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0',
+  shops: 'M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9h16M9 20v-6h6v6',
+  categories: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
 };
 const Icon = ({ name }) => (
   <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -17,11 +19,22 @@ const Icon = ({ name }) => (
   </svg>
 );
 
-export default function TabBar({ unread }) {
+export default function TabBar({ unread, loggedIn }) {
+  if (!loggedIn) {
+    // Visitors (session 72): the main tabs, so phones can reach every section.
+    return (
+      <nav className="tabbar" aria-label={t('Main')}>
+        <NavLink to="/" end><Icon name="home" /><span>{t('Home')}</span></NavLink>
+        <NavLink to="/browse"><Icon name="browse" /><span>{t('Requests')}</span></NavLink>
+        <NavLink to="/shops"><Icon name="shops" /><span>{t('Shops')}</span></NavLink>
+        <NavLink to="/categories"><Icon name="categories" /><span>{t('Categories')}</span></NavLink>
+      </nav>
+    );
+  }
   return (
     <nav className="tabbar" aria-label={t('Main')}>
       <NavLink to="/" end><Icon name="home" /><span>{t('Home')}</span></NavLink>
-      <NavLink to="/browse"><Icon name="browse" /><span>{t('Browse')}</span></NavLink>
+      <NavLink to="/browse"><Icon name="browse" /><span>{t('Requests')}</span></NavLink>
       <NavLink to="/requests/new" className="tab-post" aria-label={t('Post a request')}><Icon name="post" /><span>{t('Post')}</span></NavLink>
       <NavLink to="/messages">
         <span className="tab-icon"><Icon name="messages" />{unread > 0 && <span className="unread-dot">{unread > 99 ? '99+' : unread}</span>}</span>

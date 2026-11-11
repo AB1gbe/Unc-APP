@@ -65,6 +65,9 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 056 | [[ADR-056 Orders and wallet credit]] | Orders = chats with an accepted price or a deal, fixed stages; wallet = Unc credit ledger in fils, not money until Tap | deals only, real money now, one balance number |
 | 057 | [[ADR-057 Refer a friend]] | Reward both (BD 1 / BD 0.5) once the friend is fully verified; counts only; random 8-letter code; link from the page address | reward at sign-up or first deal, show names |
 | 058 | [[ADR-058 Short videos in chats]] | Chat/offer only, ≤1 min and 25 MB, MP4/MOV/WebM by first bytes, members only | public videos, re-encoding, any file |
+| 067 | [[ADR-067 App-style side bar]] | Side bar on computers (folds to icons, remembered); slim header + tab bar on phones | top bar designs A/B/C |
+| 066 | [[ADR-066 Calm home page and tabs]] | Calm home; tabs Home/Requests/Shops/Categories; examples in every category | one long page, member-only tab bar |
+| 065 | [[ADR-065 Shops first and fewer categories]] | Verified shops first, 4 categories + /categories, soft glow, Plus Jakarta Sans + Almarai | 16 tiles, How-it-works strip, Readex + Plex |
 | 064 | [[ADR-064 Less AI-looking details]] | Line icons, local wording, Readex Pro + IBM Plex, fewer frames | keep emoji, Fraunces + Inter |
 | 063 | [[ADR-063 Smaller corners and back-glow]] | Previous look, 6 px corners, photo-coloured glow behind cards | square redesign, one-colour shadow |
 | 062 | [[ADR-062 Photo-first marketplace look]] | **Reverted** (owner preferred the previous look) | — |

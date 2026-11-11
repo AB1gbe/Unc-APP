@@ -70,3 +70,18 @@ The owner chose four giveaways to change ([[ADR-064 Less AI-looking details]]): 
 
 ![[less-ai-home.png]]
 
+## Shops first and the owner's font (session 72)
+Front page: banner → **Verified shops** → **4 categories + All categories** → stories → activity → search → requests. New pages `/shops` and `/categories`, each with a search bar. Glow toned down. Font chosen by the owner from four samples: **Plus Jakarta Sans** (English) + **Almarai** (Arabic). See [[ADR-065 Shops first and fewer categories]].
+
+![[shops-first-home.png]]
+
+## Calm home page and tabs (session 72)
+Tabs **Home · Requests · Shops · Categories** in the top bar, and on phones in the bottom tab bar (now for visitors too). The visitors' home is calm: banner, 4 shops, 4 categories, 3 newest requests. Requests tab = search + all requests + activity; Shops tab = shops + stories. See [[ADR-066 Calm home page and tabs]].
+
+![[calm-home.png]]
+
+## App-style side bar (session 72)
+Computers: a side bar instead of a top bar, with a toggle that folds it into an icon rail (remembered). Phones: slim header + bottom tab bar. See [[ADR-067 App-style side bar]].
+
+![[app-side-open.png]]
+

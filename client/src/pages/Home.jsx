@@ -7,8 +7,6 @@ import { Avatar, CardsLoading, ListingCard, Loading, StatusBadge } from '../comp
 import { partOfDay, season } from '../seasons.js';
 import { useApi } from '../hooks.js';
 import { t, tj, tn } from '../i18n.jsx';
-import { StoriesStrip } from '../components/Stories.jsx';
-import Feed from '../components/Feed.jsx';
 import LivePulse from '../components/LivePulse.jsx';
 
 // Written out in full so the translation test can find every text.
@@ -99,7 +97,6 @@ export default function Home() {
         )}
       </section>
 
-      <Feed />
 
       {saved.data?.listings.length > 0 && (
         <section>
@@ -132,7 +129,6 @@ export default function Home() {
           <div className="grid">{forYou.data.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
         )}
       </section>
-      <StoriesStrip />
     </div>
   );
 }

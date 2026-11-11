@@ -261,3 +261,9 @@ Mounted at `/api/support`. A member's questions to the Unc team, and the team's 
 | POST | `/api/support/admin/:id/close` | ADM | → `{ok}`; status becomes `closed`. Audited `support.closed`. 404 if no such question |
 
 Login only (**A**): no email, identity or card check, so members can ask for help before they are verified. Not logged in → 401. A member who is not an admin calling an `/admin` route → 403 "Admins only.". The admin routes are declared before `/:id` so `admin` is never read as a question number. Questions and their messages are in "Download my data" (`helpQuestions`) and are removed by `deleteNow()` when the account is deleted. The `/help` page (questions and answers) is public; only the "Contact the Unc team" form needs sign-in. See [[Get Help]] and [[Database Schema]].
+
+## Verified shops — `server/src/routes/shops.js` (session 72)
+| Method | Path | Who | What |
+|---|---|---|---|
+| GET | `/api/shops?q=&limit=` | anyone | Verified (`kyc_status = 'approved'`), non-banned, not deleted **business** accounts, most sales first, then newest. `q` searches name, shop area and bio. `limit` 1–60 (default 24). Returns `{shops: [{id, displayName, avatarUrl, bio, city, sales, rating: {average, count}, coverUrl, shopArea, shopHours}]}`, with no email or ID data. There is no way to message a shop from here ([[Shop Pages]]). |
+

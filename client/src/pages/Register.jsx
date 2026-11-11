@@ -41,7 +41,7 @@ export default function Register() {
         <div className="field">
           <label>{t('I am…')}</label>
           <div className="field-row">
-            {[['individual', t('A person'), t('Buying for myself or finding items as a freelancer')], ['business', t('A business'), t('A shop or company selling products')]].map(([v, title, hint]) => (
+            {[['business', t('A business'), t('A shop or company selling products')], ['individual', t('A person'), t('Buying for myself or finding items as a freelancer')]].map(([v, title, hint]) => (
               <label key={v} className="card" style={{ cursor: 'pointer', borderColor: form.accountType === v ? 'var(--brand)' : undefined, fontWeight: 400 }}>
                 <input type="radio" name="accountType" value={v} checked={form.accountType === v} onChange={set('accountType')} style={{ width: 'auto', marginInlineEnd: '.4rem' }} />
                 <b>{title}</b>
