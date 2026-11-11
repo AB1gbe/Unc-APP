@@ -65,6 +65,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 056 | [[ADR-056 Orders and wallet credit]] | Orders = chats with an accepted price or a deal, fixed stages; wallet = Unc credit ledger in fils, not money until Tap | deals only, real money now, one balance number |
 | 057 | [[ADR-057 Refer a friend]] | Reward both (BD 1 / BD 0.5) once the friend is fully verified; counts only; random 8-letter code; link from the page address | reward at sign-up or first deal, show names |
 | 058 | [[ADR-058 Short videos in chats]] | Chat/offer only, ≤1 min and 25 MB, MP4/MOV/WebM by first bytes, members only | public videos, re-encoding, any file |
+| 060 | [[ADR-060 A darker, grown-up look]] | Dark for everyone, coral accent, bundled serif headings, one-object pictures | light theme, bright cartoons, stock photos |
 | 059 | [[ADR-059 Get Help inside the app]] | In-app questions to the Unc team, answered on the Admin page, 🔔 on reply | WhatsApp link, email address, member forum |
 
 Template for new ADRs: copy any ADR and keep the same headings.

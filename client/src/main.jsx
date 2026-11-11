@@ -6,6 +6,11 @@ import { LanguageProvider } from './i18n.jsx';
 import { api } from './api.js';
 import { registerServiceWorker } from './push.js';
 import App from './App.jsx';
+// Fonts are bundled with the app (no requests to font sites): Fraunces for
+// headings, Inter for text, Noto Kufi Arabic for Arabic (session 62).
+import '@fontsource-variable/fraunces';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/noto-kufi-arabic';
 import './styles.css';
 
 registerServiceWorker();

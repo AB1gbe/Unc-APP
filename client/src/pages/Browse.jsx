@@ -9,6 +9,7 @@ import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
 import LivePulse from '../components/LivePulse.jsx';
+import { CategoryTiles, HeroStack, HowItWorks } from '../components/Showcase.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -40,12 +41,17 @@ export default function Browse() {
   return (
     <>
       {!user && (
-        <section className="hero">
-          <h1>{t('Tell people what you want. Let them come to you.')}</h1>
-          <p>{t('Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.')}</p>
-          <Link className="btn" to="/register">{t('Post your first request')}</Link>
+        <section className="hero hero-art">
+          <div className="hero-text">
+            <h1>{t('Tell people what you want. Let them come to you.')}</h1>
+            <p>{t('Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.')}</p>
+            <Link className="btn" to="/register">{t('Post your first request')}</Link>
+          </div>
+          <HeroStack listings={result.listings} />
         </section>
       )}
+      {!user && <HowItWorks />}
+      {params.toString() === '' && <CategoryTiles categories={categories} />}
       {!user && <div style={{ marginBottom: '1.5rem' }}><StoriesStrip /></div>}
       {!user && <div style={{ marginBottom: '1.5rem' }}><Feed title={t('Happening on Unc')} /></div>}
       <LivePulse />
