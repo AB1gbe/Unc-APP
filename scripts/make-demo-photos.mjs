@@ -1,3 +1,6 @@
+// NOTE (session 64): real Pexels photos replaced these drawings; see
+// scripts/fetch-photos.mjs. Running this script draws over the photos in
+// server/demo-photos/ again, so only run it to go back to drawings.
 // Draws the example photos used by `npm run seed` (session 54): request
 // photos, offer photos, profile photos, a shop cover and a "found it"
 // story. They are simple illustrations (emoji on a soft studio background),

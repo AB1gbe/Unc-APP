@@ -1,3 +1,6 @@
+// NOTE (session 64): real Pexels photos replaced these drawings; see
+// scripts/fetch-photos.mjs. Running this script draws over the photos in
+// client/public/art/ again, so only run it to go back to drawings.
 // Draws the pictures used around the app (session 62): the three "How Unc works" steps, one tile per category and the
 // Help page pictures. Same style as the demo photos (emoji objects with a
 // soft shadow on a deep colour), so no rights issues and they look
