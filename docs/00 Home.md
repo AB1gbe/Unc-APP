@@ -141,7 +141,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Live counters + "Closes in N days" on request cards | ✅ done — on branch (session 56) → [[Social Touches]] |
 | Orders + wallet (Unc credit), refer a friend, short videos in chats | ✅ done — on branch (session 58) → [[Orders, Wallet, Invites and Video]] |
 | Get Help: common questions + questions to the Unc team, answered on the Admin page | ✅ done — in `main` since session 61 → [[Get Help]] |
-| New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — on branch (session 62) → [[Design System#The new look (session 62)]] |
+| New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — in `main` since session 63 → [[Design System#The new look (session 62)]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
