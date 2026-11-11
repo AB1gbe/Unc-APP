@@ -131,7 +131,7 @@ await check(buyer, 'request-owner');
 
 // vendor makes an offer
 await vendor.goto(BASE + '/');
-await vendor.waitForSelector('.grid .listing-card');
+await vendor.waitForSelector('.grid .card');
 await check(vendor, 'browse');
 await vendor.goto(listingUrl);
 await check(vendor, 'request-vendor');

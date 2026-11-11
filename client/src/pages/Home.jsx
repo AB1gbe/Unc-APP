@@ -92,7 +92,7 @@ export default function Home() {
             {openRequests.slice(0, 3).map((l) => (
               <div key={l.id} style={{ position: 'relative' }}>
                 <ListingCard listing={l} />
-                <div style={{ position: 'absolute', top: '.5rem', insetInlineEnd: '.5rem' }}><StatusBadge status={l.status} /></div>
+                <div style={{ position: 'absolute', top: '-8px', insetInlineEnd: '10px' }}><StatusBadge status={l.status} /></div>
               </div>
             ))}
           </div>
