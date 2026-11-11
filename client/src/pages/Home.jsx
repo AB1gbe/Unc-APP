@@ -18,10 +18,10 @@ const GREETING = {
   evening: (v) => tj('Good evening, {name}', v),
 };
 const SEASON = {
-  ramadan: () => t('Ramadan Kareem 🌙 Wishing you a blessed month.'),
-  'eid-fitr': () => t('Eid Mubarak! 🎉 Enjoy the celebrations.'),
-  'eid-adha': () => t('Eid al-Adha Mubarak! 🎉'),
-  'national-day': () => t('Happy National Day, Bahrain! 🇧🇭'),
+  ramadan: () => t('Ramadan Kareem Wishing you a blessed month.'),
+  'eid-fitr': () => t('Eid Mubarak! Enjoy the celebrations.'),
+  'eid-adha': () => t('Eid al-Adha Mubarak!'),
+  'national-day': () => t('Happy National Day, Bahrain!'),
 };
 
 export default function Home() {
@@ -56,7 +56,7 @@ export default function Home() {
       <section className="card" style={{ padding: 0 }}>
         <h2 style={{ padding: '1rem 1rem 0' }}>{t('Needs your attention')}</h2>
         {convs.loading ? <div style={{ padding: '0 1rem 1rem' }}><Loading /></div> : attention.length === 0 ? (
-          <p className="muted" style={{ padding: '0 1rem 1rem' }}>{t("You're all caught up ✓")}</p>
+          <p className="muted" style={{ padding: '0 1rem 1rem' }}>{t("You're all caught up")}</p>
         ) : attention.map((c) => (
           <Link key={c.id} to={`/messages/${c.id}`} className="inbox-item">
             <Avatar name={c.other.displayName} src={c.other.avatarUrl} />
@@ -72,7 +72,7 @@ export default function Home() {
                 <bdi>{c.listing.title}</bdi> · {ago(c.lastMessageAt)}
               </div>
             </div>
-            {c.needsRating ? <span className="badge warn">{t('★ Rate')}</span> : <span className="unread-dot">{c.unread}</span>}
+            {c.needsRating ? <span className="badge warn">{t('Rate')}</span> : <span className="unread-dot">{c.unread}</span>}
           </Link>
         ))}
       </section>
@@ -104,7 +104,7 @@ export default function Home() {
       {saved.data?.listings.length > 0 && (
         <section>
           <div className="row spread" style={{ marginBottom: '.6rem' }}>
-            <h2 style={{ margin: 0 }}>{t('♥ Saved for later')}</h2>
+            <h2 style={{ margin: 0 }}>{t('Saved for later')}</h2>
             <Link to="/saved">{t('See all')} <span className="flip">→</span></Link>
           </div>
           <div className="grid">{saved.data.listings.slice(0, 3).map((l) => <ListingCard key={l.id} listing={l} />)}</div>
@@ -122,7 +122,7 @@ export default function Home() {
             </div>
           </div>
           <span className="row" style={{ gap: '1rem' }}>
-            <Link to="/demand">{t('📊 What people ask for')}</Link>
+            <Link to="/demand">{t('What people ask for')}</Link>
             <Link to="/browse">{t('Browse all')} <span className="flip">→</span></Link>
           </span>
         </div>

@@ -3,6 +3,7 @@
 // stands and links to its chat. Payment still goes directly between the
 // two people (Tap Payments is not connected yet).
 import { useState } from 'react';
+import Icon from '../components/Icon.jsx';
 import { Link } from 'react-router-dom';
 import { ago, money } from '../api.js';
 import { Avatar, ErrorBox, Loading } from '../components/ui.jsx';
@@ -12,8 +13,8 @@ import { t, tj, tn } from '../i18n.jsx';
 const STAGE = {
   agreed: () => ['warn', t('Price agreed · not marked found yet')],
   paying: () => ['warn', t('Paying in parts')],
-  rate: () => ['warn', t('★ Rate them')],
-  done: () => ['ok', t('Done ✓')],
+  rate: () => ['warn', t('Rate them')],
+  done: () => ['ok', t('Done')],
   ended: () => ['grey', t('Closed without this deal')],
 };
 
@@ -34,7 +35,7 @@ export default function Orders() {
       <ErrorBox error={error} />
       {loading ? <Loading /> : list.length === 0 ? (
         <div className="card empty">
-          📦 <b>{t('No orders here yet')}</b>
+          <Icon name="box" size="1.6em" /> <b>{t('No orders here yet')}</b>
           <p className="muted">{tab === 'inProgress' ? t('When you and a seller (or a buyer) agree a price, it shows here until it is done.') : t('Finished deals show here.')}</p>
         </div>
       ) : (

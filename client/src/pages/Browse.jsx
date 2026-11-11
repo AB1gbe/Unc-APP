@@ -68,9 +68,9 @@ export default function Browse() {
       {user && (
         <p className="small" style={{ marginTop: 0 }}>
           <Link to={`/alerts?${new URLSearchParams(Object.fromEntries(Object.entries(draft).filter(([, v]) => v)))}`}>
-            {t('🔔 Alert me about new requests like these')}
+            {t('Alert me about new requests like these')}
           </Link>
-          {' · '}<Link to="/demand">{t('📊 What people are asking for')}</Link>
+          {' · '}<Link to="/demand">{t('What people are asking for')}</Link>
         </p>
       )}
       {loading ? <CardsLoading /> : result.listings.length === 0 ? (

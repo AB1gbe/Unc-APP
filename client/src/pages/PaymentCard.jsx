@@ -31,7 +31,7 @@ export default function PaymentCard() {
     try {
       await api('/payments/card', { method: 'POST', body: { token: testToken(form.number, form.expiry) } });
       setUser((await api('/auth/me')).user);
-      celebrate({ text: t('Card added ✓') });
+      celebrate({ text: t('Card added') });
       navigate(params.get('next') || (user.kycStatus === 'approved' ? '/' : '/verification'));
     } catch (err) {
       setError(err);
@@ -65,7 +65,7 @@ export default function PaymentCard() {
         <input id="cardName" autoComplete="cc-name" required maxLength={80} value={form.name} onChange={set('name')} />
       </div>
       <button className="btn block" disabled={busy}>{busy ? t('Saving…') : t('Save card')}</button>
-      <p className="hint">{t('🔒 Your card number goes only to our payment company (Tap Payments). Unc keeps just the last 4 digits and the expiry.')}</p>
+      <p className="hint">{t('Your card number goes only to our payment company (Tap Payments). Unc keeps just the last 4 digits and the expiry.')}</p>
     </form>
   );
 }

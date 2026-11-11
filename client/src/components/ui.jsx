@@ -3,6 +3,7 @@
 // dir="auto" or <bdi>, so English text inside the Arabic layout (and the
 // other way round) keeps its own direction and punctuation.
 import { useState } from 'react';
+import Icon from './Icon.jsx';
 import { categoryArt } from '../art.js';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
@@ -48,7 +49,7 @@ export function CardsLoading({ count = 3 }) {
 
 export function KycBadge({ status }) {
   const map = {
-    approved: ['ok', t('✓ Verified')],
+    approved: ['ok', t('Verified')],
     pending: ['warn', t('Verification pending')],
     rejected: ['bad', t('Verification rejected')],
     unverified: ['grey', t('Not verified')],
@@ -76,12 +77,12 @@ export function Avatar({ name, src, size = 40 }) {
 export function ClosesBadge({ closesAt }) {
   const days = closingDays(closesAt);
   if (days === null) return null;
-  return <span className="badge warn">{days === 0 ? t('⏳ Closes today') : tn(days, '⏳ Closes in {n} day', '⏳ Closes in {n} days')}</span>;
+  return <span className="badge warn">{days === 0 ? t('Closes today') : tn(days, 'Closes in {n} day', 'Closes in {n} days')}</span>;
 }
 
 // "🔒 Shops only" (session 34): who may make offers, when it isn't everyone.
 export function ContactRule({ rule }) {
-  const text = { shops: t('🔒 Shops only'), rated: t('🔒 4★+ sellers only'), favourites: t('🔒 Favourite sellers only') }[rule];
+  const text = { shops: t('Shops only'), rated: t('4★+ sellers only'), favourites: t('Favourite sellers only') }[rule];
   return text ? <span className="badge grey">{text}</span> : null;
 }
 
@@ -108,12 +109,12 @@ export function ListingCard({ listing }) {
         </p>
       )}
       <div className="meta">
-        <span>📍 <Place city={listing.city} /></span>
-        <span>🕒 {ago(listing.createdAt)}</span>
+        <span><Icon name="pin" /> <Place city={listing.city} /></span>
+        <span><Icon name="clock" /> {ago(listing.createdAt)}</span>
         <ContactRule rule={listing.contactRule} />
         <ClosesBadge closesAt={listing.closesAt} />
-        {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
-        {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
+        {listing.offerCount > 0 && <span><Icon name="chat" /> {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
+        {listing.viewCount > 0 && <span title={t('People who looked at it')}><Icon name="eye" /> {listing.viewCount}</span>}
       </div>
     </Link>
     </div>
@@ -206,7 +207,7 @@ export function Activity({ activity }) {
   const parts = [];
   // Away mode (session 37) says it all: no "Active now" next to it.
   if (activity.awayUntil) {
-    return <span className="activity small away">{t('🌴 Away until {date}', { date: formatDate(toDate(activity.awayUntil), { day: 'numeric', month: 'short' }) })}</span>;
+    return <span className="activity small away">{t('Away until {date}', { date: formatDate(toDate(activity.awayUntil), { day: 'numeric', month: 'short' }) })}</span>;
   }
   if (seen && since < ACTIVE_MS) parts.push(<span key="on" className="active-now">{t('Active now')}</span>);
   else if (seen && since < WEEK_MS) parts.push(<span key="ago">{t('Active {time}', { time: ago(activity.lastSeenAt) })}</span>);
@@ -217,10 +218,10 @@ export function Activity({ activity }) {
 
 // Earned badges (server/src/lib/badges.js has the rules).
 const BADGES = {
-  fast: () => ['⚡', t('Fast responder'), t('Usually replies within an hour')],
-  'top-finder': () => ['🏆', t('Top finder'), t('5+ deals as a seller, rated 4.5★ or more')],
-  trusted: () => ['🤝', t('Trusted buyer'), t('3+ deals as a buyer, rated 4.5★ or more')],
-  new: () => ['🌱', t('New member'), t('Joined in the last 30 days')],
+  fast: () => ['fast', t('Fast responder'), t('Usually replies within an hour')],
+  'top-finder': () => ['trophy', t('Top finder'), t('5+ deals as a seller, rated 4.5★ or more')],
+  trusted: () => ['deal', t('Trusted buyer'), t('3+ deals as a buyer, rated 4.5★ or more')],
+  new: () => ['plant', t('New member'), t('Joined in the last 30 days')],
 };
 export function Badges({ badges }) {
   if (!badges?.length) return null;
@@ -228,7 +229,7 @@ export function Badges({ badges }) {
     <span className="earned">
       {badges.filter((b) => BADGES[b]).map((b) => {
         const [icon, name, why] = BADGES[b]();
-        return <span key={b} className={`badge earned-${b}`} title={why}>{icon} {name}</span>;
+        return <span key={b} className={`badge earned-${b}`} title={why}><Icon name={icon} /> {name}</span>;
       })}
     </span>
   );

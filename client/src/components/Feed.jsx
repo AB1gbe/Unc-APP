@@ -2,6 +2,7 @@
 // the member's own city first. Built from GET /api/feed; the server never
 // sends the names of private people, only cities and categories.
 import { Link } from 'react-router-dom';
+import Icon from './Icon.jsx';
 import { ago } from '../api.js';
 import { useApi } from '../hooks.js';
 import { t, tj } from '../i18n.jsx';
@@ -11,13 +12,13 @@ function line(i) {
   const city = <Place city={i.city} />;
   switch (i.kind) {
     case 'found':
-      return ['🎉', tj('Someone in {city} found what they needed in {category}', { city, category: t(i.category) })];
+      return ['found', tj('Someone in {city} found what they needed in {category}', { city, category: t(i.category) })];
     case 'request':
-      return ['🆕', tj('New request in {city}: {title}', { city, title: <Link to={`/requests/${i.listing.id}`}><bdi>{i.listing.title}</bdi></Link> })];
+      return ['note', tj('New request in {city}: {title}', { city, title: <Link to={`/requests/${i.listing.id}`}><bdi>{i.listing.title}</bdi></Link> })];
     case 'shop':
-      return ['🏪', tj('New shop in {city}: {name}', { city, name: <Link to={`/members/${i.shop.id}`}><bdi>{i.shop.displayName}</bdi></Link> })];
+      return ['shop', tj('New shop in {city}: {name}', { city, name: <Link to={`/members/${i.shop.id}`}><bdi>{i.shop.displayName}</bdi></Link> })];
     case 'offers-today':
-      return ['💬', tj('{n} offers made on requests in {city} today', { n: i.count, city })];
+      return ['chat', tj('{n} offers made on requests in {city} today', { n: i.count, city })];
     default:
       return null;
   }
@@ -34,7 +35,7 @@ export default function Feed({ title }) {
       <ul>
         {items.map(([i, [icon, text]], n) => (
           <li key={n} className={i.near ? 'near' : ''}>
-            <span className="feed-icon" aria-hidden>{icon}</span>
+            <span className="feed-icon"><Icon name={icon} size="1.15em" /></span>
             <span className="feed-text">{text}</span>
             <span className="muted small feed-time">{ago(i.at)}</span>
           </li>

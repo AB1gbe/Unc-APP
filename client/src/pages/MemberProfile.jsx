@@ -2,6 +2,7 @@
 // deals. There is deliberately NO "message" button - members can only be
 // contacted about a specific request.
 import { Link, useParams } from 'react-router-dom';
+import Icon from '../components/Icon.jsx';
 import { ago, toDate } from '../api.js';
 import { Activity, Avatar, Badges, ErrorBox, KycBadge, ListingCard, Loading, Stars } from '../components/ui.jsx';
 import { useAuth } from '../auth.jsx';
@@ -39,15 +40,15 @@ export default function MemberProfile() {
             {(user && !isMe) || m.favouriteCount > 0 ? (
               <div className="row" style={{ marginTop: '.4rem', gap: '.5rem' }}>
                 {user && !isMe && <FavouriteButton memberId={m.id} initial={m.favourite} />}
-                {m.favouriteCount > 0 && <span className="muted small">{tn(m.favouriteCount, '♥ {n} member favourited this seller', '♥ {n} members favourited this seller')}</span>}
+                {m.favouriteCount > 0 && <span className="muted small">{tn(m.favouriteCount, '{n} member favourited this seller', '{n} members favourited this seller')}</span>}
               </div>
             ) : null}
             {m.shopArea ? (
               <div className="muted small" style={{ marginTop: '.3rem' }}>
-                📍 <bdi>{m.shopArea}</bdi> ·{' '}
+                <Icon name="pin" /> <bdi>{m.shopArea}</bdi> ·{' '}
                 <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.shopArea)}`} target="_blank" rel="noreferrer">{t('Map')} ↗</a>
               </div>
-            ) : m.city && <div className="muted small" style={{ marginTop: '.3rem' }}>📍 <Place city={m.city} /></div>}
+            ) : m.city && <div className="muted small" style={{ marginTop: '.3rem' }}><Icon name="pin" /> <Place city={m.city} /></div>}
             {m.shopHours && <div className="small" style={{ marginTop: '.3rem' }}><OpenNow hours={m.shopHours} /></div>}
             <div style={{ marginTop: '.3rem' }}><Activity activity={m.activity} /></div>
           </div>
@@ -85,7 +86,7 @@ export default function MemberProfile() {
       )}
       {stories.length > 0 && (
         <div>
-          <h2>{t('Found on Unc 🎉')}</h2>
+          <h2>{t('Found on Unc')}</h2>
           <div className="grid">{stories.map((s) => <StoryCard key={s.id} story={s} />)}</div>
         </div>
       )}

@@ -43,11 +43,11 @@ export default function PushSettings({ hideWhenOn = false }) {
         <div className="alert warn">{t('Notifications are blocked for Unc. Allow them in your browser or phone settings, then reload this page.')}</div>
       )}
       {support === 'ok' && state === 'off' && (
-        <button className="btn" disabled={busy} onClick={run(async () => setState(await enablePush()))}>{t('🔔 Turn on notifications')}</button>
+        <button className="btn" disabled={busy} onClick={run(async () => setState(await enablePush()))}>{t('Turn on notifications')}</button>
       )}
       {support === 'ok' && state === 'on' && (
         <div className="row">
-          <span className="badge ok">{t('✓ On for this device')}</span>
+          <span className="badge ok">{t('On for this device')}</span>
           <button className="btn sm secondary" disabled={busy} onClick={run(async () => { await api('/push/test', { method: 'POST' }); setTested(true); })}>{t('Send a test')}</button>
           <button className="btn sm secondary" disabled={busy} onClick={run(async () => { await disablePush(); setState('off'); setTested(false); })}>{t('Turn off')}</button>
         </div>

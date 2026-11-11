@@ -67,7 +67,7 @@ export default function NewListing() {
         Object.entries(form).forEach(([k, v]) => v !== '' && fd.append(k, v));
         images.forEach((f) => fd.append('images', f));
         ({ listing } = await api('/listings', { method: 'POST', form: fd }));
-        celebrate({ text: t('Posted! 🎉 Sellers can see your request now.'), confetti: true });
+        celebrate({ text: t('Posted! Sellers can see your request now.'), confetti: true });
       }
       navigate(`/requests/${listing.id}`);
     } catch (err) {

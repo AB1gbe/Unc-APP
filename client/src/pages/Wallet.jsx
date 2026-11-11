@@ -8,7 +8,7 @@ import { useApi } from '../hooks.js';
 import { formatDate, t } from '../i18n.jsx';
 
 const REASON = {
-  referral: () => t('A friend you invited joined and got verified 🎉'),
+  referral: () => t('A friend you invited joined and got verified'),
   'referral-welcome': () => t('Welcome credit for joining with a friend’s invite'),
 };
 const credit = (fils, currency) => moneyExact(fils / 1000, currency);
@@ -24,7 +24,7 @@ export default function Wallet() {
         <div className="muted small">{t('Unc credit')}</div>
         <div className="wallet-amount">{credit(data.balance, data.currency)}</div>
         <p className="small muted" style={{ margin: 0 }}>{t('Credit counts towards Unc fees once Unc starts charging them. It can’t be paid out.')}</p>
-        <Link className="btn sm secondary" to="/invite" style={{ marginTop: '.75rem' }}>{t('🎁 Invite friends to earn credit')}</Link>
+        <Link className="btn sm secondary" to="/invite" style={{ marginTop: '.75rem' }}>{t('Invite friends to earn credit')}</Link>
       </div>
       <h2>{t('History')}</h2>
       {data.entries.length === 0 ? <div className="card empty">{t('No credit yet.')}</div> : (

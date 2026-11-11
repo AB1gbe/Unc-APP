@@ -46,7 +46,7 @@ export default function Verification() {
       )}
       {status === 'approved' && user.hasCard && (
         <div className="card center">
-          <h1>{t("You're verified ✓")}</h1>
+          <h1>{t("You're verified")}</h1>
           <p className="muted">{t('You can now post requests and contact buyers.')}</p>
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link className="btn" to="/requests/new">{t('Post a request')}</Link>

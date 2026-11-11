@@ -268,7 +268,7 @@ await buyer.reload();
 await buyer.locator('.plan-parts button:has-text("I\'ve paid this")').first().click();
 await buyer.waitForSelector('.plan-parts li:has-text("Paid, waiting for the seller")');
 await vendor.reload();
-await vendor.locator('.plan-parts button:has-text("Received ✓")').first().click();
+await vendor.locator('.plan-parts button:has-text("Received")').first().click();
 await vendor.waitForSelector('.plan-parts li.done');
 await vendor.locator('.plan').screenshot({ path: `${OUT}/45-plan.png` });
 // Orders (session 58): the PS5 deal is listed, with its payment plan.
@@ -318,7 +318,7 @@ for (let d = 0; d < 7; d++) if (d !== 5) await vendor.locator('.hours-row input[
 await vendor.setInputFiles('[data-testid=cover-input]', img);
 await vendor.waitForSelector('img.shop-cover-preview');
 await vendor.click('.shop-editor button:has-text("Save shop page")');
-await vendor.waitForSelector('text=Saved ✓');
+await vendor.waitForSelector('.shop-editor [role=status]:has-text("Saved")');
 const shopUrl = BASE + await vendor.getAttribute('a[href^="/members/"]', 'href');
 await buyer.goto(shopUrl);
 await buyer.waitForSelector('img.shop-cover');
@@ -409,7 +409,7 @@ await vendor.locator('.live-pulse').screenshot({ path: `${OUT}/48-live-pulse.png
 // What people are asking for (session 34): with 2 furniture requests, the shop sees that category.
 await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ title: 'Looking for a standing fan', description: 'Tall, quiet, with a remote.', category: 'Home & Furniture', city: 'Austin' }) }));
-await vendor.goto(BASE + '/browse'); await vendor.click('text=📊 What people are asking for');
+await vendor.goto(BASE + '/browse'); await vendor.click('text=What people are asking for');
 await vendor.waitForSelector('.demand-row:has-text("Home & Furniture"):has-text("fan")');
 await shot(vendor, '34-demand');
 

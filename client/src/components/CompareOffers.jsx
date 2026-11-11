@@ -1,6 +1,7 @@
 // "Compare offers" (session 31): every offer on the buyer's request side by
 // side, so choosing is easy. Only the request's buyer gets this data.
 import { useState } from 'react';
+import Icon from './Icon.jsx';
 import { Link } from 'react-router-dom';
 import { money } from '../api.js';
 import { useApi } from '../hooks.js';
@@ -43,7 +44,7 @@ export default function CompareOffers({ listing }) {
       <div className="compare-grid">
         {rows.map(({ o, c }) => (
           <Link key={o.id} to={`/messages/${o.id}`} className={`compare-item ${o.id === listing.dealConversationId ? 'deal' : ''}`}>
-            {c.photoUrl ? <img src={c.photoUrl} alt="" loading="lazy" /> : <div className="compare-nophoto" aria-hidden>📦</div>}
+            {c.photoUrl ? <img src={c.photoUrl} alt="" loading="lazy" /> : <div className="compare-nophoto" aria-hidden><Icon name="box" size="1.6em" /></div>}
             <div className="compare-body">
               <div className="row" style={{ flexWrap: 'nowrap' }}>
                 <Avatar name={o.other.displayName} src={o.other.avatarUrl} size={32} />
@@ -64,8 +65,8 @@ export default function CompareOffers({ listing }) {
               </dl>
               <Badges badges={c.badges} />
               {c.awayUntil && <Activity activity={{ awayUntil: c.awayUntil }} />}
-              {c.hasVideo && <span className="badge grey">{t('🎬 Video')}</span>}
-              {c.hasProof && <span className="badge ok">{t('✓ Proof photo')}</span>}
+              {c.hasVideo && <span className="badge grey">{t('Video')}</span>}
+              {c.hasProof && <span className="badge ok">{t('Proof photo')}</span>}
               {c.firstMessage && <p className="small muted compare-msg" dir="auto">{c.firstMessage}</p>}
               <span className="small">{t('Open chat')} <span className="flip">→</span></span>
             </div>

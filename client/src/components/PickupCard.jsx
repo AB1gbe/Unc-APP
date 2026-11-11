@@ -47,7 +47,7 @@ export default function PickupCard({ convId, category, price, currency }) {
     <div className="pickup">
       {isBigDeal(price, currency) && (
         <div className="big-deal" role="note">
-          <b>{t('🛡️ Big deal: {price}', { price: money(price, currency) })}</b>
+          <b>{t('Big deal: {price}', { price: money(price, currency) })}</b>
           <ul>
             <li>{t('Meet at a bank, a mall service desk or a police station’s safe meeting spot.')}</li>
             <li>{t('Check ID and papers (receipt, warranty, ownership) before paying.')}</li>
@@ -57,7 +57,7 @@ export default function PickupCard({ convId, category, price, currency }) {
         </div>
       )}
       <details>
-        <summary><b>{t('✅ Pickup checklist')}</b> <span className="muted small">{t('{done} of {total} checked', { done: items.filter((k) => ticks.includes(k)).length, total: items.length })}</span></summary>
+        <summary><b>{t('Pickup checklist')}</b> <span className="muted small">{t('{done} of {total} checked', { done: items.filter((k) => ticks.includes(k)).length, total: items.length })}</span></summary>
         <p className="small muted" style={{ margin: '.3rem 0' }}>{t('Only you see these ticks, on this device.')}</p>
         {items.map((k) => (
           <label key={k} className="pickup-item">

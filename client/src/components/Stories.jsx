@@ -36,14 +36,14 @@ export function StoryCard({ story: s, onHidden }) {
   );
 }
 
-// "Found on Unc 🎉": the newest stories. Hidden when there are none yet.
+// "Found on Unc": the newest stories. Hidden when there are none yet.
 export function StoriesStrip({ limit = 3 }) {
   const { data } = useApi('/stories');
   const stories = data?.stories.slice(0, limit) ?? [];
   if (!stories.length) return null;
   return (
     <section>
-      <h2 style={{ marginBottom: '.2rem' }}>{t('Found on Unc 🎉')}</h2>
+      <h2 style={{ marginBottom: '.2rem' }}>{t('Found on Unc')}</h2>
       <p className="muted small" style={{ marginTop: 0 }}>{t('Real people, real finds.')}</p>
       <div className="grid">{stories.map((s) => <StoryCard key={s.id} story={s} />)}</div>
     </section>
@@ -68,7 +68,7 @@ export function StoryForm({ dealId, otherName, onShared }) {
       fd.append('story', text);
       if (photos[0]) fd.append('image', photos[0]);
       await api(`/deals/${dealId}/story`, { method: 'POST', form: fd });
-      celebrate({ text: t('Story shared! 🎉 Thanks for spreading the word.'), confetti: true });
+      celebrate({ text: t('Story shared! Thanks for spreading the word.'), confetti: true });
       await onShared();
     } catch (err) {
       setError(err);
@@ -82,7 +82,7 @@ export function StoryForm({ dealId, otherName, onShared }) {
       <b>{t('Share your story? (optional)')}</b>
       <span className="hint">{tj('A sentence and a photo of what you got. It shows on the home page and on your and {name}’s profiles.', { name: <bdi>{otherName}</bdi> })}</span>
       <ErrorBox error={error} />
-      <textarea dir="auto" maxLength={280} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('e.g. Got my bike the same day, thanks Ali! 🚲')} aria-label={t('Your story')} />
+      <textarea dir="auto" maxLength={280} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('e.g. Got my bike the same day, thanks Ali!')} aria-label={t('Your story')} />
       <PhotoPicker id="storyPhoto" files={photos} onChange={setPhotos} max={1} />
       <div className="row">
         <button className="btn sm" disabled={busy || text.trim().length < 5}>{t('Share publicly')}</button>
