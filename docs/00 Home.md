@@ -152,9 +152,9 @@ This vault is the complete record of the project: **how** everything was built, 
 | Real photos from Pexels (demo data, steps, categories, Help) | ✅ done — in `main` since session 65 → [[Photo Credits]] |
 | Smaller corners + back-glow behind photo cards (square redesign tried and reverted) | ✅ done — in `main` since session 69 → [[ADR-063 Smaller corners and back-glow]] |
 | Less AI-looking: line icons, local wording, Readex Pro + IBM Plex, fewer frames, glow on categories | ✅ done — in `main` since session 71 → [[ADR-064 Less AI-looking details]] |
-| Shops first (Verified shops, /shops), 4 categories + /categories, softer glow, Plus Jakarta Sans + Almarai | ✅ done — on branch (session 72) → [[ADR-065 Shops first and fewer categories]] |
-| Example requests in every category; calm home page; tabs Home · Requests · Shops · Categories | ✅ done — on branch (session 72) → [[ADR-066 Calm home page and tabs]] |
-| App-style side bar on computers (opens and folds), slim header + tab bar on phones | ✅ done — on branch (session 72) → [[ADR-067 App-style side bar]] |
+| Shops first (Verified shops, /shops), 4 categories + /categories, softer glow, Plus Jakarta Sans + Almarai | ✅ done — in `main` since session 73 → [[ADR-065 Shops first and fewer categories]] |
+| Example requests in every category; calm home page; tabs Home · Requests · Shops · Categories | ✅ done — in `main` since session 73 → [[ADR-066 Calm home page and tabs]] |
+| App-style side bar on computers (opens and folds), slim header + tab bar on phones | ✅ done — in `main` since session 73 → [[ADR-067 App-style side bar]] |
 | API tests | ✅ 188 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
