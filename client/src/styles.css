@@ -615,3 +615,16 @@ p.plan { display: block; }
 .gallery-fallback { margin: .75rem 0; }
 .gallery-fallback img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: 6px; }
 .gallery-fallback figcaption { font-size: .75rem; color: var(--muted); margin-top: .35rem; }
+
+/* Back-glow (session 68): a blurred, brighter copy of the photo sits behind
+   the card and spills out around it, like ambient TV backlighting. */
+.glow-wrap { position: relative; isolation: isolate; }
+.glow-wrap > .card { position: relative; z-index: 1; height: 100%; }
+.glow { position: absolute; z-index: 0; pointer-events: none; object-fit: cover;
+  filter: blur(38px) saturate(1.8) brightness(1.15); opacity: .55; transition: opacity .3s; }
+.glow-wrap > .glow { top: -3%; inset-inline-start: -5%; width: 110%; height: 78%; }
+.glow-wrap:hover > .glow { opacity: .85; }
+.hero-glow { top: -15%; inset-inline-start: -15%; width: 130%; height: 130%; opacity: .75; filter: blur(50px) saturate(1.8); }
+.hero-card { z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .glow { transition: none; } }
+.glow-wrap > .how-step { position: relative; z-index: 1; height: 100%; }
