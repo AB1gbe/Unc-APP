@@ -35,7 +35,7 @@ export default function ListingDetail() {
     <div className="two-col">
       <article className="card">
         <div className="row spread">
-          <span className="badge">{t(l.category)}</span>
+          <span className="cat-label">{t(l.category)}</span>
           <div className="row" style={{ gap: '.5rem' }}>
             {l.status === 'open' && <ShareButton listing={l} mine={isOwner} />}
             {user && !isOwner && l.status === 'open' && <SaveButton listing={l} />}

@@ -99,7 +99,7 @@ export function ListingCard({ listing }) {
         <img src={photo} alt="" loading="lazy" />
       </div>
       <div className="row spread" style={{ marginBottom: '.4rem' }}>
-        <span className="badge">{t(listing.category)}</span>
+        <span className="cat-label">{t(listing.category)}</span>
         <span className="price">{budget(listing)}</span>
       </div>
       <h3 dir="auto">{listing.title}</h3>

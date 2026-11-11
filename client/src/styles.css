@@ -79,7 +79,7 @@ p { margin: 0 0 .75rem; }
 a.card { display: block; color: inherit; transition: border-color .15s, transform .15s; }
 a.card:hover { border-color: var(--brand); text-decoration: none; transform: translateY(-1px); }
 .card h3 { margin-bottom: .25rem; }
-.price { font-weight: 700; color: var(--ok); }
+.price { font-weight: 700; color: var(--text); }
 .meta { display: flex; gap: .75rem; flex-wrap: wrap; color: var(--muted); font-size: .875rem; }
 .thumbs { display: flex; gap: .5rem; flex-wrap: wrap; margin: .75rem 0; }
 .thumbs img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
@@ -397,8 +397,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* "Happening near you" feed (session 26) */
 .feed ul { list-style: none; margin: .5rem 0 0; padding: 0; }
-.feed li { display: flex; gap: .6rem; align-items: baseline; padding: .65rem 1rem; border-top: 1px solid var(--border); }
-.feed li.near { background: var(--brand-soft); }
+.feed li { display: flex; gap: .6rem; align-items: baseline; padding: .65rem 0; border-top: 1px solid var(--border); }
+.feed li.near .feed-text { font-weight: 500; }
 .feed-icon { flex-shrink: 0; }
 .feed-text { flex: 1; min-width: 0; }
 .feed-time { white-space: nowrap; }
@@ -571,8 +571,8 @@ p.plan { display: block; }
 .hero-card-body { padding: .55rem .7rem .65rem; }
 .hero-card-title { font-size: .8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hero-card-price { font-size: .78rem; color: var(--brand); font-weight: 700; }
-.hero-card-0 { inset-inline-start: 0; top: 34px; transform: rotate(-5deg); z-index: 1; }
-.hero-card-1 { inset-inline-start: 120px; top: 0; transform: rotate(4deg); z-index: 2; }
+.hero-card-0 { inset-inline-start: 0; top: 40px; }
+.hero-card-1 { inset-inline-start: 130px; top: 0; }
 .card-art img { object-fit: cover; }
 .how { margin-bottom: 1.5rem; }
 .how h2, .cat-tiles-wrap h2 { margin: 0 0 .75rem; }
@@ -654,3 +654,11 @@ html, body { overflow-x: clip; }
   .how-item + .how-item { border-inline-start: 0; border-top: 1px solid var(--border); padding-inline-start: 0; }
 }
 [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] .logo { letter-spacing: 0; }
+
+/* Boxes and badges (session 69): plain labels instead of coloured pills,
+   lists without frames, white prices, straight banner cards. */
+.cat-label { font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.feed ul { border-bottom: 1px solid var(--border); }
+.feed { margin-bottom: 1.5rem; }
+.attention .inbox-item { padding-inline: 0; border-top: 1px solid var(--border); }
+.attention { border-bottom: 1px solid var(--border); padding-bottom: .25rem; }

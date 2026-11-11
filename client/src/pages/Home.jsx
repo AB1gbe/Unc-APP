@@ -53,10 +53,10 @@ export default function Home() {
       <LivePulse />
       <ProfileChecklist user={user} />
 
-      <section className="card" style={{ padding: 0 }}>
-        <h2 style={{ padding: '1rem 1rem 0' }}>{t('Needs your attention')}</h2>
-        {convs.loading ? <div style={{ padding: '0 1rem 1rem' }}><Loading /></div> : attention.length === 0 ? (
-          <p className="muted" style={{ padding: '0 1rem 1rem' }}>{t("You're all caught up")}</p>
+      <section className="attention">
+        <h2>{t('Needs your attention')}</h2>
+        {convs.loading ? <Loading /> : attention.length === 0 ? (
+          <p className="muted">{t("You're all caught up")}</p>
         ) : attention.map((c) => (
           <Link key={c.id} to={`/messages/${c.id}`} className="inbox-item">
             <Avatar name={c.other.displayName} src={c.other.avatarUrl} />

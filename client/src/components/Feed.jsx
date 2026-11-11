@@ -29,9 +29,9 @@ export default function Feed({ title }) {
   const items = (data?.items ?? []).map((i) => [i, line(i)]).filter(([, l]) => l);
   if (!items.length) return null;
   return (
-    <section className="card feed" style={{ padding: 0 }}>
-      <h2 style={{ padding: '1rem 1rem 0', margin: 0 }}>{title ?? t('Happening near you')}</h2>
-      {data.city && <p className="muted small" style={{ padding: '0 1rem', margin: '.2rem 0 0' }}>{tj('{city} first, then the rest of Unc.', { city: <Place city={data.city} /> })}</p>}
+    <section className="feed">
+      <h2 style={{ margin: 0 }}>{title ?? t('Happening near you')}</h2>
+      {data.city && <p className="muted small" style={{ margin: '.2rem 0 0' }}>{tj('{city} first, then the rest of Unc.', { city: <Place city={data.city} /> })}</p>}
       <ul>
         {items.map(([i, [icon, text]], n) => (
           <li key={n} className={i.near ? 'near' : ''}>
