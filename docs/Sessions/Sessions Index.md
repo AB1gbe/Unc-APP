@@ -75,3 +75,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-11 | [[2026-11-11 Session 66]] | New look didn't show after `pull`: `npm start` now rebuilds first |
 | 2026-11-11 | [[2026-11-11 Session 67]] | Pull request #21 (`npm start` rebuilds first) merged into `main` |
 | 2026-11-11 | [[2026-11-11 Session 68]] | Square redesign (reverted), then the previous look with 6 px corners and a back-glow |
+| 2026-11-11 | [[2026-11-11 Session 69]] | Pull request #22 (smaller corners, back-glow) merged into `main` |
