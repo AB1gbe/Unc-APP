@@ -6,7 +6,7 @@ import { t } from '../i18n.jsx';
 export default function ContactNudge() {
   return (
     <div className="contact-nudge" role="note">
-      {t('📵 Numbers, emails and links stay hidden until you agree a price. Keep talking here: your rating, proof photos and our help only work for deals on Unc.')}
+      {t('Numbers, emails and links stay hidden until you agree a price. Keep talking here: your rating, proof photos and our help only work for deals on Unc.')}
     </div>
   );
 }

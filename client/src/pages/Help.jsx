@@ -15,7 +15,7 @@ const FAQ = () => [
   ['start', t('Getting started'), [
     [t('What is Unc?'), t('Unc turns shopping around: you post what you need, and verified shops and finders in Bahrain come to you with offers. You choose the best one.')],
     [t('Why do I need to verify my identity?'), t('So everyone you deal with is a real, checked person or shop. You need it to post requests and make offers; browsing is open to all.')],
-    [t('How long does verification take?'), t('Usually within a day. You get a 🔔 when it is done. Clear photos of your ID and a selfie in good light make it faster.')],
+    [t('How long does verification take?'), t('Usually within a day. You get a notification when it is done. Clear photos of your ID and a selfie in good light make it faster.')],
   ]],
   ['offers', t('Offers and deals'), [
     [t('How do sellers contact me?'), t('Only about a request you posted, inside that request’s chat. Nobody can message you out of nowhere.')],
@@ -107,7 +107,7 @@ function Contact() {
           <img src={art('help-team.jpg')} alt="" width="72" height="72" />
           <div>
             <h2 style={{ margin: 0 }}>{t('Contact the Unc team')}</h2>
-            <p className="muted small" style={{ margin: 0 }}>{t('Only the Unc team sees your question. We usually answer within a day, and you get a 🔔 when we do.')}</p>
+            <p className="muted small" style={{ margin: 0 }}>{t('Only the Unc team sees your question. We usually answer within a day, and you get a notification when we do.')}</p>
           </div>
         </div>
         <label htmlFor="helpTopic">{t('What is it about?')}</label>
@@ -134,7 +134,7 @@ export default function Help() {
     <div className="narrow stack" style={{ maxWidth: 680 }}>
       <div className="hero hero-art help-hero">
         <div className="hero-text">
-          <h1>{t('❓ Get help')}</h1>
+          <h1>{t('Get help')}</h1>
           <p>{t('Answers to common questions. Can’t find yours? Ask the Unc team below, right here in the app.')}</p>
           <a className="btn" href="#contact">{t('Contact the Unc team')}</a>
         </div>

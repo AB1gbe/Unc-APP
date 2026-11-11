@@ -32,12 +32,12 @@ export default function Invite() {
   return (
     <div className="narrow" style={{ maxWidth: 680 }}>
       <div className="card invite">
-        <h1>{t('🎁 Invite friends to Unc')}</h1>
+        <h1>{t('Invite friends to Unc')}</h1>
         <p>{t('You get {reward} of Unc credit for every friend who joins with your link and gets verified. They get {welcome} too.', { reward: credit(data.reward), welcome: credit(data.welcome) })}</p>
         <label htmlFor="inviteLink" className="small">{t('Your invite link')}</label>
         <div className="row invite-link">
           <input id="inviteLink" className="ltr" readOnly value={link} onFocus={(e) => e.target.select()} />
-          <button type="button" className="btn secondary" onClick={copy}>{copied ? t('Copied ✓') : t('Copy')}</button>
+          <button type="button" className="btn secondary" onClick={copy}>{copied ? t('Copied') : t('Copy')}</button>
           <button type="button" className="btn" onClick={share}>{t('Share')}</button>
         </div>
         <div className="stat-tiles invite-stats">

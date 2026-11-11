@@ -35,7 +35,7 @@ export default function Register() {
     <div className="narrow card">
       <h1>{t('Create your account')}</h1>
       <p className="muted">{t("Post what you're looking for, or find buyers for what you sell.")}</p>
-      {ref && <p className="alert info">{t('🎁 A friend invited you. Once you are verified, you both get Unc credit.')}</p>}
+      {ref && <p className="alert info">{t('A friend invited you. Once you are verified, you both get Unc credit.')}</p>}
       <ErrorBox error={error} />
       <form onSubmit={submit}>
         <div className="field">

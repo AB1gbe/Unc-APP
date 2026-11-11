@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-11 (session 68)
+updated: 2026-11-11 (session 70)
 ---
 # Unc — Project Vault
 
@@ -91,6 +91,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 60 - The new look]]
 - [[Step 61 - Real photos from Pexels]]
 - [[Step 62 - Photo-first marketplace look]]
+- [[Step 63 - Less AI-looking details]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -109,7 +110,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-11, after session 68)
+## Status (2026-11-11, after session 70)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -147,6 +148,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — in `main` since session 63 → [[Design System#The new look (session 62)]] |
 | Real photos from Pexels (demo data, steps, categories, Help) | ✅ done — in `main` since session 65 → [[Photo Credits]] |
 | Smaller corners + back-glow behind photo cards (square redesign tried and reverted) | ✅ done — in `main` since session 69 → [[ADR-063 Smaller corners and back-glow]] |
+| Less AI-looking: line icons, local wording, Readex Pro + IBM Plex, fewer frames, glow on categories | ✅ done — in `main` since session 71 → [[ADR-064 Less AI-looking details]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

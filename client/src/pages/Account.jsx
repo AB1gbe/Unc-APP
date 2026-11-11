@@ -26,15 +26,15 @@ export default function Account() {
           </div>
         </div>
         <div className="row" style={{ marginTop: '.75rem' }}>
-          <span>{t('Email:')} {user.emailVerified ? <span className="badge ok">{t('✓ Confirmed')}</span> : <Link to="/verify-email">{t('Confirm now')}</Link>}</span>
+          <span>{t('Email:')} {user.emailVerified ? <span className="badge ok">{t('Confirmed')}</span> : <Link to="/verify-email">{t('Confirm now')}</Link>}</span>
           <span>{t('Identity:')} <KycBadge status={user.kycStatus} /></span>
           {user.kycStatus === 'approved' && <Link to={`/members/${user.id}`}>{t('View my public profile & ratings')} <span className="flip">→</span></Link>}
-          <Link to="/saved">{t('♥ Saved requests')} <span className="flip">→</span></Link>
-          <Link to="/alerts">{t('🔔 Request alerts')} <span className="flip">→</span></Link>
-          <Link to="/orders">{t('📦 Orders')} <span className="flip">→</span></Link>
-          <Link to="/wallet">{t('👛 My wallet')} <span className="flip">→</span></Link>
-          <Link to="/invite">{t('🎁 Invite friends')} <span className="flip">→</span></Link>
-          <Link to="/help">{t('❓ Get help')} <span className="flip">→</span></Link>
+          <Link to="/saved">{t('Saved requests')} <span className="flip">→</span></Link>
+          <Link to="/alerts">{t('Request alerts')} <span className="flip">→</span></Link>
+          <Link to="/orders">{t('Orders')} <span className="flip">→</span></Link>
+          <Link to="/wallet">{t('My wallet')} <span className="flip">→</span></Link>
+          <Link to="/invite">{t('Invite friends')} <span className="flip">→</span></Link>
+          <Link to="/help">{t('Get help')} <span className="flip">→</span></Link>
         </div>
         {user.kycStatus !== 'approved' && user.emailVerified && (
           <p style={{ marginTop: '.75rem' }}><Link className="btn sm" to="/verification">{t('Go to verification')}</Link></p>
@@ -217,7 +217,7 @@ function YourData() {
     <div className="card your-data">
       <h2>{t('Your data')}</h2>
       <p className="small muted">{t('A file with your profile, requests, your messages, deals, ratings and settings. Identity numbers show only their last 4 digits.')}</p>
-      <a className="btn secondary" href="/api/auth/me/export" download>{t('⬇ Download my data')}</a>
+      <a className="btn secondary" href="/api/auth/me/export" download>{t('Download my data')}</a>
       <hr />
       {user.deleteAt ? (
         <DeletePending />
@@ -271,7 +271,7 @@ function AwayMode() {
       <ErrorBox error={error} />
       {user.awayUntil ? (
         <div className="row spread">
-          <b>{t('🌴 Away until {date}', { date: formatDate(toDate(user.awayUntil), { day: 'numeric', month: 'long' }) })}</b>
+          <b>{t('Away until {date}', { date: formatDate(toDate(user.awayUntil), { day: 'numeric', month: 'long' }) })}</b>
           <button type="button" className="btn secondary" disabled={busy} onClick={() => save(null)}>{t("I'm back")}</button>
         </div>
       ) : (

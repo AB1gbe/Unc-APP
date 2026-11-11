@@ -24,7 +24,7 @@ export default function FavouriteButton({ memberId, name, initial, onChange, wid
   }
   return (
     <button type="button" className={`btn sm secondary fav-btn ${on ? 'on' : ''}`} onClick={toggle} disabled={busy} aria-pressed={on}>
-      {on ? t('♥ Favourite seller') : wide ? tj('♡ Add {name} to favourite sellers', { name: <bdi>{name}</bdi> }) : t('♡ Favourite')}
+      {on ? t('Favourite seller') : wide ? tj('Add {name} to favourite sellers', { name: <bdi>{name}</bdi> }) : t('Favourite')}
     </button>
   );
 }

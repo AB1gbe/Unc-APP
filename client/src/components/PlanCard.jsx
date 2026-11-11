@@ -35,12 +35,12 @@ export default function PlanCard({ conv, price }) {
   const statusLine = {
     proposed: plan.proposedByMe ? tj('Waiting for {name} to accept this plan.', { name: <bdi>{conv.other.displayName}</bdi> }) : tj('{name} suggests paying in parts.', { name: <bdi>{conv.other.displayName}</bdi> }),
     active: t('{paid} of {total} paid', { paid: money(plan.paid, currency), total: money(plan.total, currency) }),
-    completed: t('All paid ✓'),
+    completed: t('All paid'),
   }[plan.status];
 
   return (
     <div className="plan">
-      <b>{t('💳 Paying in parts')}</b> <span className="muted small">{statusLine}</span>
+      <b>{t('Paying in parts')}</b> <span className="muted small">{statusLine}</span>
       <ErrorBox error={error} />
       {plan.status !== 'proposed' && <div className="plan-progress" aria-hidden><span style={{ width: `${(plan.paid / plan.total) * 100}%` }} /></div>}
       <ol className="plan-parts">
@@ -48,14 +48,14 @@ export default function PlanCard({ conv, price }) {
           <li key={p.n} className={p.confirmedAt ? 'done' : p.late ? 'late' : ''}>
             <span>{t('{amount} on {date}', { amount: money(p.amount, currency), date: shortDate(p.dueOn) })}</span>
             <span className="small">
-              {p.confirmedAt ? t('✓ Received')
-                : p.paidAt ? (iAmBuyer ? t('Paid, waiting for the seller') : <button type="button" className="btn sm ok" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/confirm`, { method: 'POST' }))}>{t('Received ✓')}</button>)
+              {p.confirmedAt ? t('Received')
+                : p.paidAt ? (iAmBuyer ? t('Paid, waiting for the seller') : <button type="button" className="btn sm ok" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/confirm`, { method: 'POST' }))}>{t('Received')}</button>)
                   : plan.status === 'active' && (
                     <>
                       {p.late && <span className="badge bad">{t('Late')}</span>}{' '}
                       {iAmBuyer
                         ? <button type="button" className="btn sm" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/paid`, { method: 'POST' }))}>{t("I've paid this")}</button>
-                        : <button type="button" className="btn sm secondary" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/confirm`, { method: 'POST' }))}>{t('Received ✓')}</button>}
+                        : <button type="button" className="btn sm secondary" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/confirm`, { method: 'POST' }))}>{t('Received')}</button>}
                     </>
                   )}
             </span>
@@ -64,7 +64,7 @@ export default function PlanCard({ conv, price }) {
       </ol>
       {plan.status === 'proposed' && !plan.proposedByMe && (
         <div className="row">
-          <button type="button" className="btn sm ok" disabled={busy} onClick={run(async () => { await api(`/plans/${plan.id}/respond`, { method: 'POST', body: { action: 'accept' } }); celebrate({ text: t('Plan agreed 🤝') }); })}>{t('Accept plan')}</button>
+          <button type="button" className="btn sm ok" disabled={busy} onClick={run(async () => { await api(`/plans/${plan.id}/respond`, { method: 'POST', body: { action: 'accept' } }); celebrate({ text: t('Plan agreed') }); })}>{t('Accept plan')}</button>
           <button type="button" className="btn sm secondary" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/respond`, { method: 'POST', body: { action: 'decline' } }))}>{t('Not for me')}</button>
         </div>
       )}
@@ -86,7 +86,7 @@ function ProposePlan({ conv, price, onDone }) {
   if (!open) {
     return (
       <p className="plan small" style={{ margin: 0 }}>
-        <button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('💳 Pay in parts?')}</button>{' '}
+        <button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('Pay in parts?')}</button>{' '}
         <span className="muted">{t('Agree a plan to split {price} into smaller payments.', { price: money(price, conv.listing.currency) })}</span>
       </p>
     );
@@ -107,7 +107,7 @@ function ProposePlan({ conv, price, onDone }) {
   }
   return (
     <form className="plan plan-form" onSubmit={submit}>
-      <b>{t('💳 Suggest paying in parts')}</b>
+      <b>{t('Suggest paying in parts')}</b>
       <ErrorBox error={error} />
       <div className="plan-fields">
         <label>{t('Payments')}

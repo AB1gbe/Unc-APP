@@ -2,6 +2,7 @@
 // stay highlighted until you leave. The wording lives here (not on the
 // server) so it shows in the reader's language.
 import { useEffect } from 'react';
+import Icon from '../components/Icon.jsx';
 import { Link } from 'react-router-dom';
 import { api, ago } from '../api.js';
 import { Avatar, ErrorBox, Loading } from '../components/ui.jsx';
@@ -15,14 +16,14 @@ function describe(n) {
   const chat = n.conversationId ? `/messages/${n.conversationId}` : '/messages';
   switch (n.kind) {
     case 'offer': return [tj('{name} made an offer on “{title}”', { name, title }), chat];
-    case 'deal': return [tj('{name} picked your offer for “{title}”. Deal done! 🤝', { name, title }), chat];
+    case 'deal': return [tj('{name} picked your offer for “{title}”. Deal done!', { name, title }), chat];
     case 'rating': return [tj('{name} rated your deal on “{title}”.', { name, title }), chat];
     case 'favourite-request': return [tj('{name}, who favourited you, is looking for “{title}”. Make an offer?', { name, title }), `/requests/${n.listing?.id}`];
     case 'alert-match': return [tj('New request matching your alert: “{title}”', { title }), `/requests/${n.listing?.id}`];
     case 'expiring': return [tj('Still looking for “{title}”? It closes in 3 days. Open it to keep it going.', { title }), `/requests/${n.listing?.id}`];
     case 'expired': return [tj('“{title}” closed after 30 days. You can reopen it any time.', { title }), `/requests/${n.listing?.id}`];
-    case 'found-elsewhere': return [tj('{name} found what they needed for “{title}”. Thanks for your offer 🙏', { name, title }), chat];
-    case 'request-closed': return [tj('“{title}” is closed now. Thanks for your offer 🙏', { title }), chat];
+    case 'found-elsewhere': return [tj('{name} found what they needed for “{title}”. Thanks for your offer', { name, title }), chat];
+    case 'request-closed': return [tj('“{title}” is closed now. Thanks for your offer', { title }), chat];
     case 'report-action': return [n.listing ? tj('Thanks for your report about “{title}”. Our team looked at it and took action.', { title }) : t('Thanks for your report. Our team looked at it and took action.'), n.listing ? `/requests/${n.listing.id}` : '/'];
     case 'report-no-action': return [n.listing ? tj('Thanks for your report about “{title}”. Our team looked at it and found nothing against the rules this time.', { title }) : t('Thanks for your report. Our team looked at it and found nothing against the rules this time.'), '/'];
     case 'budget-raised': return [tj('{name} raised the budget for “{title}”. Take another look?', { name, title }), `/requests/${n.listing?.id}`];
@@ -31,18 +32,25 @@ function describe(n) {
     case 'plan-accepted': return [tj('{name} accepted the payment plan.', { name }), chat];
     case 'plan-declined': return [tj('{name} said no to the payment plan.', { name }), chat];
     case 'part-paid': return [tj('{name} says they paid a part. Did you receive it?', { name }), chat];
-    case 'part-confirmed': return [tj('{name} confirmed your payment ✓', { name }), chat];
+    case 'part-confirmed': return [tj('{name} confirmed your payment', { name }), chat];
     case 'part-due': return [tj('A payment to {name} is due tomorrow.', { name }), chat];
     case 'part-late': return [tj('A payment with {name} is late.', { name }), chat];
     case 'support-reply': return [t('The Unc team answered your question.'), '/help'];
-    case 'referral-reward': return [t('A friend you invited is now verified. Unc credit was added to your wallet 🎉'), '/wallet'];
+    case 'referral-reward': return [t('A friend you invited is now verified. Unc credit was added to your wallet'), '/wallet'];
     case 'kyc_approved': return [t('Your identity is verified ✓ You can now post requests and make offers.'), '/'];
     case 'kyc_rejected': return [t('Your identity check was not approved. See why and try again.'), '/verification'];
     default: return [n.kind, '/'];
   }
 }
 
-const ICON = { offer: '💬', deal: '🤝', rating: '★', kyc_approved: '✓', kyc_rejected: '!', 'favourite-request': '♥', 'alert-match': '🔔', expiring: '⏳', expired: '⏳', 'found-elsewhere': '🙏', 'request-closed': '🙏', 'report-action': '⚑', 'report-no-action': '⚑', 'budget-raised': '💸', 'did-you-get-it': '🤔', 'plan-proposed': '💳', 'plan-accepted': '💳', 'plan-declined': '💳', 'part-paid': '💳', 'part-confirmed': '💳', 'part-due': '⏰', 'part-late': '⚠️', 'referral-reward': '🎁', 'support-reply': '❓' };
+const ICON = {
+  offer: 'chat', deal: 'deal', rating: 'star', kyc_approved: 'check', kyc_rejected: 'warning', 'favourite-request': 'heart',
+  'alert-match': 'bell', expiring: 'hourglass', expired: 'hourglass', 'found-elsewhere': 'found', 'request-closed': 'found',
+  'report-action': 'flag', 'report-no-action': 'flag', 'budget-raised': 'coins', 'did-you-get-it': 'question',
+  'plan-proposed': 'card', 'plan-accepted': 'card', 'plan-declined': 'card', 'part-paid': 'card', 'part-confirmed': 'card',
+  'part-due': 'calendar', 'part-late': 'warning', 'referral-reward': 'gift', 'support-reply': 'question',
+};
+const iconOf = (kind) => <Icon name={ICON[kind] || 'bell'} />;
 
 export default function Notifications() {
   const { data, error, loading } = useApi('/notifications');
@@ -69,10 +77,10 @@ export default function Notifications() {
               <Link key={n.id} to={to} className={`inbox-item ${n.read ? '' : 'unread'}`}>
                 {n.actor
                   ? <Avatar name={n.actor.displayName} src={n.actor.avatarUrl} />
-                  : <div className="avatar" aria-hidden>{ICON[n.kind]}</div>}
+                  : <div className="avatar" aria-hidden>{iconOf(n.kind)}</div>}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div>{text}</div>
-                  <div className="muted small">{n.actor && <>{ICON[n.kind]} · </>}{ago(n.createdAt)}</div>
+                  <div className="muted small">{n.actor && <>{iconOf(n.kind)} · </>}{ago(n.createdAt)}</div>
                 </div>
                 {!n.read && <span className="new-dot" role="img" aria-label={t('New')} />}
               </Link>

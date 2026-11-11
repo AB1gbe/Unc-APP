@@ -65,3 +65,8 @@ The square redesign above was **reverted** ([[ADR-062 Photo-first marketplace lo
 
 ![[backglow-home.png]]
 
+## Less AI-looking details (session 70)
+The owner chose four giveaways to change ([[ADR-064 Less AI-looking details]]): emoji → line icons (`<Icon name="…" />`, Phosphor) and plain wording; plain, local wording and a slim How-it-works strip; fonts **Readex Pro** (headings) + **IBM Plex Sans / IBM Plex Sans Arabic** (text); white prices, plain uppercase category labels, fewer frames, straight banner cards. Glow is stronger and also on category tiles. Steps: [[Step 63 - Less AI-looking details]].
+
+![[less-ai-home.png]]
+

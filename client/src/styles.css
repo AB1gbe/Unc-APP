@@ -20,12 +20,12 @@
   --bad-soft: #3a1717;
   --radius: 6px;
   --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 8px 24px rgba(0, 0, 0, .35);
-  --font-display: 'Fraunces Variable', Georgia, 'Noto Kufi Arabic Variable', serif;
-  font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Readex Pro Variable', 'IBM Plex Sans Arabic', sans-serif;
+  font-family: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   line-height: 1.5;
 }
-[dir="rtl"] { font-family: 'Noto Kufi Arabic Variable', 'Inter Variable', system-ui, sans-serif; --font-display: 'Noto Kufi Arabic Variable', serif; }
+[dir="rtl"] { font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif; }
 * { box-sizing: border-box; }
 /* Right-to-left: the browser mirrors flex rows, text and "start/end"
    spacing automatically once <html dir="rtl">. Always use logical
@@ -46,8 +46,8 @@ a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { max-width: 100%; }
 h1, h2, h3 { line-height: 1.2; margin: 0 0 .5rem; }
-h1, h2, .logo { font-family: var(--font-display); font-weight: 700; letter-spacing: -.01em; }
-[dir="rtl"] h1, [dir="rtl"] h2 { letter-spacing: 0; }
+h1, h2, .logo { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; }
+
 h1 { font-size: 1.6rem; }
 h2 { font-size: 1.25rem; }
 p { margin: 0 0 .75rem; }
@@ -79,7 +79,7 @@ p { margin: 0 0 .75rem; }
 a.card { display: block; color: inherit; transition: border-color .15s, transform .15s; }
 a.card:hover { border-color: var(--brand); text-decoration: none; transform: translateY(-1px); }
 .card h3 { margin-bottom: .25rem; }
-.price { font-weight: 700; color: var(--ok); }
+.price { font-weight: 700; color: var(--text); }
 .meta { display: flex; gap: .75rem; flex-wrap: wrap; color: var(--muted); font-size: .875rem; }
 .thumbs { display: flex; gap: .5rem; flex-wrap: wrap; margin: .75rem 0; }
 .thumbs img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
@@ -397,8 +397,8 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* "Happening near you" feed (session 26) */
 .feed ul { list-style: none; margin: .5rem 0 0; padding: 0; }
-.feed li { display: flex; gap: .6rem; align-items: baseline; padding: .65rem 1rem; border-top: 1px solid var(--border); }
-.feed li.near { background: var(--brand-soft); }
+.feed li { display: flex; gap: .6rem; align-items: baseline; padding: .65rem 0; border-top: 1px solid var(--border); }
+.feed li.near .feed-text { font-weight: 500; }
 .feed-icon { flex-shrink: 0; }
 .feed-text { flex: 1; min-width: 0; }
 .feed-time { white-space: nowrap; }
@@ -571,8 +571,8 @@ p.plan { display: block; }
 .hero-card-body { padding: .55rem .7rem .65rem; }
 .hero-card-title { font-size: .8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hero-card-price { font-size: .78rem; color: var(--brand); font-weight: 700; }
-.hero-card-0 { inset-inline-start: 0; top: 34px; transform: rotate(-5deg); z-index: 1; }
-.hero-card-1 { inset-inline-start: 120px; top: 0; transform: rotate(4deg); z-index: 2; }
+.hero-card-0 { inset-inline-start: 0; top: 40px; }
+.hero-card-1 { inset-inline-start: 130px; top: 0; }
 .card-art img { object-fit: cover; }
 .how { margin-bottom: 1.5rem; }
 .how h2, .cat-tiles-wrap h2 { margin: 0 0 .75rem; }
@@ -582,7 +582,8 @@ p.plan { display: block; }
 .how-step h3 { margin: .8rem 1rem .25rem; font-size: 1.05rem; }
 .how-step p { margin: 0 1rem 1rem; }
 .cat-tiles-wrap { margin-bottom: 1.5rem; }
-.cat-tiles { display: grid; grid-auto-flow: column; grid-auto-columns: 150px; gap: .75rem; overflow-x: auto; padding-bottom: .4rem; scroll-snap-type: x proximity; }
+.cat-tiles { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 1rem; }
+@media (max-width: 899px) { .cat-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .cat-tile { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; color: var(--text); text-decoration: none; scroll-snap-align: start; transition: transform .15s; }
 .cat-tile:hover { transform: translateY(-2px); text-decoration: none; }
 .cat-tile img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
@@ -605,7 +606,8 @@ p.plan { display: block; }
   .how-step img { grid-row: span 2; height: 100%; }
   .how-step h3 { margin: .6rem .8rem .15rem; }
   .how-step p { margin: 0 .8rem .6rem; }
-  .cat-tiles { grid-auto-columns: 120px; }
+  .cat-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .6rem; }
+  .cat-tile span { font-size: .72rem; padding: .35rem .4rem; }
   .help-topics { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 130px; overflow-x: auto; }
 }
 .nav .btn, .nav a { white-space: nowrap; }
@@ -621,10 +623,42 @@ p.plan { display: block; }
 .glow-wrap { position: relative; isolation: isolate; }
 .glow-wrap > .card { position: relative; z-index: 1; height: 100%; }
 .glow { position: absolute; z-index: 0; pointer-events: none; object-fit: cover;
-  filter: blur(38px) saturate(1.8) brightness(1.15); opacity: .55; transition: opacity .3s; }
-.glow-wrap > .glow { top: -3%; inset-inline-start: -5%; width: 110%; height: 78%; }
-.glow-wrap:hover > .glow { opacity: .85; }
-.hero-glow { top: -15%; inset-inline-start: -15%; width: 130%; height: 130%; opacity: .75; filter: blur(50px) saturate(1.8); }
+  filter: blur(44px) saturate(2.2) brightness(1.3); opacity: .85; transition: opacity .3s; }
+.glow-wrap > .glow { top: -6%; inset-inline-start: -8%; width: 116%; height: 86%; }
+.glow-wrap:hover > .glow { opacity: 1; }
+.hero-glow { top: -20%; inset-inline-start: -20%; width: 140%; height: 140%; opacity: 1; filter: blur(56px) saturate(2.2) brightness(1.2); }
 .hero-card { z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .glow { transition: none; } }
 .glow-wrap > .how-step { position: relative; z-index: 1; height: 100%; }
+.glow-wrap > .cat-tile { position: relative; z-index: 1; height: 100%; }
+.cat-tiles .glow-wrap > .glow { height: 80%; }
+/* The glow spills past the page edge on phones; clip it so the page never scrolls sideways. */
+html, body { overflow-x: clip; }
+.cat-tile span { white-space: normal; line-height: 1.25; min-height: 2.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+/* Line icons (session 69): sit on the text line like a letter. */
+.icon { display: inline-block; vertical-align: -0.14em; flex: none; }
+.feed-icon .icon { color: var(--brand); }
+.attach .icon { vertical-align: middle; }
+
+/* How Unc works as one compact strip (session 69). */
+.how-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+.how-item { display: flex; gap: .8rem; align-items: center; padding: .9rem 1rem .9rem 0; }
+.how-item + .how-item { border-inline-start: 1px solid var(--border); padding-inline-start: 1rem; }
+.how-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; flex: none; }
+.how-item b { display: block; font-size: .95rem; }
+.how-item .small { display: block; line-height: 1.35; }
+.how-n { color: var(--brand); font-weight: 800; margin-inline-end: .2rem; }
+@media (max-width: 759px) {
+  .how-strip { grid-template-columns: 1fr; }
+  .how-item { padding: .7rem 0; }
+  .how-item + .how-item { border-inline-start: 0; border-top: 1px solid var(--border); padding-inline-start: 0; }
+}
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] .logo { letter-spacing: 0; }
+
+/* Boxes and badges (session 69): plain labels instead of coloured pills,
+   lists without frames, white prices, straight banner cards. */
+.cat-label { font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.feed ul { border-bottom: 1px solid var(--border); }
+.feed { margin-bottom: 1.5rem; }
+.attention .inbox-item { padding-inline: 0; border-top: 1px solid var(--border); }
+.attention { border-bottom: 1px solid var(--border); padding-bottom: .25rem; }

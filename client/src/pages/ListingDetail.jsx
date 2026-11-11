@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { categoryArt } from '../art.js';
+import Icon from '../components/Icon.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
@@ -34,7 +35,7 @@ export default function ListingDetail() {
     <div className="two-col">
       <article className="card">
         <div className="row spread">
-          <span className="badge">{t(l.category)}</span>
+          <span className="cat-label">{t(l.category)}</span>
           <div className="row" style={{ gap: '.5rem' }}>
             {l.status === 'open' && <ShareButton listing={l} mine={isOwner} />}
             {user && !isOwner && l.status === 'open' && <SaveButton listing={l} />}
@@ -193,7 +194,7 @@ function OwnerPanel({ listing, onChange }) {
     try {
       await api(`/listings/${listing.id}/status`, { method: 'POST', body: { status, conversationId } });
       if (status === 'fulfilled') {
-        celebrate({ text: conversationId ? t("Found it! 🎉 Don't forget to rate the seller.") : t('Glad you found it! 🎉'), confetti: true });
+        celebrate({ text: conversationId ? t("Found it! Don't forget to rate the seller.") : t('Glad you found it!'), confetti: true });
       }
       setPicking(false);
       onChange();
@@ -212,7 +213,7 @@ function OwnerPanel({ listing, onChange }) {
         <h2>{t('Your request')}</h2>
         {listing.status === 'open' && (
           <p className="small muted">
-            👀 {tn(listing.viewCount ?? 0, '{n} person looked at it', '{n} people looked at it')} · 💬 {tn(offers.length, '{n} offer', '{n} offers')}
+            <Icon name="eye" /> {tn(listing.viewCount ?? 0, '{n} person looked at it', '{n} people looked at it')} · <Icon name="chat" /> {tn(offers.length, '{n} offer', '{n} offers')}
             {(listing.viewCount ?? 0) === 0 && <> · {t('Share it to reach more sellers.')}</>}
           </p>
         )}
@@ -224,7 +225,7 @@ function OwnerPanel({ listing, onChange }) {
         {listing.status === 'open' && !picking && (
           <div className="stack">
             <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>{t('Edit')}</Link>
-            <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it! 🎉')}</button>
+            <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it!')}</button>
             <button className="btn secondary block" onClick={() => confirmThen('closed', t('Close this request without buying? Conversations about it will become read-only.'))}>
               {t('Close without buying')}
             </button>
@@ -255,7 +256,7 @@ function OwnerPanel({ listing, onChange }) {
           <div className="stack">
             {listing.dealConversationId && (
               <p>
-                🤝 {tj('Bought from {name}.', { name: <b><bdi>{offers.find((c) => c.id === listing.dealConversationId)?.other.displayName ?? t('a seller')}</bdi></b> })}{' '}
+                <Icon name="deal" /> {tj('Bought from {name}.', { name: <b><bdi>{offers.find((c) => c.id === listing.dealConversationId)?.other.displayName ?? t('a seller')}</bdi></b> })}{' '}
                 <Link to={`/messages/${listing.dealConversationId}`}>{t('Rate them')}</Link>
               </p>
             )}
@@ -299,7 +300,7 @@ function SaveButton({ listing }) {
   }
   return (
     <button type="button" className={`btn sm secondary save-btn ${saved ? 'on' : ''}`} onClick={toggle} disabled={busy} aria-pressed={saved}>
-      {saved ? t('♥ Saved') : t('♡ Save')}
+      {saved ? t('Saved') : t('Save')}
     </button>
   );
 }
@@ -322,7 +323,7 @@ function ExpiryLine({ listing, onChange }) {
   }
   return (
     <p className={`small ${soon ? 'expiry-soon' : 'muted'}`}>
-      ⏳ {t('Open until {date}', { date: formatDate(ends, { day: 'numeric', month: 'short' }) })}
+      <Icon name="hourglass" /> {t('Open until {date}', { date: formatDate(ends, { day: 'numeric', month: 'short' }) })}
       {soon && <> · <button type="button" className="linkish small" onClick={renew} disabled={busy}>{t('Keep it open')}</button></>}
     </p>
   );
@@ -351,7 +352,7 @@ function RaiseBudget({ listing, onChange }) {
       setBusy(false);
     }
   }
-  if (!open) return <p className="small"><button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('💸 Raise my budget')}</button></p>;
+  if (!open) return <p className="small"><button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('Raise my budget')}</button></p>;
   return (
     <form className="raise-budget" onSubmit={submit}>
       <ErrorBox error={error} />
@@ -379,7 +380,7 @@ function Tips({ listing, offers }) {
   if (!tips.length) return null;
   return (
     <div className="tips">
-      <b>{t('💡 Tips to get more offers')}</b>
+      <b>{t('Tips to get more offers')}</b>
       <ul>
         {tips.map((k) => <li key={k}>{TIPS[k]()}</li>)}
       </ul>
@@ -398,7 +399,7 @@ export function ReportLink({ listingId, conversationId }) {
   }
   return (
     <p className="small center" style={{ marginTop: '1rem' }}>
-      {sent ? <span className="muted">{t('Thanks — our team will review it.')}</span> : <button className="linkish" onClick={report}>{t('⚑ Report')}</button>}
+      {sent ? <span className="muted">{t('Thanks — our team will review it.')}</span> : <button className="linkish" onClick={report}>{t('Report')}</button>}
     </p>
   );
 }

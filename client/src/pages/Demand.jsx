@@ -48,7 +48,7 @@ export default function Demand() {
           ))}
         </div>
       )}
-      <p className="small" style={{ marginTop: '1rem' }}><Link to="/alerts">{t('🔔 Get an alert when a matching request is posted')}</Link></p>
+      <p className="small" style={{ marginTop: '1rem' }}><Link to="/alerts">{t('Get an alert when a matching request is posted')}</Link></p>
     </div>
   );
 }

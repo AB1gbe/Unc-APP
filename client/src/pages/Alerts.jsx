@@ -1,6 +1,7 @@
 // Request alerts (session 31): saved searches for sellers. Every new
 // request that matches reaches them in the 🔔 (and as a phone push).
 import { useState } from 'react';
+import Icon from '../components/Icon.jsx';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api.js';
 import { ErrorBox, Loading } from '../components/ui.jsx';
@@ -83,7 +84,7 @@ export default function Alerts() {
           <p className="muted" style={{ padding: '0 1rem 1rem' }}>{t('No alerts yet.')} <Link to="/browse">{t('Browse requests')}</Link></p>
         ) : data?.alerts.map((a) => (
           <div key={a.id} className="inbox-item alert-row">
-            <span aria-hidden>🔔</span>
+            <Icon name="bell" size="1.4em" />
             <span style={{ flex: 1 }} dir="auto">{describe(a)}</span>
             <button type="button" className="linkish" onClick={() => remove(a.id)}>{t('Delete')}</button>
           </div>

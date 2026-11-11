@@ -86,7 +86,7 @@ export default function ShopEditor() {
       <p className="hint">{t('Closing earlier than opening means you close after midnight.')}</p>
       <div className="row">
         <button className="btn" disabled={busy}>{t('Save shop page')}</button>
-        {saved && <span className="small" role="status">{t('Saved ✓')}</span>}
+        {saved && <span className="small" role="status">{t('Saved')}</span>}
       </div>
     </form>
   );

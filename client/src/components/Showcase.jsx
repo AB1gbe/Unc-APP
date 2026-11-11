@@ -27,26 +27,23 @@ export function HeroStack({ listings }) {
 }
 
 export function HowItWorks() {
+  // One compact strip (session 69), not a three-card template block.
   const steps = [
-    ['step-post.jpg', t('1. Post what you need'), t('A used phone, a sofa, a part. Add a photo and your budget.')],
-    ['step-offers.jpg', t('2. Offers come to you'), t('Verified shops and finders reply privately, only about your request.')],
-    ['step-deal.jpg', t('3. Pick the best deal'), t('Compare prices and ratings, agree in the chat, and rate each other.')],
+    ['step-post.jpg', t('Say what you want'), t('Item, budget, area. A photo helps.')],
+    ['step-offers.jpg', t('Sellers reply'), t('Only checked shops and finders, only about your request.')],
+    ['step-deal.jpg', t('You choose'), t('Agree in the chat, then rate each other.')],
   ];
   return (
-    <section className="how" aria-labelledby="howTitle">
-      <h2 id="howTitle">{t('How Unc works')}</h2>
-      <div className="how-steps">
-        {steps.map(([img, title, text]) => (
-          <div key={img} className="glow-wrap">
-            <img className="glow" src={art(img)} alt="" aria-hidden="true" loading="lazy" />
-            <div className="how-step">
-            <img src={art(img)} alt="" loading="lazy" width="400" height="300" />
-            <h3>{title}</h3>
-            <p className="muted small">{text}</p>
+    <section className="how-strip" aria-label={t('How Unc works')}>
+      {steps.map(([img, title, text], i) => (
+        <div key={img} className="how-item">
+          <img src={art(img)} alt="" loading="lazy" width="64" height="64" />
+          <div>
+            <b><span className="how-n">{i + 1}</span> {title}</b>
+            <span className="muted small">{text}</span>
           </div>
-          </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </section>
   );
 }
@@ -58,10 +55,13 @@ export function CategoryTiles({ categories }) {
       <h2 id="catTitle">{t('Browse by category')}</h2>
       <div className="cat-tiles">
         {categories.map((c) => (
-          <Link key={c} className="cat-tile" to={`/browse?category=${encodeURIComponent(c)}`}>
-            <img src={categoryArt(c)} alt="" loading="lazy" width="360" height="270" />
-            <span>{t(c)}</span>
-          </Link>
+          <div key={c} className="glow-wrap">
+            <img className="glow" src={categoryArt(c)} alt="" aria-hidden="true" loading="lazy" />
+            <Link className="cat-tile" to={`/browse?category=${encodeURIComponent(c)}`}>
+              <img src={categoryArt(c)} alt="" loading="lazy" width="360" height="270" />
+              <span>{t(c)}</span>
+            </Link>
+          </div>
         ))}
       </div>
     </section>

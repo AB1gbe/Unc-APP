@@ -1,6 +1,7 @@
 // A single conversation. Polls every 4 seconds for new messages (simple and
 // reliable; see docs/Decisions for why not WebSockets yet).
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Icon from '../components/Icon.jsx';
 import { Link, useParams } from 'react-router-dom';
 import { api, budget, money, toDate } from '../api.js';
 import { Activity, Avatar, Badges, ErrorBox, KycBadge, Loading, RatingBadge, StarInput, Stars } from '../components/ui.jsx';
@@ -170,15 +171,15 @@ export default function Conversation() {
               {m.videoUrl && <video className="bubble-video" src={m.videoUrl} controls playsInline preload="metadata" />}
               {m.proof && (
                 <div className="proof-badge">
-                  {t('✓ Proof photo · {code}', { code: conv.proofCode })}
+                  {t('Proof photo · {code}', { code: conv.proofCode })}
                   {!m.mine && <div className="small">{t('Check that the paper in the photo says {code}.', { code: conv.proofCode })}</div>}
                 </div>
               )}
               {m.body && <div dir="auto">{m.body}</div>}
-              {m.hiddenContact && <div className="hidden-note">{t('📵 Contact details are hidden until you agree a price.')}</div>}
-              {m.hiddenForOther && <div className="hidden-note">{tj('📵 Hidden from {name} until you agree a price.', { name: <bdi>{conv.other.displayName}</bdi> })}</div>}
+              {m.hiddenContact && <div className="hidden-note">{t('Contact details are hidden until you agree a price.')}</div>}
+              {m.hiddenForOther && <div className="hidden-note">{tj('Hidden from {name} until you agree a price.', { name: <bdi>{conv.other.displayName}</bdi> })}</div>}
               {!m.mine && scamSignals(m.body).length > 0 && (
-                <div className="scam-warning" role="note">{t("⚠️ Be careful: never send money before you've seen the item, and don't open links from strangers. Unc never asks you to pay by transfer.")}</div>
+                <div className="scam-warning" role="note">{t("Be careful: never send money before you've seen the item, and don't open links from strangers. Unc never asks you to pay by transfer.")}</div>
               )}
               <div className="time">{formatDateTime(toDate(m.createdAt), { dateStyle: 'short', timeStyle: 'short' })}{m.mine && m.readAt ? ` · ${t('Seen')}` : ''}</div>
             </div>
@@ -189,7 +190,7 @@ export default function Conversation() {
           <BlockedNotice conv={conv} onChange={load} />
         ) : conv.readOnly ? (
           <div className="chat-form muted small" style={{ justifyContent: 'center' }}>
-            {l.status === 'fulfilled' ? t('Found! 🎉 This request is done, so the chat is now read-only.') : t('This request is closed. The conversation is read-only.')}
+            {l.status === 'fulfilled' ? t('Found! This request is done, so the chat is now read-only.') : t('This request is closed. The conversation is read-only.')}
           </div>
         ) : (
           <>
@@ -210,12 +211,12 @@ export default function Conversation() {
           {!conv.agreed && hasContacts(text) && <ContactNudge />}
           <form className="chat-form" onSubmit={send}>
             <label className="attach" title={t('Add a photo')} aria-label={t('Add a photo')}>
-              📷
+              <Icon name="camera" size="1.3em" />
               <input type="file" accept="image/jpeg,image/png,image/webp" hidden
                 onChange={async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) setPhoto(await shrinkImage(f)); }} />
             </label>
             <label className="attach" title={t('Add a short video')} aria-label={t('Add a short video')}>
-              🎬
+              <Icon name="video" size="1.3em" />
               <input type="file" accept="video/mp4,video/quicktime,video/webm" hidden data-testid="chat-video"
                 onChange={async (e) => {
                   const f = e.target.files[0]; e.target.value = '';
@@ -259,7 +260,7 @@ function DealBanner({ conv, onRated }) {
     setError(null);
     try {
       await api(`/deals/${deal.id}/rating`, { method: 'POST', body: { stars, comment: comment || undefined } });
-      celebrate({ text: t('Thanks for rating! ⭐ It helps everyone on Unc.'), confetti: stars >= 4 });
+      celebrate({ text: t('Thanks for rating! It helps everyone on Unc.'), confetti: stars >= 4 });
       await onRated();
     } catch (err) {
       setError(err);
@@ -271,7 +272,7 @@ function DealBanner({ conv, onRated }) {
   if (deal.myRating) {
     return (
       <div className="deal-banner small">
-        🤝 <b>{t('Deal done.')}</b> {tj('You rated {name}', { name: <bdi>{other.displayName}</bdi> })} <Stars value={deal.myRating.stars} />
+        <Icon name="deal" /> <b>{t('Deal done.')}</b> {tj('You rated {name}', { name: <bdi>{other.displayName}</bdi> })} <Stars value={deal.myRating.stars} />
         {deal.theirRating ? (
           <> · {t('They rated you')} <Stars value={deal.theirRating.stars} />{deal.theirRating.comment && <> {tj('“{text}”', { text: <bdi>{deal.theirRating.comment}</bdi> })}</>}</>
         ) : (
@@ -285,11 +286,11 @@ function DealBanner({ conv, onRated }) {
     );
   }
   if (!deal.canRate) {
-    return <div className="deal-banner small">🤝 <b>{t('Deal done.')}</b> <span className="muted">{t('The 30-day rating window has closed.')}</span></div>;
+    return <div className="deal-banner small"><Icon name="deal" /> <b>{t('Deal done.')}</b> <span className="muted">{t('The 30-day rating window has closed.')}</span></div>;
   }
   return (
     <form className="deal-banner" onSubmit={submit}>
-      <p style={{ margin: 0 }}>🤝 <b>{t('Deal done!')}</b> {conv.myRole === 'buyer'
+      <p style={{ margin: 0 }}><Icon name="deal" /> <b>{t('Deal done!')}</b> {conv.myRole === 'buyer'
         ? tj('How was {name} as a seller?', { name: <bdi>{other.displayName}</bdi> })
         : tj('How was {name} as a buyer?', { name: <bdi>{other.displayName}</bdi> })}</p>
       {deal.otherHasRated && <p className="small muted" style={{ margin: 0 }}>{tj('{name} has already rated you — rate them to see it.', { name: <bdi>{other.displayName}</bdi> })}</p>}
@@ -340,7 +341,7 @@ function DealProblem({ conv, onDone }) {
   if (!open) {
     return (
       <p className="deal-problem small">
-        <button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('⚠️ Something went wrong with this deal?')}</button>
+        <button type="button" className="linkish small" onClick={() => setOpen(true)}>{t('Something went wrong with this deal?')}</button>
       </p>
     );
   }
@@ -398,7 +399,7 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
   };
   const respond = (action) => run(async () => {
     await api(`/conversations/${conv.id}/messages/${m.id}/respond`, { method: 'POST', body: { action } });
-    if (action === 'accept') celebrate({ text: t('Agreed at {price}! 🤝', { price }), confetti: true });
+    if (action === 'accept') celebrate({ text: t('Agreed at {price}!', { price }), confetti: true });
   });
   const sendCounter = run(async () => {
     await api(`/conversations/${conv.id}/messages`, { method: 'POST', body: { offerPrice: counter } });
@@ -408,8 +409,8 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
 
   return (
     <div className={`offer-card ${expired ? 'is-expired' : ''}`}>
-      <div className="offer">{fromSeller ? '💰' : '↩️'} {fromSeller ? t('Offer: {price}', { price }) : t('Counter-offer: {price}', { price })}</div>
-      {answer === 'accept' && <span className="badge ok">{t('✓ Accepted')}</span>}
+      <div className="offer"><Icon name={fromSeller ? 'money' : 'counter'} /> {fromSeller ? t('Offer: {price}', { price }) : t('Counter-offer: {price}', { price })}</div>
+      {answer === 'accept' && <span className="badge ok">{t('Accepted')}</span>}
       {answer === 'decline' && <span className="badge grey">{t('Declined')}</span>}
       <OfferDetailsLine details={m.details} />
       {!answer && !newest && <span className="small muted">{t('Replaced by a newer price')}</span>}
@@ -441,7 +442,7 @@ function AnswerLine({ m, conv, price }) {
   return (
     <div className={`answer-line ${accepted ? 'ok' : ''}`} role="note">
       {accepted
-        ? (m.mine ? t('You accepted {price} 🤝', { price }) : tj('{name} accepted {price} 🤝', { name, price }))
+        ? (m.mine ? t('You accepted {price}', { price }) : tj('{name} accepted {price}', { name, price }))
         : (m.mine ? t('You said no to {price}', { price }) : tj('{name} said no to {price}', { name, price }))}
       {accepted && conv.myRole === 'buyer' && !conv.readOnly && (
         <> · <Link to={`/requests/${conv.listing.id}`}>{t('Got it? Mark the request as found')} <span className="flip">→</span></Link></>
@@ -464,7 +465,7 @@ function ProofAskButton({ conv, onDone }) {
   }
   return (
     <p className="small center" style={{ marginTop: '1rem' }}>
-      <button type="button" className="linkish" onClick={ask}>{t('📸 Ask for a proof photo')}</button>
+      <button type="button" className="linkish" onClick={ask}>{t('Ask for a proof photo')}</button>
       {error && <span className="muted"> · {error.message}</span>}
     </p>
   );
@@ -499,7 +500,7 @@ function BlockLink({ conv, onChange }) {
     await api(`/members/${conv.other.id}/block`, { method: 'POST' });
     await onChange();
   }
-  return <button type="button" className="linkish small" onClick={block}>{t('🚫 Block')}</button>;
+  return <button type="button" className="linkish small" onClick={block}>{t('Block')}</button>;
 }
 
 function BlockedNotice({ conv, onChange }) {

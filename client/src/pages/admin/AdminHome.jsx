@@ -147,7 +147,7 @@ function ReportRow({ report: r, onDone }) {
             <button className="btn sm secondary" onClick={act(async () => setThread(await api(`/admin/reports/${r.id}/conversation`)))}>{t('Read conversation')}</button>
           )}
           {/* The reporter is told which one (session 37), never the details. */}
-          <button className="btn sm" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'action' } }); onDone(); })}>{t('✓ Took action')}</button>
+          <button className="btn sm" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'action' } }); onDone(); })}>{t('Took action')}</button>
           <button className="btn sm secondary" onClick={act(async () => { await api(`/admin/reports/${r.id}/resolve`, { method: 'POST', body: { outcome: 'nothing' } }); onDone(); })}>{t('Nothing wrong')}</button>
         </div>
       </div>
@@ -158,8 +158,8 @@ function ReportRow({ report: r, onDone }) {
           {thread.messages.map((m) => (
             <p key={m.id} className="small">
               <b>{m.sender_id === thread.conversation.buyer_id ? t('Buyer:') : t('Vendor:')}</b> <bdi>{m.body}</bdi>
-              {m.imageUrl && <> <a href={m.imageUrl} target="_blank" rel="noreferrer">{t('📷 Photo')}</a></>}
-              {m.videoUrl && <> <a href={m.videoUrl} target="_blank" rel="noreferrer">{t('🎬 Video')}</a></>}
+              {m.imageUrl && <> <a href={m.imageUrl} target="_blank" rel="noreferrer">{t('Photo')}</a></>}
+              {m.videoUrl && <> <a href={m.videoUrl} target="_blank" rel="noreferrer">{t('Video')}</a></>}
               {m.offer_price !== null && ` [${t('offer {price}', { price: m.offer_price })}]`}
             </p>
           ))}
