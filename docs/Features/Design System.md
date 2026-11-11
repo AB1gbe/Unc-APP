@@ -85,3 +85,8 @@ Computers: a side bar instead of a top bar, with a toggle that folds it into an 
 
 ![[app-side-open.png]]
 
+## Phones look like an app (session 74)
+Search = field + small icon button (word "Search" only on computers); no auto-focus; phone category tiles show the name on the photo. See [[2026-11-11 Session 74]].
+
+![[phone-categories-app.png]]
+
