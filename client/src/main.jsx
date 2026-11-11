@@ -6,19 +6,14 @@ import { LanguageProvider } from './i18n.jsx';
 import { api } from './api.js';
 import { registerServiceWorker } from './push.js';
 import App from './App.jsx';
-// Fonts are bundled with the app (no requests to font sites). Session 69:
-// Readex Pro for headings (drawn for Arabic and English together), IBM Plex
-// Sans and IBM Plex Sans Arabic for text. Replaces Fraunces + Inter, a very
-// common pairing on AI-made sites.
-import '@fontsource-variable/readex-pro';
-import '@fontsource/ibm-plex-sans/400.css';
-import '@fontsource/ibm-plex-sans/500.css';
-import '@fontsource/ibm-plex-sans/600.css';
-import '@fontsource/ibm-plex-sans/700.css';
-import '@fontsource/ibm-plex-sans-arabic/400.css';
-import '@fontsource/ibm-plex-sans-arabic/500.css';
-import '@fontsource/ibm-plex-sans-arabic/600.css';
-import '@fontsource/ibm-plex-sans-arabic/700.css';
+// Fonts are bundled with the app (no requests to font sites). Session 72,
+// chosen by the owner from four samples: Plus Jakarta Sans for English and
+// Almarai (a Saudi-designed font used by many Gulf apps) for Arabic. Only
+// Almarai's Arabic letters are loaded, so English always uses Jakarta.
+import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource/almarai/arabic-400.css';
+import '@fontsource/almarai/arabic-700.css';
+import '@fontsource/almarai/arabic-800.css';
 import './styles.css';
 
 registerServiceWorker();
