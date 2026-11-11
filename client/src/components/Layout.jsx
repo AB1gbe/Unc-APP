@@ -4,14 +4,14 @@ import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { Loading } from './ui.jsx';
 import TabBar from './TabBar.jsx';
+import SideNav from './SideNav.jsx';
 import { usePolling } from '../hooks.js';
 import { LANGUAGES, hasSavedChoice, t, tj, useLanguage } from '../i18n.jsx';
 import Celebrations from './Celebrate.jsx';
+import Icon from './Icon.jsx';
 import DeletePending from './DeletePending.jsx';
 import TermsAccept from './TermsAccept.jsx';
 
-// On phones these header links are hidden: the bottom tab bar has them.
-const tabbed = ({ isActive }) => `hide-phone${isActive ? ' active' : ''}`;
 
 export default function Layout() {
   const { user } = useAuth();
@@ -52,38 +52,23 @@ export default function Layout() {
 
   return (
     <>
+      <SideNav unread={unread} bell={bell} />
+      {/* Phones and small tablets: a slim app header; the tabs are at the bottom. */}
       <header className="topbar">
         <div className="topbar-inner">
           <Link to="/" className="logo">un<span>c</span></Link>
           <nav className="nav">
-            <NavLink to="/" end className={tabbed}>{t('Home')}</NavLink>
-            <NavLink to="/browse" className={tabbed}>{t('Requests')}</NavLink>
-            <NavLink to="/shops" className={tabbed}>{t('Shops')}</NavLink>
-            <NavLink to="/categories" className={tabbed}>{t('Categories')}</NavLink>
-            {user && <NavLink to="/my-requests" className={tabbed}>{t('My requests')}</NavLink>}
-            {user && (
-              <NavLink to="/messages" className={tabbed}>
-                {t('Messages')} {unread > 0 && <span className="unread-dot">{unread}</span>}
-              </NavLink>
-            )}
-            {user?.role === 'admin' && <NavLink to="/admin">{t('Admin')}</NavLink>}
             {user ? (
-              <>
-                <NavLink to="/notifications" className="bell" aria-label={bell > 0 ? t('Notifications ({n} new)', { n: bell }) : t('Notifications')} title={t('Notifications')}>
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                  </svg>
-                  {bell > 0 && <span className="unread-dot">{bell > 99 ? '99+' : bell}</span>}
-                </NavLink>
-                <NavLink to="/account" className={tabbed}>{t('Account')}</NavLink>
-              </>
+              <NavLink to="/notifications" className="top-bell" aria-label={bell > 0 ? t('Notifications ({n} new)', { n: bell }) : t('Notifications')} title={t('Notifications')}>
+                <Icon name="bell" size="1.5em" />
+                {bell > 0 && <span className="unread-dot">{bell > 99 ? '99+' : bell}</span>}
+              </NavLink>
             ) : (
               <>
                 <NavLink to="/login">{t('Log in')}</NavLink>
                 <Link className="btn sm" to="/register">{t('Sign up')}</Link>
               </>
             )}
-            {user && <Link className="btn sm hide-phone" to="/requests/new">{t('+ Post a request')}</Link>}
             {/* Shows the OTHER language's name, written in that language. */}
             <button className="btn sm secondary lang-switch" onClick={() => setLang(other)} lang={other} title={t('Change language')}>
               {LANGUAGES[other]}

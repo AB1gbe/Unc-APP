@@ -5,6 +5,7 @@ import {
   Bell, Camera, ChatCircle, CheckCircle, Clock, CreditCard, Eye, Flag, Handshake, Heart, Hourglass, Lightning,
   Lock, MapPin, Money, NotePencil, Package, Plant, Question, SealCheck, Sparkle, Star, Storefront, Trophy,
   VideoCamera, Warning, ArrowBendUpLeft, Gift, Coins, CalendarBlank, XCircle, Info,
+  House, MagnifyingGlass, SquaresFour, UserCircle, Plus, ShieldCheck, Translate, ListChecks, SidebarSimple,
 } from '@phosphor-icons/react';
 
 const ICONS = {
@@ -13,6 +14,8 @@ const ICONS = {
   money: Money, note: NotePencil, box: Package, plant: Plant, question: Question, found: SealCheck, sparkle: Sparkle,
   star: Star, shop: Storefront, trophy: Trophy, video: VideoCamera, warning: Warning, counter: ArrowBendUpLeft,
   gift: Gift, coins: Coins, calendar: CalendarBlank, cross: XCircle, info: Info,
+  home: House, search: MagnifyingGlass, grid: SquaresFour, user: UserCircle, plus: Plus, admin: ShieldCheck,
+  language: Translate, list: ListChecks, sidebar: SidebarSimple,
 };
 
 export default function Icon({ name, size = '1.05em', weight = 'regular', className = '' }) {

@@ -703,3 +703,56 @@ html, body { overflow-x: clip; }
 .page-head h1 { margin-bottom: .2rem; }
 .page-head p { margin: 0; }
 .latest { margin-bottom: 1rem; }
+
+/* ===== App-style navigation (session 72) =====
+   Computers and big tablets (900px+): a side bar on the inline-start side,
+   no top bar. Phones and small tablets: slim header + bottom tab bar. */
+:root { --side-w: 0px; }
+.sidenav { display: none; }
+.top-bell { position: relative; display: inline-flex; align-items: center; justify-content: center; color: var(--text); padding: .4rem .5rem; }
+.top-bell .unread-dot { position: absolute; top: 0; inset-inline-end: -2px; }
+@media (min-width: 900px) {
+  :root { --side-w: 248px; --topbar-h: 0px; }
+  .topbar { display: none; }
+  .sidenav { display: flex; flex-direction: column; gap: .4rem; position: fixed; top: 0; bottom: 0; inset-inline-start: 0; width: var(--side-w);
+    padding: 1.25rem .9rem; background: var(--bg); border-inline-end: 1px solid var(--border); z-index: 20; overflow-y: auto; }
+  main.container, .container { margin-inline-start: max(var(--side-w), calc((100vw - var(--side-w) - 1080px) / 2 + var(--side-w))); margin-inline-end: auto; }
+  .side-logo { font-size: 1.6rem; padding: .2rem .7rem 1rem; }
+  .side-links { display: flex; flex-direction: column; align-items: stretch; gap: .15rem; margin: 0; flex-wrap: nowrap; }
+  .side-links a { display: flex; align-items: center; gap: .85rem; padding: .7rem .75rem; min-height: 46px; border-radius: 10px; color: var(--text); font-weight: 500; font-size: 1rem; background: none; }
+  .side-links a:hover { background: var(--surface); text-decoration: none; color: var(--text); }
+  .side-links a.active { background: var(--surface-2); color: var(--text); font-weight: 700; }
+  .side-links a.active .icon { color: var(--brand); }
+  .side-icon { position: relative; display: inline-flex; }
+  .side-icon .unread-dot { position: absolute; top: -6px; inset-inline-end: -9px; }
+  .side-post { margin: 1rem .2rem 0; padding: .8rem 1rem; font-size: 1rem; border-radius: 999px; }
+  .side-bottom { margin-top: auto; display: flex; flex-direction: column; gap: .3rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .side-lang { display: flex; align-items: center; gap: .6rem; background: none; border: 0; color: var(--muted); font: inherit; padding: .6rem .75rem; border-radius: 10px; cursor: pointer; min-height: 44px; }
+  .side-lang:hover { background: var(--surface); color: var(--text); }
+  .side-me { display: flex; align-items: center; gap: .7rem; padding: .55rem .6rem; border-radius: 10px; color: var(--text); min-height: 48px; }
+  .side-me:hover, .side-me.active { background: var(--surface); text-decoration: none; }
+  .side-me span { display: flex; flex-direction: column; line-height: 1.2; font-weight: 600; min-width: 0; }
+  .side-me small { color: var(--muted); font-weight: 400; }
+  .side-me bdi { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (min-width: 900px) { .side-links a.bell { justify-content: flex-start; padding: .7rem .75rem; } }
+
+/* Side bar open / collapsed (session 72): the toggle at the top folds it to
+   an icon-only rail; labels show as tooltips. */
+@media (min-width: 900px) {
+  .side-top { display: flex; align-items: center; justify-content: space-between; gap: .4rem; padding-bottom: .6rem; }
+  .side-top .side-logo { padding-bottom: 0; }
+  .side-toggle { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .side-toggle:hover { background: var(--surface); color: var(--text); }
+  .sidenav { transition: width .2s ease; }
+  main.container, .container { transition: margin .2s ease; }
+  html.side-collapsed { --side-w: 76px; }
+  html.side-collapsed .sidenav { padding-inline: .6rem; align-items: center; }
+  html.side-collapsed .side-top { flex-direction: column; }
+  html.side-collapsed .side-logo { font-size: 1.15rem; padding: .2rem 0; }
+  html.side-collapsed .side-label, html.side-collapsed .side-me span { display: none; }
+  html.side-collapsed .side-links a, html.side-collapsed .side-lang, html.side-collapsed .side-me { justify-content: center; padding-inline: 0; width: 52px; }
+  html.side-collapsed .side-post { width: 52px; height: 52px; padding: 0; margin-inline: 0; display: inline-flex; align-items: center; justify-content: center; }
+  html.side-collapsed .side-bottom { align-items: center; }
+}
+@media (prefers-reduced-motion: reduce) { .sidenav, main.container, .container { transition: none; } }

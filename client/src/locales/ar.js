@@ -1069,4 +1069,6 @@ export default {
   "Latest requests": "أحدث الطلبات",
   "All requests": "كل الطلبات",
   "What people in Bahrain are looking for right now. Shops and finders answer with offers.": "ما يبحث عنه الناس في البحرين الآن. ترد المحلات والباحثون بعروضهم.",
+  "Open the menu": "افتح القائمة",
+  "Close the menu": "أغلق القائمة",
 };
