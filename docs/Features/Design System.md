@@ -70,3 +70,8 @@ The owner chose four giveaways to change ([[ADR-064 Less AI-looking details]]): 
 
 ![[less-ai-home.png]]
 
+## Shops first and the owner's font (session 72)
+Front page: banner → **Verified shops** → **4 categories + All categories** → stories → activity → search → requests. New pages `/shops` and `/categories`, each with a search bar. Glow toned down. Font chosen by the owner from four samples: **Plus Jakarta Sans** (English) + **Almarai** (Arabic). See [[ADR-065 Shops first and fewer categories]].
+
+![[shops-first-home.png]]
+

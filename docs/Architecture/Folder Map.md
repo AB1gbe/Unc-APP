@@ -245,3 +245,9 @@ Unc-APP/
 - Fonts come from `@fontsource-variable/fraunces`, `inter` and `noto-kufi-arabic` (client packages), imported in `client/src/main.jsx`.
 - `scripts/fetch-photos.mjs` (session 64) — downloads the real Pexels photos and writes `credits.json` next to them. See [[Step 61 - Real photos from Pexels]].
 
+## Added in session 72
+- `server/src/routes/shops.js` — `GET /api/shops`; test `server/test/shops.test.js`.
+- `client/src/pages/Categories.jsx` (`/categories`) and `client/src/pages/Shops.jsx` (`/shops`).
+- `client/src/components/Showcase.jsx` now holds `ShopCard`, `ShopsPreview`, `CategoryTile`, `CategoryPreview` (and `HeroStack`).
+- `client/src/components/Icon.jsx` (session 70) — line icons.
+
