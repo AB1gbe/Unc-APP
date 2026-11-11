@@ -252,4 +252,4 @@ Unc-APP/
 - `client/src/components/Icon.jsx` (session 70) — line icons.
 - `client/src/pages/Landing.jsx` (session 72) — the calm home page for visitors.
 - `server/src/demo-requests.js` (session 72) — example requests and demo buyers used by `npm run seed` and `scripts/fetch-photos.mjs`.
-
+- `client/src/components/SideNav.jsx` (session 72) — the app-style side bar (opens and folds).

@@ -80,3 +80,8 @@ Tabs **Home · Requests · Shops · Categories** in the top bar, and on phones i
 
 ![[calm-home.png]]
 
+## App-style side bar (session 72)
+Computers: a side bar instead of a top bar, with a toggle that folds it into an icon rail (remembered). Phones: slim header + bottom tab bar. See [[ADR-067 App-style side bar]].
+
+![[app-side-open.png]]
+
