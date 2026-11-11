@@ -55,3 +55,8 @@ The drawings were replaced with **real photos from Pexels** (free licence): the 
 
 ![[photos-home.png]]
 
+## Photo-first marketplace look (session 68)
+The owner found the session-62 look "too AI". After researching real marketplaces ([[Marketplace Design Study]]): square photos, 2 px corners, no shadows or gradients, request cards that are just a photo and text, Archivo as the only font, white prices. Decision: [[ADR-062 Photo-first marketplace look]]; steps: [[Step 62 - Photo-first marketplace look]]. **Tokens now:** `--radius: 2px`, `--shadow: none`, font Archivo (Noto Kufi Arabic in Arabic).
+
+![[marketplace-look-home.png]]
+

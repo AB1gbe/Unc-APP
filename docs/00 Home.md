@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-11 (session 64)
+updated: 2026-11-11 (session 68)
 ---
 # Unc — Project Vault
 
@@ -24,6 +24,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Market
 - [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
 - [[Siin Competitor Study]] — Siin (live-stream shopping) vs Unc: offering and position
+- [[Marketplace Design Study]] — how real marketplaces look, and the "AI look" to avoid
 - Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]] · [[Keeping Deals on Unc]] · [[Publishing as an App]]
 - [[Glossary]] — every technical word used here, explained
 
@@ -89,6 +90,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 59 - Get Help]]
 - [[Step 60 - The new look]]
 - [[Step 61 - Real photos from Pexels]]
+- [[Step 62 - Photo-first marketplace look]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -107,7 +109,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-11, after session 64)
+## Status (2026-11-11, after session 68)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -144,6 +146,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Get Help: common questions + questions to the Unc team, answered on the Admin page | ✅ done — in `main` since session 61 → [[Get Help]] |
 | New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — in `main` since session 63 → [[Design System#The new look (session 62)]] |
 | Real photos from Pexels (demo data, steps, categories, Help) | ✅ done — in `main` since session 65 → [[Photo Credits]] |
+| Photo-first marketplace look (square photos, no boxes, shadows or gradients) | ✅ done — on branch (session 68) → [[Marketplace Design Study]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
