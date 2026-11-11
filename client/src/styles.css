@@ -20,12 +20,12 @@
   --bad-soft: #3a1717;
   --radius: 6px;
   --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 8px 24px rgba(0, 0, 0, .35);
-  --font-display: 'Fraunces Variable', Georgia, 'Noto Kufi Arabic Variable', serif;
-  font-family: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Readex Pro Variable', 'IBM Plex Sans Arabic', sans-serif;
+  font-family: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   line-height: 1.5;
 }
-[dir="rtl"] { font-family: 'Noto Kufi Arabic Variable', 'Inter Variable', system-ui, sans-serif; --font-display: 'Noto Kufi Arabic Variable', serif; }
+[dir="rtl"] { font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif; }
 * { box-sizing: border-box; }
 /* Right-to-left: the browser mirrors flex rows, text and "start/end"
    spacing automatically once <html dir="rtl">. Always use logical
@@ -46,8 +46,8 @@ a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { max-width: 100%; }
 h1, h2, h3 { line-height: 1.2; margin: 0 0 .5rem; }
-h1, h2, .logo { font-family: var(--font-display); font-weight: 700; letter-spacing: -.01em; }
-[dir="rtl"] h1, [dir="rtl"] h2 { letter-spacing: 0; }
+h1, h2, .logo { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; }
+
 h1 { font-size: 1.6rem; }
 h2 { font-size: 1.25rem; }
 p { margin: 0 0 .75rem; }
@@ -653,3 +653,4 @@ html, body { overflow-x: clip; }
   .how-item { padding: .7rem 0; }
   .how-item + .how-item { border-inline-start: 0; border-top: 1px solid var(--border); padding-inline-start: 0; }
 }
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] .logo { letter-spacing: 0; }
