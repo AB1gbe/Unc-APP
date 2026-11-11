@@ -53,5 +53,35 @@
     "pexelsId": 11297769,
     "photographer": "Mathias Reding",
     "page": "https://www.pexels.com/photo/a-set-of-tables-and-shelves-with-displayed-cellphones-11297769/"
+  },
+  "cover-furniture.jpg": {
+    "pexelsId": 6830012,
+    "photographer": "Tima Miroshnichenko",
+    "page": "https://www.pexels.com/photo/wood-furniture-on-display-in-an-antique-shop-6830012/"
+  },
+  "avatar-furniture.jpg": {
+    "pexelsId": 8837498,
+    "photographer": "Yan Krukau",
+    "page": "https://www.pexels.com/photo/a-woman-in-white-top-and-gray-skirt-inside-an-office-8837498/"
+  },
+  "cover-autoparts.jpg": {
+    "pexelsId": 4480505,
+    "photographer": "cottonbro studio",
+    "page": "https://www.pexels.com/photo/red-and-white-vintage-car-parked-in-front-of-blue-and-white-food-stall-4480505/"
+  },
+  "avatar-autoparts.jpg": {
+    "pexelsId": 9112798,
+    "photographer": "Jan Ernest",
+    "page": "https://www.pexels.com/photo/a-man-holding-a-car-part-9112798/"
+  },
+  "cover-phonefix.jpg": {
+    "pexelsId": 31862953,
+    "photographer": "Fotografia Lui  Vlad",
+    "page": "https://www.pexels.com/photo/smartphone-repair-tools-on-a-workbench-31862953/"
+  },
+  "avatar-phonefix.jpg": {
+    "pexelsId": 19518397,
+    "photographer": "Abubakar Isa",
+    "page": "https://www.pexels.com/photo/portrait-of-african-man-holding-smart-phone-19518397/"
   }
 }

@@ -1055,4 +1055,13 @@ export default {
   "Agree in the chat, then rate each other.": "اتفقا في المحادثة، ثم قيّما بعضكما.",
   // Session 72
   "Categories": "الفئات",
+  "Verified shops": "محلات موثّقة",
+  "All shops": "كل المحلات",
+  "Real businesses in Bahrain, checked by Unc. They answer requests with offers.": "محلات حقيقية في البحرين تحقّق منها Unc. ترد على الطلبات بعروضها.",
+  "Search categories or requests": "ابحث في الفئات أو الطلبات",
+  "No category matches. Press Search to look through requests instead.": "لا توجد فئة مطابقة. اضغط بحث لتبحث في الطلبات.",
+  "Shop name, area or what they sell": "اسم المحل أو المنطقة أو ما يبيعه",
+  "No shops match that yet.": "لا توجد محلات مطابقة بعد.",
+  "A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and verified shops send you their best price.": "بلايستيشن في الرفاع، كنبة للمجلس، قطعة لا يبيعها أحد. اكتب ما تريد وميزانيتك، وترسل لك المحلات الموثّقة أفضل سعر.",
+  '{n} sales': { zero: 'لا مبيعات', one: 'عملية بيع واحدة', two: 'عمليتا بيع', few: '{n} عمليات بيع', many: '{n} عملية بيع', other: '{n} عملية بيع' },
 };

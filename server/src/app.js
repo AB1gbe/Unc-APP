@@ -23,6 +23,7 @@ import { paymentRoutes } from './routes/payments.js';
 import { installmentRoutes } from './routes/installments.js';
 import { walletRoutes } from './routes/wallet.js';
 import { supportRoutes } from './routes/support.js';
+import { shopRoutes } from './routes/shops.js';
 import { blockRoutes } from './routes/blocks.js';
 import { pushRoutes } from './routes/push.js';
 import { kycRoutes } from './routes/kyc.js';
@@ -68,6 +69,7 @@ export function createApp(db) {
   app.use('/api', installmentRoutes(db));
   app.use('/api', walletRoutes(db));
   app.use('/api/support', supportRoutes(db));
+  app.use('/api', shopRoutes(db));
   app.use('/api', (_req, _res, next) => next(notFound('Unknown API route')));
 
   // Listing photos are public. KYC files are NOT served statically - only

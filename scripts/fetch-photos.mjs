@@ -22,7 +22,7 @@ const DEMO = new URL('../server/demo-photos/', import.meta.url).pathname;
 const PHOTOS = [
   // Demo data (npm run seed)
   [DEMO, 'ps5-wanted.jpg', 1200, 900, 'playstation 5 console controller', 13189290],
-  [DEMO, 'oak-table.jpg', 1200, 900, 'dining room table', null],
+  [DEMO, 'oak-table.jpg', 1200, 900, 'dining room table', 6748972],
   [DEMO, 'wardrobe.jpg', 1200, 900, 'wardrobe closet bedroom', 6527064],
   [DEMO, 'offer-ps5-boxed.jpg', 1200, 900, 'playstation 5 box', 34956925],
   [DEMO, 'offer-ps5-disc.jpg', 1200, 900, 'playstation controller white', 3945657],
@@ -32,6 +32,13 @@ const PHOTOS = [
   [DEMO, 'avatar-riverside.jpg', 512, 512, 'phone repair shop', 36969131],
   [DEMO, 'avatar-alex.jpg', 512, 512, 'young man smiling portrait', 27544052],
   [DEMO, 'cover-riverside.jpg', 1600, 600, 'mobile phone shop', 11297769],
+  // More demo shops (session 72: Unc puts businesses first)
+  [DEMO, 'cover-furniture.jpg', 1600, 600, 'furniture showroom', 6830012],
+  [DEMO, 'avatar-furniture.jpg', 512, 512, 'furniture store owner', 8837498],
+  [DEMO, 'cover-autoparts.jpg', 1600, 600, 'auto parts store shelves', 4480505],
+  [DEMO, 'avatar-autoparts.jpg', 512, 512, 'mechanic portrait', 9112798],
+  [DEMO, 'cover-phonefix.jpg', 1600, 600, 'phone repair workbench', 31862953],
+  [DEMO, 'avatar-phonefix.jpg', 512, 512, 'smartphone repair technician', 19518397],
   // How Unc works
   [ART, 'step-post.jpg', 480, 360, 'person typing on smartphone', 6260105],
   [ART, 'step-offers.jpg', 480, 360, 'shop owner using phone counter', 6612691],

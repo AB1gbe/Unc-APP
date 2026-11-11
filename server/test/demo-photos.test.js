@@ -11,7 +11,9 @@ test('npm run seed gives the demo requests, offers, profiles and story real phot
   await seedDemo(t.db); // seeding again adds nothing
   assert.equal(t.db.prepare('SELECT COUNT(*) AS n FROM listing_images').get().n, 4);
   assert.equal(t.db.prepare('SELECT COUNT(*) AS n FROM messages WHERE image IS NOT NULL').get().n, 2);
-  assert.equal(t.db.prepare("SELECT COUNT(*) AS n FROM users WHERE email LIKE '%@demo.local' AND avatar IS NOT NULL").get().n, 3);
+  // 3 members + 3 more demo shops (session 72), each with a profile photo; all 4 shops have a cover.
+  assert.equal(t.db.prepare("SELECT COUNT(*) AS n FROM users WHERE email LIKE '%@demo.local' AND avatar IS NOT NULL").get().n, 6);
+  assert.equal(t.db.prepare("SELECT COUNT(*) AS n FROM users WHERE account_type = 'business' AND cover IS NOT NULL").get().n, 4);
 
   // They are served like any upload: request photos publicly...
   const browse = (await t.request(t.app).get('/api/listings').expect(200)).body.listings;

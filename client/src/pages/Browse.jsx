@@ -9,7 +9,7 @@ import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
 import LivePulse from '../components/LivePulse.jsx';
-import { CategoryBar, HeroStack } from '../components/Showcase.jsx';
+import { CategoryPreview, HeroStack, ShopsPreview } from '../components/Showcase.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -44,12 +44,14 @@ export default function Browse() {
         <section className="hero hero-art">
           <div className="hero-text">
             <h1>{t('Need something? Post it. Bahrain’s shops come to you.')}</h1>
-            <p>{t('A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and checked sellers send you their best price.')}</p>
+            <p>{t('A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and verified shops send you their best price.')}</p>
             <Link className="btn" to="/register">{t('Post what you need')}</Link>
           </div>
           <HeroStack listings={result.listings} />
         </section>
       )}
+      {params.toString() === '' && <ShopsPreview />}
+      {params.toString() === '' && <CategoryPreview />}
       {!user && <div style={{ marginBottom: '1.5rem' }}><StoriesStrip /></div>}
       {!user && <div style={{ marginBottom: '1.5rem' }}><Feed title={t('Happening on Unc')} /></div>}
       <LivePulse />
@@ -62,7 +64,6 @@ export default function Browse() {
         <CityField governorates placeholder={t('City or governorate')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
         <button className="btn">{t('Search')}</button>
       </form>
-      <CategoryBar categories={categories} active={params.get('category')} />
       <ErrorBox error={error} />
       {user && (
         <p className="small" style={{ marginTop: 0 }}>

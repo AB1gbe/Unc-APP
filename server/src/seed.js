@@ -73,8 +73,15 @@ export async function seedDemo(db) {
   const buyer = mk('buyer@demo.local', 'Sam Buyer', 'individual', 'Juffair');
   mk('vendor@demo.local', 'Riverside Electronics', 'business', 'Seef');
   mk('freelancer@demo.local', 'Alex Finder', 'individual', 'Riffa');
+  // More verified shops (session 72: Unc puts businesses first).
+  const DEMO_SHOPS = [
+    ['furniture@demo.local', 'Muharraq Home & Furniture', 'Muharraq', 'Road 1105, Muharraq', 'Solid wood dining sets, sofas and majlis furniture. Delivery and assembly across Bahrain.', ['Home & Furniture'], 'cover-furniture.jpg', 'avatar-furniture.jpg'],
+    ['autoparts@demo.local', 'Riffa Auto Parts', 'East Riffa', 'Building 120, East Riffa', 'New and used parts for Japanese and American cars. We find what others don\'t stock.', ['Vehicles & Parts', 'Tools & DIY'], 'cover-autoparts.jpg', 'avatar-autoparts.jpg'],
+    ['phonefix@demo.local', 'Manama Phone Fix', 'Manama', 'Manama Souq', 'Screens, batteries and repairs for all phones, same day. Original and tested parts.', ['Phones & Tablets', 'Electronics', 'Services'], 'cover-phonefix.jpg', 'avatar-phonefix.jpg'],
+  ];
+  for (const [email, name, city] of DEMO_SHOPS) mk(email, name, 'business', city);
   // Demo members have a test payment card (session 40), like everyone who joins.
-  for (const email of ['buyer@demo.local', 'vendor@demo.local', 'freelancer@demo.local']) {
+  for (const email of ['buyer@demo.local', 'vendor@demo.local', 'freelancer@demo.local', ...DEMO_SHOPS.map((x) => x[0])]) {
     const id = db.prepare('SELECT id FROM users WHERE email = ?').get(email).id;
     db.prepare(`INSERT OR IGNORE INTO payment_cards (user_id, provider, provider_ref, brand, last4, exp_month, exp_year) VALUES (?, 'test', 'tok_test_visa_4242_12_39', 'visa', '4242', 12, 2039)`).run(id);
     db.prepare(`UPDATE users SET card_added_at = COALESCE(card_added_at, datetime('now')) WHERE id = ?`).run(id);
@@ -100,6 +107,13 @@ export async function seedDemo(db) {
   const hours = Array.from({ length: 7 }, (_, d) => (d === 5 ? null : { open: '09:00', close: '21:00' }));
   db.prepare('UPDATE users SET shop_area = COALESCE(shop_area, ?), shop_hours = COALESCE(shop_hours, ?) WHERE email = ?')
     .run('Block 428, Seef', JSON.stringify(hours), 'vendor@demo.local');
+  for (const [email, , , area, bio, interests, cover, avatar] of DEMO_SHOPS) {
+    profile.run(bio, JSON.stringify(interests), email);
+    db.prepare('UPDATE users SET shop_area = COALESCE(shop_area, ?), shop_hours = COALESCE(shop_hours, ?) WHERE email = ?').run(area, JSON.stringify(hours), email);
+    const u = db.prepare('SELECT cover, avatar FROM users WHERE email = ?').get(email);
+    if (!u.cover) db.prepare('UPDATE users SET cover = ? WHERE email = ?').run(demoPhoto(COVER_DIR, cover), email);
+    if (!u.avatar) db.prepare('UPDATE users SET avatar = ? WHERE email = ?').run(demoPhoto(AVATAR_DIR, avatar), email);
+  }
 
   // One finished, rated deal so profiles and star ratings have something to show.
   const shop = db.prepare('SELECT id FROM users WHERE email = ?').get('vendor@demo.local').id;
@@ -134,7 +148,7 @@ export async function seedDemo(db) {
     }
   }
   addDemoPhotos(db);
-  console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local');
+  console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local, furniture@demo.local, autoparts@demo.local, phonefix@demo.local');
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
