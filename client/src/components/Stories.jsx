@@ -44,7 +44,7 @@ export function StoriesStrip({ limit = 3 }) {
   return (
     <section>
       <h2 style={{ marginBottom: '.2rem' }}>{t('Found on Unc')}</h2>
-      <p className="muted small" style={{ marginTop: 0 }}>{t('Real people, real finds.')}</p>
+      <p className="muted small" style={{ marginTop: 0 }}>{t('What members found this week.')}</p>
       <div className="grid">{stories.map((s) => <StoryCard key={s.id} story={s} />)}</div>
     </section>
   );

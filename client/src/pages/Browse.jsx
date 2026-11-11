@@ -43,9 +43,9 @@ export default function Browse() {
       {!user && (
         <section className="hero hero-art">
           <div className="hero-text">
-            <h1>{t('Tell people what you want. Let them come to you.')}</h1>
-            <p>{t('Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.')}</p>
-            <Link className="btn" to="/register">{t('Post your first request')}</Link>
+            <h1>{t('Need something? Post it. Bahrain’s shops come to you.')}</h1>
+            <p>{t('A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and checked sellers send you their best price.')}</p>
+            <Link className="btn" to="/register">{t('Post what you need')}</Link>
           </div>
           <HeroStack listings={result.listings} />
         </section>

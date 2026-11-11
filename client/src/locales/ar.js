@@ -1042,4 +1042,15 @@ export default {
   // Session 68
   "Example picture. The buyer hasn’t added a photo.": "صورة توضيحية. لم يُضف المشتري صورة بعد.",
   '{n} views': { zero: 'لا مشاهدات', one: 'مشاهدة واحدة', two: 'مشاهدتان', few: '{n} مشاهدات', many: '{n} مشاهدة', other: '{n} مشاهدة' },
+  // Session 69: plainer, local wording
+  "Need something? Post it. Bahrain’s shops come to you.": "تحتاج شيئًا؟ انشره، ومحلات البحرين تأتيك.",
+  "A PS5 in Riffa, a sofa for the majlis, a part nobody stocks. Say what you want and your budget, and checked sellers send you their best price.": "بلايستيشن في الرفاع، كنبة للمجلس، قطعة لا يبيعها أحد. اكتب ما تريد وميزانيتك، ويرسل لك البائعون الموثّقون أفضل سعر.",
+  "Post what you need": "انشر ما تحتاجه",
+  "What members found this week.": "ما وجده الأعضاء هذا الأسبوع.",
+  "Say what you want": "اكتب ما تريد",
+  "Item, budget, area. A photo helps.": "الغرض والميزانية والمنطقة. والصورة تساعد.",
+  "Sellers reply": "البائعون يردّون",
+  "Only checked shops and finders, only about your request.": "محلات وباحثون موثّقون فقط، وفقط بخصوص طلبك.",
+  "You choose": "أنت تختار",
+  "Agree in the chat, then rate each other.": "اتفقا في المحادثة، ثم قيّما بعضكما.",
 };

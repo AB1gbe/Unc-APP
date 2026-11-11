@@ -639,3 +639,17 @@ html, body { overflow-x: clip; }
 .icon { display: inline-block; vertical-align: -0.14em; flex: none; }
 .feed-icon .icon { color: var(--brand); }
 .attach .icon { vertical-align: middle; }
+
+/* How Unc works as one compact strip (session 69). */
+.how-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+.how-item { display: flex; gap: .8rem; align-items: center; padding: .9rem 1rem .9rem 0; }
+.how-item + .how-item { border-inline-start: 1px solid var(--border); padding-inline-start: 1rem; }
+.how-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; flex: none; }
+.how-item b { display: block; font-size: .95rem; }
+.how-item .small { display: block; line-height: 1.35; }
+.how-n { color: var(--brand); font-weight: 800; margin-inline-end: .2rem; }
+@media (max-width: 759px) {
+  .how-strip { grid-template-columns: 1fr; }
+  .how-item { padding: .7rem 0; }
+  .how-item + .how-item { border-inline-start: 0; border-top: 1px solid var(--border); padding-inline-start: 0; }
+}
