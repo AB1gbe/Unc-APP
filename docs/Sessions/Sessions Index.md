@@ -70,3 +70,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-10 | [[2026-11-10 Session 61]] | Pull request #18 (Get Help) merged into `main` |
 | 2026-11-10 | [[2026-11-10 Session 62]] | New look: dark theme, serif headings, coral accent, pictures everywhere |
 | 2026-11-11 | [[2026-11-11 Session 63]] | Pull request #19 (new look) merged into `main` |
+| 2026-11-11 | [[2026-11-11 Session 64]] | Real product photos: blocked, the image service has 0 credits |
