@@ -12,6 +12,7 @@ export function HeroStack({ listings }) {
   if (!top.length) return null;
   return (
     <div className="hero-stack" aria-hidden="true">
+      <img className="glow hero-glow" src={top[top.length - 1].images?.[0] || categoryArt(top[top.length - 1].category)} alt="" />
       {top.map((l, i) => (
         <div key={l.id} className={`hero-card hero-card-${i}`}>
           <img src={l.images?.[0] || categoryArt(l.category)} alt="" />
@@ -36,10 +37,13 @@ export function HowItWorks() {
       <h2 id="howTitle">{t('How Unc works')}</h2>
       <div className="how-steps">
         {steps.map(([img, title, text]) => (
-          <div key={img} className="how-step">
+          <div key={img} className="glow-wrap">
+            <img className="glow" src={art(img)} alt="" aria-hidden="true" loading="lazy" />
+            <div className="how-step">
             <img src={art(img)} alt="" loading="lazy" width="400" height="300" />
             <h3>{title}</h3>
             <p className="muted small">{text}</p>
+          </div>
           </div>
         ))}
       </div>

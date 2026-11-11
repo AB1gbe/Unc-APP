@@ -55,3 +55,13 @@ The drawings were replaced with **real photos from Pexels** (free licence): the 
 
 ![[photos-home.png]]
 
+## Photo-first marketplace look (session 68)
+The owner found the session-62 look "too AI". After researching real marketplaces ([[Marketplace Design Study]]): square photos, 2 px corners, no shadows or gradients, request cards that are just a photo and text, Archivo as the only font, white prices. Decision: [[ADR-062 Photo-first marketplace look]]; steps: [[Step 62 - Photo-first marketplace look]]. **Tokens now:** `--radius: 2px`, `--shadow: none`, font Archivo (Noto Kufi Arabic in Arabic).
+
+![[marketplace-look-home.png]]
+
+## Smaller corners and back-glow (session 68, final)
+The square redesign above was **reverted** ([[ADR-062 Photo-first marketplace look]]). What stays: the session 62–64 look with **6 px corners** (8 px banner) and a **back-glow**: `.glow-wrap` holds a blurred copy of the photo (`img.glow`, blur 38 px, saturate 1.8, opacity .55, .85 on hover) behind the card. Used by `ListingCard` (`client/src/components/ui.jsx`), `HeroStack` and `HowItWorks` (`client/src/components/Showcase.jsx`). Decision: [[ADR-063 Smaller corners and back-glow]].
+
+![[backglow-home.png]]
+

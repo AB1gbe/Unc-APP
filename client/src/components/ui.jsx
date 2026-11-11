@@ -86,11 +86,16 @@ export function ContactRule({ rule }) {
 }
 
 export function ListingCard({ listing }) {
+  // Back-glow (session 68): a blurred copy of the photo behind the card, so
+  // it looks lit from behind in its own colours.
+  const photo = listing.images?.[0] || categoryArt(listing.category);
   return (
+    <div className="glow-wrap">
+      <img className="glow" src={photo} alt="" aria-hidden="true" loading="lazy" />
     <Link className="card" to={`/requests/${listing.id}`}>
       {/* No photo? The category's picture, so every card has an image (session 62). */}
       <div className={`card-photo${listing.images?.[0] ? '' : ' card-art'}`}>
-        <img src={listing.images?.[0] || categoryArt(listing.category)} alt="" loading="lazy" />
+        <img src={photo} alt="" loading="lazy" />
       </div>
       <div className="row spread" style={{ marginBottom: '.4rem' }}>
         <span className="badge">{t(listing.category)}</span>
@@ -111,6 +116,7 @@ export function ListingCard({ listing }) {
         {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
       </div>
     </Link>
+    </div>
   );
 }
 

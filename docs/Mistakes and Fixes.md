@@ -6,7 +6,7 @@ updated: 2026-11-08 (session 58)
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 121 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106) + 3 in session 58: 1 browser-test slip (repeat of M77), 1 found by a screenshot, 1 translation self-review, 1 found by the docs review (M107–M110) + 3 self-review catches and 1 found by the docs review in session 60 (M111–M114) + 2 in session 62: 1 design miss found by the owner, 1 found by a screenshot (M115–M116) + 2 in session 64: 1 wrong approach, 1 credential set-up slip, 1 proxy gotcha, 1 forgotten rebuild (M117–M120) + 1 found by the owner in session 66 (M121). All fixed.
+**Totals so far:** 125 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106) + 3 in session 58: 1 browser-test slip (repeat of M77), 1 found by a screenshot, 1 translation self-review, 1 found by the docs review (M107–M110) + 3 self-review catches and 1 found by the docs review in session 60 (M111–M114) + 2 in session 62: 1 design miss found by the owner, 1 found by a screenshot (M115–M116) + 2 in session 64: 1 wrong approach, 1 credential set-up slip, 1 proxy gotcha, 1 forgotten rebuild (M117–M120) + 1 found by the owner in session 66 (M121) + 3 in session 68: 1 test slip, 2 found by screenshots (M122–M124) + 1 design over-reach found by the owner (M125). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -131,6 +131,10 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M119 | Tooling | Node's fetch ignored the work machine's proxy (ENOTFOUND api.pexels.com) | 64 |
 | M120 | Process | New photos didn't show until the client was rebuilt | 64 |
 | M121 | Setup | After `pull`, `npm start` still showed the old website (no rebuild) | 66 |
+| M122 | Test | Browser tests still looked for the old boxed request cards (`.card h3`) | 68 |
+| M123 | Script | The banner kept its gradient box after the redesign | 68 |
+| M124 | Layout | Category photos stretched tall | 68 |
+| M125 | Design | Redesigned everything when the owner only disliked the rounded photos | 68 |
 
 ---
 
@@ -846,4 +850,32 @@ Also in session 56 (not a bug in the app): the first browser-test check for the 
 - **Cause:** `npm start` serves the built website in `client/dist/`, which `pull` doesn't update. The same trap as [[Mistakes and Fixes#M120]], on the owner's PC.
 - **Fix:** `"prestart": "npm run build"` in the root `package.json`, so `npm start` always builds first.
 - **Lesson:** anything the owner starts by hand should rebuild what it serves.
+
+## M122
+**The English browser test timed out after the redesign**
+- **Symptom:** `waiting for locator('.card h3')` (e2e/smoke.mjs line 122).
+- **Cause:** request cards are now `.listing-card` with no box; the test still looked for the old `.card`.
+- **Fix:** `.listing-card h3` in `e2e/smoke.mjs` (two places) and `.grid .listing-card` in `e2e/arabic.mjs` (that one only passed by luck, matching another box).
+- **Lesson:** when a component's class changes, search the tests for it first.
+
+## M123
+**The banner kept its gradient box**
+- **Found by:** screenshot.
+- **Cause:** the restyle script first turned every `border-radius: 24px` into `var(--radius)`, so the later search for the old `.hero` line (still containing `24px`) found nothing and was skipped silently.
+- **Fix:** replaced the `.hero` line by hand; checked with `grep -n "^\.hero"`.
+- **Lesson:** in multi-step text replacements, check that each one actually matched (assert), especially after a broad search-and-replace.
+
+## M124
+**Category photos stretched tall**
+- **Found by:** screenshot.
+- **Cause:** the `<img>` tags have `width`/`height` attributes; with `width: 100%` but no `height: auto`, the browser kept the 270 px height from the attribute.
+- **Fix:** `height: auto` next to every `aspect-ratio` on those images.
+- **Lesson:** an `<img height>` attribute wins unless CSS sets `height`.
+
+## M125
+**Changed the whole look when the owner only disliked the rounded photos**
+- **Found by:** the owner: "no, this looks worse than before".
+- **Cause:** the owner said "I like how it looks but it feels too AI… e.g. all rounded images". The research gave a list of AI tells, and all of them were applied (new font, no boxes, flat banner), not just the one named.
+- **Fix:** restored the previous look, made only the corners smaller, then added the back-glow the owner asked for ([[ADR-063 Smaller corners and back-glow]]).
+- **Lesson:** when the owner says "I like it, but X", change X and keep the rest; offer bigger changes as a separate option.
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { categoryArt } from '../art.js';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
@@ -43,13 +44,21 @@ export default function ListingDetail() {
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
         <p className="price" style={{ fontSize: '1.2rem' }}>{budget(l)}</p>
         <div className="meta" style={{ marginBottom: '1rem' }}>
-          <span>📍 <Place city={l.city} /></span>
-          <span>🕒 {t('Posted {time}', { time: ago(l.createdAt) })}</span>
-          {l.neededBy && <span>📅 {t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
+          <span><Place city={l.city} /></span>
+          <span>{t('Posted {time}', { time: ago(l.createdAt) })}</span>
+          {l.neededBy && <span>{t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
           <ContactRule rule={l.contactRule} />
           {!isOwner && <ClosesBadge closesAt={l.closesAt} />}
         </div>
         <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{l.description}</p>
+        {/* No photo: show the category's picture, marked as an example, so the
+            page isn't just text (session 68). */}
+        {l.images.length === 0 && (
+          <figure className="gallery-fallback">
+            <img src={categoryArt(l.category)} alt="" />
+            <figcaption>{t('Example picture. The buyer hasn’t added a photo.')}</figcaption>
+          </figure>
+        )}
         {l.images.length > 0 && (
           <div className="gallery">
             {l.images.map((src, i) => (
