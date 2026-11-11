@@ -243,3 +243,5 @@ Unc-APP/
 - `client/src/components/Showcase.jsx` — `HeroStack` (newest requests in the banner), `HowItWorks`, `CategoryTiles`.
 - `scripts/make-art.mjs` — re-draws the pictures (`node scripts/make-art.mjs`).
 - Fonts come from `@fontsource-variable/fraunces`, `inter` and `noto-kufi-arabic` (client packages), imported in `client/src/main.jsx`.
+- `scripts/fetch-photos.mjs` (session 64) — downloads the real Pexels photos and writes `credits.json` next to them. See [[Step 61 - Real photos from Pexels]].
+

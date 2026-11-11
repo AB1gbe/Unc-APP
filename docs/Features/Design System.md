@@ -50,3 +50,8 @@ Change these to re-theme the app.
 
 **Real photos:** sample photos from photo sites can't be downloaded from Claude's work machine (the network blocks them). Real member photos replace the demo pictures once people use Unc. To change a picture, edit the list in the script and run `node scripts/make-art.mjs`.
 
+## Real photos (session 64)
+The drawings were replaced with **real photos from Pexels** (free licence): the 11 demo photos, the 3 "How Unc works" pictures, the 16 category tiles and the 6 Help pictures. See [[ADR-061 Real photos from Pexels]], [[Photo Credits]] and [[Step 61 - Real photos from Pexels]].
+
+![[photos-home.png]]
+

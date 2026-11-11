@@ -6,7 +6,7 @@ updated: 2026-11-08 (session 58)
 
 Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**, the **fix**, and the **lesson**. Newest at the bottom. Numbered `M1, M2, …` so other notes can link to them (e.g. `[[Mistakes and Fixes#M4]]`).
 
-**Totals so far:** 116 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106) + 3 in session 58: 1 browser-test slip (repeat of M77), 1 found by a screenshot, 1 translation self-review, 1 found by the docs review (M107–M110) + 3 self-review catches and 1 found by the docs review in session 60 (M111–M114) + 2 in session 62: 1 design miss found by the owner, 1 found by a screenshot (M115–M116). All fixed.
+**Totals so far:** 120 entries = 5 tooling/setup (M1–M5) + 6 app bugs caught before release (M6–M11) + 5 dev-environment gotchas (M12, M13, M15, M17, M18) + 1 documentation gap found by the owner (M14) + 1 false alarm (M16) + 2 performance problems found by measuring (M19, M20) + 2 self-review catches (M21, M22) + 1 test that couldn't fail (M23) + 12 entries for the 15 bugs found by the session-05 code review (M24–M35) + 2 in session 09 (M36 test-setup slip, M37 brittle test) + 2 in session 10 caught by testing the push/pull helper (M38, M39) + 8 in session 12 (Arabic): 1 script slip, 1 repeat of the pkill trap, 5 caught by screenshots or the Arabic browser test, 1 brittle test (M40–M47) + 7 in session 13 (profiles, phones, photos): 2 caught by screenshots, 1 by the all-devices test, 1 race between two redirects, 1 replicability slip, 1 server bug caught by a new test, 1 outdated test (M48–M54) + 1 process slip in session 14 (M55) + 4 in session 15: 1 missed session-13 slip, 2 test-browser limits, 1 self-caught UX bug (M56–M59) + 4 in session 17: 1 bug found by the browser test, 1 found by looking at the rendered email, 1 test-run slip, 1 test that needed updating (M60–M63) + 1 wrong number in a summary, session 18 (M64) + 7 in session 20: 2 translation-tooling slips, 1 self-review catch, 2 found by screenshots, 1 test-checker limit, 1 repeat of the reused-database slip (M65–M71) + 1 self-review catch in session 22 (M72) + 3 in session 24: 2 test-helper slips, 1 phone layout found by screenshot (M73–M75) + 1 self-review catch in session 26 (M76) + 1 browser-test slip in session 28 (M77) + 4 in session 31: 1 repeat of short test data, 1 self-review catch, 2 found by screenshots (M78–M81) + 6 in session 34: 2 wrong test expectations, 2 Arabic-file slips caught by the coverage test, 1 browser-test data slip, 1 docs-script slip (M82–M87) + 7 in session 37: 2 test slips, 1 browser-test selector, 3 found by screenshots or the Arabic layout check, 1 missing translation (M88–M94) + 6 in session 40: 1 caught by trying examples, 1 Arabic layout check, 1 test that needed updating, 3 self-review catches (M95–M100) + 1 instruction slip in session 42 (M101) + 1 in session 48 (M102) + 1 start-up bug found by the owner in session 49 (M103) + 1 instruction slip in session 53 (M104) + 1 found by looking at a picture in session 54 (M105) + 1 found by a screenshot in session 56 (M106) + 3 in session 58: 1 browser-test slip (repeat of M77), 1 found by a screenshot, 1 translation self-review, 1 found by the docs review (M107–M110) + 3 self-review catches and 1 found by the docs review in session 60 (M111–M114) + 2 in session 62: 1 design miss found by the owner, 1 found by a screenshot (M115–M116) + 2 in session 64: 1 wrong approach, 1 credential set-up slip, 1 proxy gotcha, 1 forgotten rebuild (M117–M120). All fixed.
 
 | # | Area | One-liner | Session |
 |---|---|---|---|
@@ -126,6 +126,10 @@ Every mistake, wrong turn, or bug we hit — with the **symptom**, the **cause**
 | M114 | Bug | An admin answer reopened a closed help question (past the 3-question limit) | 60 |
 | M115 | Design | First picture pass looked childish (bright cartoon scenes) | 62 |
 | M116 | Layout | Arabic "Sign up" button wrapped onto two lines with the new font | 62 |
+| M117 | Approach | Tried Unsplash's website search from a script instead of its official API | 64 |
+| M118 | Setup | Pexels key saved with "Bearer" in front; Pexels wants the bare key | 64 |
+| M119 | Tooling | Node's fetch ignored the work machine's proxy (ENOTFOUND api.pexels.com) | 64 |
+| M120 | Process | New photos didn't show until the client was rebuilt | 64 |
 
 ---
 
@@ -806,4 +810,32 @@ Also in session 56 (not a bug in the app): the first browser-test check for the 
 - **Cause:** Noto Kufi Arabic is wider than the old system font, and top-bar links were allowed to wrap.
 - **Fix:** `.nav .btn, .nav a { white-space: nowrap; }` at the end of `client/src/styles.css`; `npm run e2e:devices` still has no sideways scrolling.
 - **Lesson:** after changing fonts, look at the Arabic phone screens.
+
+## M117
+**Searched Unsplash through its website instead of its API**
+- **Found by:** the safety check on Claude's work machine stopped the command.
+- **Cause:** the website's internal search address redirects scripts away; the next step would have meant pretending to be a browser, which Unsplash doesn't allow.
+- **Fix:** use the official Unsplash API with a free key (see [[2026-11-11 Session 64]]), or have the owner copy the photo links by hand.
+- **Lesson:** for any outside service, use its official API and rules from the start.
+
+## M118
+**The Pexels key was rejected ("Invalid API key")**
+- **Found by:** the first Pexels search returned 401.
+- **Cause (most likely):** the key form adds `Bearer ` in front for the `Authorization` header; Pexels expects only the key.
+- **Fix:** the owner edits the network secret for `api.pexels.com` so the value is the bare key.
+- **Lesson:** check exactly how an API wants its key (header and any word in front) before asking for it.
+
+## M119
+**Node's built-in `fetch` couldn't reach Pexels on Claude's machine**
+- **Symptom:** `getaddrinfo ENOTFOUND api.pexels.com`, although `curl` worked.
+- **Cause:** that machine only reaches the internet through a proxy; `curl` uses it automatically, Node's `fetch` doesn't.
+- **Fix:** run with `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt`. The owner's PC has no proxy and doesn't need this.
+- **Lesson:** on the work machine, check the proxy notes before running Node scripts that download.
+
+## M120
+**The new photos didn't show in the app**
+- **Found by:** screenshot: the demo photos were new, the tiles still drawn.
+- **Cause:** `client/public/art/` is copied into `client/dist/` only by `npm run build`; the running server serves `dist`.
+- **Fix:** `npm run build`. (`npm run dev` shows changes straight away.)
+- **Lesson:** after changing files in `client/public/`, rebuild before looking.
 
