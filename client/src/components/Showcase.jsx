@@ -5,21 +5,20 @@ import { art, categoryArt } from '../art.js';
 import { budget } from '../api.js';
 import { t } from '../i18n.jsx';
 
-// The banner's right side: the newest real requests, fanned like cards,
-// instead of a drawing (session 62).
-export function HeroStack({ listings }) {
-  const top = (listings || []).slice(0, 2);
-  if (!top.length) return null;
+// The banner's right side: the newest real requests as a plain photo grid
+// (session 68; before: tilted cards).
+export function HeroPhotos({ listings }) {
+  // Four photos when there are four requests, otherwise two (no gaps).
+  const all = listings || [];
+  if (all.length < 2) return null;
+  const top = all.slice(0, all.length >= 4 ? 4 : 2);
   return (
-    <div className="hero-stack" aria-hidden="true">
-      {top.map((l, i) => (
-        <div key={l.id} className={`hero-card hero-card-${i}`}>
+    <div className="hero-photos">
+      {top.map((l) => (
+        <Link key={l.id} to={`/requests/${l.id}`} aria-label={l.title}>
           <img src={l.images?.[0] || categoryArt(l.category)} alt="" />
-          <div className="hero-card-body">
-            <div className="hero-card-title" dir="auto">{l.title}</div>
-            <div className="hero-card-price">{budget(l)}</div>
-          </div>
-        </div>
+          <span>{budget(l)}</span>
+        </Link>
       ))}
     </div>
   );
@@ -33,7 +32,7 @@ export function HowItWorks() {
   ];
   return (
     <section className="how" aria-labelledby="howTitle">
-      <h2 id="howTitle">{t('How Unc works')}</h2>
+      <h2 id="howTitle" className="section-title">{t('How Unc works')}</h2>
       <div className="how-steps">
         {steps.map(([img, title, text]) => (
           <div key={img} className="how-step">
@@ -51,7 +50,7 @@ export function CategoryTiles({ categories }) {
   if (!categories?.length) return null;
   return (
     <section className="cat-tiles-wrap" aria-labelledby="catTitle">
-      <h2 id="catTitle">{t('Browse by category')}</h2>
+      <h2 id="catTitle" className="section-title">{t('Browse by category')}</h2>
       <div className="cat-tiles">
         {categories.map((c) => (
           <Link key={c} className="cat-tile" to={`/browse?category=${encodeURIComponent(c)}`}>

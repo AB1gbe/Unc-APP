@@ -86,29 +86,28 @@ export function ContactRule({ rule }) {
 }
 
 export function ListingCard({ listing }) {
+  // Photo first, plain text under it, no box (session 68: like Grailed or
+  // Vinted, not a stack of rounded cards). Requests without a photo show
+  // their category's picture.
   return (
-    <Link className="card" to={`/requests/${listing.id}`}>
-      {/* No photo? The category's picture, so every card has an image (session 62). */}
-      <div className={`card-photo${listing.images?.[0] ? '' : ' card-art'}`}>
+    <Link className="listing-card" to={`/requests/${listing.id}`}>
+      <div className={`listing-photo${listing.images?.[0] ? '' : ' is-example'}`}>
         <img src={listing.images?.[0] || categoryArt(listing.category)} alt="" loading="lazy" />
-      </div>
-      <div className="row spread" style={{ marginBottom: '.4rem' }}>
-        <span className="badge">{t(listing.category)}</span>
-        <span className="price">{budget(listing)}</span>
-      </div>
-      <h3 dir="auto">{listing.title}</h3>
-      {listing.description && (
-        <p dir="auto" className="muted small" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {listing.description}
-        </p>
-      )}
-      <div className="meta">
-        <span>📍 <Place city={listing.city} /></span>
-        <span>🕒 {ago(listing.createdAt)}</span>
-        <ContactRule rule={listing.contactRule} />
         <ClosesBadge closesAt={listing.closesAt} />
-        {listing.offerCount > 0 && <span>💬 {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
-        {listing.viewCount > 0 && <span title={t('People who looked at it')}>👀 {listing.viewCount}</span>}
+      </div>
+      <div className="listing-body">
+        <div className="listing-top">
+          <span className="price">{budget(listing)}</span>
+          {listing.offerCount > 0 && <span className="listing-offers">{tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
+        </div>
+        <h3 dir="auto">{listing.title}</h3>
+        <div className="listing-meta">
+          <span>{t(listing.category)}</span>
+          <span><Place city={listing.city} /></span>
+          <span>{ago(listing.createdAt)}</span>
+          {listing.viewCount > 0 && <span title={t('People who looked at it')}>{tn(listing.viewCount, '{n} view', '{n} views')}</span>}
+        </div>
+        <ContactRule rule={listing.contactRule} />
       </div>
     </Link>
   );

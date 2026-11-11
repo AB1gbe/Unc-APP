@@ -9,7 +9,7 @@ import { StoriesStrip } from '../components/Stories.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
 import LivePulse from '../components/LivePulse.jsx';
-import { CategoryTiles, HeroStack, HowItWorks } from '../components/Showcase.jsx';
+import { CategoryTiles, HeroPhotos, HowItWorks } from '../components/Showcase.jsx';
 
 export default function Browse() {
   const { user } = useAuth();
@@ -47,7 +47,7 @@ export default function Browse() {
             <p>{t('Post a request for anything — a used phone, a sofa, a hard-to-find part. Verified shops and finders contact you privately with offers.')}</p>
             <Link className="btn" to="/register">{t('Post your first request')}</Link>
           </div>
-          <HeroStack listings={result.listings} />
+          <HeroPhotos listings={result.listings} />
         </section>
       )}
       {!user && <HowItWorks />}

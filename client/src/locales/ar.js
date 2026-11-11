@@ -1051,4 +1051,7 @@ export default {
   "Compare prices and ratings, agree in the chat, and rate each other.": "قارن الأسعار والتقييمات، واتفقا في المحادثة، ثم قيّما بعضكما.",
   "Browse by category": "تصفّح حسب الفئة",
   "Help topics": "مواضيع المساعدة",
+  // Session 68
+  "Example picture. The buyer hasn’t added a photo.": "صورة توضيحية. لم يُضف المشتري صورة بعد.",
+  '{n} views': { zero: 'لا مشاهدات', one: 'مشاهدة واحدة', two: 'مشاهدتان', few: '{n} مشاهدات', many: '{n} مشاهدة', other: '{n} مشاهدة' },
 };
