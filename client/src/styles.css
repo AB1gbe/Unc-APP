@@ -130,9 +130,15 @@ input[type="file"] { padding: .5rem; }
 .hero .btn { background: var(--brand); color: var(--brand-ink); }
 .searchbar { display: grid; gap: .5rem; grid-template-columns: 2fr 1fr 1fr auto; margin-bottom: 1.25rem; }
 @media (max-width: 700px) {
-  /* search on its own row; category + city side by side; button full width */
-  .searchbar { grid-template-columns: 1fr 1fr; }
-  .searchbar > :first-child, .searchbar > .btn { grid-column: 1 / -1; }
+  /* Phones (session 73): search field + a small icon button on one row,
+     category + area side by side under it. No full-width orange button. */
+  .searchbar { grid-template-columns: 1fr 1fr auto; }
+  .searchbar > :first-child { grid-column: 1 / 3; grid-row: 1; }
+  .searchbar > .search-btn { grid-column: 3; grid-row: 1; }
+  .searchbar > select { grid-column: 1; grid-row: 2; }
+  .searchbar > :nth-child(3):not(.btn) { grid-column: 2 / 4; grid-row: 2; }
+  .search-btn { width: 48px; padding: 0; }
+  .search-btn .search-label { display: none; }
 }
 
 /* ===== Steps (verification progress) ===== */
@@ -756,3 +762,25 @@ html, body { overflow-x: clip; }
   html.side-collapsed .side-bottom { align-items: center; }
 }
 @media (prefers-reduced-motion: reduce) { .sidenav, main.container, .container { transition: none; } }
+
+/* Search button: icon + word on computers, icon only on phones (session 73). */
+.search-btn { gap: .45rem; }
+.searchbar.searchbar-simple .search-btn { padding-inline: 1.2rem; }
+@media (max-width: 700px) { .searchbar.searchbar-simple .search-btn { padding: 0; width: 48px; } }
+input[type=search]::-webkit-search-cancel-button { filter: invert(1); opacity: .5; }
+
+/* Phones (session 73): app-like category grid: name on the photo, tight gaps,
+   smaller page titles, lighter header. */
+@media (max-width: 759px) {
+  .cat-all, .cat-preview { gap: .5rem; }
+  .cat-all .cat-tile, .cat-preview .cat-tile { position: relative; border: 0; }
+  .cat-all .cat-tile img, .cat-preview .cat-tile:not(.cat-more) img { aspect-ratio: 1; }
+  .cat-all .cat-tile span, .cat-preview .cat-tile:not(.cat-more) span { position: absolute; inset-inline: 0; bottom: 0; min-height: 0; padding: 1.4rem .45rem .4rem;
+    background: linear-gradient(transparent, rgba(0,0,0,.78)); color: #fff; font-size: .74rem; }
+  .cat-all .glow, .cat-preview .glow { display: none; }
+  h1 { font-size: 1.45rem; }
+  .topbar .nav a:not(.btn):not(.top-bell) { padding-inline: .4rem; font-size: .92rem; }
+  .topbar .nav .btn.sm { padding: .3rem .7rem; font-size: .85rem; min-height: 40px; }
+  .topbar .lang-switch { padding: .3rem .55rem; }
+}
+.topbar .nav a { display: inline-flex; align-items: center; }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import Icon from '../components/Icon.jsx';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, ListingCard, CardsLoading, Loading } from '../components/ui.jsx';
@@ -50,7 +51,7 @@ export default function Browse() {
           {categories.map((c) => <option key={c} value={c}>{t(c)}</option>)}
         </select>
         <CityField governorates placeholder={t('City or governorate')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
-        <button className="btn">{t('Search')}</button>
+        <button className="btn search-btn" aria-label={t('Search')}><Icon name="search" weight="bold" /><span className="search-label">{t('Search')}</span></button>
       </form>
       <ErrorBox error={error} />
       {user && (
