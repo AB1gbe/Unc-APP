@@ -60,3 +60,8 @@ The owner found the session-62 look "too AI". After researching real marketplace
 
 ![[marketplace-look-home.png]]
 
+## Smaller corners and back-glow (session 68, final)
+The square redesign above was **reverted** ([[ADR-062 Photo-first marketplace look]]). What stays: the session 62–64 look with **6 px corners** (8 px banner) and a **back-glow**: `.glow-wrap` holds a blurred copy of the photo (`img.glow`, blur 38 px, saturate 1.8, opacity .55, .85 on hover) behind the card. Used by `ListingCard` (`client/src/components/ui.jsx`), `HeroStack` and `HowItWorks` (`client/src/components/Showcase.jsx`). Decision: [[ADR-063 Smaller corners and back-glow]].
+
+![[backglow-home.png]]
+

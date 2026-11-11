@@ -1,9 +1,11 @@
 ---
 tags: [decision, design]
-status: accepted
+status: reverted
 date: 2026-11-11
 ---
 # ADR-062 Photo-first marketplace look
+
+> **Reverted the same session.** The owner: "no, this looks worse than before". Kept from it: the example photo on requests without one. Instead: the session 62–64 look with 6 px corners and a back-glow → [[ADR-063 Smaller corners and back-glow]].
 
 Replaces parts of [[ADR-060 A darker, grown-up look]] (dark theme and coral stay). Research: [[Marketplace Design Study]].
 

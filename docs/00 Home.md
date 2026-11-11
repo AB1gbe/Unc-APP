@@ -146,7 +146,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Get Help: common questions + questions to the Unc team, answered on the Admin page | ✅ done — in `main` since session 61 → [[Get Help]] |
 | New look: dark theme, serif headings, coral accent, pictures on the front page, cards and Help | ✅ done — in `main` since session 63 → [[Design System#The new look (session 62)]] |
 | Real photos from Pexels (demo data, steps, categories, Help) | ✅ done — in `main` since session 65 → [[Photo Credits]] |
-| Photo-first marketplace look (square photos, no boxes, shadows or gradients) | ✅ done — on branch (session 68) → [[Marketplace Design Study]] |
+| Smaller corners + back-glow behind photo cards (square redesign tried and reverted) | ✅ done — on branch (session 68) → [[ADR-063 Smaller corners and back-glow]] |
 | API tests | ✅ 187 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

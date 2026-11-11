@@ -4,6 +4,11 @@ step: 62
 ---
 # Step 62: Photo-first marketplace look (session 68)
 
+> **Reverted.** Skip steps 1–5 and 7. Do instead:
+> - `client/src/styles.css`: `--radius: 6px`; every `border-radius` of 10–14 px → 6 px, 16–24 px → 8 px; add `.gallery-fallback` styles.
+> - **Back-glow:** in `ListingCard`, wrap the card in `<div className="glow-wrap">` with `<img className="glow" src={photo} alt="" aria-hidden="true" />` before it; the same in `HeroStack` (`hero-glow`) and `HowItWorks`; CSS block "Back-glow (session 68)" at the end of `styles.css`.
+> - Step 6 (Arabic) and the request-page example photo stay.
+
 **What/why:** [[ADR-062 Photo-first marketplace look]], [[Marketplace Design Study]].
 
 1. Fonts (inside `Unc-APP`):
