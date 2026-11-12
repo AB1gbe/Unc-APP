@@ -255,7 +255,7 @@ Unc-APP/
 - `client/src/components/SideNav.jsx` (session 72) — the app-style side bar (opens and folds).
 
 ## Added in session 79 (Cloudflare test site)
-- `cloudflare/`: `wrangler.jsonc`, `worker.js`, `start.js`, `shims/` (`storage.js`, `sqlite.js`, `fs.js`). See [[Step 69 - Cloudflare test site]].
-- `scripts/cloudflare-build.mjs`: builds the website and copies the demo photos for Cloudflare.
-- `.github/workflows/cloudflare-test.yml`: publishes the test site on every change to `main`.
+- `wrangler.jsonc` (top folder): Cloudflare settings for the test site `unc-app`.
+- `cloudflare/`: `worker.js`, `start.js`, `shims/` (`storage.js`, `sqlite.js`, `fs.js`). See [[Step 69 - Cloudflare test site]].
+- `scripts/copy-demo-photos.mjs`: run by `npm run build`; copies the demo photos into `client/dist/demo-photos/`.
 

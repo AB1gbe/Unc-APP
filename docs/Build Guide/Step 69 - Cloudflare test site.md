@@ -6,28 +6,22 @@ step: 69
 
 **Optional, but it's what lets you stop using cmd:** Unc runs on Cloudflare and updates itself whenever `main` changes. Your PC version keeps working exactly as before. Why it's built this way: [[ADR-069 Cloudflare test site]].
 
-## A. One-time setup (only you can do this; about 10 minutes)
-Keys never go in a chat; you paste them straight into GitHub.
-1. **Cloudflare key.** In the Cloudflare dashboard: your profile icon (top right) → **My Profile** → **API Tokens** → **Create Token** → template **Edit Cloudflare Workers** → **Use template**.
-   - Account Resources: your account.
-   - Zone Resources: **Include → Specific zone → b1gbe.org**.
-   - **+ Add more**: **Zone → DNS → Edit** (so it can create `unc.b1gbe.org`).
-   - **Continue to summary** → **Create Token** → **Copy** (it's shown once).
-2. **Account ID.** Cloudflare dashboard → **Workers & Pages** (left menu) → the **Account ID** on the right → copy.
-3. **GitHub secrets.** github.com/AB1gbe/Unc-APP → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Add these four:
-   - `CLOUDFLARE_API_TOKEN` = the key from step 1
-   - `CLOUDFLARE_ACCOUNT_ID` = the ID from step 2
-   - `UNC_ADMIN_PASSWORD` = a strong admin password for the test site (the default `ChangeMe123!` is public!)
-   - `UNC_SECRET_PEPPER` = any long random text (e.g. 40 random letters). **Never change it later.**
-4. Start the first publish: **Actions** tab → **Cloudflare test site** → **Run workflow** (or merge a pull request). After 2–3 minutes, open **https://unc.b1gbe.org**.
-   - The first visit takes a few seconds: it creates the database and loads the demo data.
-   - Log in with the demo accounts (password `Password123`) or as `admin@unc.local` with your `UNC_ADMIN_PASSWORD`.
+## A. One-time setup (done by the owner in the Cloudflare dashboard)
+The owner connected the repository directly: **Workers & Pages → Create → Import a repository → AB1gbe/Unc-APP**, project name **unc-app**. Cloudflare ("Workers Builds") then builds and publishes on every push. Settings to check in **unc-app → Settings → Build**:
+- **Production branch:** `main`
+- **Build command:** `npm run build` (it also copies the demo photos)
+- **Deploy command:** `npx wrangler deploy` (it reads `wrangler.jsonc` in the top folder)
+- **Root directory:** empty (the top folder)
+
+Two more things in the dashboard, both important:
+1. **Admin password** (the default `ChangeMe123!` is public): **unc-app → Settings → Variables and Secrets → Add** → type **Secret**, name `ADMIN_PASSWORD`, a strong value → Deploy. Optional: `SECRET_PEPPER` (a long random text, never change it later). Set them **before the first visit**: the admin account is created on the first visit with the password at that moment.
+2. **Your address:** **unc-app → Domains** (or Settings → Domains & Routes) → **Add → Custom domain** → `unc.b1gbe.org`. It also works at the `…workers.dev` address shown there.
 
 ## B. Updating
-Tell Claude "merge it" (or merge a pull request yourself). Every change to `main` runs **Actions → Cloudflare test site**: tests → build → publish. You can watch it in the Actions tab.
+Tell Claude "merge it" (or merge a pull request yourself). Every push to `main` builds and publishes by itself: **unc-app → Deployments** shows each one.
 
 ## C. How it works (files)
-- `cloudflare/wrangler.jsonc`: name `unc-test`, the website (`../client/dist`), the Durable Object `UncServer`, the stand-ins (`alias`), settings (`vars`), the address (`routes`).
+- `wrangler.jsonc` (top folder): name `unc-app`, the website (`client/dist`), the Durable Object `UncServer`, the stand-ins (`alias`), settings (`vars`).
 - `cloudflare/worker.js`: pages come from static assets; `/api/*` and `/uploads/*` go to the Durable Object "main". Hourly jobs run on an alarm.
 - `cloudflare/start.js`: opens the database, creates the admin, loads demo data once (`SEED_DEMO=1`, photos from `client/dist/demo-photos`), starts the normal Express app.
 - `cloudflare/shims/sqlite.js`: `node:sqlite`'s `DatabaseSync` on the Durable Object's SQLite (`transactionSync` for transactions, `user_version` in `_meta`).
@@ -37,16 +31,14 @@ Tell Claude "merge it" (or merge a pull request yourself). Every change to `main
   - `sendStored()` in `server/src/lib/uploads.js` sends photos and videos;
   - no app compression on Cloudflare;
   - `config.js` and `seed.js` work without a file path.
-- `scripts/cloudflare-build.mjs`: `npm run build` + copy `server/demo-photos/*.jpg` to `client/dist/demo-photos/`.
-- `.github/workflows/cloudflare-test.yml`: the auto-publish.
+- `scripts/copy-demo-photos.mjs` (end of `npm run build`): copies `server/demo-photos/*.jpg` to `client/dist/demo-photos/`.
 
 ## D. Trying the Cloudflare version on a computer (optional, for developers)
 ```
-node scripts/cloudflare-build.mjs
-cd cloudflare
+npm run build
 npx wrangler dev --port 8790
 ```
 Open http://localhost:8790. Browser tests against it: `set BASE_URL=http://127.0.0.1:8790` then `node e2e/smoke.mjs` (start wrangler with `--var SEED_DEMO:0` for an empty database).
 
 ## E. Starting the test site over (wipe all its data)
-In `cloudflare/wrangler.jsonc`, add a new entry to `migrations`, e.g. `{ "tag": "v2", "deleted_classes": ["UncServer"] }` then `{ "tag": "v3", "new_sqlite_classes": ["UncServer"] }`, and merge. Ask Claude if unsure.
+In `wrangler.jsonc`, add a new entry to `migrations`, e.g. `{ "tag": "v2", "deleted_classes": ["UncServer"] }` then `{ "tag": "v3", "new_sqlite_classes": ["UncServer"] }`, and merge. Ask Claude if unsure.

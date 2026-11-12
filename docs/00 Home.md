@@ -162,7 +162,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | App-style side bar on computers (opens and folds), slim header + tab bar on phones | ✅ done — in `main` since session 73 → [[ADR-067 App-style side bar]] |
 | Phones: app-like search and category tiles, floating glass tab bar, dark system bars | ✅ done — in `main` since session 78 → [[2026-11-11 Session 74]] |
 | Marketplace first: filters + sort, who answered (no prices), offer status, stock/delivery, home rebuilt | ✅ done — in `main` since session 78 → [[ADR-068 Marketplace first]] |
-| Cloudflare test site (unc.b1gbe.org), auto-publish on `main` | ✅ built and tested locally — waiting for the owner's Cloudflare key and GitHub secrets → [[Step 69 - Cloudflare test site]] |
+| Cloudflare test site (unc.b1gbe.org), auto-publish on `main` | ✅ connected to Cloudflare (unc-app, Workers Builds); owner adds ADMIN_PASSWORD and the domain → [[Step 69 - Cloudflare test site]] |
 | API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

@@ -14,9 +14,9 @@ The owner: "I have a domain b1gbe.org in Cloudflare, can we create a worker for 
 | Uploaded photos/videos | R2 (async, rewrite); **rows in the Durable Object's SQLite (`_files`)** | Same database | Keeps the app's file code. Fine for a test; 25 MB videos are the largest. |
 | The app's code | Rewrite for Workers; **same Express app** (`cloudflare:node` http handler) + small "if on Cloudflare" spots | Same app | One codebase: the PC version and all 192 tests stay as they were. |
 | Website files | **Workers static assets** (`client/dist`) | Assets | Fast, free, no code. |
-| Updates | Owner runs commands; **GitHub workflow on every change to `main`** | Workflow | "Update" = merge the pull request; the site publishes itself. Skips until the key is added. |
+| Updates | Owner runs commands; GitHub workflow; **Cloudflare's own GitHub connection (Workers Builds)** | Workers Builds | The owner connected the repository in the dashboard (project `unc-app`); every push to `main` publishes. No keys in GitHub. |
 | Email | Real provider; **console mode (codes shown on screen)** | Console | Test only, as the owner said. Anyone can sign up without a real inbox. |
-| Address | **unc.b1gbe.org** | | Like the owner's jpn.b1gbe.org. Change `routes` in `cloudflare/wrangler.jsonc`. |
+| Address | **unc.b1gbe.org** | | Like the owner's jpn.b1gbe.org. Added in the dashboard (unc-app → Domains). |
 
 **Not for real users yet:** emails aren't sent, everything is one Durable Object (fine for a test), and ID photos are stored on Cloudflare outside Bahrain (PDPL, ask the lawyer). Search engines are told not to list it (`X-Robots-Tag: noindex`).
 
