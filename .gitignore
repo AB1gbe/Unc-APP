@@ -8,4 +8,5 @@ docs/.obsidian/workspace.json
 docs/.obsidian/workspace-mobile.json
 e2e/screenshots/
 # Cloudflare local runs (wrangler dev)
+.wrangler/
 cloudflare/.wrangler/
