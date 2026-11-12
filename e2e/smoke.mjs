@@ -402,6 +402,7 @@ await buyer.locator('[data-setting=shortName]').uncheck(); await buyer.waitForTi
 // The server caches the counts for a minute, so reload until fresh ones arrive.
 for (let i = 0; ; i++) {
   await vendor.goto(BASE + '/browse');
+  await vendor.waitForLoadState('networkidle'); // the counters load after the page
   if (await vendor.locator('.live-pulse:has-text("posted today"):has-text("active now")').count()) break;
   if (i > 15) throw new Error('live counters never showed');
   await vendor.waitForTimeout(5000);

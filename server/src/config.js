@@ -9,8 +9,12 @@ const serverRoot = path.resolve(here, '..');
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
+// The Cloudflare test site (session 80): built as "production" by wrangler,
+// but allowed console email and on-screen sign-up codes. Never set this on a
+// real site.
+const testSite = process.env.TEST_SITE === '1';
 
-if (isProd && !process.env.SECRET_PEPPER) {
+if (isProd && !testSite && !process.env.SECRET_PEPPER) {
   throw new Error('SECRET_PEPPER must be set in production');
 }
 
@@ -21,12 +25,15 @@ const dataDir = process.env.DATA_DIR || path.join(serverRoot, 'data');
 // (Resend's HTTP API). See docs/Features/Email Sending.md
 // Tests always use 'memory' so a real .env can never make tests send email.
 const mailTransport = isTest ? 'memory' : process.env.MAIL_TRANSPORT || 'console';
-if (isProd && ['console', 'memory'].includes(mailTransport)) {
+if (isProd && !testSite && ['console', 'memory'].includes(mailTransport)) {
   throw new Error('In production set MAIL_TRANSPORT to smtp or resend so emails are really sent');
 }
 
 export const config = {
   isProd,
+  testSite,
+  // Sign-up and reset codes shown on screen: development and the test site only.
+  showDevCodes: (!isProd || testSite) && ['console', 'memory'].includes(mailTransport),
   isTest,
   port: Number(process.env.PORT || 4000),
   // How many proxies sit in front of the app (Render/Railway/Fly/nginx: 1).

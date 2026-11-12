@@ -30,6 +30,9 @@
     "CLIENT_DIST": "/no-client-dist",
     "TRUST_PROXY": "1",
     "MAIL_TRANSPORT": "console",
+    // A test site (session 80): console email and on-screen codes are allowed
+    // even though wrangler builds it as "production".
+    "TEST_SITE": "1",
     "SEED_DEMO": "1",
     "APP_URL": "https://unc.b1gbe.org"
   },

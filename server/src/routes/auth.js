@@ -78,7 +78,7 @@ export function authRoutes(db) {
   // When emails are only printed (console) or kept in memory (tests), we
   // also hand the code back in the response so you can test without a mail
   // provider. Never in production, and not when real email is configured.
-  const showDevCode = !config.isProd && ['console', 'memory'].includes(config.mail.transport);
+  const showDevCode = config.showDevCodes;
   const devExtra = (code) => (showDevCode ? { devCode: code } : {});
 
   r.post('/register', limits.register, async (req, res) => {
