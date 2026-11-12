@@ -5,7 +5,7 @@ import { config } from '../config.js';
 import { audit, tx } from '../db.js';
 import { pepperedHash } from '../lib/crypto.js';
 import { HttpError } from '../lib/http.js';
-import { KYC_DIR, memoryUpload, saveFiles } from '../lib/uploads.js';
+import { KYC_DIR, memoryUpload, saveFiles, sendStored } from '../lib/uploads.js';
 import * as v from '../lib/validate.js';
 import { requireAuth, publicMe } from '../middleware/auth.js';
 import { getProvider, applyDecision } from '../kyc/index.js';
@@ -141,5 +141,5 @@ export function sendKycFile(res, filename) {
   const full = path.join(KYC_DIR(), filename);
   if (!fs.existsSync(full)) throw new HttpError(404, 'File not found');
   res.set('Cache-Control', 'no-store');
-  res.sendFile(full);
+  sendStored(res, full);
 }

@@ -24,7 +24,7 @@ export async function ensureAdmin(db) {
 // Example photos (session 54): illustrations in server/demo-photos/ (made by
 // scripts/make-demo-photos.mjs), stored exactly like a member's upload:
 // checked, and saved under a new random name.
-const DEMO_PHOTOS = fileURLToPath(new URL('../demo-photos/', import.meta.url));
+const DEMO_PHOTOS = process.env.DEMO_PHOTOS_DIR || fileURLToPath(new URL('../demo-photos/', import.meta.url));
 const demoPhoto = (dir, name) => saveFiles(dir(), [{ file: { buffer: fs.readFileSync(path.join(DEMO_PHOTOS, name)), fieldname: 'image' } }]).names[0];
 
 function addDemoPhotos(db) {
@@ -173,7 +173,7 @@ export async function seedDemo(db) {
   console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local, furniture@demo.local, autoparts@demo.local, phonefix@demo.local, fatima@demo.local, hussain@demo.local, noor@demo.local');
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (import.meta.url?.startsWith('file:') && process.argv[1] === fileURLToPath(import.meta.url)) {
   const db = openDb();
   await ensureAdmin(db);
   await seedDemo(db);

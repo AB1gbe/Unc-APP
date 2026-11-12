@@ -253,3 +253,9 @@ Unc-APP/
 - `client/src/pages/Landing.jsx` (session 72) — the calm home page for visitors.
 - `server/src/demo-requests.js` (session 72) — example requests and demo buyers used by `npm run seed` and `scripts/fetch-photos.mjs`.
 - `client/src/components/SideNav.jsx` (session 72) — the app-style side bar (opens and folds).
+
+## Added in session 79 (Cloudflare test site)
+- `wrangler.jsonc` (top folder): Cloudflare settings for the test site `unc-app`.
+- `cloudflare/`: `worker.js`, `start.js`, `shims/` (`storage.js`, `sqlite.js`, `fs.js`). See [[Step 69 - Cloudflare test site]].
+- `scripts/copy-demo-photos.mjs`: run by `npm run build`; copies the demo photos into `client/dist/demo-photos/`.
+

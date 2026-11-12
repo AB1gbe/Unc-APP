@@ -546,6 +546,8 @@ export function openDb(file = config.dbFile) {
 function migrate(db) {
   const { user_version: current } = db.prepare('PRAGMA user_version').get();
   for (let i = current; i < MIGRATIONS.length; i++) {
+    // On Cloudflare (session 79) a Durable Object step is the transaction.
+    if (db.transactionSync) { db.transactionSync(() => { db.exec(MIGRATIONS[i]); db.exec(`PRAGMA user_version = ${i + 1}`); }); continue; }
     db.exec('BEGIN');
     try {
       db.exec(MIGRATIONS[i]);
@@ -560,6 +562,7 @@ function migrate(db) {
 
 // Small helper so route code reads cleanly: tx(db, () => { ... })
 export function tx(db, fn) {
+  if (db.transactionSync) return db.transactionSync(fn); // Cloudflare (session 79)
   db.exec('BEGIN');
   try {
     const result = fn();

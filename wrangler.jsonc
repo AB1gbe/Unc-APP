@@ -1,0 +1,38 @@
+// Unc on Cloudflare, TEST version (session 79). See docs/Build Guide/Step 69.
+// In the top folder so Cloudflare's "Connect to GitHub" (Workers Builds)
+// finds it: build command `npm run build`, deploy command `npx wrangler deploy`.
+{
+  "name": "unc-app",
+  "main": "cloudflare/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // The built website (npm run build) plus the demo photos copied by
+  // scripts/copy-demo-photos.mjs. Pages are served directly; /api and
+  // /uploads go to the Worker.
+  "assets": {
+    "directory": "client/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/uploads/*"]
+  },
+  "durable_objects": { "bindings": [{ "name": "UNC", "class_name": "UncServer" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["UncServer"] }],
+  // Node's database and disk are replaced by the Durable Object's SQLite.
+  "alias": {
+    "node:sqlite": "./cloudflare/shims/sqlite.js",
+    "fs": "./cloudflare/shims/fs.js",
+    "node:fs": "./cloudflare/shims/fs.js"
+  },
+  "vars": {
+    "DATA_DIR": "/data",
+    "DB_FILE": "/data/unc.sqlite",
+    "DEMO_PHOTOS_DIR": "/demo-photos",
+    "CLIENT_DIST": "/no-client-dist",
+    "TRUST_PROXY": "1",
+    "MAIL_TRANSPORT": "console",
+    "SEED_DEMO": "1",
+    "APP_URL": "https://unc.b1gbe.org"
+  },
+  // The address (unc.b1gbe.org) is added in the dashboard: unc-app → Domains.
+  "observability": { "enabled": true }
+}

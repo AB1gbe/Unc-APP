@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { Router } from 'express';
-import { CHAT_DIR } from '../lib/uploads.js';
+import { CHAT_DIR, sendStored } from '../lib/uploads.js';
 import { audit, tx } from '../db.js';
 import { notify } from '../lib/notify.js';
 import { HttpError, notFound } from '../lib/http.js';
@@ -118,7 +118,7 @@ export function adminRoutes(db) {
     if (!owned || !fs.existsSync(full)) throw notFound('File not found');
     audit(db, req.user.id, 'report.image_viewed', `report:${rep.id}`, { file: req.params.file });
     res.set('Cache-Control', 'no-store');
-    res.sendFile(full);
+    sendStored(res, full);
   });
 
   // Videos in a reported conversation (session 58): same rules as photos.
@@ -129,7 +129,7 @@ export function adminRoutes(db) {
     if (!owned || !fs.existsSync(full)) throw notFound('File not found');
     audit(db, req.user.id, 'report.video_viewed', `report:${rep.id}`, { file: req.params.file });
     res.set('Cache-Control', 'no-store');
-    res.sendFile(full);
+    sendStored(res, full);
   });
 
   // outcome (session 37): 'action' (we did something) or 'nothing' (found

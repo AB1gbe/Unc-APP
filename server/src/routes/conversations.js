@@ -18,7 +18,7 @@ import { canStillRate, ratingQueries } from '../lib/ratings.js';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHAT_DIR, VIDEO_MAX_BYTES, avatarUrl, memoryUpload, saveFiles, saveVideo } from '../lib/uploads.js';
+import { CHAT_DIR, VIDEO_MAX_BYTES, avatarUrl, memoryUpload, saveFiles, saveVideo, sendStored } from '../lib/uploads.js';
 import { config } from '../config.js';
 import { notify } from '../lib/notify.js';
 import { pushTo } from '../lib/push.js';
@@ -418,7 +418,7 @@ export function conversationRoutes(db) {
     const full = path.join(CHAT_DIR(), path.basename(req.params.file));
     if (!owned || !fs.existsSync(full)) throw notFound('File not found');
     res.set('Cache-Control', 'private, max-age=31536000, immutable');
-    res.sendFile(full);
+    sendStored(res, full);
   });
 
   // Chat photos: only for the two people in the conversation, and only
@@ -429,7 +429,7 @@ export function conversationRoutes(db) {
     const full = path.join(CHAT_DIR(), path.basename(req.params.file));
     if (!owned || !fs.existsSync(full)) throw notFound('File not found');
     res.set('Cache-Control', 'private, max-age=31536000, immutable');
-    res.sendFile(full);
+    sendStored(res, full);
   });
 
   // ---- Reporting (safety) ----

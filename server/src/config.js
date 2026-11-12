@@ -3,7 +3,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
+// On Cloudflare (session 79) there is no file path; DATA_DIR and CLIENT_DIST are set instead.
+const here = import.meta.url?.startsWith('file:') ? path.dirname(fileURLToPath(import.meta.url)) : '/server/src';
 const serverRoot = path.resolve(here, '..');
 
 const isProd = process.env.NODE_ENV === 'production';
