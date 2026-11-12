@@ -3,6 +3,7 @@
 // language (users.language). Keep the HTML simple: many email apps strip
 // CSS. Arabic emails are laid out right-to-left (dir="rtl").
 import { config } from '../config.js';
+import { formatMoney } from '../../../shared/money.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -108,9 +109,7 @@ export function newOfferEmail({ sellerName, title, message, offerPrice, currency
   const lang = pick(language);
   const url = `${config.appUrl}/messages/${conversationId}`;
   const settingsUrl = `${config.appUrl}/account`;
-  const price = offerPrice == null ? null : new Intl.NumberFormat(lang === 'ar' ? 'ar-BH-u-nu-latn' : 'en-US', {
-    style: 'currency', currency, currencyDisplay: lang === 'ar' ? 'code' : 'symbol', maximumFractionDigits: 0,
-  }).format(offerPrice);
+  const price = offerPrice == null ? null : formatMoney(offerPrice, { lang, currency });
   const snippet = message.length > 300 ? `${message.slice(0, 300)}…` : message;
   const quote = `<blockquote dir="${textDir(snippet)}" style="margin:16px 0;padding:12px 16px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap;text-align:${textDir(snippet) === 'rtl' ? 'right' : 'left'}">${esc(snippet)}</blockquote>`;
   const button = (label) => `<p style="margin:20px 0"><a href="${esc(url)}" style="background:#2f6fed;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">${label}</a></p>`;

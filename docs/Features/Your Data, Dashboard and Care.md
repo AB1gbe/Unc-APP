@@ -53,7 +53,7 @@ The "recommended next five" from [[New Directions for the Vision]], all built in
 
 - **✅ Pickup checklist** for that kind of item, e.g. phones: IMEI matches the box, Find My signed out, battery, screen and cameras. Every list ends with: matches the chat, meet in public, pay only when happy.
 - The ticks are private notes kept **on this device** only.
-- **🛡️ Big deal** card from 500 USD/EUR (400 GBP, 700 CAD, 750 AUD; 200 BHD, 2000 SAR/AED when those currencies come): meet at a bank or police safe spot, check papers, pay in a way that leaves a record, bring someone.
+- **🛡️ Big deal** card from BD 200 (all prices are BHD since session 80; the table still holds other currencies for later): meet at a bank or police safe spot, check papers, pay in a way that leaves a record, bring someone.
 
 ## 5. Report follow-up and raise my budget
 **Why:** [[ADR-047 Report follow-up and raise my budget]] · **Build:** [[Step 47 - Report follow-up and raise my budget]]

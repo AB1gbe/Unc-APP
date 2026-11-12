@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { categoryArt } from '../art.js';
 import Icon from '../components/Icon.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api, ago, budget, toDate } from '../api.js';
+import { api, ago, budget, currencyName, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
 import { Activity, Avatar, Badges, ClosesBadge, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt, conditionLabel, daysLeft, replyLabel } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
@@ -159,7 +159,7 @@ function OfferPanel({ listing }) {
       <p className="muted small">{tj('Your message goes privately to {name} and stays attached to this request.', { name: <bdi>{listing.buyer.displayName}</bdi> })}</p>
       <ErrorBox error={error} />
       <div className="field">
-        <label htmlFor="offerPrice">{t('Your price ({currency})', { currency: listing.currency })} <span className="muted">{t('(optional)')}</span></label>
+        <label htmlFor="offerPrice">{t('Your price ({currency})', { currency: currencyName(listing.currency) })} <span className="muted">{t('(optional)')}</span></label>
         <input id="offerPrice" type="number" min="0" step="1" value={offerPrice} onChange={(e) => setOfferPrice(e.target.value)} />
       </div>
       {offerPrice !== '' && <OfferDetailFields value={details} onChange={setDetails} />}
@@ -366,7 +366,7 @@ function RaiseBudget({ listing, onChange }) {
   return (
     <form className="raise-budget" onSubmit={submit}>
       <ErrorBox error={error} />
-      <label htmlFor="raiseBudget" className="small">{t('New top budget ({currency})', { currency: listing.currency })}</label>
+      <label htmlFor="raiseBudget" className="small">{t('New top budget ({currency})', { currency: currencyName(listing.currency) })}</label>
       <div className="row">
         <input id="raiseBudget" type="number" min={(listing.budgetMax ?? listing.budgetMin ?? 0) + 1} required value={amount} onChange={(e) => setAmount(e.target.value)} style={{ width: 120 }} />
         <button className="btn sm" disabled={busy || amount === ''}>{t('Raise')}</button>

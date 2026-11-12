@@ -4,4 +4,5 @@ export const CATEGORIES = [
   'Vehicles & Parts', 'Fashion', 'Beauty & Health', 'Sports & Outdoors', 'Toys & Kids',
   'Books & Media', 'Tools & DIY', 'Garden', 'Pets', 'Services', 'Other',
 ];
-export const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'];
+// Unc works in Bahrain: every price is in Bahraini Dinar (session 80).
+export const CURRENCIES = ['BHD'];

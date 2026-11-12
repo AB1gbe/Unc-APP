@@ -416,7 +416,7 @@ function readListingBody(body) {
     category: v.oneOf(body, 'category', CATEGORIES),
     budgetMin: v.int(body, 'budgetMin', { optional: true }),
     budgetMax: v.int(body, 'budgetMax', { optional: true }),
-    currency: v.oneOf(body, 'currency', CURRENCIES, { optional: true }) || 'USD',
+    currency: v.oneOf(body, 'currency', CURRENCIES, { optional: true }) || 'BHD',
     city: normalizeCity(v.str(body, 'city', { min: 2, max: 80 })),
     neededBy: v.isoDate(body, 'neededBy', { optional: true }),
     contactRule: v.oneOf(body, 'contactRule', CONTACT_RULES, { optional: true }) || 'anyone',

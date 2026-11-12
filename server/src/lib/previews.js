@@ -3,6 +3,7 @@
 // these <meta> tags (Open Graph) to show a card with a picture and a title.
 // They don't run JavaScript, so the server writes the tags into index.html.
 import { config } from '../config.js';
+import { formatMoney } from '../../../shared/money.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -12,9 +13,7 @@ const TEXT = {
 };
 
 function price(l, lang) {
-  const fmt = (n) => new Intl.NumberFormat(lang === 'ar' ? 'ar-BH-u-nu-latn' : 'en-US', {
-    style: 'currency', currency: l.currency, currencyDisplay: lang === 'ar' ? 'code' : 'symbol', maximumFractionDigits: 0,
-  }).format(n);
+  const fmt = (n) => formatMoney(n, { lang, currency: l.currency });
   if (l.budget_min != null && l.budget_max != null) return `${fmt(l.budget_min)} – ${fmt(l.budget_max)}`;
   if (l.budget_max != null) return fmt(l.budget_max);
   if (l.budget_min != null) return fmt(l.budget_min);

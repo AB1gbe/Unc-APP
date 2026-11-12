@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
-import { openDb } from './db.js';
+import { openDb, TO_BHD_SQL } from './db.js';
 import { hashPassword } from './lib/crypto.js';
 import { DEMO_BUYERS, DEMO_REQUESTS } from './demo-requests.js';
 import { TERMS_VERSION } from './lib/terms.js';
@@ -161,6 +161,8 @@ export async function seedDemo(db) {
     `).run(who, title, description, category, min, max, city, `-${daysAgo} days`, `-${daysAgo} days`).lastInsertRowid);
     db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(id, demoPhoto(LISTING_DIR, photo));
   });
+  // Demo prices are written in dollars above; turn them into Bahraini Dinar (session 80).
+  db.exec(TO_BHD_SQL);
   // Everything the seed made is sample data (session 77): labelled "Sample"
   // and left out of live counters and the activity list.
   const demoIds = db.prepare(`SELECT id FROM users WHERE email LIKE '%@demo.local'`).all().map((u) => u.id);

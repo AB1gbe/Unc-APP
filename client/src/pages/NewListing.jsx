@@ -1,7 +1,7 @@
 // Used for both "post a new request" and "edit my request".
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { api } from '../api.js';
+import { api, currencyName } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
@@ -10,13 +10,13 @@ import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import CityField from '../components/CityField.jsx';
 
-const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '', contactRule: 'anyone', condition: 'any' };
+const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'BHD', city: '', neededBy: '', contactRule: 'anyone', condition: 'any' };
 
 export default function NewListing() {
   const { id } = useParams();
   const editing = Boolean(id);
   const { user } = useAuth();
-  const { categories, currencies } = useMeta();
+  const { categories } = useMeta();
   const navigate = useNavigate();
   const [form, setForm] = useState({ ...EMPTY, city: user.city || '' });
   const [images, setImages] = useState([]);     // new photos to upload
@@ -31,7 +31,7 @@ export default function NewListing() {
     api(`/listings/${id}`).then(({ listing: l }) => {
       setForm({
         title: l.title, description: l.description, category: l.category, budgetMin: l.budgetMin ?? '',
-        budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '', contactRule: l.contactRule ?? 'anyone', condition: l.condition ?? 'any',
+        budgetMax: l.budgetMax ?? '', currency: 'BHD', city: l.city, neededBy: l.neededBy ?? '', contactRule: l.contactRule ?? 'anyone', condition: l.condition ?? 'any',
       });
       setExisting(l.photos ?? []);
       setLoaded(true);
@@ -101,13 +101,10 @@ export default function NewListing() {
         <textarea id="description" required minLength={10} maxLength={3000} placeholder={t('Condition, model, size, colour, must-haves, deal-breakers…')} value={form.description} onChange={set('description')} />
       </div>
       <div className="field">
-        <label>{t('Budget')} <span className="muted">{t('(optional)')}</span></label>
-        <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr 110px' }}>
+        <label>{t('Budget in {currency}', { currency: currencyName() })} <span className="muted">{t('(optional)')}</span></label>
+        <div className="field-row">
           <input type="number" min="0" placeholder={t('Min')} value={form.budgetMin} onChange={set('budgetMin')} aria-label={t('Minimum budget')} />
           <input type="number" min="0" placeholder={t('Max')} value={form.budgetMax} onChange={set('budgetMax')} aria-label={t('Maximum budget')} />
-          <select value={form.currency} onChange={set('currency')} aria-label={t('Currency')}>
-            {currencies.map((c) => <option key={c}>{c}</option>)}
-          </select>
         </div>
       </div>
       <div className="field-row">

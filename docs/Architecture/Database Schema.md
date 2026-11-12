@@ -184,3 +184,5 @@ Install *DB Browser for SQLite* (free, https://sqlitebrowser.org) and open `serv
 - **40:** `messages.offer_stock` TEXT (in-stock/order); `messages.offer_delivery` TEXT (pickup/delivery/both).
 See [[ADR-068 Marketplace first]].
 
+## Migration 41 (session 80): Bahraini Dinar
+- **41:** `TO_BHD_SQL` (exported from `db.js`, also run by the seed). Converts `messages.offer_price` (by the listing's currency), `installment_parts.amount`, `installment_plans.total` and `listings.budget_min/max` from USD/EUR/GBP/CAD/AUD to BHD and sets `currency = 'BHD'`. No new columns; the `currency` columns stay for later. See [[ADR-070 Bahraini Dinar only]].

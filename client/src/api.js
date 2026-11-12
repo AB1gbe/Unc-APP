@@ -1,4 +1,5 @@
 import { getLang, locale, t } from './i18n.jsx';
+import { CURRENCY, formatMoney } from '../../shared/money.js';
 
 // One function for every call to the backend. Sends cookies, parses JSON,
 // and throws an Error with the server's message when something fails.
@@ -31,20 +32,19 @@ export async function api(path, { method = 'GET', body, form } = {}) {
   return data;
 }
 
-export function money(n, currency = 'USD') {
-  if (n === null || n === undefined) return null;
-  // Arabic: "300 USD" rather than "300 US$" - a loose "$" gets reordered by
-  // the right-to-left layout when two prices sit side by side ("$US").
-  const display = getLang() === 'ar' ? 'code' : 'symbol';
-  return new Intl.NumberFormat(locale(), { style: 'currency', currency, currencyDisplay: display, maximumFractionDigits: 0 }).format(n);
+// Prices are in Bahraini Dinar (session 80): "BD 120" / "120 د.ب".
+// The formatting lives in shared/money.js so emails and previews match.
+export function money(n, currency = CURRENCY) {
+  return formatMoney(n, { lang: getLang(), currency });
 }
 
 // Exact amounts with the currency's own decimals (BD 1.500), for wallet credit (session 58).
-export function moneyExact(n, currency = 'USD') {
-  if (n === null || n === undefined) return null;
-  const display = getLang() === 'ar' ? 'code' : 'symbol';
-  return new Intl.NumberFormat(locale(), { style: 'currency', currency, currencyDisplay: display }).format(n);
+export function moneyExact(n, currency = CURRENCY) {
+  return formatMoney(n, { lang: getLang(), currency, exact: true });
 }
+
+// The short name shown next to price boxes: "BD" / "د.ب".
+export const currencyName = (currency = CURRENCY) => (currency === 'BHD' ? (getLang() === 'ar' ? 'د.ب' : 'BD') : currency);
 
 export function budget(l) {
   const min = money(l.budgetMin, l.currency);
