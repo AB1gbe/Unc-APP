@@ -99,7 +99,7 @@ export function daysLeft(closesAt, now = Date.now()) {
 // The shops (and finders) who answered, as overlapping avatars (session 77).
 // Public: names, ratings and areas only; prices stay with the buyer.
 export function Responders({ responders, count }) {
-  if (!count) return <span className="muted small">{t('No offers yet. Be the first.')}</span>;
+  if (!count) return <span className="muted small">{t('No offers yet')}</span>;
   return (
     <span className="responders">
       <span className="avatars" aria-hidden="true">

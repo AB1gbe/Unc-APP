@@ -1122,4 +1122,6 @@ export default {
   "Identity checked by Unc": "هوية تحقّق منها Unc",
   "Shop": "محل",
   "Finder": "باحث",
+  "What Bahrain is looking for": "ما تبحث عنه البحرين",
+  "Buyers post what they need. Verified shops answer with offers.": "المشترون ينشرون ما يحتاجونه، والمحلات الموثّقة ترد بعروضها.",
 };
