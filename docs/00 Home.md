@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-11 (session 72)
+updated: 2026-11-12 (session 77)
 ---
 # Unc — Project Vault
 
@@ -24,6 +24,8 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Market
 - [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
 - [[Siin Competitor Study]] — Siin (live-stream shopping) vs Unc: offering and position
+- [[Figma Design Prompt]] — a ready-to-paste prompt for a Figma design of the whole app
+- `docs/Design/Unc screens.pdf` — every tab and page, computer and phone ([[Step 67 - Screens PDF]])
 - [[Marketplace Design Study]] — how real marketplaces look, and the "AI look" to avoid
 - Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]] · [[Keeping Deals on Unc]] · [[Publishing as an App]]
 - [[Glossary]] — every technical word used here, explained
@@ -95,6 +97,8 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 64 - Shops first and fewer categories]]
 - [[Step 65 - Calm home page and tabs]]
 - [[Step 66 - App-style side bar]]
+- [[Step 67 - Screens PDF]]
+- [[Step 68 - Marketplace first]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -113,7 +117,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-11, after session 72)
+## Status (2026-11-12, after session 77)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -155,6 +159,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Shops first (Verified shops, /shops), 4 categories + /categories, softer glow, Plus Jakarta Sans + Almarai | ✅ done — in `main` since session 73 → [[ADR-065 Shops first and fewer categories]] |
 | Example requests in every category; calm home page; tabs Home · Requests · Shops · Categories | ✅ done — in `main` since session 73 → [[ADR-066 Calm home page and tabs]] |
 | App-style side bar on computers (opens and folds), slim header + tab bar on phones | ✅ done — in `main` since session 73 → [[ADR-067 App-style side bar]] |
-| API tests | ✅ 188 passing |
+| Phones: app-like search and category tiles, floating glass tab bar, dark system bars | ✅ done — in `main` since session 78 → [[2026-11-11 Session 74]] |
+| Marketplace first: filters + sort, who answered (no prices), offer status, stock/delivery, home rebuilt | ✅ done — in `main` since session 78 → [[ADR-068 Marketplace first]] |
+| API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

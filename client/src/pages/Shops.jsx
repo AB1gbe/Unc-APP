@@ -2,6 +2,7 @@
 // they sell, from their bio). Shops can't be messaged from here: they reply
 // to requests, inside each request's chat.
 import { useState } from 'react';
+import Icon from '../components/Icon.jsx';
 import { useApi } from '../hooks.js';
 import { t } from '../i18n.jsx';
 import { ShopCard } from '../components/Showcase.jsx';
@@ -17,8 +18,8 @@ export default function Shops() {
       <h1>{t('Verified shops')}</h1>
       <p className="muted" style={{ marginTop: '-.6rem' }}>{t('Real businesses in Bahrain, checked by Unc. They answer requests with offers.')}</p>
       <form className="searchbar searchbar-simple" onSubmit={(e) => { e.preventDefault(); setSearch(q.trim()); }}>
-        <input placeholder={t('Shop name, area or what they sell')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('Search')} />
-        <button className="btn">{t('Search')}</button>
+        <input type="search" enterKeyHint="search" placeholder={t('Shop name, area or what they sell')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('Search')} />
+        <button className="btn search-btn" aria-label={t('Search')}><Icon name="search" weight="bold" /><span className="search-label">{t('Search')}</span></button>
       </form>
       {loading ? <CardsLoading /> : data?.shops.length === 0
         ? <p className="muted">{t('No shops match that yet.')}</p>

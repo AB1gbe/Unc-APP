@@ -20,8 +20,8 @@ export function feedRoutes(db) {
   const r = Router();
   const pulseCounts = db.prepare(`
     SELECT
-      (SELECT COUNT(*) FROM listings WHERE created_at >= datetime('now', '-1 day')) AS requests,
-      (SELECT COUNT(*) FROM conversations WHERE created_at >= datetime('now', '-1 day')) AS offers,
+      (SELECT COUNT(*) FROM listings WHERE created_at >= datetime('now', '-1 day') AND sample = 0) AS requests,
+      (SELECT COUNT(*) FROM conversations c JOIN listings l ON l.id = c.listing_id WHERE c.created_at >= datetime('now', '-1 day') AND l.sample = 0) AS offers,
       (SELECT COUNT(*) FROM users WHERE last_seen_at >= datetime('now', '-${ACTIVE_MINUTES} minutes') AND banned_at IS NULL) AS active
   `);
   let pulseCache = null;
@@ -34,13 +34,13 @@ export function feedRoutes(db) {
   const found = db.prepare(`
     SELECT 'found' AS kind, d.created_at AS at, l.city, l.category
     FROM deals d JOIN listings l ON l.id = d.listing_id JOIN users b ON b.id = d.buyer_id JOIN users v ON v.id = d.vendor_id
-    WHERE d.created_at >= datetime('now', '-${DAYS} days') AND b.banned_at IS NULL AND v.banned_at IS NULL
+    WHERE d.created_at >= datetime('now', '-${DAYS} days') AND b.banned_at IS NULL AND v.banned_at IS NULL AND l.sample = 0
     ORDER BY d.created_at DESC LIMIT 20
   `);
   const requests = db.prepare(`
     SELECT 'request' AS kind, l.created_at AS at, l.city, l.category, l.id AS listing_id, l.title
     FROM listings l JOIN users u ON u.id = l.buyer_id
-    WHERE l.status = 'open' AND l.created_at >= datetime('now', '-${DAYS} days') AND u.banned_at IS NULL
+    WHERE l.status = 'open' AND l.created_at >= datetime('now', '-${DAYS} days') AND u.banned_at IS NULL AND l.sample = 0
       AND l.buyer_id <> ? -- not the member's own requests
       AND ${NOT_BLOCKED_BUYER}
     ORDER BY l.created_at DESC LIMIT 20

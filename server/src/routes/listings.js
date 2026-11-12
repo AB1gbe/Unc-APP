@@ -23,6 +23,8 @@ import { NOT_AWAY } from '../lib/activity.js';
 import { nameFor } from '../../../shared/names.js';
 
 export const MAX_PHOTOS = 6;
+export const CONDITIONS = ['any', 'new', 'used'];
+export const SORTS = ['newest', 'closing', 'offers'];
 
 // images: [{ id, file }] in display order
 export function listingView(row, images = []) {
@@ -40,6 +42,9 @@ export function listingView(row, images = []) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     contactRule: row.contact_rule ?? 'anyone',
+    condition: row.item_condition ?? 'any',
+    // Demo data from `npm run seed` (session 77): shown as "Sample", never as live.
+    sample: row.sample === 1,
     buyer: { id: row.buyer_id, displayName: nameFor(row.buyer_name, row.buyer_short), accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
     images: images.map((i) => `/uploads/listings/${i.file}`),
     photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}` })),
@@ -65,6 +70,25 @@ export function listingRoutes(db) {
   const activity = activityQueries(db);
   const viewCount = db.prepare('SELECT COUNT(*) AS n FROM listing_views WHERE listing_id = ?');
   const badgesFor = badgeQueries(db, ratings, activity);
+  // Who answered a request (session 77, the owner's choice): verified shops
+  // and finders with their rating and area, but NEVER their prices, which
+  // stay private to the buyer. Newest first.
+  const respondersStmt = db.prepare(`
+    SELECT u.id, u.display_name, u.short_name, u.account_type, u.avatar, COALESCE(u.shop_area, u.city) AS area, c.created_at
+    FROM conversations c JOIN users u ON u.id = c.vendor_id
+    WHERE c.listing_id = ? AND u.banned_at IS NULL
+    ORDER BY c.created_at DESC, c.id DESC LIMIT ?
+  `);
+  const respondersOf = (listingId, limit = 20, withReplyTime = false) => respondersStmt.all(listingId, limit).map((u) => ({
+    id: u.id,
+    displayName: u.account_type === 'business' ? u.display_name : nameFor(u.display_name, u.short_name),
+    accountType: u.account_type,
+    avatarUrl: avatarUrl(u.avatar),
+    area: u.area,
+    rating: ratings.summaryFor(u.id),
+    replyTime: withReplyTime ? activity.replyTime(u.id) : undefined,
+    answeredAt: u.created_at,
+  }));
 
   // The full single-request view: adds the buyer's rating and, for the
   // owner, which conversation the deal was made in.
@@ -73,6 +97,7 @@ export function listingRoutes(db) {
     listing.buyer.rating = ratings.summaryFor(listing.buyer.id);
     listing.buyer.badges = badgesFor(listing.buyer.id);
     if (me) listing.buyer.activity = activity.summaryFor(listing.buyer.id);
+    listing.responders = respondersOf(id, 20, true);
     if (me?.id === listing.buyer.id) {
       listing.viewCount = viewCount.get(id).n;
       listing.expiresAt = db.prepare(`SELECT ${EXPIRES_AT_SQL} AS at FROM listings WHERE id = ?`).get(id).at;
@@ -88,9 +113,20 @@ export function listingRoutes(db) {
     const params = [];
     if (req.user) { where.push(NOT_BLOCKED_BUYER); params.push(req.user.id); }
     if (req.query.q) {
-      where.push('(l.title LIKE ? OR l.description LIKE ?)');
+      // Words match the item, the description or the area (session 77).
+      where.push('(l.title LIKE ? OR l.description LIKE ? OR l.city LIKE ?)');
       const like = `%${String(req.query.q).slice(0, 100)}%`;
-      params.push(like, like);
+      params.push(like, like, like);
+    }
+    // Budget: requests whose range overlaps the one asked for (session 77).
+    const min = Number.parseInt(req.query.min, 10);
+    const max = Number.parseInt(req.query.max, 10);
+    if (Number.isFinite(min) && min >= 0) { where.push('COALESCE(l.budget_max, l.budget_min, 0) >= ?'); params.push(min); }
+    if (Number.isFinite(max) && max >= 0) { where.push('COALESCE(l.budget_min, l.budget_max, 0) <= ?'); params.push(max); }
+    if (req.query.offers === 'with') where.push('EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id)');
+    if (req.query.offers === 'none') where.push('NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id)');
+    if (CONDITIONS.includes(req.query.condition) && req.query.condition !== 'any') {
+      where.push(`l.item_condition IN (?, 'any')`); params.push(req.query.condition);
     }
     if (req.query.category && CATEGORIES.includes(req.query.category)) {
       where.push('l.category = ?');
@@ -112,10 +148,15 @@ export function listingRoutes(db) {
     // Capped so absurd page numbers can't overflow the OFFSET.
     const page = Math.min(10_000, Math.max(1, Number.parseInt(req.query.page, 10) || 1));
     const pageSize = 20;
-    const rows = db.prepare(`${BASE_SELECT} WHERE ${where.join(' AND ')} ORDER BY l.created_at DESC, l.id DESC LIMIT ? OFFSET ?`)
+    const order = {
+      newest: 'l.created_at DESC, l.id DESC',
+      closing: 'COALESCE(l.renewed_at, l.created_at) ASC, l.id ASC',
+      offers: 'offer_count DESC, l.created_at DESC, l.id DESC',
+    }[SORTS.includes(req.query.sort) ? req.query.sort : 'newest'];
+    const rows = db.prepare(`${BASE_SELECT} WHERE ${where.join(' AND ')} ORDER BY ${order} LIMIT ? OFFSET ?`)
       .all(...params, pageSize + 1, (page - 1) * pageSize);
     res.json({
-      listings: rows.slice(0, pageSize).map(withImages),
+      listings: rows.slice(0, pageSize).map((row) => ({ ...withImages(row), responders: respondersOf(row.id, 3) })),
       page,
       hasMore: rows.length > pageSize,
     });
@@ -189,6 +230,15 @@ export function listingRoutes(db) {
     if (req.user && req.user.id !== row.buyer_id) {
       const conv = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, req.user.id);
       listing.myConversationId = conv?.id ?? null;
+      // Where my offer stands (session 77): sent → seen → accepted / declined.
+      if (conv) {
+        const last = db.prepare('SELECT id, read_at FROM messages WHERE conversation_id = ? AND sender_id = ? AND offer_price IS NOT NULL ORDER BY id DESC LIMIT 1').get(conv.id, req.user.id);
+        const answer = last && db.prepare(`SELECT kind FROM messages WHERE conversation_id = ? AND reply_to = ? AND kind IN ('accept', 'decline') ORDER BY id DESC LIMIT 1`).get(conv.id, last.id);
+        listing.myOffer = !last ? { status: 'message' }
+          : answer?.kind === 'accept' ? { status: 'accepted' }
+          : answer?.kind === 'decline' ? { status: 'declined' }
+          : { status: last.read_at ? 'seen' : 'sent', seenAt: last.read_at ?? null };
+      }
       listing.saved = Boolean(db.prepare('SELECT 1 FROM saved_listings WHERE user_id = ? AND listing_id = ?').get(req.user.id, row.id));
       // Which rule stops me making an offer, if any (session 34).
       listing.contactBlocked = conv ? null : contactBlocker(db, row, req.user);
@@ -206,10 +256,10 @@ export function listingRoutes(db) {
     try {
       id = tx(db, () => {
         const info = db.prepare(`
-          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by, contact_rule)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by, contact_rule, item_condition)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(req.user.id, data.title, data.description, data.category, data.budgetMin, data.budgetMax,
-          data.currency, data.city, data.neededBy, data.contactRule);
+          data.currency, data.city, data.neededBy, data.contactRule, data.condition);
         const newId = Number(info.lastInsertRowid);
         for (const name of photos.names) {
           db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(newId, name);
@@ -237,9 +287,9 @@ export function listingRoutes(db) {
     const data = readListingBody(req.body);
     db.prepare(`
       UPDATE listings SET title = ?, description = ?, category = ?, budget_min = ?, budget_max = ?, currency = ?,
-        city = ?, needed_by = ?, contact_rule = ?, updated_at = datetime('now') WHERE id = ?
+        city = ?, needed_by = ?, contact_rule = ?, item_condition = ?, updated_at = datetime('now') WHERE id = ?
     `).run(data.title, data.description, data.category, data.budgetMin, data.budgetMax, data.currency,
-      data.city, data.neededBy, data.contactRule, row.id);
+      data.city, data.neededBy, data.contactRule, data.condition, row.id);
     res.json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(row.id)) });
   });
 
@@ -370,6 +420,7 @@ function readListingBody(body) {
     city: normalizeCity(v.str(body, 'city', { min: 2, max: 80 })),
     neededBy: v.isoDate(body, 'neededBy', { optional: true }),
     contactRule: v.oneOf(body, 'contactRule', CONTACT_RULES, { optional: true }) || 'anyone',
+    condition: v.oneOf(body, 'condition', CONDITIONS, { optional: true }) || 'any',
   };
   if (data.budgetMin !== null && data.budgetMax !== null && data.budgetMin > data.budgetMax) {
     throw new HttpError(400, 'Minimum budget cannot be higher than maximum budget.', { field: 'budgetMin' });

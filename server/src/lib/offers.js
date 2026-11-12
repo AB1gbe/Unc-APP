@@ -6,6 +6,8 @@ import * as v from './validate.js';
 export const CONDITIONS = ['new', 'like-new', 'good', 'fair'];
 export const WARRANTIES = ['none', '1m', '3m', '6m', '12m'];
 export const RETURNS = ['none', '3d', '7d'];
+export const STOCK = ['in-stock', 'order'];
+export const DELIVERY = ['pickup', 'delivery', 'both'];
 export const MAX_VALID_DAYS = 60;
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -17,6 +19,8 @@ export function readOfferDetails(body, { isSeller, hasPrice }) {
     warranty: v.oneOf(body, 'warranty', WARRANTIES, { optional: true }),
     returns: v.oneOf(body, 'returns', RETURNS, { optional: true }),
     validUntil: v.isoDate(body, 'validUntil', { optional: true }),
+    stock: v.oneOf(body, 'stock', STOCK, { optional: true }),
+    delivery: v.oneOf(body, 'delivery', DELIVERY, { optional: true }),
   };
   if (!Object.values(d).some((x) => x !== null)) return null;
   if (!isSeller || !hasPrice) throw new HttpError(400, 'Offer details go with a seller’s price.', { field: 'offerPrice' });
@@ -29,10 +33,10 @@ export function readOfferDetails(body, { isSeller, hasPrice }) {
 
 // messages row -> { condition, warranty, returns, validUntil, expired } or null
 export function offerDetailsView(m) {
-  if (!m.offer_condition && !m.offer_warranty && !m.offer_returns && !m.offer_valid_until) return null;
+  if (!m.offer_condition && !m.offer_warranty && !m.offer_returns && !m.offer_valid_until && !m.offer_stock && !m.offer_delivery) return null;
   return {
     condition: m.offer_condition, warranty: m.offer_warranty, returns: m.offer_returns,
-    validUntil: m.offer_valid_until, expired: isExpired(m),
+    validUntil: m.offer_valid_until, expired: isExpired(m), stock: m.offer_stock ?? null, delivery: m.offer_delivery ?? null,
   };
 }
 

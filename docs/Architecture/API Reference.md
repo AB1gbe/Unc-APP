@@ -267,3 +267,10 @@ Login only (**A**): no email, identity or card check, so members can ask for hel
 |---|---|---|---|
 | GET | `/api/shops?q=&limit=` | anyone | Verified (`kyc_status = 'approved'`), non-banned, not deleted **business** accounts, most sales first, then newest. `q` searches name, shop area and bio. `limit` 1–60 (default 24). Returns `{shops: [{id, displayName, avatarUrl, bio, city, sales, rating: {average, count}, coverUrl, shopArea, shopHours}]}`, with no email or ID data. There is no way to message a shop from here ([[Shop Pages]]). |
 
+## Session 77 changes (marketplace first)
+- `GET /api/listings` also takes `min`, `max` (budget overlap), `offers=with|none`, `condition=new|used` and `sort=newest|closing|offers`. `q` also matches the area. Each listing returns `condition`, `sample` and `responders` (up to 3: `{id, displayName, accountType, avatarUrl, area, rating, answeredAt}`; **no prices**).
+- `GET /api/listings/:id` returns all `responders`, with `replyTime`. For a seller who answered: `myOffer.status` = `sent` | `seen` (+ `seenAt`) | `accepted` | `declined` | `message`.
+- `POST /api/listings` and `PUT /api/listings/:id` take `condition` = `any` | `new` | `used`.
+- Offer details (contact and new messages) also take `stock` = `in-stock` | `order` and `delivery` = `pickup` | `delivery` | `both`.
+- `GET /api/feed/pulse` and `GET /api/feed` leave out sample (demo) requests.
+

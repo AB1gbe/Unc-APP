@@ -4,7 +4,7 @@ import Icon from '../components/Icon.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
-import { Activity, Avatar, Badges, ClosesBadge, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
+import { Activity, Avatar, Badges, ClosesBadge, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt, conditionLabel, daysLeft, replyLabel } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
 import Lightbox from '../components/Lightbox.jsx';
@@ -42,8 +42,14 @@ export default function ListingDetail() {
             <StatusBadge status={l.status} />
           </div>
         </div>
+        {l.sample && <p className="sample-note small">{t('Sample request from the demo data. It shows how Unc works; it is not a real buyer.')}</p>}
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
-        <p className="price" style={{ fontSize: '1.2rem' }}>{budget(l)}</p>
+        <p className="detail-price">{budget(l)}</p>
+        <div className="detail-facts">
+          <span><b>{conditionLabel(l.condition)}</b><small>{t('Condition')}</small></span>
+          <span><b>{tn(l.offerCount ?? 0, '{n} offer', '{n} offers')}</b><small>{t('So far')}</small></span>
+          {l.status === 'open' && daysLeft(l.closesAt) !== null && <span><b>{daysLeft(l.closesAt) === 0 ? t('Last day') : tn(daysLeft(l.closesAt), '{n} day left', '{n} days left')}</b><small>{t('Open for offers')}</small></span>}
+        </div>
         <div className="meta" style={{ marginBottom: '1rem' }}>
           <span><Place city={l.city} /></span>
           <span>{t('Posted {time}', { time: ago(l.createdAt) })}</span>
@@ -86,6 +92,9 @@ export default function ListingDetail() {
       </aside>
     </div>
     {isOwner && <CompareOffers listing={l} />}
+    {isOwner && l.status === 'open' && (l.offerCount ?? 0) > 0 && <ChoosingSteps />}
+    {/* The buyer sees every offer above; everyone else sees who answered. */}
+    {!isOwner && <WhoAnswered listing={l} isOwner={false} />}
     </>
   );
 }
@@ -107,6 +116,7 @@ function OfferPanel({ listing }) {
     return (
       <div className="card">
         <h2>{t("You've already made an offer")}</h2>
+        {listing.myOffer && listing.myOffer.status !== 'message' && <OfferStatus status={listing.myOffer.status} />}
         <p className="muted">{tj('Continue the conversation with {name}.', { name: <bdi>{listing.buyer.displayName}</bdi> })}</p>
         <Link className="btn block" to={`/messages/${listing.myConversationId}`}>{t('Open conversation')}</Link>
       </div>
@@ -404,3 +414,65 @@ export function ReportLink({ listingId, conversationId }) {
   );
 }
 
+
+// Where a seller's offer stands (session 77): Sent → Seen → Accepted/Declined.
+function OfferStatus({ status }) {
+  const steps = [['sent', t('Sent')], ['seen', t('Seen by the buyer')], [status === 'declined' ? 'declined' : 'accepted', status === 'declined' ? t('Declined') : t('Accepted')]];
+  const reached = { sent: 1, seen: 2, accepted: 3, declined: 3 }[status] ?? 1;
+  return (
+    <ol className="offer-status">
+      {steps.map(([key, label], i) => (
+        <li key={key} className={`${i < reached ? 'done' : ''} ${key === 'declined' && i < reached ? 'declined' : ''}`}>{label}</li>
+      ))}
+    </ol>
+  );
+}
+
+// What happens when the buyer chooses an offer (session 77).
+function ChoosingSteps() {
+  return (
+    <section className="card choosing">
+      <h2>{t('What happens when you choose an offer')}</h2>
+      <ol>
+        <li>{t('Open the offer’s chat and press Accept. You both agree the price and to finish the deal on Unc.')}</li>
+        <li>{t('Phone numbers unlock in that chat. Agree on pickup or delivery.')}</li>
+        <li>{t('Pay the seller when you get the item, or in parts if you both agreed a plan.')}</li>
+        <li>{t('Press “I found it” and rate each other. The other sellers are told the request is closed.')}</li>
+      </ol>
+    </section>
+  );
+}
+
+// Who answered (session 77, the owner's choice): shops and finders with
+// rating, area and reply speed; prices stay private to the buyer.
+function WhoAnswered({ listing, isOwner }) {
+  const list = listing.responders ?? [];
+  return (
+    <section className="who-answered">
+      <div className="section-head">
+        <h2>{t('Who answered')}</h2>
+        <span className="muted small">{isOwner ? t('Prices are in each chat and in Compare offers. Only you see them.') : t('Prices are private to the buyer.')}</span>
+      </div>
+      {list.length === 0 ? <p className="muted">{t('No offers yet. Be the first.')}</p> : (
+        <ul className="responder-list">
+          {list.map((r) => (
+            <li key={r.id}>
+              <Avatar name={r.displayName} src={r.avatarUrl} size={40} />
+              <div className="responder-main">
+                <Link to={`/members/${r.id}`}><b><bdi>{r.displayName}</bdi></b></Link>{' '}
+                <span className="verified-tick" title={t('Identity checked by Unc')}><Icon name="check" /></span>
+                <div className="muted small">
+                  {r.accountType === 'business' ? t('Shop') : t('Finder')}
+                  {r.area && <> · <bdi>{r.area}</bdi></>}
+                  {r.rating?.count > 0 && <> · <Icon name="star" /> {r.rating.average.toFixed(1)} ({r.rating.count})</>}
+                  {replyLabel(r.replyTime) && <> · {replyLabel(r.replyTime)}</>}
+                </div>
+              </div>
+              <span className="muted small">{ago(r.answeredAt)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

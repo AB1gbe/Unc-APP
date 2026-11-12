@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import Icon from '../components/Icon.jsx';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, ListingCard, CardsLoading, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
-import { t } from '../i18n.jsx';
+import { t, tn } from '../i18n.jsx';
 import Feed from '../components/Feed.jsx';
 import CityField from '../components/CityField.jsx';
 import LivePulse from '../components/LivePulse.jsx';
@@ -13,7 +14,9 @@ export default function Browse() {
   const { user } = useAuth();
   const { categories } = useMeta();
   const [params, setParams] = useSearchParams();
-  const [draft, setDraft] = useState({ q: params.get('q') || '', city: params.get('city') || '', category: params.get('category') || '' });
+  const FIELDS = ['q', 'city', 'category', 'min', 'max', 'offers', 'condition', 'sort'];
+  const [draft, setDraft] = useState(Object.fromEntries(FIELDS.map((k) => [k, params.get(k) || ''])));
+  const moreSet = ['min', 'max', 'offers', 'condition'].some((k) => params.get(k));
   const [result, setResult] = useState({ listings: [], hasMore: false, page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,12 +29,14 @@ export default function Browse() {
       .finally(() => setLoading(false));
   }, [params]);
 
-  function search(e) {
-    e.preventDefault();
+  function apply(values) {
     const next = {};
-    Object.entries(draft).forEach(([k, v]) => v && (next[k] = v));
+    Object.entries(values).forEach(([k, v]) => v && (next[k] = v));
     setParams(next);
   }
+  function search(e) { e.preventDefault(); apply(draft); }
+  const sortBy = (sort) => { const d = { ...draft, sort }; setDraft(d); apply(d); };
+  const clear = () => { const d = Object.fromEntries(FIELDS.map((k) => [k, ''])); setDraft(d); apply(d); };
 
   const page = Number(params.get('page') || 1);
   const goPage = (p) => { const n = new URLSearchParams(params); n.set('page', p); setParams(n); };
@@ -50,8 +55,33 @@ export default function Browse() {
           {categories.map((c) => <option key={c} value={c}>{t(c)}</option>)}
         </select>
         <CityField governorates placeholder={t('City or governorate')} value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} aria-label={t('City')} />
-        <button className="btn">{t('Search')}</button>
+        <button className="btn search-btn" aria-label={t('Search')}><Icon name="search" weight="bold" /><span className="search-label">{t('Search')}</span></button>
+        <details className="more-filters" open={moreSet || undefined}>
+          <summary>{t('More filters')}</summary>
+          <div className="more-filters-body">
+            <label>{t('Budget from')}<input type="number" min="0" inputMode="numeric" value={draft.min} onChange={(e) => setDraft({ ...draft, min: e.target.value })} /></label>
+            <label>{t('Budget to')}<input type="number" min="0" inputMode="numeric" value={draft.max} onChange={(e) => setDraft({ ...draft, max: e.target.value })} /></label>
+            <label>{t('Offers')}<select value={draft.offers} onChange={(e) => setDraft({ ...draft, offers: e.target.value })}>
+              <option value="">{t('Any')}</option><option value="none">{t('No offers yet')}</option><option value="with">{t('Has offers')}</option>
+            </select></label>
+            <label>{t('Condition')}<select value={draft.condition} onChange={(e) => setDraft({ ...draft, condition: e.target.value })}>
+              <option value="">{t('Any')}</option><option value="new">{t('New')}</option><option value="used">{t('Used')}</option>
+            </select></label>
+            <div className="more-filters-actions">
+              <button className="btn sm">{t('Apply')}</button>
+              <button type="button" className="btn sm secondary" onClick={clear}>{t('Clear all')}</button>
+            </div>
+          </div>
+        </details>
       </form>
+      <div className="results-bar">
+        <span className="muted small">{loading ? '' : result.hasMore ? t('Showing the first {n}', { n: result.listings.length }) : tn(result.listings.length, '{n} request', '{n} requests')}</span>
+        <label className="sort small">{t('Sort')}
+          <select value={draft.sort || 'newest'} onChange={(e) => sortBy(e.target.value === 'newest' ? '' : e.target.value)}>
+            <option value="newest">{t('Newest')}</option><option value="closing">{t('Closing soon')}</option><option value="offers">{t('Most offers')}</option>
+          </select>
+        </label>
+      </div>
       <ErrorBox error={error} />
       {user && (
         <p className="small" style={{ marginTop: 0 }}>
@@ -64,6 +94,7 @@ export default function Browse() {
       {loading ? <CardsLoading /> : result.listings.length === 0 ? (
         <div className="card empty">
           <p>{t("Nobody's asked for that yet. Looking for it yourself? Post it and let sellers come to you.")}</p>
+          {params.toString() && <button type="button" className="btn secondary" onClick={clear} style={{ marginInlineEnd: '.5rem' }}>{t('Clear all')}</button>}
           {user && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
         </div>
       ) : (

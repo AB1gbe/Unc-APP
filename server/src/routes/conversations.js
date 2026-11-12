@@ -134,10 +134,10 @@ export function conversationRoutes(db) {
 
   function insertMessage(convId, senderId, body, offerPrice, image = null, kind = null, replyTo = null, proof = null, details = null, video = null) {
     db.prepare(`INSERT INTO messages (conversation_id, sender_id, body, offer_price, image, kind, reply_to, proof,
-        offer_condition, offer_warranty, offer_returns, offer_valid_until, had_contact, video) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        offer_condition, offer_warranty, offer_returns, offer_valid_until, had_contact, video, offer_stock, offer_delivery) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(convId, senderId, body, offerPrice, image, kind, replyTo, proof,
         details?.condition ?? null, details?.warranty ?? null, details?.returns ?? null, details?.validUntil ?? null,
-        hasContacts(body) ? 1 : 0, video);
+        hasContacts(body) ? 1 : 0, video, details?.stock ?? null, details?.delivery ?? null);
     db.prepare(`UPDATE conversations SET last_message_at = datetime('now') WHERE id = ?`).run(convId);
   }
 
@@ -319,7 +319,7 @@ export function conversationRoutes(db) {
     const after = Number.parseInt(req.query.after, 10) || 0; // for polling: only newer messages
     const messages = db.prepare(`
       SELECT id, sender_id, body, offer_price, image, video, kind, reply_to, proof, had_contact, created_at, read_at,
-             offer_condition, offer_warranty, offer_returns, offer_valid_until FROM messages
+             offer_condition, offer_warranty, offer_returns, offer_valid_until, offer_stock, offer_delivery FROM messages
       WHERE conversation_id = ? AND id > ? ORDER BY id
     `).all(c.id, after);
     // Opening the conversation marks the other side's messages as read.
