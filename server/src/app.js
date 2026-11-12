@@ -8,7 +8,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { errorHandler, notFound } from './lib/http.js';
-import { AVATAR_DIR, COVER_DIR, LISTING_DIR, STORY_DIR } from './lib/uploads.js';
+import { AVATAR_DIR, COVER_DIR, LISTING_DIR, STORY_DIR, sendStored } from './lib/uploads.js';
 import { CATEGORIES, CURRENCIES } from './lib/categories.js';
 import { loadUser } from './middleware/auth.js';
 import { withPreview } from './lib/previews.js';
@@ -44,7 +44,8 @@ export function createApp(db) {
     },
   }));
   // gzip text responses (JSON, JS, CSS, HTML): the app's JS shrinks ~3x.
-  app.use(compression());
+  // Cloudflare compresses at its edge (session 79), so only a normal server does it here.
+  if (!globalThis.UNC_ON_CLOUDFLARE) app.use(compression());
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
   app.use(loadUser(db));
@@ -75,10 +76,19 @@ export function createApp(db) {
   // Listing photos are public. KYC files are NOT served statically - only
   // through the admin route that checks permissions.
   // Photo names are random and never reused, so browsers may cache them for a year.
-  app.use('/uploads/listings', express.static(LISTING_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
-  app.use('/uploads/avatars', express.static(AVATAR_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
-  app.use('/uploads/stories', express.static(STORY_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
-  app.use('/uploads/covers', express.static(COVER_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+  if (!globalThis.UNC_ON_CLOUDFLARE) {
+    app.use('/uploads/listings', express.static(LISTING_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+    app.use('/uploads/avatars', express.static(AVATAR_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+    app.use('/uploads/stories', express.static(STORY_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+    app.use('/uploads/covers', express.static(COVER_DIR(), { fallthrough: false, immutable: true, maxAge: '365d' }));
+  } else {
+    // Cloudflare (session 79): the same public folders, read from the Durable Object.
+    for (const [name, dir] of [['listings', LISTING_DIR], ['avatars', AVATAR_DIR], ['stories', STORY_DIR], ['covers', COVER_DIR]]) {
+      app.get(`/uploads/${name}/:file`, (req, res) => {
+        try { sendStored(res, path.join(dir(), path.basename(req.params.file)), { immutable: true }); } catch { throw notFound('File not found'); }
+      });
+    }
+  }
 
   // In production the built React app is served by this same server.
   if (fs.existsSync(config.clientDist)) {

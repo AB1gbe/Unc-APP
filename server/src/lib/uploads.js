@@ -98,3 +98,15 @@ export function saveFiles(dir, items) {
 export function mimeFor(filename) {
   return SIGNATURES.find((s) => s.ext === path.extname(filename))?.mime || 'application/octet-stream';
 }
+
+// Sends a stored upload (session 79). On a normal server: res.sendFile. On
+// Cloudflare files live in the Durable Object's database, so they are read
+// into memory and sent as a buffer.
+const TYPES = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif', mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm', pdf: 'application/pdf' };
+export function sendStored(res, full, { immutable = false } = {}) {
+  if (!globalThis.UNC_ON_CLOUDFLARE) return res.sendFile(full, immutable ? { immutable: true, maxAge: '365d' } : undefined);
+  const buf = fs.readFileSync(full);
+  res.type(TYPES[path.extname(full).slice(1).toLowerCase()] || 'application/octet-stream');
+  if (immutable) res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  return res.send(buf);
+}
