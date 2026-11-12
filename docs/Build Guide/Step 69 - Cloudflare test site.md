@@ -14,7 +14,7 @@ The owner connected the repository directly: **Workers & Pages → Create → Im
 - **Root directory:** empty (the top folder)
 
 Two more things in the dashboard, both important:
-1. **Admin password** (the default `ChangeMe123!` is public): **unc-app → Settings → Variables and Secrets → Add** → type **Secret**, name `ADMIN_PASSWORD`, a strong value → Deploy. Optional: `SECRET_PEPPER` (a long random text, never change it later). Without `ADMIN_PASSWORD` the site creates **no admin account** (so the public default can't be used). Once you add it, the admin account appears on the next start (log in as `admin@unc.local`).
+1. **Admin password** (the default `ChangeMe123!` is public): **unc-app → Settings → Variables and Secrets** (the running Worker's, **not** "Build variables": those only exist while building) **→ Add** → type **Secret** (plain-text variables are replaced by `wrangler.jsonc` on every publish; secrets are kept), name `ADMIN_PASSWORD`, a strong value → Deploy. Optional: `SECRET_PEPPER` (a long random text, never change it later). Without `ADMIN_PASSWORD` the site creates **no admin account** (so the public default can't be used). Once you add it, the admin account appears on the next start (log in as `admin@unc.local`).
 2. **Your address:** **unc-app → Domains** (or Settings → Domains & Routes) → **Add → Custom domain** → `unc.b1gbe.org`. It also works at the `…workers.dev` address shown there.
 
 ## B. Updating
