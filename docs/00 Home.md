@@ -159,8 +159,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Shops first (Verified shops, /shops), 4 categories + /categories, softer glow, Plus Jakarta Sans + Almarai | ✅ done — in `main` since session 73 → [[ADR-065 Shops first and fewer categories]] |
 | Example requests in every category; calm home page; tabs Home · Requests · Shops · Categories | ✅ done — in `main` since session 73 → [[ADR-066 Calm home page and tabs]] |
 | App-style side bar on computers (opens and folds), slim header + tab bar on phones | ✅ done — in `main` since session 73 → [[ADR-067 App-style side bar]] |
-| Phones: app-like search and category tiles, floating glass tab bar, dark system bars | ✅ done — on branch (session 74) → [[2026-11-11 Session 74]] |
-| Marketplace first: filters + sort, who answered (no prices), offer status, stock/delivery, home rebuilt | ✅ done — on branch (session 77) → [[ADR-068 Marketplace first]] |
+| Phones: app-like search and category tiles, floating glass tab bar, dark system bars | ✅ done — in `main` since session 78 → [[2026-11-11 Session 74]] |
+| Marketplace first: filters + sort, who answered (no prices), offer status, stock/delivery, home rebuilt | ✅ done — in `main` since session 78 → [[ADR-068 Marketplace first]] |
 | API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
