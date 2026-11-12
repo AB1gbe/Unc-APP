@@ -161,6 +161,14 @@ export async function seedDemo(db) {
     `).run(who, title, description, category, min, max, city, `-${daysAgo} days`, `-${daysAgo} days`).lastInsertRowid);
     db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(id, demoPhoto(LISTING_DIR, photo));
   });
+  // Everything the seed made is sample data (session 77): labelled "Sample"
+  // and left out of live counters and the activity list.
+  const demoIds = db.prepare(`SELECT id FROM users WHERE email LIKE '%@demo.local'`).all().map((u) => u.id);
+  db.prepare(`UPDATE listings SET sample = 1 WHERE buyer_id IN (${demoIds.map(() => '?').join(',')})`).run(...demoIds);
+  for (const [like, cond] of [['Looking for a used PS5%', 'used'], ['iPhone 14 Pro%', 'used'], ['MacBook Air%', 'used'], ['Front-load washing%', 'used'],
+    ['Car tyres%', 'new'], ['Oud perfume%', 'new'], ['Split AC%', 'new'], ['Sony noise%', 'used']]) {
+    db.prepare(`UPDATE listings SET item_condition = ? WHERE title LIKE ? AND item_condition = 'any'`).run(cond, like);
+  }
   addDemoPhotos(db);
   console.log('Demo data ready (with example photos). Logins (password Password123): buyer@demo.local, vendor@demo.local, freelancer@demo.local, furniture@demo.local, autoparts@demo.local, phonefix@demo.local, fatima@demo.local, hussain@demo.local, noor@demo.local');
 }

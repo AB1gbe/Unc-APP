@@ -87,7 +87,7 @@ const vendor = await onboard('Riverside Electronics', 'shop@x.test', 'business')
 const admin = await adminApproveAll();
 
 // Request alert: the seller watches Electronics before the buyer posts.
-await vendor.goto(BASE + '/browse'); await vendor.selectOption('.searchbar select', 'Electronics');
+await vendor.goto(BASE + '/browse'); await vendor.selectOption('.searchbar > select', 'Electronics');
 await vendor.click('text=Alert me about new requests like these');
 await vendor.waitForURL('**/alerts?category=Electronics');
 await vendor.click('button:has-text("Save alert")');

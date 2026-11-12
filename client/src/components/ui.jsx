@@ -86,35 +86,62 @@ export function ContactRule({ rule }) {
   return text ? <span className="badge grey">{text}</span> : null;
 }
 
+export const conditionLabel = (c) => ({ new: t('New'), used: t('Used'), any: t('New or used') }[c] || t('New or used'));
+
+// Days a request stays open (session 77): "12 days left", "Last day".
+export function daysLeft(closesAt, now = Date.now()) {
+  if (!closesAt) return null;
+  const left = Date.parse(`${closesAt.replace(' ', 'T')}Z`) - now;
+  if (left <= 0) return null;
+  return Math.max(0, Math.floor(left / 86_400_000));
+}
+
+// The shops (and finders) who answered, as overlapping avatars (session 77).
+// Public: names, ratings and areas only; prices stay with the buyer.
+export function Responders({ responders, count }) {
+  if (!count) return <span className="muted small">{t('No offers yet. Be the first.')}</span>;
+  return (
+    <span className="responders">
+      <span className="avatars" aria-hidden="true">
+        {(responders || []).slice(0, 3).map((r) => <Avatar key={r.id} name={r.displayName} src={r.avatarUrl} size={24} />)}
+      </span>
+      <span className="small">{tn(count, '{n} offer', '{n} offers')}{responders?.[0] ? <> · <bdi>{responders[0].displayName}</bdi>{count > 1 ? ` ${t('and others')}` : ''}</> : null}</span>
+    </span>
+  );
+}
+
 export function ListingCard({ listing }) {
-  // Back-glow (session 68): a blurred copy of the photo behind the card, so
-  // it looks lit from behind in its own colours.
+  // A request as a marketplace card (session 77): photo, item and condition,
+  // budget, area, time left, who answered, and one clear action.
+  const { user } = useAuth();
   const photo = listing.images?.[0] || categoryArt(listing.category);
+  const left = daysLeft(listing.closesAt);
+  const mine = user && listing.buyer?.id === user.id;
+  const action = mine ? t('See offers') : user ? t('Make an offer') : t('View request');
   return (
     <div className="glow-wrap">
       <img className="glow" src={photo} alt="" aria-hidden="true" loading="lazy" />
-    <Link className="card" to={`/requests/${listing.id}`}>
+    <Link className="card req-card" to={`/requests/${listing.id}`}>
       {/* No photo? The category's picture, so every card has an image (session 62). */}
       <div className={`card-photo${listing.images?.[0] ? '' : ' card-art'}`}>
         <img src={photo} alt="" loading="lazy" />
+        {listing.sample && <span className="sample-tag" title={t('Example request from the demo data, not a real buyer.')}>{t('Sample')}</span>}
+        {!listing.images?.[0] && <span className="example-tag">{t('Example picture')}</span>}
       </div>
-      <div className="row spread" style={{ marginBottom: '.4rem' }}>
-        <span className="cat-label">{t(listing.category)}</span>
-        <span className="price">{budget(listing)}</span>
+      <div className="req-top">
+        <span className="cat-label">{t(listing.category)} · {conditionLabel(listing.condition)}</span>
+        <ContactRule rule={listing.contactRule} />
       </div>
       <h3 dir="auto">{listing.title}</h3>
-      {listing.description && (
-        <p dir="auto" className="muted small" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {listing.description}
-        </p>
-      )}
+      <div className="req-price">{budget(listing)}</div>
       <div className="meta">
         <span><Icon name="pin" /> <Place city={listing.city} /></span>
+        {left !== null && <span className={left <= 3 ? 'closing-soon' : ''}><Icon name="hourglass" /> {left === 0 ? t('Last day') : tn(left, '{n} day left', '{n} days left')}</span>}
         <span><Icon name="clock" /> {ago(listing.createdAt)}</span>
-        <ContactRule rule={listing.contactRule} />
-        <ClosesBadge closesAt={listing.closesAt} />
-        {listing.offerCount > 0 && <span><Icon name="chat" /> {tn(listing.offerCount, '{n} offer', '{n} offers')}</span>}
-        {listing.viewCount > 0 && <span title={t('People who looked at it')}><Icon name="eye" /> {listing.viewCount}</span>}
+      </div>
+      <div className="req-foot">
+        <Responders responders={listing.responders} count={listing.offerCount} />
+        <span className="req-action">{action} <span className="flip">→</span></span>
       </div>
     </Link>
     </div>

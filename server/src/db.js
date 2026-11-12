@@ -510,6 +510,12 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_support_messages ON support_messages(ticket_id);
   `,
+  // 39: marketplace list (session 77): the item's condition the buyer wants,
+  // and a flag for demo data so it is never shown as live activity.
+  `
+  ALTER TABLE listings ADD COLUMN item_condition TEXT NOT NULL DEFAULT 'any' CHECK (item_condition IN ('any', 'new', 'used'));
+  ALTER TABLE listings ADD COLUMN sample INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

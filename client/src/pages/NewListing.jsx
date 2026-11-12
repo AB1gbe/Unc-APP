@@ -10,7 +10,7 @@ import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import CityField from '../components/CityField.jsx';
 
-const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '', contactRule: 'anyone' };
+const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'USD', city: '', neededBy: '', contactRule: 'anyone', condition: 'any' };
 
 export default function NewListing() {
   const { id } = useParams();
@@ -31,7 +31,7 @@ export default function NewListing() {
     api(`/listings/${id}`).then(({ listing: l }) => {
       setForm({
         title: l.title, description: l.description, category: l.category, budgetMin: l.budgetMin ?? '',
-        budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '', contactRule: l.contactRule ?? 'anyone',
+        budgetMax: l.budgetMax ?? '', currency: l.currency, city: l.city, neededBy: l.neededBy ?? '', contactRule: l.contactRule ?? 'anyone', condition: l.condition ?? 'any',
       });
       setExisting(l.photos ?? []);
       setLoaded(true);
@@ -119,6 +119,14 @@ export default function NewListing() {
           <label htmlFor="neededBy">{t('Needed by')} <span className="muted">{t('(optional)')}</span></label>
           <input id="neededBy" type="date" value={form.neededBy} onChange={set('neededBy')} />
         </div>
+      </div>
+      <div className="field">
+        <label htmlFor="condition">{t('Condition')}</label>
+        <select id="condition" value={form.condition} onChange={set('condition')}>
+          <option value="any">{t('New or used')}</option>
+          <option value="new">{t('New only')}</option>
+          <option value="used">{t('Used is fine')}</option>
+        </select>
       </div>
       <div className="field">
         <label htmlFor="contactRule">{t('Who can make offers?')}</label>
