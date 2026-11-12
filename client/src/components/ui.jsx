@@ -227,6 +227,8 @@ const REPLY = {
 
 // "🟢 Active now · Usually replies within an hour". Shows nothing it doesn't
 // know (never online, or not seen for a week).
+export const replyLabel = (rt) => (REPLY[rt] ? REPLY[rt]() : null);
+
 export function Activity({ activity }) {
   if (!activity) return null;
   const seen = activity.lastSeenAt ? toDate(activity.lastSeenAt).getTime() : 0;

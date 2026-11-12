@@ -230,6 +230,15 @@ export function listingRoutes(db) {
     if (req.user && req.user.id !== row.buyer_id) {
       const conv = db.prepare('SELECT id FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, req.user.id);
       listing.myConversationId = conv?.id ?? null;
+      // Where my offer stands (session 77): sent → seen → accepted / declined.
+      if (conv) {
+        const last = db.prepare('SELECT id, read_at FROM messages WHERE conversation_id = ? AND sender_id = ? AND offer_price IS NOT NULL ORDER BY id DESC LIMIT 1').get(conv.id, req.user.id);
+        const answer = last && db.prepare(`SELECT kind FROM messages WHERE conversation_id = ? AND reply_to = ? AND kind IN ('accept', 'decline') ORDER BY id DESC LIMIT 1`).get(conv.id, last.id);
+        listing.myOffer = !last ? { status: 'message' }
+          : answer?.kind === 'accept' ? { status: 'accepted' }
+          : answer?.kind === 'decline' ? { status: 'declined' }
+          : { status: last.read_at ? 'seen' : 'sent', seenAt: last.read_at ?? null };
+      }
       listing.saved = Boolean(db.prepare('SELECT 1 FROM saved_listings WHERE user_id = ? AND listing_id = ?').get(req.user.id, row.id));
       // Which rule stops me making an offer, if any (session 34).
       listing.contactBlocked = conv ? null : contactBlocker(db, row, req.user);

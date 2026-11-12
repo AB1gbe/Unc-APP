@@ -10,8 +10,11 @@ const CONDITION_HINT = {
 };
 const WARRANTY = { none: () => t('No warranty'), '1m': () => t('1-month warranty'), '3m': () => t('3-month warranty'), '6m': () => t('6-month warranty'), '12m': () => t('1-year warranty') };
 const RETURNS = { none: () => t('No returns'), '3d': () => t('Returns within 3 days'), '7d': () => t('Returns within 7 days') };
+// Session 77: stock and hand-over.
+const STOCK = { 'in-stock': () => t('In stock'), order: () => t('Can order it') };
+const DELIVERY = { pickup: () => t('Pickup'), delivery: () => t('Delivery'), both: () => t('Pickup or delivery') };
 
-export const EMPTY_DETAILS = { condition: '', warranty: '', returns: '', validUntil: '' };
+export const EMPTY_DETAILS = { condition: '', warranty: '', returns: '', validUntil: '', stock: '', delivery: '' };
 const iso = (d) => d.toISOString().slice(0, 10);
 
 // The four optional fields, as a small grid.
@@ -35,6 +38,18 @@ export function OfferDetailFields({ value, onChange, idPrefix = 'offer' }) {
         <select id={`${idPrefix}-returns`} value={value.returns} onChange={set('returns')}>
           <option value="">—</option>
           {Object.entries(RETURNS).map(([k, f]) => <option key={k} value={k}>{f()}</option>)}
+        </select>
+      </label>
+      <label>{t('Stock')}
+        <select id={`${idPrefix}-stock`} value={value.stock ?? ''} onChange={set('stock')}>
+          <option value="">—</option>
+          {Object.entries(STOCK).map(([k, f]) => <option key={k} value={k}>{f()}</option>)}
+        </select>
+      </label>
+      <label>{t('Pickup or delivery')}
+        <select id={`${idPrefix}-delivery`} value={value.delivery ?? ''} onChange={set('delivery')}>
+          <option value="">—</option>
+          {Object.entries(DELIVERY).map(([k, f]) => <option key={k} value={k}>{f()}</option>)}
         </select>
       </label>
       <label>{t('Price valid until')}
@@ -61,6 +76,8 @@ export function OfferDetailsLine({ details }) {
     details.condition && CONDITION[details.condition]?.(),
     details.warranty && WARRANTY[details.warranty]?.(),
     details.returns && RETURNS[details.returns]?.(),
+    details.stock && STOCK[details.stock]?.(),
+    details.delivery && DELIVERY[details.delivery]?.(),
   ].filter(Boolean);
   return (
     <div className="offer-details small">

@@ -14,7 +14,7 @@ test('a seller adds details to a price; the buyer sees them in the chat and in C
     message: 'Like new, boxed', offerPrice: 200, condition: 'like-new', warranty: '3m', returns: '3d', validUntil: day(5),
   }).expect(201)).body.conversation;
   const first = (await buyer.get(`/api/conversations/${conv.id}`)).body.messages[0];
-  assert.deepEqual(first.details, { condition: 'like-new', warranty: '3m', returns: '3d', validUntil: day(5), expired: false });
+  assert.deepEqual(first.details, { condition: 'like-new', warranty: '3m', returns: '3d', validUntil: day(5), expired: false, stock: null, delivery: null });
   const compare = (await buyer.get(`/api/listings/${l.id}/conversations`)).body.conversations[0].compare;
   assert.equal(compare.details.warranty, '3m');
 

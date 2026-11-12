@@ -419,7 +419,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .compare-item.deal { border-color: #16a34a; box-shadow: 0 0 0 1px #16a34a; }
 .compare-item > img, .compare-nophoto { width: 100%; height: 130px; object-fit: cover; display: grid; place-items: center; background: var(--bg); font-size: 2rem; }
 .compare-body { padding: .75rem; display: grid; gap: .45rem; }
-.compare-price { font-size: 1.25rem; font-weight: 800; color: var(--ok, #0a7a3d); }
+.compare-price { font-size: 1.25rem; font-weight: 800; color: var(--text); }
 .compare dl { display: grid; grid-template-columns: auto 1fr; gap: .2rem .6rem; margin: 0; font-size: .85rem; }
 .compare dt { color: var(--muted); }
 .compare dd { margin: 0; }
@@ -856,3 +856,22 @@ a.req-card { display: flex; flex-direction: column; }
   .req-card .avatars .avatar { width: 20px !important; height: 20px !important; }
   .grid:has(.req-card) .glow { display: none; }
 }
+
+/* ===== Request page with offers (session 77) ===== */
+.sample-note { background: var(--warn-soft); color: var(--warn); border-radius: 4px; padding: .4rem .6rem; margin: .5rem 0 0; }
+.detail-price { font-size: 1.7rem; font-weight: 800; margin: .1rem 0 .7rem; letter-spacing: -.01em; }
+.detail-facts { display: flex; gap: 0; margin-bottom: .9rem; border: 1px solid var(--border); border-radius: var(--radius); }
+.detail-facts span { flex: 1; padding: .55rem .8rem; display: flex; flex-direction: column; }
+.detail-facts span + span { border-inline-start: 1px solid var(--border); }
+.detail-facts b { font-size: .98rem; } .detail-facts small { color: var(--muted); font-size: .75rem; }
+.who-answered { margin-top: 1.75rem; }
+.responder-list { list-style: none; margin: 0; padding: 0; }
+.responder-list li { display: flex; align-items: center; gap: .8rem; padding: .7rem 0; border-top: 1px solid var(--border); }
+.responder-main { flex: 1; min-width: 0; }
+.verified-tick { color: var(--ok); }
+.choosing { margin-top: 1.25rem; }
+.choosing ol { margin: .4rem 0 0; padding-inline-start: 1.2rem; display: grid; gap: .35rem; color: var(--text); }
+.offer-status { list-style: none; display: flex; gap: .3rem; padding: 0; margin: .4rem 0 .8rem; }
+.offer-status li { flex: 1; font-size: .78rem; color: var(--muted); padding-top: .45rem; border-top: 3px solid var(--border); }
+.offer-status li.done { color: var(--text); border-top-color: var(--ok); }
+.offer-status li.declined { border-top-color: var(--bad); }
