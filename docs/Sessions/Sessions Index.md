@@ -85,3 +85,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-12 | [[2026-11-12 Session 76]] | PDF of every tab and page (39 screens, computer + phone) |
 | 2026-11-12 | [[2026-11-12 Session 77]] | Marketplace first: filters and sort, who answered (no prices), offer status, home rebuilt |
 | 2026-11-12 | [[2026-11-12 Session 78]] | Pull request #25 (phones, Figma prompt, screens PDF, marketplace first) merged into `main` |
+| 2026-11-12 | [[2026-11-12 Session 79]] | Unc on Cloudflare (test site at unc.b1gbe.org), auto-publish on `main` |
