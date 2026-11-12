@@ -24,6 +24,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Market
 - [[Bahrain Market Research]] — similar apps in Bahrain, gaps, what Unc would need
 - [[Siin Competitor Study]] — Siin (live-stream shopping) vs Unc: offering and position
+- [[Figma Design Prompt]] — a ready-to-paste prompt for a Figma design of the whole app
 - [[Marketplace Design Study]] — how real marketplaces look, and the "AI look" to avoid
 - Idea lists: [[Social Marketplace Ideas]] · [[More Ideas for the Vision]] · [[Fresh Ideas for the Vision]] · [[New Directions for the Vision]] · [[Keeping Deals on Unc]] · [[Publishing as an App]]
 - [[Glossary]] — every technical word used here, explained

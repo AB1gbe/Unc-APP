@@ -81,3 +81,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-11 | [[2026-11-11 Session 72]] | Shops first, 4 categories + Categories page, softer glow, owner-chosen font, example requests in every category, calm home + tabs, app-style side bar (opens and folds) |
 | 2026-11-11 | [[2026-11-11 Session 73]] | Pull request #24 (shops first, tabs, side bar) merged into `main` |
 | 2026-11-11 | [[2026-11-11 Session 74]] | Phone fix: app-like search (icon button), no auto-focus, category names on the photos; floating glass tab bar; blue system bars removed |
+| 2026-11-12 | [[2026-11-12 Session 75]] | Figma design prompt with everything learned so far |
