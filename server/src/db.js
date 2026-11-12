@@ -6,6 +6,19 @@ import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { config } from './config.js';
 
+// Converts prices in other currencies to Bahraini Dinar (migration 41, and
+// the demo data in seed.js; session 80).
+export const TO_BHD_SQL = `
+  UPDATE messages SET offer_price = (CASE WHEN (offer_price * (CASE (SELECT l.currency FROM conversations c JOIN listings l ON l.id = c.listing_id WHERE c.id = messages.conversation_id) WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) >= 50 THEN CAST(ROUND((offer_price * (CASE (SELECT l.currency FROM conversations c JOIN listings l ON l.id = c.listing_id WHERE c.id = messages.conversation_id) WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) / 5.0) * 5 AS INTEGER) WHEN (offer_price * (CASE (SELECT l.currency FROM conversations c JOIN listings l ON l.id = c.listing_id WHERE c.id = messages.conversation_id) WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) > 0 THEN MAX(1, CAST(ROUND(offer_price * (CASE (SELECT l.currency FROM conversations c JOIN listings l ON l.id = c.listing_id WHERE c.id = messages.conversation_id) WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) AS INTEGER)) ELSE 0 END)
+    WHERE offer_price IS NOT NULL AND COALESCE((SELECT l.currency FROM conversations c JOIN listings l ON l.id = c.listing_id WHERE c.id = messages.conversation_id), 'BHD') <> 'BHD';
+  UPDATE installment_parts SET amount = (CASE WHEN (amount * (CASE (SELECT p.currency FROM installment_plans p WHERE p.id = installment_parts.plan_id) WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) > 0 THEN MAX(1, CAST(ROUND(amount * (CASE (SELECT p.currency FROM installment_plans p WHERE p.id = installment_parts.plan_id) WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) AS INTEGER)) ELSE 0 END)
+    WHERE (SELECT p.currency FROM installment_plans p WHERE p.id = installment_parts.plan_id) <> 'BHD';
+  UPDATE installment_plans SET total = (CASE WHEN (total * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) > 0 THEN MAX(1, CAST(ROUND(total * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) AS INTEGER)) ELSE 0 END), currency = 'BHD' WHERE currency <> 'BHD';
+  UPDATE listings SET budget_min = CASE WHEN budget_min IS NULL THEN NULL ELSE (CASE WHEN (budget_min * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) >= 50 THEN CAST(ROUND((budget_min * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) / 5.0) * 5 AS INTEGER) WHEN (budget_min * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) > 0 THEN MAX(1, CAST(ROUND(budget_min * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) AS INTEGER)) ELSE 0 END) END,
+    budget_max = CASE WHEN budget_max IS NULL THEN NULL ELSE (CASE WHEN (budget_max * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) >= 50 THEN CAST(ROUND((budget_max * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) / 5.0) * 5 AS INTEGER) WHEN (budget_max * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) > 0 THEN MAX(1, CAST(ROUND(budget_max * (CASE currency WHEN 'USD' THEN 0.376 WHEN 'EUR' THEN 0.43 WHEN 'GBP' THEN 0.5 WHEN 'CAD' THEN 0.27 WHEN 'AUD' THEN 0.25 ELSE 1 END)) AS INTEGER)) ELSE 0 END) END,
+    currency = 'BHD' WHERE currency <> 'BHD';
+`;
+
 const MIGRATIONS = [
   // 1: initial schema
   `
@@ -522,6 +535,10 @@ const MIGRATIONS = [
   ALTER TABLE messages ADD COLUMN offer_stock TEXT CHECK (offer_stock IN ('in-stock', 'order'));
   ALTER TABLE messages ADD COLUMN offer_delivery TEXT CHECK (offer_delivery IN ('pickup', 'delivery', 'both'));
   `,
+  // 41: Bahraini Dinar everywhere (session 80). Older prices in other
+  // currencies are converted at approximate 2026 rates (1 USD = 0.376 BD)
+  // and rounded (to 5 dinars from 50 up). Only test data existed before.
+    TO_BHD_SQL,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

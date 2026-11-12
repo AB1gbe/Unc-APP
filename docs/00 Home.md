@@ -100,6 +100,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 67 - Screens PDF]]
 - [[Step 68 - Marketplace first]]
 - [[Step 69 - Cloudflare test site]]
+- [[Step 70 - Bahraini Dinar]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -163,6 +164,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Phones: app-like search and category tiles, floating glass tab bar, dark system bars | ✅ done — in `main` since session 78 → [[2026-11-11 Session 74]] |
 | Marketplace first: filters + sort, who answered (no prices), offer status, stock/delivery, home rebuilt | ✅ done — in `main` since session 78 → [[ADR-068 Marketplace first]] |
 | Cloudflare test site (unc.b1gbe.org), auto-publish on `main` | ✅ **live** on Cloudflare (unc-app, Workers Builds); every merge to `main` publishes by itself → [[Step 69 - Cloudflare test site]] |
+| Prices in Bahraini Dinar only ("BD 120" / "120 د.ب"), old prices converted | ✅ on the branch, live after the next merge → [[Step 70 - Bahraini Dinar]] |
+| Test site sign-up fix ("Request failed (500)") | ✅ on the branch, live after the next merge → [[Mistakes and Fixes#M143]] |
 | API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

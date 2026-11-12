@@ -19,7 +19,7 @@ export function useApi(path) {
 
 let metaCache = null;
 export function useMeta() {
-  const [meta, setMeta] = useState(metaCache || { categories: [], currencies: ['USD'] });
+  const [meta, setMeta] = useState(metaCache || { categories: [], currencies: ['BHD'] });
   useEffect(() => {
     if (metaCache) return;
     api('/meta').then((m) => { metaCache = m; setMeta(m); }).catch(() => {});

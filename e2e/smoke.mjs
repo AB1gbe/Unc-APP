@@ -154,11 +154,11 @@ await buyer.locator('.offer-card').first().screenshot({ path: `${OUT}/36-offer-d
 // A quick-reply chip fills the message box.
 await buyer.click('.quick-replies .chip:has-text("Where can we meet?")');
 if ((await buyer.inputValue('.chat-form textarea')) !== 'Where can we meet?') throw new Error('quick reply did not fill the box');
-await buyer.fill('.chat-form textarea', 'Sounds great — can you do $350 if I pick up today?');
+await buyer.fill('.chat-form textarea', 'Sounds great — can you do BD 350 if I pick up today?');
 await buyer.setInputFiles('.chat-form input[type=file]', img); // buyer sends a photo too
 await buyer.waitForSelector('.attach-preview img');
 await buyer.click('.chat-form button.btn');
-await vendor.waitForSelector('text=can you do $350', { timeout: 8000 });
+await vendor.waitForSelector('text=can you do BD 350', { timeout: 8000 });
 await vendor.waitForSelector('.bubble.mine .bubble-photo img'); // vendor's own offer photo
 // open a photo full-screen and close it again
 await vendor.click('.bubble.mine .bubble-photo');
@@ -170,7 +170,7 @@ await vendor.waitForSelector('.chat-head .active-now'); // the buyer is online r
 await shot(vendor, '12-vendor-chat');
 await shot(buyer, '13-buyer-chat');
 
-// Offer cards: the buyer counters with $350, the seller accepts it.
+// Offer cards: the buyer counters with BD 350, the seller accepts it.
 await buyer.click('.offer-actions button:has-text("Counter")');
 await buyer.fill('.offer-actions input', '350');
 await buyer.click('.offer-actions button:has-text("Send")');
@@ -212,7 +212,7 @@ await buyer.waitForSelector('.story-form', { state: 'detached' });
 await buyer.click('.deal-banner .fav-btn');
 await buyer.waitForSelector('.deal-banner .fav-btn.on');
 const controllerId = await buyer.evaluate(() => fetch('/api/listings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'USD', city: 'Austin' }) }).then((r) => r.json()).then((j) => j.listing.id));
+  body: JSON.stringify({ title: 'Looking for a PS5 controller', description: 'White, original', category: 'Electronics', budgetMin: 30, budgetMax: 60, currency: 'BHD', city: 'Austin' }) }).then((r) => r.json()).then((j) => j.listing.id));
 const vendorChat = vendor.url();
 await vendor.goto(BASE + '/notifications');
 await vendor.waitForSelector('.inbox-item:has-text("who favourited you, is looking for")');
@@ -427,14 +427,14 @@ await buyer.locator('.chat-head').screenshot({ path: `${OUT}/40-away.png` });
 await vendor.click('.away-mode button:has-text("I\'m back")');
 await vendor.waitForSelector('button:has-text("Turn on away mode")');
 
-// Raise my budget (session 37), on the controller request ($30–$60).
+// Raise my budget (session 37), on the controller request (BD 30–60).
 await buyer.goto(`${BASE}/requests/${controllerId}`);
 await buyer.click('button:has-text("Raise my budget")');
 await buyer.fill('#raiseBudget', '80');
 await buyer.locator('.raise-budget').screenshot({ path: `${OUT}/42-raise-budget.png` });
 await buyer.click('.raise-budget button:has-text("Raise")');
 await buyer.waitForSelector('.toast:has-text("Budget raised")');
-await buyer.waitForSelector('text=$30 – $80');
+await buyer.waitForSelector('text=BD 30 – BD 80');
 
 // Owner dashboard (session 37): the admin sees today's requests in the charts.
 {

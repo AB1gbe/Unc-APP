@@ -6,7 +6,7 @@ step: 6
 
 **Files:** `server/src/lib/categories.js`, `server/src/routes/listings.js`.
 
-- `CATEGORIES` (16) and `CURRENCIES` (USD, EUR, GBP, CAD, AUD) are served by `GET /api/meta` so the client never hard-codes them.
+- `CATEGORIES` (16) and `CURRENCIES` (USD, EUR, GBP, CAD, AUD; only BHD since session 80, see [[Step 70 - Bahraini Dinar]]) are served by `GET /api/meta` so the client never hard-codes them.
 - `listingView(row, images)` converts DB rows (snake_case) to API objects (camelCase) and never exposes the buyer's email.
 - **Browse** (`GET /api/listings`): only `status='open'` and buyer not banned; filters `q` (title/description `LIKE`), `category`, `city`; 20 per page; fetches 21 to know if there's a next page (`hasMore`).
 - **Create** requires `requireVerified`; multipart so up to 3 reference photos can be attached (public folder).

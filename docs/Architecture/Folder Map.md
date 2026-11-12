@@ -25,6 +25,7 @@ Unc-APP/
 │   ├── areas.js            Bahrain governorates + areas (English/Arabic/other spellings): normalizeCity(),
 │                             governorateOf(), governorateNamed(), areasOf(), placeName()
 │   ├── names.js            "Show only my first name": shortName() ("Sam Buyer" → "Sam B."), nameFor() (session 34)
+│   ├── money.js            formatMoney(): "BD 120" / "120 د.ب", CURRENCY = 'BHD' (session 80)
 │   └── contact-mask.js     Hides numbers, emails, links and @handles as 📵 until a price is agreed: maskContacts(), hasContacts(), HIDDEN (session 40)
 ├── server/
 │   ├── package.json        Server deps + scripts
@@ -162,7 +163,7 @@ Unc-APP/
     └── src/
         ├── main.jsx        Mounts <App/> with Router + AuthProvider
         ├── App.jsx         All page routes + guards (`/` = Home for members, Browse for visitors)
-        ├── api.js          api() fetch wrapper, money/budget/date helpers; moneyExact() with the currency's decimals for wallet credit (session 58)
+        ├── api.js          api() fetch wrapper, money/budget/date helpers; moneyExact() with the currency's decimals for wallet credit (session 58); both use shared/money.js, currencyName() = BD (session 80)
         ├── auth.jsx        AuthProvider, useAuth(), isVerified() (also needs hasCard, session 40)
         ├── i18n.jsx        t(), tj(), tn(), LanguageProvider, date helpers (session 12)
         ├── locales/ar.js   All Arabic text, keyed by the English

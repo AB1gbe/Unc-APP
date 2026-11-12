@@ -262,6 +262,7 @@ export default {
   'Have this? Make an offer': 'هل لديك هذا؟ قدّم عرضًا',
   'Your message goes privately to {name} and stays attached to this request.': 'تصل رسالتك إلى {name} بشكل خاص، وتبقى مرتبطة بهذا الطلب.',
   'Your price ({currency})': 'سعرك ({currency})',
+  'Budget in {currency}': 'الميزانية بـ{currency}',
   Message: 'الرسالة',
   'Describe what you have: condition, photos available, when you can deliver…': 'صف ما لديك: الحالة، هل تتوفر صور، ومتى يمكنك التسليم…',
   'Send offer': 'إرسال العرض',

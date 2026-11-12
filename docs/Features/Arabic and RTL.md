@@ -15,7 +15,7 @@ tags: [feature, i18n, arabic]
 - The whole page mirrors (menus, chat bubbles, forms, arrows ← →).
 - Server error messages ("Wrong email or password") and **emails** come in the member's language.
 - Dates, "5 minutes ago" (قبل 5 دقائق) and plurals follow Arabic grammar. **Numbers stay in Western digits** (123), as on Bahraini price tags.
-- Prices show as `USD 300` in Arabic (a loose "$" gets reordered by right-to-left text).
+- Prices show as `120 د.ب` in Arabic and `BD 120` in English (`shared/money.js`, session 80; before that `USD 300`, because a loose "$" gets reordered by right-to-left text).
 - Text that members write keeps its own direction: an English title on an Arabic page reads correctly, and vice versa.
 
 ## How it works (where)

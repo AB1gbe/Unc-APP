@@ -15,7 +15,7 @@ test('a new offer emails the buyer with the seller, price, message and a link; n
   const seller = await t.user();
   const { email } = await me(buyer);
   const sellerEmail = (await me(seller)).email;
-  const l = await t.listing(buyer, { title: 'Need a desk lamp', currency: 'USD' });
+  const l = await t.listing(buyer, { title: 'Need a desk lamp', currency: 'BHD' });
   const before = { buyer: mailsTo(email).length, seller: mailsTo(sellerEmail).length };
 
   const conv = (await seller.post(`/api/listings/${l.id}/contact`).send({ message: 'Brass lamp, works <b>great</b>', offerPrice: 35 }).expect(201)).body.conversation;
@@ -24,7 +24,7 @@ test('a new offer emails the buyer with the seller, price, message and a link; n
   const m = mails.at(-1);
   assert.equal(plain(m.subject), 'New offer on “Need a desk lamp”');
   assert.match(plain(m.text), /User \d+ made an offer/);
-  assert.match(m.text, /\$35/);
+  assert.match(m.text, /BD 35/);
   assert.match(m.text, new RegExp(`/messages/${conv.id}`));
   assert.match(m.html, /works &lt;b&gt;great&lt;\/b&gt;/, 'member text is escaped in the HTML');
   assert.match(m.html, /\/account/, 'says where to turn these off');

@@ -19,11 +19,11 @@ test('an open request: its own title, price, city and photo', async () => {
   const buyer = await t.user();
   const res = await buyer.post('/api/listings')
     .field('title', 'Looking for a "vintage" lamp <b>').field('description', 'Brass, working').field('category', 'Home & Furniture')
-    .field('budgetMin', '20').field('budgetMax', '60').field('currency', 'USD').field('city', 'Manama')
+    .field('budgetMin', '20').field('budgetMax', '60').field('currency', 'BHD').field('city', 'Manama')
     .attach('images', PNG, 'lamp.png').expect(201);
   const html = await page(`/requests/${res.body.listing.id}`);
   assert.equal(meta(html, 'og:title'), 'Looking for a &quot;vintage&quot; lamp &lt;b&gt;', 'member text is escaped');
-  assert.match(meta(html, 'og:description'), /\$20 – \$60 · Manama · Have one\? Make an offer on Unc\./);
+  assert.match(meta(html, 'og:description'), /BD 20 – BD 60 · Manama · Have one\? Make an offer on Unc\./);
   assert.match(meta(html, 'og:image'), /^http:\/\/localhost:5173\/uploads\/listings\/.+\.png$/);
   assert.equal(meta(html, 'twitter:card'), 'summary_large_image');
   assert.match(html, /<title>Looking for a &quot;vintage&quot; lamp &lt;b&gt; · Unc<\/title>/);
