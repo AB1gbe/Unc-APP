@@ -14,7 +14,7 @@ The owner connected the repository directly: **Workers & Pages → Create → Im
 - **Root directory:** empty (the top folder)
 
 Two more things in the dashboard, both important:
-1. **Admin password** (the default `ChangeMe123!` is public): **unc-app → Settings → Variables and Secrets → Add** → type **Secret**, name `ADMIN_PASSWORD`, a strong value → Deploy. Optional: `SECRET_PEPPER` (a long random text, never change it later). Set them **before the first visit**: the admin account is created on the first visit with the password at that moment.
+1. **Admin password** (the default `ChangeMe123!` is public): **unc-app → Settings → Variables and Secrets → Add** → type **Secret**, name `ADMIN_PASSWORD`, a strong value → Deploy. Optional: `SECRET_PEPPER` (a long random text, never change it later). Without `ADMIN_PASSWORD` the site creates **no admin account** (so the public default can't be used). Once you add it, the admin account appears on the next start (log in as `admin@unc.local`).
 2. **Your address:** **unc-app → Domains** (or Settings → Domains & Routes) → **Add → Custom domain** → `unc.b1gbe.org`. It also works at the `…workers.dev` address shown there.
 
 ## B. Updating
@@ -38,7 +38,7 @@ Tell Claude "merge it" (or merge a pull request yourself). Every push to `main` 
 npm run build
 npx wrangler dev --port 8790
 ```
-Open http://localhost:8790. Browser tests against it: `set BASE_URL=http://127.0.0.1:8790` then `node e2e/smoke.mjs` (start wrangler with `--var SEED_DEMO:0` for an empty database).
+Open http://localhost:8790. Browser tests against it: start wrangler with `--var SEED_DEMO:0 --var ADMIN_PASSWORD:ChangeMe123!`, then `set BASE_URL=http://127.0.0.1:8790` and `node e2e/smoke.mjs`.
 
 ## E. Starting the test site over (wipe all its data)
 In `wrangler.jsonc`, add a new entry to `migrations`, e.g. `{ "tag": "v2", "deleted_classes": ["UncServer"] }` then `{ "tag": "v3", "new_sqlite_classes": ["UncServer"] }`, and merge. Ask Claude if unsure.

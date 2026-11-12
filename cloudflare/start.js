@@ -16,7 +16,10 @@ const DEMO_PHOTOS = ['ps5-wanted.jpg', 'oak-table.jpg', 'wardrobe.jpg', 'offer-p
 
 export async function start(env) {
   const db = openDb(process.env.DB_FILE || '/data/unc.sqlite');
-  await ensureAdmin(db);
+  // The admin account is only created once the owner has set their own
+  // ADMIN_PASSWORD secret: the default password is public (session 79).
+  if (env.ADMIN_PASSWORD) await ensureAdmin(db);
+  else console.warn('ADMIN_PASSWORD is not set: no admin account yet. Add it in the dashboard (Settings → Variables and Secrets).');
   // A test site starts with the demo data (SEED_DEMO=1), once.
   if (env.SEED_DEMO === '1' && !db.prepare(`SELECT 1 FROM users WHERE email = 'buyer@demo.local'`).get()) {
     const { DEMO_REQUESTS } = await import('../server/src/demo-requests.js');
