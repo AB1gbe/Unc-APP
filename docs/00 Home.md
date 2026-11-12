@@ -1,6 +1,6 @@
 ---
 tags: [home, index]
-updated: 2026-11-11 (session 74)
+updated: 2026-11-12 (session 77)
 ---
 # Unc — Project Vault
 
@@ -98,6 +98,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 65 - Calm home page and tabs]]
 - [[Step 66 - App-style side bar]]
 - [[Step 67 - Screens PDF]]
+- [[Step 68 - Marketplace first]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -116,7 +117,7 @@ This vault is the complete record of the project: **how** everything was built, 
 ### Going live
 - [[Environment Variables]] · [[Deploying to Production]]
 
-## Status (2026-11-11, after session 74)
+## Status (2026-11-12, after session 77)
 | Area | State |
 |---|---|
 | Accounts + email verification | ✅ done |
@@ -159,6 +160,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Example requests in every category; calm home page; tabs Home · Requests · Shops · Categories | ✅ done — in `main` since session 73 → [[ADR-066 Calm home page and tabs]] |
 | App-style side bar on computers (opens and folds), slim header + tab bar on phones | ✅ done — in `main` since session 73 → [[ADR-067 App-style side bar]] |
 | Phones: app-like search and category tiles, floating glass tab bar, dark system bars | ✅ done — on branch (session 74) → [[2026-11-11 Session 74]] |
-| API tests | ✅ 188 passing |
+| Marketplace first: filters + sort, who answered (no prices), offer status, stock/delivery, home rebuilt | ✅ done — on branch (session 77) → [[ADR-068 Marketplace first]] |
+| API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

@@ -83,3 +83,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-11 | [[2026-11-11 Session 74]] | Phone fix: app-like search (icon button), no auto-focus, category names on the photos; floating glass tab bar; blue system bars removed |
 | 2026-11-12 | [[2026-11-12 Session 75]] | Figma design prompt with everything learned so far |
 | 2026-11-12 | [[2026-11-12 Session 76]] | PDF of every tab and page (39 screens, computer + phone) |
+| 2026-11-12 | [[2026-11-12 Session 77]] | Marketplace first: filters and sort, who answered (no prices), offer status, home rebuilt |

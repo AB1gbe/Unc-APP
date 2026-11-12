@@ -178,3 +178,9 @@ Checked in `server/test/performance.test.js`.
 
 ## Inspect the database by hand
 Install *DB Browser for SQLite* (free, https://sqlitebrowser.org) and open `server/data/unc.sqlite`. Stop the server first or open read-only.
+
+## Migrations 39–40 (session 77)
+- **39:** `listings.item_condition` TEXT NOT NULL DEFAULT 'any' (any/new/used); `listings.sample` INTEGER NOT NULL DEFAULT 0 (1 = demo data from `npm run seed`).
+- **40:** `messages.offer_stock` TEXT (in-stock/order); `messages.offer_delivery` TEXT (pickup/delivery/both).
+See [[ADR-068 Marketplace first]].
+
