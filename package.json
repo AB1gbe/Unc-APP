@@ -26,7 +26,8 @@
     "pull": "node scripts/git-helper.mjs pull",
     "push": "node scripts/git-helper.mjs push",
     "e2e:ar": "node e2e/arabic.mjs",
-    "e2e:devices": "node e2e/devices.mjs"
+    "e2e:devices": "node e2e/devices.mjs",
+    "deploy": "node scripts/cloudflare-deploy.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
