@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { Loading } from './ui.jsx';
+import Logo from './Logo.jsx';
 import TabBar from './TabBar.jsx';
 import SideNav from './SideNav.jsx';
 import { usePolling } from '../hooks.js';
@@ -56,7 +57,7 @@ export default function Layout() {
       {/* Phones and small tablets: a slim app header; the tabs are at the bottom. */}
       <header className="topbar">
         <div className="topbar-inner">
-          <Link to="/" className="logo">un<span>c</span></Link>
+          <Link to="/" className="logo" aria-label="Unc"><Logo size={26} /></Link>
           <nav className="nav">
             {user && <NavLink to="/me" className="top-bell" aria-label={t('My Unc')} title={t('My Unc')}><Icon name="user" size="1.5em" /></NavLink>}
             {user ? (

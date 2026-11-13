@@ -63,7 +63,6 @@ p { margin: 0 0 .75rem; }
 .topbar { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
 .topbar-inner { max-width: 1180px; margin: 0 auto; padding: .7rem 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .logo { font-weight: 800; font-size: 1.3rem; color: var(--text); letter-spacing: -.02em; }
-.logo span { color: var(--brand); }
 .nav { display: flex; gap: .25rem; align-items: center; flex-wrap: wrap; margin-inline-start: auto; }
 .nav a { color: var(--muted); padding: .4rem .6rem; border-radius: 8px; font-weight: 500; }
 .nav a:hover, .nav a.active { background: var(--brand-soft); color: var(--brand); text-decoration: none; }
@@ -985,5 +984,9 @@ a.req-card { display: flex; flex-direction: column; }
 /* Yellow main actions (session 85): "Sell" and "Post an ad" buttons. */
 .btn.accent { background: var(--accent); color: var(--accent-ink); }
 .btn.accent:hover { filter: brightness(.96); }
-.logo span { color: var(--brand); }
-.logo::after { content: ''; display: inline-block; width: .32em; height: .32em; border-radius: 50%; background: var(--accent); margin-inline-start: .08em; }
+/* The logo (session 85, ADR-075): tile + word. */
+.logo { display: inline-flex; align-items: center; gap: .45rem; text-decoration: none; }
+.logo:hover { text-decoration: none; }
+.logo-mark { flex: 0 0 auto; display: block; }
+.logo-word { font-weight: 800; letter-spacing: -.04em; color: var(--text); line-height: 1; }
+html.side-collapsed .side-logo .logo-word { display: none; }

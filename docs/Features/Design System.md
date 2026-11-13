@@ -98,3 +98,6 @@ Since [[ADR-073 Marketplace layout and light colours]] the app is light: page `#
 
 ## Session 85 (later): white, grey, blue, yellow
 Replaced the coral: [[ADR-074 White, grey, blue and yellow]]. In `:root` of `client/src/styles.css`: `--brand` = blue #1f5fd6 (buttons, links), `--accent` = yellow #ffc928 with `--accent-ink` #1a1a1a (Sell / Post an ad via `.btn.accent`, the side-bar post button, the centre tab, the selected chip and tab, the "Looking for" tag, the dot after the logo).
+
+## Logo (session 85)
+See [[ADR-075 Logo]]. Tile `client/public/icons/logo-mark.svg`, component `client/src/components/Logo.jsx`, icons via `node scripts/make-icons.mjs`.
