@@ -95,3 +95,6 @@ Phone tab bar (session 74): floating glass bar (blur, see-through, rounded), tab
 
 ## Session 85: light colours
 Since [[ADR-073 Marketplace layout and light colours]] the app is light: page `#f0f2f5`, cards `#ffffff`, second surface `#e9ebee`, text `#1c1e21`, muted `#65676b`, borders `#dadde1`, coral `#e8552a` with white text, soft coral `#fdebe4`. All in `:root` at the top of `client/src/styles.css`. Theme colour `#ffffff` (`index.html`, `manifest.webmanifest`).
+
+## Session 85 (later): white, grey, blue, yellow
+Replaced the coral: [[ADR-074 White, grey, blue and yellow]]. In `:root` of `client/src/styles.css`: `--brand` = blue #1f5fd6 (buttons, links), `--accent` = yellow #ffc928 with `--accent-ink` #1a1a1a (Sell / Post an ad via `.btn.accent`, the side-bar post button, the centre tab, the selected chip and tab, the "Looking for" tag, the dot after the logo).
