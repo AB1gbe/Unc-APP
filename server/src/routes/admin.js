@@ -24,6 +24,7 @@ export function adminRoutes(db) {
       conversations: one('SELECT COUNT(*) n FROM conversations'),
       openReports: one(`SELECT COUNT(*) n FROM reports WHERE status = 'open'`),
       openHelp: one(`SELECT COUNT(*) n FROM support_tickets WHERE status = 'open'`),
+      heldAds: one(`SELECT COUNT(*) n FROM listings WHERE held_at IS NOT NULL AND status = 'open'`),
     });
   });
 
@@ -148,6 +149,39 @@ export function adminRoutes(db) {
         notify(db, rep.reporter_id, outcome === 'action' ? 'report-action' : 'report-no-action', { listingId: rep.about_listing });
       }
       audit(db, req.user.id, 'report.resolved', `report:${rep.id}`, outcome ? { outcome } : undefined);
+    });
+    res.json({ ok: true });
+  });
+
+  // Ads held by the scam checks (session 82), oldest first. Approve = it
+  // goes up (and isn't held again on edits); remove = closed. The poster
+  // gets a 🔔 either way.
+  r.get('/held-ads', (_req, res) => {
+    const rows = db.prepare(`
+      SELECT l.id, l.title, l.description, l.section, l.category, l.budget_min, l.budget_max, l.city, l.held_at, l.held_reason,
+             u.id AS user_id, u.display_name, u.created_at AS user_since
+      FROM listings l JOIN users u ON u.id = l.buyer_id
+      WHERE l.held_at IS NOT NULL AND l.status = 'open' ORDER BY l.held_at ASC LIMIT 100
+    `).all();
+    res.json({ ads: rows.map((r) => ({
+      id: r.id, title: r.title, description: r.description, section: r.section, category: r.category,
+      price: r.budget_min, priceMax: r.budget_max, city: r.city, heldAt: r.held_at, reasons: (r.held_reason || '').split('; ').filter(Boolean),
+      poster: { id: r.user_id, displayName: r.display_name, since: r.user_since },
+    })) });
+  });
+
+  r.post('/held-ads/:id/decision', (req, res) => {
+    const decision = v.oneOf(req.body, 'decision', ['approve', 'remove']);
+    const ad = db.prepare('SELECT * FROM listings WHERE id = ? AND held_at IS NOT NULL').get(Number(req.params.id));
+    if (!ad) throw notFound('Request not found.');
+    tx(db, () => {
+      if (decision === 'approve') {
+        db.prepare(`UPDATE listings SET held_at = NULL, held_reason = NULL, checked_at = datetime('now') WHERE id = ?`).run(ad.id);
+      } else {
+        db.prepare(`UPDATE listings SET status = 'closed', held_at = NULL, updated_at = datetime('now') WHERE id = ?`).run(ad.id);
+      }
+      notify(db, ad.buyer_id, decision === 'approve' ? 'ad-approved' : 'ad-removed', { actorId: req.user.id, listingId: ad.id });
+      audit(db, req.user.id, `ad.${decision === 'approve' ? 'approved' : 'removed'}`, `listing:${ad.id}`);
     });
     res.json({ ok: true });
   });

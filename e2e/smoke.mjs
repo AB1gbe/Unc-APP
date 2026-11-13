@@ -118,7 +118,7 @@ const listingUrl = buyer.url();
 await vendor.goto(BASE + '/notifications');
 await vendor.waitForSelector('.inbox-item:has-text("New request matching your alert")');
 
-await vendor.goto(BASE + '/');
+await vendor.goto(BASE + '/me'); // the member dashboard moved to /me (session 82)
 await vendor.waitForSelector('.card h3');
 await shot(vendor, '09-browse');
 await vendor.goto(listingUrl);
@@ -126,7 +126,7 @@ await vendor.goto(listingUrl);
 await vendor.click('.save-btn'); await vendor.waitForSelector('.save-btn.on');
 await vendor.goto(BASE + '/saved'); await vendor.waitForSelector('.card h3:has-text("PS5")');
 await shot(vendor, '09b-saved');
-await vendor.goto(BASE + '/'); await vendor.waitForSelector('h2:has-text("Saved for later")');
+await vendor.goto(BASE + '/me'); await vendor.waitForSelector('h2:has-text("Saved for later")');
 await vendor.goto(listingUrl); await vendor.waitForSelector('.save-btn.on');
 await vendor.fill('#offerPrice', '380'); await vendor.fill('#message', 'Hi! I have a PS5 disc edition with 2 controllers, boxed, 6 months old.');
 await vendor.selectOption('#offer-condition', 'like-new'); await vendor.selectOption('#offer-warranty', '3m'); // offer details (session 34)
@@ -494,6 +494,31 @@ await shot(buyer, '53-help');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
-const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.market-intro'); await mp.waitForSelector('.searchbar'); /* marketplace first: short intro + search… */ await mp.waitForSelector('.tabbar a[href="/shops"]'); /* …and the visitor tab bar */ await shot(mp, '14-mobile-home');
+const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.board-intro'); await mp.waitForSelector('.searchbar'); /* Craigslist-style front page (session 82) */ await mp.waitForSelector('.tabbar a[href="/housing"]'); /* …and the visitor tab bar */ await shot(mp, '14-mobile-home');
+// Housing ad (session 82): posted through the form, listed under Housing,
+// answered in a private chat; a scam-style ad is refused on screen.
+await buyer.goto(BASE + '/requests/new?section=housing');
+await buyer.fill('#title', 'Furnished studio in Juffair');
+await buyer.selectOption('#category', 'Flats & apartments');
+await buyer.fill('#description', 'Pay a deposit before the viewing by Western Union.');
+await buyer.waitForSelector('.alert.error:has-text("Ads may not ask for money")');
+await buyer.fill('#description', 'Sea view, gym, bills included. Available now.');
+await buyer.fill('#rent', '240');
+await buyer.fill('#bedrooms', '0');
+await buyer.selectOption('#furnished', 'true');
+await buyer.click('button:has-text("Post ad")');
+await buyer.waitForSelector('h1:has-text("Furnished studio in Juffair")');
+await buyer.waitForSelector('.detail-price:has-text("/ month")');
+await shot(buyer, '40-housing-ad');
+const adUrl = buyer.url();
+await vendor.goto(BASE + '/housing');
+await vendor.waitForSelector('.ad-row:has-text("Furnished studio in Juffair")');
+await shot(vendor, '41-housing-list');
+await vendor.goto(adUrl);
+await vendor.fill('#message', 'Can I view it on Saturday?');
+await vendor.click('button:has-text("Send message")');
+await vendor.waitForURL('**/messages/*');
+await buyer.goto(BASE + '/notifications');
+await buyer.waitForSelector('.inbox-item:has-text("replied to your ad")');
 console.log('E2E OK');
 await browser.close();

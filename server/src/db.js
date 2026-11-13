@@ -539,6 +539,20 @@ const MIGRATIONS = [
   // currencies are converted at approximate 2026 rates (1 USD = 0.376 BD)
   // and rounded (to 5 dinars from 50 up). Only test data existed before.
     TO_BHD_SQL,
+  // 42: Craigslist-style sections (session 82). Every old listing is a
+  // "wanted" request. Housing ads have bedrooms / furnished, job ads a job
+  // type. An ad that fails a soft scam check is held (held_at) until the
+  // Unc team approves it; held ads are hidden from everyone but the poster.
+  `
+  ALTER TABLE listings ADD COLUMN section TEXT NOT NULL DEFAULT 'wanted' CHECK (section IN ('wanted', 'housing', 'jobs'));
+  ALTER TABLE listings ADD COLUMN bedrooms INTEGER;
+  ALTER TABLE listings ADD COLUMN furnished INTEGER;
+  ALTER TABLE listings ADD COLUMN job_type TEXT CHECK (job_type IN ('full-time', 'part-time', 'contract'));
+  ALTER TABLE listings ADD COLUMN held_at TEXT;
+  ALTER TABLE listings ADD COLUMN held_reason TEXT;
+  ALTER TABLE listings ADD COLUMN checked_at TEXT;
+  CREATE INDEX idx_listings_section ON listings(section, status, created_at);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

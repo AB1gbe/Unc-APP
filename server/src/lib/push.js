@@ -36,6 +36,10 @@ export function setPushSender(fn) { sender = fn; }
 
 // What the phone shows, in the member's language.
 const TEXT = {
+  'ad-reply': {
+    en: { title: 'New reply to your ad', body: (v) => `${v.actor} replied to “${v.title}”` },
+    ar: { title: 'رد جديد على إعلانك', body: (v) => `ردّ ${v.actor} على «${v.title}»` },
+  },
   offer: {
     en: { title: 'New offer', body: (v) => `${v.actor} made an offer on “${v.title}”` },
     ar: { title: 'عرض جديد', body: (v) => `قدّم ${v.actor} عرضاً على «${v.title}»` },

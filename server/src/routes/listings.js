@@ -6,7 +6,8 @@ import { Router } from 'express';
 import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
 import { LISTING_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
-import { CATEGORIES, CURRENCIES } from '../lib/categories.js';
+import { CATEGORIES, CURRENCIES, JOB_TYPES, SECTIONS, categoriesFor } from '../lib/categories.js';
+import { checkAd } from '../../../shared/scam-check.js';
 import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
@@ -25,6 +26,10 @@ import { nameFor } from '../../../shared/names.js';
 export const MAX_PHOTOS = 6;
 export const CONDITIONS = ['any', 'new', 'used'];
 export const SORTS = ['newest', 'closing', 'offers'];
+// Housing and Jobs ads (session 82): how many a member may post a day, and
+// how long the same title can't be posted again (Craigslist's repeat-post rule).
+export const ADS_PER_DAY = 5;
+export const REPEAT_DAYS = 7;
 
 // images: [{ id, file }] in display order
 export function listingView(row, images = []) {
@@ -43,6 +48,13 @@ export function listingView(row, images = []) {
     updatedAt: row.updated_at,
     contactRule: row.contact_rule ?? 'anyone',
     condition: row.item_condition ?? 'any',
+    // Craigslist-style sections (session 82).
+    section: row.section ?? 'wanted',
+    bedrooms: row.bedrooms ?? null,
+    furnished: row.furnished == null ? null : row.furnished === 1,
+    jobType: row.job_type ?? null,
+    // Held for a scam check: only the poster (and admins) can see it.
+    held: Boolean(row.held_at),
     // Demo data from `npm run seed` (session 77): shown as "Sample", never as live.
     sample: row.sample === 1,
     buyer: { id: row.buyer_id, displayName: nameFor(row.buyer_name, row.buyer_short), accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
@@ -97,7 +109,9 @@ export function listingRoutes(db) {
     listing.buyer.rating = ratings.summaryFor(listing.buyer.id);
     listing.buyer.badges = badgesFor(listing.buyer.id);
     if (me) listing.buyer.activity = activity.summaryFor(listing.buyer.id);
-    listing.responders = respondersOf(id, 20, true);
+    // Who answered is public only for requests: who applied for a job or
+    // asked about a flat stays private to the advertiser (session 82).
+    listing.responders = listing.section === 'wanted' ? respondersOf(id, 20, true) : [];
     if (me?.id === listing.buyer.id) {
       listing.viewCount = viewCount.get(id).n;
       listing.expiresAt = db.prepare(`SELECT ${EXPIRES_AT_SQL} AS at FROM listings WHERE id = ?`).get(id).at;
@@ -109,8 +123,10 @@ export function listingRoutes(db) {
 
   // Public browse + search. Only open requests are shown.
   r.get('/', (req, res) => {
-    const where = [`l.status = 'open'`, 'u.banned_at IS NULL'];
-    const params = [];
+    // One section at a time; requests ("wanted") unless another is asked for.
+    const section = SECTIONS.includes(req.query.section) ? req.query.section : 'wanted';
+    const where = [`l.status = 'open'`, 'u.banned_at IS NULL', 'l.section = ?', 'l.held_at IS NULL'];
+    const params = [section];
     if (req.user) { where.push(NOT_BLOCKED_BUYER); params.push(req.user.id); }
     if (req.query.q) {
       // Words match the item, the description or the area (session 77).
@@ -128,7 +144,13 @@ export function listingRoutes(db) {
     if (CONDITIONS.includes(req.query.condition) && req.query.condition !== 'any') {
       where.push(`l.item_condition IN (?, 'any')`); params.push(req.query.condition);
     }
-    if (req.query.category && CATEGORIES.includes(req.query.category)) {
+    if (section === 'housing') {
+      const beds = Number.parseInt(req.query.bedrooms, 10);
+      if (Number.isFinite(beds) && beds > 0) { where.push('l.bedrooms >= ?'); params.push(beds); }
+      if (req.query.furnished === 'yes' || req.query.furnished === 'no') { where.push('l.furnished = ?'); params.push(req.query.furnished === 'yes' ? 1 : 0); }
+    }
+    if (section === 'jobs' && JOB_TYPES.includes(req.query.jobType)) { where.push('l.job_type = ?'); params.push(req.query.jobType); }
+    if (req.query.category && categoriesFor(section).includes(req.query.category)) {
       where.push('l.category = ?');
       params.push(req.query.category);
     }
@@ -156,10 +178,27 @@ export function listingRoutes(db) {
     const rows = db.prepare(`${BASE_SELECT} WHERE ${where.join(' AND ')} ORDER BY ${order} LIMIT ? OFFSET ?`)
       .all(...params, pageSize + 1, (page - 1) * pageSize);
     res.json({
-      listings: rows.slice(0, pageSize).map((row) => ({ ...withImages(row), responders: respondersOf(row.id, 3) })),
+      listings: rows.slice(0, pageSize).map((row) => ({ ...withImages(row), responders: section === 'wanted' ? respondersOf(row.id, 3) : undefined })),
       page,
       hasMore: rows.length > pageSize,
     });
+  });
+
+  // The Craigslist-style front page (session 82): how many open ads each
+  // section and category has, and the newest few in each section.
+  r.get('/sections', (req, res) => {
+    const counts = db.prepare(`
+      SELECT l.section, l.category, COUNT(*) AS n FROM listings l JOIN users u ON u.id = l.buyer_id
+      WHERE l.status = 'open' AND l.held_at IS NULL AND u.banned_at IS NULL GROUP BY l.section, l.category
+    `).all();
+    const latest = {};
+    for (const section of SECTIONS) {
+      latest[section] = db.prepare(`${BASE_SELECT} WHERE l.status = 'open' AND l.section = ? AND l.held_at IS NULL AND u.banned_at IS NULL ORDER BY l.created_at DESC, l.id DESC LIMIT 8`)
+        .all(section).map(withImages);
+    }
+    const out = Object.fromEntries(SECTIONS.map((sec) => [sec, { total: 0, categories: {} }]));
+    for (const c of counts) { out[c.section].total += c.n; out[c.section].categories[c.category] = c.n; }
+    res.json({ sections: out, latest });
   });
 
   // "Requests you could help with" on the member's home page: open
@@ -170,7 +209,7 @@ export function listingRoutes(db) {
     const rows = db.prepare(`
       ${BASE_SELECT}
       WHERE l.status = 'open' AND u.banned_at IS NULL AND l.buyer_id <> ? AND ${NOT_BLOCKED_BUYER}
-        AND ${CONTACT_ALLOWED_SQL}
+        AND l.section = 'wanted' AND l.held_at IS NULL AND ${CONTACT_ALLOWED_SQL}
         AND NOT EXISTS (SELECT 1 FROM conversations c WHERE c.listing_id = l.id AND c.vendor_id = ?)
         ${interests.length ? `AND l.category IN (${interests.map(() => '?').join(', ')})` : ''}
       ORDER BY (lower(l.city) = lower(COALESCE(?, ''))) DESC, l.created_at DESC, l.id DESC
@@ -219,7 +258,8 @@ export function listingRoutes(db) {
     const isParticipant = row && me && db.prepare('SELECT 1 FROM conversations WHERE listing_id = ? AND vendor_id = ?').get(row.id, me.id);
     const hidden = !row
       || (row.buyer_banned && !isAdmin)                                  // banned buyer: gone for everyone
-      || (row.status !== 'open' && !isOwner && !isParticipant && !isAdmin); // closed: owner, its vendors, admins
+      || (row.status !== 'open' && !isOwner && !isParticipant && !isAdmin)  // closed: owner, its vendors, admins
+      || (row.held_at && !isOwner && !isAdmin);                          // held for a scam check (session 82)
     if (hidden) throw notFound('This request does not exist or is no longer open.');
     // "👀 Seen by N people": count each logged-in member once (not the buyer).
     if (me && me.id !== row.buyer_id) {
@@ -248,6 +288,7 @@ export function listingRoutes(db) {
 
   r.post('/', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
     const data = readListingBody(req.body);
+    const held = adChecks(db, req.user.id, data);
     // All photos are checked before anything is saved, and the listing +
     // photo rows are written in one transaction: a bad photo means nothing
     // is created (no half-made listing that a retry would duplicate).
@@ -256,10 +297,12 @@ export function listingRoutes(db) {
     try {
       id = tx(db, () => {
         const info = db.prepare(`
-          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by, contact_rule, item_condition)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO listings (buyer_id, title, description, category, budget_min, budget_max, currency, city, needed_by, contact_rule, item_condition,
+            section, bedrooms, furnished, job_type, held_at, held_reason)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ${held.length ? "datetime('now')" : 'NULL'}, ?)
         `).run(req.user.id, data.title, data.description, data.category, data.budgetMin, data.budgetMax,
-          data.currency, data.city, data.neededBy, data.contactRule, data.condition);
+          data.currency, data.city, data.neededBy, data.contactRule, data.condition,
+          data.section, data.bedrooms, data.furnished, data.jobType, held.length ? held.join('; ') : null);
         const newId = Number(info.lastInsertRowid);
         for (const name of photos.names) {
           db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(newId, name);
@@ -270,6 +313,10 @@ export function listingRoutes(db) {
     } catch (err) {
       photos.discard();
       throw err;
+    }
+    // Ads (Housing, Jobs) and held posts don't go out as request alerts.
+    if (data.section !== 'wanted' || held.length) {
+      return res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)), held });
     }
     // Sellers who were favourited by this buyer hear about it first.
     // Then everyone whose request alert matches (session 31), once each.
@@ -284,12 +331,15 @@ export function listingRoutes(db) {
   r.patch('/:id', requireVerified, (req, res) => {
     const row = ownListing(db, req);
     if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
-    const data = readListingBody(req.body);
+    // The section can't change after posting (session 82).
+    const data = readListingBody({ ...req.body, section: row.section });
+    const held = adChecks(db, req.user.id, data, row);
     db.prepare(`
       UPDATE listings SET title = ?, description = ?, category = ?, budget_min = ?, budget_max = ?, currency = ?,
-        city = ?, needed_by = ?, contact_rule = ?, item_condition = ?, updated_at = datetime('now') WHERE id = ?
+        city = ?, needed_by = ?, contact_rule = ?, item_condition = ?, bedrooms = ?, furnished = ?, job_type = ?, updated_at = datetime('now') WHERE id = ?
     `).run(data.title, data.description, data.category, data.budgetMin, data.budgetMax, data.currency,
-      data.city, data.neededBy, data.contactRule, data.condition, row.id);
+      data.city, data.neededBy, data.contactRule, data.condition, data.bedrooms, data.furnished, data.jobType, row.id);
+    if (held.length && !row.held_at) db.prepare(`UPDATE listings SET held_at = datetime('now'), held_reason = ? WHERE id = ?`).run(held.join('; '), row.id);
     res.json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(row.id)) });
   });
 
@@ -410,10 +460,12 @@ function ownListing(db, req) {
 }
 
 function readListingBody(body) {
+  const section = v.oneOf(body, 'section', SECTIONS, { optional: true }) || 'wanted';
   const data = {
+    section,
     title: v.str(body, 'title', { min: 5, max: 100 }),
     description: v.str(body, 'description', { min: 10, max: 3000 }),
-    category: v.oneOf(body, 'category', CATEGORIES),
+    category: v.oneOf(body, 'category', categoriesFor(section)),
     budgetMin: v.int(body, 'budgetMin', { optional: true }),
     budgetMax: v.int(body, 'budgetMax', { optional: true }),
     currency: v.oneOf(body, 'currency', CURRENCIES, { optional: true }) || 'BHD',
@@ -425,5 +477,37 @@ function readListingBody(body) {
   if (data.budgetMin !== null && data.budgetMax !== null && data.budgetMin > data.budgetMax) {
     throw new HttpError(400, 'Minimum budget cannot be higher than maximum budget.', { field: 'budgetMin' });
   }
+  // Housing: a monthly rent (kept in budget_min and budget_max), bedrooms
+  // and furnished. Jobs: a job type and an optional monthly pay range.
+  data.bedrooms = null; data.furnished = null; data.jobType = null;
+  if (section === 'housing') {
+    data.budgetMin = v.int(body, 'rent', { min: 1, max: 100_000 });
+    data.budgetMax = data.budgetMin;
+    data.bedrooms = v.int(body, 'bedrooms', { min: 0, max: 20, optional: true });
+    const f = body?.furnished;
+    data.furnished = f === undefined || f === null || f === '' ? null : (f === true || f === 'true' || f === '1' || f === 1 ? 1 : 0);
+  }
+  if (section === 'jobs') data.jobType = v.oneOf(body, 'jobType', JOB_TYPES);
+  if (section !== 'wanted') { data.condition = 'any'; data.neededBy = null; data.contactRule = 'anyone'; }
   return data;
+}
+
+// Safety checks for Housing and Jobs ads (session 82): refuses scam
+// wording, contact details, the same ad twice in a week and more than
+// ADS_PER_DAY ads a day; returns the reasons an ad is held for a check.
+// An ad the Unc team already approved (checked_at) isn't held again.
+function adChecks(db, userId, data, existing = null) {
+  if (data.section === 'wanted') return [];
+  const { block, hold } = checkAd({ ...data, price: data.budgetMin, priceMax: data.budgetMax });
+  if (block) throw new HttpError(400, block, { field: 'description', scam: true });
+  const repeat = db.prepare(`
+    SELECT 1 FROM listings WHERE buyer_id = ? AND section = ? AND lower(title) = lower(?) AND id <> ?
+      AND created_at >= datetime('now', '-${REPEAT_DAYS} days') AND status = 'open'
+  `).get(userId, data.section, data.title, existing?.id ?? 0);
+  if (repeat) throw new HttpError(409, 'You already have an open ad with this title. Edit that one instead of posting it again.', { field: 'title' });
+  if (!existing) {
+    const today = db.prepare(`SELECT COUNT(*) AS n FROM listings WHERE buyer_id = ? AND section <> 'wanted' AND created_at >= datetime('now', '-1 day')`).get(userId).n;
+    if (today >= ADS_PER_DAY) throw new HttpError(429, 'You can post up to 5 ads a day. Please try again tomorrow.');
+  }
+  return existing?.checked_at ? [] : hold;
 }

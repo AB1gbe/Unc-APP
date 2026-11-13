@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import { config } from './config.js';
 import { errorHandler, notFound } from './lib/http.js';
 import { AVATAR_DIR, COVER_DIR, LISTING_DIR, STORY_DIR, sendStored } from './lib/uploads.js';
-import { CATEGORIES, CURRENCIES } from './lib/categories.js';
+import { CATEGORIES, CURRENCIES, HOUSING_CATEGORIES, JOB_CATEGORIES, JOB_TYPES } from './lib/categories.js';
 import { loadUser } from './middleware/auth.js';
 import { withPreview } from './lib/previews.js';
 import { authRoutes } from './routes/auth.js';
@@ -51,7 +51,7 @@ export function createApp(db) {
   app.use(loadUser(db));
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
-  app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES }));
+  app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES }, jobTypes: JOB_TYPES }));
   app.use('/api/auth', authRoutes(db));
   app.use('/api/kyc', kycRoutes(db));
   app.use('/api/listings', listingRoutes(db));
@@ -105,7 +105,7 @@ export function createApp(db) {
       SELECT l.*, u.language AS buyer_language,
              (SELECT file FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS first_image
       FROM listings l JOIN users u ON u.id = l.buyer_id
-      WHERE l.id = ? AND l.status = 'open' AND u.banned_at IS NULL
+      WHERE l.id = ? AND l.status = 'open' AND l.held_at IS NULL AND u.banned_at IS NULL
     `);
     app.get(/^(?!\/api|\/uploads).*/, (req, res) => {
       const id = req.path.match(/^\/requests\/(\d+)\/?$/)?.[1];

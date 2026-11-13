@@ -154,6 +154,8 @@ const ACTIONS = {
   post: () => t('post a request'),
   edit: () => t('edit a request'),
   contact: () => t('contact this buyer'),
+  reply: () => t('reply to this ad'),
+  postAd: () => t('post an ad'),
   postMany: () => t('post requests'),
 };
 
