@@ -179,8 +179,9 @@ function KycForm({ isBusiness, onDone }) {
               <input id="businessName" required value={form.businessName} onChange={set('businessName')} />
             </div>
             <div className="field">
-              <label htmlFor="businessRegNumber">{t('Registration number')}</label>
-              <input id="businessRegNumber" required value={form.businessRegNumber} onChange={set('businessRegNumber')} />
+              <label htmlFor="businessRegNumber">{t('CR number (Commercial Registration)')}</label>
+              <input id="businessRegNumber" required inputMode="numeric" pattern="[0-9]{1,7}([\-/][0-9]{1,4})?" placeholder="12345-1" dir="ltr" value={form.businessRegNumber} onChange={set('businessRegNumber')} />
+              <div className="hint">{t('As shown on Sijilat: the CR number, then the branch number.')}</div>
             </div>
           </div>
         </>
@@ -192,7 +193,7 @@ function KycForm({ isBusiness, onDone }) {
       {needsBack && <FileField name="docBack" label={t('Back of ID')} required onChange={setFile} />}
       <FileField name="selfie" label={t('Selfie')} hint={t('Look straight at the camera in good light. No hats or sunglasses.')} capture="user" required onChange={setFile} />
       {isBusiness && (
-        <FileField name="businessDoc" label={t('Business registration document')} accept="image/jpeg,image/png,image/webp,application/pdf" hint={t('Photo or PDF.')} required onChange={setFile} />
+        <FileField name="businessDoc" label={t('CR certificate (from Sijilat)')} accept="image/jpeg,image/png,image/webp,application/pdf" hint={t('Photo or PDF.')} required onChange={setFile} />
       )}
       <button className="btn block" disabled={busy}>{busy ? t('Uploading…') : t('Submit for verification')}</button>
     </form>

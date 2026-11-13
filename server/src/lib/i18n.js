@@ -15,7 +15,7 @@ export function langOf(req) {
 const FIELDS = {
   en: {
     accountType: 'Account type', budgetMax: 'Maximum budget', budgetMin: 'Minimum budget', businessName: 'Business name',
-    businessRegNumber: 'Registration number', category: 'Category', city: 'City', code: 'Code', comment: 'Comment',
+    businessRegNumber: 'CR number', category: 'Category', city: 'City', code: 'Code', comment: 'Comment',
     conversationId: 'Conversation', country: 'Country', currency: 'Currency', currentPassword: 'Current password',
     dateOfBirth: 'Date of birth', decision: 'Decision', description: 'Details', displayName: 'Name', email: 'Email',
     idNumber: 'ID number', idType: 'ID type', legalName: 'Full legal name', listingId: 'Request', message: 'Message',
@@ -63,6 +63,8 @@ const AR = {
   "Please don't put phone numbers, links or emails in the ad. People reply through the ad's chat on Unc, so your number stays private.": 'من فضلك لا تضع أرقام هواتف أو روابط أو بريداً إلكترونياً في الإعلان. يرد الناس عبر محادثة الإعلان على Unc، فيبقى رقمك خاصاً.',
   'You already have an open ad with this title. Edit that one instead of posting it again.': 'لديك إعلان مفتوح بهذا العنوان. عدّله بدلاً من نشره مرة أخرى.',
   'You can post up to 5 ads a day. Please try again tomorrow.': 'يمكنك نشر 5 إعلانات في اليوم كحد أقصى. حاول مرة أخرى غداً.',
+  'Please enter your CR number as it appears on Sijilat, for example 12345-1.': 'من فضلك أدخل رقم السجل التجاري كما يظهر في سجلات، مثل 12345-1.',
+  'This CR is already used by another business account on Unc.': 'هذا السجل التجاري مستخدم في حساب تجاري آخر على Unc.',
   'Only open requests can be edited.': 'يمكن تعديل الطلبات المفتوحة فقط.',
   'Only the person who posted this request can change it.': 'فقط صاحب هذا الطلب يمكنه تغييره.',
   'That conversation is not about this request.': 'هذه المحادثة لا تخص هذا الطلب.',

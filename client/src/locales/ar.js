@@ -1268,4 +1268,8 @@ export default {
   "Have one of these? Make an offer.": "لديك واحد منها؟ قدّم عرضاً.",
   "Listed {time} in {place}": "نُشر {time} في {place}",
   "Hi, is this still available?": "مرحباً، هل ما زال متاحاً؟",
+  // ---- Businesses (session 88) ----
+  "CR number (Commercial Registration)": "رقم السجل التجاري",
+  "As shown on Sijilat: the CR number, then the branch number.": "كما يظهر في سجلات: رقم السجل ثم رقم الفرع.",
+  "CR certificate (from Sijilat)": "شهادة السجل التجاري (من سجلات)",
 };
