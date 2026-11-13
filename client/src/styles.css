@@ -8,7 +8,8 @@
        RED    = a negative one (Decline, Close, Remove, Report, Delete)
        BLUE   = neutral steps and "you are here" (Search, Log in, Save,
                 links, the selected chip/tab)
-       YELLOW = careful (safety warnings), and the logo dot
+       RED also = warnings / be careful (session 87; was yellow)
+       YELLOW = only the logo dot
        GREY   = everything else.
      Session 62's dark look is in git history (ADR-060). */
   color-scheme: light;
@@ -26,8 +27,10 @@
   --accent-soft: #fff6d6;
   --ok: #15803d;
   --ok-soft: #dcfce7;
-  --warn: #8a5a00;
-  --warn-soft: #fff3d6;
+  /* Warnings are RED (session 87): same as --bad, so 'be careful'
+     looks dangerous without reading. */
+  --warn: #c62828;
+  --warn-soft: #fdecea;
   --bad: #c62828;
   --bad-soft: #fdecea;
   --radius: 6px;
@@ -384,7 +387,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .story figcaption { gap: .5rem; flex-wrap: nowrap; }
 .story-form { display: grid; gap: .5rem; margin-top: .75rem; padding-top: .75rem; border-top: 1px dashed var(--border); }
 .earned { display: inline-flex; flex-wrap: wrap; gap: .3rem; vertical-align: middle; }
-.earned .badge { background: var(--warn-soft); color: var(--warn); }
+.earned .badge { background: var(--ok-soft); color: var(--ok); }
 .earned .badge.earned-new { background: var(--ok-soft); color: var(--ok); }
 
 /* ===== Shop pages (session 24) ===== */
@@ -393,7 +396,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .shop-cover-preview { display: block; width: 100%; max-width: 100%; height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
 .shop-cover-preview.empty { display: grid; place-items: center; color: var(--muted); font-size: .9rem; background: var(--bg); text-align: center; padding: 1rem; }
 .open-now { color: #0a7a3d; font-weight: 600; }
-.closed-now { color: #b45309; font-weight: 600; }
+.closed-now { color: var(--bad); font-weight: 600; }
 .shop-hours table { width: 100%; margin-top: .75rem; border-collapse: collapse; }
 .shop-hours th { text-align: start; font-weight: 500; padding: .35rem 0; }
 .shop-hours td { text-align: end; padding: .35rem 0; }
@@ -444,12 +447,12 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .compare-sort select { width: auto; margin: 0; }
 
 /* Scam warning under a message (session 31) */
-.scam-warning { margin-top: .4rem; padding: .45rem .6rem; border-radius: 8px; background: var(--warn-soft); color: var(--warn); border: 1px solid #f0d9a8; font-size: .8rem; }
+.scam-warning { margin-top: .4rem; padding: .45rem .6rem; border-radius: 8px; background: var(--warn-soft); color: var(--warn); border: 1px solid #f5c2c0; font-size: .8rem; }
 .linkish.small { font-size: .875rem; } /* .linkish's 'font: inherit' came after .small and undid it (session 31) */
 
 /* Expiry + tips on your own request (session 31) */
-.expiry-soon { color: #b45309; font-weight: 600; }
-.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 6px; background: var(--warn-soft); border: 1px solid #f0d9a8; font-size: .9rem; }
+.expiry-soon { color: var(--bad); font-weight: 600; }
+.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 6px; background: var(--brand-soft); border: 1px solid #c9dafb; font-size: .9rem; }
 .tips ul { margin: .35rem 0 .4rem; padding-inline-start: 1.1rem; }
 
 /* "What people are asking for" (session 34) */
@@ -505,7 +508,7 @@ form.deal-problem { display: grid; gap: .5rem; padding: .75rem 1rem; border-bott
 .list-bar { display: block; height: 100%; background: var(--brand); border-start-end-radius: 4px; border-end-end-radius: 4px; }
 
 /* Away mode (session 37) */
-.activity.away { color: var(--warn); font-weight: 600; }
+.activity.away { color: var(--muted); font-weight: 600; }
 
 /* Pickup checklist + big-deal card (session 37) */
 .pickup { padding: .5rem 1rem; border-bottom: 1px solid var(--border); display: grid; gap: .5rem; }
@@ -874,7 +877,7 @@ a.req-card { display: flex; flex-direction: column; }
 }
 
 /* ===== Request page with offers (session 77) ===== */
-.sample-note { background: var(--warn-soft); color: var(--warn); border-radius: 4px; padding: .4rem .6rem; margin: .5rem 0 0; }
+.sample-note { background: var(--surface-2); color: var(--muted); border-radius: 4px; padding: .4rem .6rem; margin: .5rem 0 0; }
 .detail-price { font-size: 1.7rem; font-weight: 800; margin: .1rem 0 .7rem; letter-spacing: -.01em; }
 .detail-facts { display: flex; gap: 0; margin-bottom: .9rem; border: 1px solid var(--border); border-radius: var(--radius); }
 .detail-facts span { flex: 1; padding: .55rem .8rem; display: flex; flex-direction: column; }
@@ -998,3 +1001,7 @@ a.req-card { display: flex; flex-direction: column; }
 .logo-word { font-weight: 800; letter-spacing: -.04em; color: var(--text); line-height: 1; }
 html.side-collapsed .side-logo .logo-word { display: none; }
 .linkish.bad-link { color: var(--bad); }
+
+/* 'Rate' reminders are a good next step (session 87): green, not a warning. */
+.badge.todo { background: var(--ok-soft); color: var(--ok); }
+.big-deal, .contact-nudge { border: 1px solid #f5c2c0; color: var(--bad); }

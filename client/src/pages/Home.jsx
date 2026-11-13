@@ -70,7 +70,7 @@ export default function Home() {
                 <bdi>{c.listing.title}</bdi> · {ago(c.lastMessageAt)}
               </div>
             </div>
-            {c.needsRating ? <span className="badge warn">{t('Rate')}</span> : <span className="unread-dot">{c.unread}</span>}
+            {c.needsRating ? <span className="badge todo">{t('Rate')}</span> : <span className="unread-dot">{c.unread}</span>}
           </Link>
         ))}
       </section>

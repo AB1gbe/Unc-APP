@@ -57,7 +57,7 @@ export default function Inbox() {
                       {c.myRole === 'buyer' ? t('Offer from seller') : t('Your offer')} · <bdi>{c.lastKind === 'accept' ? t('Offer accepted') : c.lastKind === 'decline' ? t('Offer declined') : c.lastKind === 'proof-ask' ? t('Proof photo asked for') : c.lastMessage || (c.lastPrice != null ? `💰 ${money(c.lastPrice, c.listing.currency)}` : c.lastVideo ? t('Video') : t('Photo'))}</bdi>
                     </div>
                   </div>
-                  {c.needsRating && <span className="badge warn">{t('Rate')}</span>}
+                  {c.needsRating && <span className="badge todo">{t('Rate')}</span>}
                   {c.unread > 0 && <span className="unread-dot">{c.unread}</span>}
                 </Link>
               ))}
