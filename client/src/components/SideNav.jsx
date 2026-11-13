@@ -7,6 +7,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { LANGUAGES, t, useLanguage } from '../i18n.jsx';
 import Icon from './Icon.jsx';
+import Logo from './Logo.jsx';
 import { Avatar } from './ui.jsx';
 
 // Collapsed or open is remembered on this device (session 72).
@@ -32,7 +33,7 @@ export default function SideNav({ unread, bell }) {
   return (
     <aside className="sidenav">
       <div className="side-top">
-        <Link to="/" className="logo side-logo">un<span>c</span></Link>
+        <Link to="/" className="logo side-logo" aria-label="Unc"><Logo size={30} /></Link>
         <button type="button" className="side-toggle" onClick={() => setCollapsed((c) => !c)}
           aria-expanded={!collapsed} aria-label={collapsed ? t('Open the menu') : t('Close the menu')} title={collapsed ? t('Open the menu') : t('Close the menu')}>
           <Icon name="sidebar" size="1.35em" />
@@ -45,6 +46,7 @@ export default function SideNav({ unread, bell }) {
         <Item to="/jobs" icon="briefcase" label={t('Jobs')} />
         <Item to="/browse" icon="search" label={t('Wanted')} />
         <Item to="/shops" icon="shop" label={t('Shops')} />
+        {user?.accountType === 'business' && <Item to="/business" icon="chart" label={t('Business panel')} />}
         {user && <Item to="/me" icon="user" label={t('My Unc')} />}
         {user && <Item to="/messages" icon="chat" label={t('Messages')} count={unread} />}
         {user && <Item to="/notifications" icon="bell" label={t('Notifications')} count={bell} className="bell" />}
@@ -52,7 +54,7 @@ export default function SideNav({ unread, bell }) {
         {user?.role === 'admin' && <Item to="/admin" icon="admin" label={t('Admin')} />}
       </nav>
       {user
-        ? <Link className="btn side-post" to="/requests/new?section=forsale" title={t('Post an ad')}><Icon name="plus" weight="bold" /> <span className="side-label">{t('Post an ad')}</span></Link>
+        ? <Link className="btn ok side-post" to="/requests/new?section=forsale" title={t('Post an ad')}><Icon name="plus" weight="bold" /> <span className="side-label">{t('Post an ad')}</span></Link>
         : <Link className="btn side-post" to="/register" title={t('Sign up')}><Icon name="user" weight="bold" /> <span className="side-label">{t('Sign up')}</span></Link>}
       <div className="side-bottom">
         <button className="side-lang" onClick={() => setLang(other)} lang={other} title={t('Change language')}>

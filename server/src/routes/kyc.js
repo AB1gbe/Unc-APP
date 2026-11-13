@@ -56,7 +56,20 @@ export function kycRoutes(db) {
     const idNumber = v.str(req.body, 'idNumber', { min: 4, max: 40 }).replace(/[\s-]/g, '').toUpperCase();
     const isBusiness = user.account_type === 'business';
     const businessName = isBusiness ? v.str(req.body, 'businessName', { min: 2, max: 120 }) : null;
-    const businessRegNumber = isBusiness ? v.str(req.body, 'businessRegNumber', { min: 2, max: 60 }) : null;
+    // Businesses need a Bahrain Commercial Registration (CR, from Sijilat),
+    // written like 12345-1: the CR number, then the branch (session 88).
+    // "12345", "12345/1" and spaces are accepted and stored as 12345-1.
+    const rawCr = isBusiness ? v.str(req.body, 'businessRegNumber', { min: 2, max: 60 }).replace(/\s+/g, '').replace('/', '-') : null;
+    if (isBusiness && !/^\d{1,7}(-\d{1,4})?$/.test(rawCr)) {
+      throw new HttpError(400, 'Please enter your CR number as it appears on Sijilat, for example 12345-1.', { field: 'businessRegNumber' });
+    }
+    const businessRegNumber = isBusiness ? (rawCr.includes('-') ? rawCr : `${rawCr}-1`) : null;
+    // One CR = one business account on Unc.
+    if (isBusiness && db.prepare(`
+      SELECT 1 FROM kyc_submissions WHERE business_reg_number = ? AND user_id <> ? AND status IN ('pending', 'approved')
+    `).get(businessRegNumber, user.id)) {
+      throw new HttpError(409, 'This CR is already used by another business account on Unc.', { field: 'businessRegNumber' });
+    }
 
     if (v.ageOn(dateOfBirth) < config.minAge) {
       throw new HttpError(400, `You must be at least ${config.minAge} years old.`, { field: 'dateOfBirth' });

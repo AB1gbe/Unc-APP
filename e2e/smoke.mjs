@@ -46,7 +46,7 @@ async function onboard(name, email, type) {
   await p.click('button:has-text("Start verification")');
   await p.fill('#legalName', name + ' Legal'); await p.fill('#dateOfBirth', '1990-04-03'); await p.fill('#country', 'United States');
   await p.selectOption('#idType', 'national_id'); await p.fill('#idNumber', 'ID' + Math.floor(Math.random() * 1e9));
-  if (type === 'business') { await p.fill('#businessName', name + ' LLC'); await p.fill('#businessRegNumber', 'REG-55'); await p.setInputFiles('#businessDoc', img); }
+  if (type === 'business') { await p.fill('#businessName', name + ' LLC'); await p.fill('#businessRegNumber', '23456-1'); await p.setInputFiles('#businessDoc', img); }
   await p.setInputFiles('#docFront', img); await p.setInputFiles('#docBack', img); await p.setInputFiles('#selfie', img);
   await shot(p, `03-kyc-form-${type}`);
   await p.click('button:has-text("Submit for verification")');
@@ -535,5 +535,28 @@ await vendor.fill('#message', 'Is it still available?');
 await vendor.click('button:has-text("Send message")');
 await vendor.waitForURL('**/messages/*');
 await shot(vendor, '42-for-sale-reply');
+// Business panel (session 88): the shop buys ad credit, posts a paid ad
+// (the form says what it costs), and finds the receipt.
+await vendor.goto(BASE + '/business?tab=billing');
+await vendor.waitForSelector('.pack');
+vendor.once('dialog', (d) => d.accept());
+await vendor.click('.pack >> nth=0 >> button');
+await vendor.waitForSelector('.stat-n:has-text("11.000")');
+await vendor.goto(BASE + '/requests/new?section=jobs');
+await vendor.waitForSelector('.alert.info:has-text("paid from your ad credit")');
+await vendor.fill('#title', 'Shop assistant, weekends');
+await vendor.selectOption('#category', 'Sales & retail');
+await vendor.fill('#description', 'Help customers in the shop on Fridays and Saturdays.');
+await vendor.selectOption('#jobType', 'part-time');
+await vendor.click('button:has-text("Post ad")');
+await vendor.waitForSelector('h1:has-text("Shop assistant, weekends")');
+await vendor.goto(BASE + '/business?tab=billing');
+await vendor.waitForSelector('.stat-n:has-text("6.000")');
+await vendor.click('td a[href^="/business/receipts/"]');
+await vendor.waitForSelector('.receipt:has-text("UNC-")');
+await shot(vendor, '50-business-receipt');
+await vendor.goto(BASE + '/business');
+await vendor.waitForSelector('.stats-grid');
+await shot(vendor, '51-business-dashboard');
 console.log('E2E OK');
 await browser.close();

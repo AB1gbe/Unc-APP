@@ -96,7 +96,7 @@ function HeldAds({ onChange }) {
           <div className="muted small"><bdi>{a.poster.displayName}</bdi> · <bdi>{a.city}</bdi> · {formatDateTime(toDate(a.heldAt))}</div>
           <div className="row" style={{ marginTop: '.5rem' }}>
             <button className="btn sm ok" onClick={() => decide(a.id, 'approve')}>{t('Approve')}</button>
-            <button className="btn sm secondary" onClick={() => decide(a.id, 'remove')}>{t('Remove')}</button>
+            <button className="btn sm danger" onClick={() => decide(a.id, 'remove')}>{t('Remove')}</button>
           </div>
         </div>
       ))}

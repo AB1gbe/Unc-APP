@@ -95,7 +95,7 @@ export default function Browse() {
         <div className="card empty">
           <p>{t("Nobody's asked for that yet. Looking for it yourself? Post it and let sellers come to you.")}</p>
           {params.toString() && <button type="button" className="btn secondary" onClick={clear} style={{ marginInlineEnd: '.5rem' }}>{t('Clear all')}</button>}
-          {user && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
+          {user && <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>}
         </div>
       ) : (
         <div className="grid">

@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { Loading } from './ui.jsx';
+import Logo from './Logo.jsx';
 import TabBar from './TabBar.jsx';
 import SideNav from './SideNav.jsx';
 import { usePolling } from '../hooks.js';
@@ -56,7 +57,7 @@ export default function Layout() {
       {/* Phones and small tablets: a slim app header; the tabs are at the bottom. */}
       <header className="topbar">
         <div className="topbar-inner">
-          <Link to="/" className="logo">un<span>c</span></Link>
+          <Link to="/" className="logo" aria-label="Unc"><Logo size={26} /></Link>
           <nav className="nav">
             {user && <NavLink to="/me" className="top-bell" aria-label={t('My Unc')} title={t('My Unc')}><Icon name="user" size="1.5em" /></NavLink>}
             {user ? (
@@ -77,6 +78,7 @@ export default function Layout() {
           </nav>
         </div>
       </header>
+      {user?.actor && <ActingBanner user={user} />}
       {user && !user.emailVerified && (
         <div className="container" style={{ paddingBottom: 0 }}>
           <div className="alert warn" style={{ margin: 0 }}>{tj('Confirm your email to get started. {link}', { link: <Link to="/verify-email">{t('Enter code')}</Link> })}</div>
@@ -96,5 +98,17 @@ export default function Layout() {
       <TabBar unread={unread} loggedIn={loggedIn} />
       <Celebrations />
     </>
+  );
+}
+
+// Shown while a team member uses a business account (session 88).
+function ActingBanner({ user }) {
+  const { refresh } = useAuth();
+  const back = async () => { await api('/team/switch-back', { method: 'POST' }); await refresh(); window.location.assign('/team'); };
+  return (
+    <div className="acting-bar" role="status">
+      <Icon name="team" /> {tj('You are using {business} as {name}.', { business: <b><bdi>{user.displayName}</bdi></b>, name: <bdi>{user.actor.displayName}</bdi> })}
+      <button type="button" className="btn sm secondary" onClick={back}>{t('Switch back')}</button>
+    </div>
   );
 }

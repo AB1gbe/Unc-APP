@@ -39,7 +39,7 @@ export async function setup() {
     await agent.post('/api/auth/verify-email').send({ code: reg.body.devCode }).expect(200);
     if (stage === 'email') return agent;
     // Business accounts also need a business name, number and document.
-    const business = accountType === 'business' ? { businessName: `Test Shop ${n}`, businessRegNumber: `CR-${n}-1234` } : {};
+    const business = accountType === 'business' ? { businessName: `Test Shop ${n}`, businessRegNumber: `${10000 + n}-1` } : {};
     const sub = await kyc(agent, { idNumber: `ID-${n}-0000${n}`, ...business }, { businessDoc: accountType === 'business' }).expect(201);
     if (stage === 'pending') return agent;
     await admin.post(`/api/admin/kyc/${sub.body.submission.id}/decision`).send({ decision: 'approved' }).expect(200);

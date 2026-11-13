@@ -95,3 +95,12 @@ Phone tab bar (session 74): floating glass bar (blur, see-through, rounded), tab
 
 ## Session 85: light colours
 Since [[ADR-073 Marketplace layout and light colours]] the app is light: page `#f0f2f5`, cards `#ffffff`, second surface `#e9ebee`, text `#1c1e21`, muted `#65676b`, borders `#dadde1`, coral `#e8552a` with white text, soft coral `#fdebe4`. All in `:root` at the top of `client/src/styles.css`. Theme colour `#ffffff` (`index.html`, `manifest.webmanifest`).
+
+## Session 85 (later): white, grey, blue, yellow
+Replaced the coral: [[ADR-074 White, grey, blue and yellow]]. In `:root` of `client/src/styles.css`: `--brand` = blue #1f5fd6 (buttons, links), `--accent` = yellow #ffc928 with `--accent-ink` #1a1a1a (Sell / Post an ad via `.btn.accent`, the side-bar post button, the centre tab, the selected chip and tab, the "Looking for" tag, the dot after the logo).
+
+## Logo (session 85)
+See [[ADR-075 Logo]]. Tile `client/public/icons/logo-mark.svg`, component `client/src/components/Logo.jsx`, icons via `node scripts/make-icons.mjs`.
+
+## Colours that mean something (session 86)
+See [[ADR-076 Colours that mean something]]. When adding a button: positive buy/sell step → `btn ok`; negative → `btn danger` (can't undo) or `btn danger-outline`; neutral → `btn` (blue) or `btn secondary`; red text link → `linkish bad-link`.

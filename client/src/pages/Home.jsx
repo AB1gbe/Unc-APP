@@ -8,6 +8,7 @@ import { partOfDay, season } from '../seasons.js';
 import { useApi } from '../hooks.js';
 import { t, tj, tn } from '../i18n.jsx';
 import LivePulse from '../components/LivePulse.jsx';
+import Icon from '../components/Icon.jsx';
 
 // Written out in full so the translation test can find every text.
 const GREETING = {
@@ -45,9 +46,12 @@ export default function Home() {
             <div className="muted small">{SEASON[season()]?.() ?? t('Here is what is happening with your requests and offers.')}</div>
           </div>
         </div>
-        <Link className="btn hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
+        <Link className="btn ok hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
       </div>
 
+      {user.accountType === 'business' && (
+        <Link to="/business" className="card biz-link"><Icon name="chart" /> <b>{t('Business panel')}</b> <span className="muted small">{t('Your ads, numbers, billing and team')}</span> <span className="flip">→</span></Link>
+      )}
       <LivePulse />
       <ProfileChecklist user={user} />
 
@@ -70,7 +74,7 @@ export default function Home() {
                 <bdi>{c.listing.title}</bdi> · {ago(c.lastMessageAt)}
               </div>
             </div>
-            {c.needsRating ? <span className="badge warn">{t('Rate')}</span> : <span className="unread-dot">{c.unread}</span>}
+            {c.needsRating ? <span className="badge todo">{t('Rate')}</span> : <span className="unread-dot">{c.unread}</span>}
           </Link>
         ))}
       </section>
@@ -83,7 +87,7 @@ export default function Home() {
         {mine.loading ? <CardsLoading /> : openRequests.length === 0 ? (
           <div className="card empty">
             <p>{t('Looking for something? Post it and let sellers come to you.')}</p>
-            {isVerified(user) && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
+            {isVerified(user) && <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>}
           </div>
         ) : (
           <div className="grid">

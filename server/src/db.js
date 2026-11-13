@@ -565,6 +565,60 @@ const MIGRATIONS = [
   ALTER TABLE listings RENAME COLUMN section_new TO section;
   CREATE INDEX idx_listings_section ON listings(section, status, created_at);
   `,
+  // 44: businesses (session 88). Like Craigslist, businesses pay for ads
+  // (For sale, Housing, Jobs); people never do. Money is kept in fils
+  // (1000 = BD 1.000).
+  // - ad_credit: a business's prepaid ad balance (+ pack bought, - ad paid).
+  // - ad_payments: every card payment, with a receipt number.
+  // - team_members / team_invites: staff who post for the business. A staff
+  //   member "switches to" the business: the session's user is the
+  //   business, actor_id is the staff member (shown in the audit log).
+  `
+  CREATE TABLE ad_credit (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    amount     INTEGER NOT NULL,
+    reason     TEXT NOT NULL CHECK (reason IN ('pack', 'ad', 'refund', 'grant')),
+    listing_id INTEGER REFERENCES listings(id) ON DELETE SET NULL,
+    payment_id INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX idx_ad_credit_user ON ad_credit(user_id, created_at);
+  CREATE TABLE ad_payments (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receipt_no   TEXT NOT NULL UNIQUE,
+    kind         TEXT NOT NULL CHECK (kind IN ('pack', 'ad')),
+    pack         TEXT,
+    amount       INTEGER NOT NULL,
+    credit       INTEGER NOT NULL DEFAULT 0,
+    listing_id   INTEGER REFERENCES listings(id) ON DELETE SET NULL,
+    card_brand   TEXT,
+    card_last4   TEXT,
+    provider_ref TEXT,
+    actor_id     INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX idx_ad_payments_user ON ad_payments(user_id, created_at);
+  ALTER TABLE listings ADD COLUMN paid_fils INTEGER;
+  ALTER TABLE listings ADD COLUMN posted_by INTEGER REFERENCES users(id) ON DELETE SET NULL;
+  CREATE TABLE team_members (
+    business_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (business_id, user_id)
+  );
+  CREATE INDEX idx_team_user ON team_members(user_id);
+  CREATE TABLE team_invites (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    business_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    email       TEXT NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (business_id, email)
+  );
+  CREATE INDEX idx_team_invites_email ON team_invites(email);
+  ALTER TABLE sessions ADD COLUMN actor_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

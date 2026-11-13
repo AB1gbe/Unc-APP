@@ -1,8 +1,8 @@
 // Used for both "post a new request" and "edit my request", and (session
 // 82) for Housing and Jobs ads: ?section=housing|jobs picks the form.
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { api, currencyName } from '../api.js';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { api, currencyName, moneyExact } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { ErrorBox, Loading } from '../components/ui.jsx';
 import { useMeta } from '../hooks.js';
@@ -26,6 +26,12 @@ export default function NewListing() {
   const [section, setSection] = useState(SECTION_ORDER.includes(params.get('section')) ? params.get('section') : 'wanted');
   const categories = section === 'wanted' ? meta.categories : (meta.sections?.[section] ?? []);
   const ad = section !== 'wanted';
+  // Businesses pay for ads (session 88): show the price before posting.
+  const [billing, setBilling] = useState(null);
+  useEffect(() => {
+    if (user.accountType === 'business' && !editing) api('/business/billing').then(setBilling).catch(() => {});
+  }, [user.accountType, editing]);
+  const price = ad && billing ? billing.prices[section] : 0;
   // The same scam check the server runs, as a warning while typing.
   const check = checkAd({ section, title: form.title, description: form.description, category: form.category,
     price: Number(section === 'housing' ? form.rent : section === 'forsale' ? form.price : form.budgetMin) || null, priceMax: Number(form.budgetMax) || null });
@@ -126,6 +132,14 @@ export default function NewListing() {
         <label htmlFor="description">{t('Details')}</label>
         <textarea id="description" required minLength={10} maxLength={3000} placeholder={section === 'forsale' ? t('Condition, age, what is included, where to collect it…') : section === 'housing' ? t('Size, floor, bills included, parking, available from…') : section === 'jobs' ? t('Duties, hours, experience needed, how to apply in the chat…') : t('Condition, model, size, colour, must-haves, deal-breakers…')} value={form.description} onChange={set('description')} />
       </div>
+      {price > 0 && (
+        <div className="alert info small">
+          {billing.credit >= price
+            ? t('This ad costs {price}, paid from your ad credit ({credit} left).', { price: moneyExact(price / 1000), credit: moneyExact(billing.credit / 1000) })
+            : t('This ad costs {price}. Your card ending {last4} will be charged when you post.', { price: moneyExact(price / 1000), last4: billing.card?.last4 ?? '' })}
+          {' '}<Link to="/business?tab=billing">{t('Buy ad credit')}</Link>
+        </div>
+      )}
       {check.block && <div className="alert error" role="alert">{t(check.block)}</div>}
       {!check.block && check.hold.length > 0 && <div className="alert warn" role="status">{t('This ad will be checked by the Unc team before it shows:')} {check.hold.map((h) => t(h)).join(', ')}</div>}
       {section === 'housing' && (
@@ -229,7 +243,7 @@ export default function NewListing() {
         <PhotoPicker id="images" files={images} onChange={setImages} max={6} existing={existing.length} />
         <div className="hint">{section === 'forsale' ? t('Clear photos of the real item sell faster.') : section === 'housing' ? t('Real photos of the place get more replies.') : section === 'jobs' ? t('A photo of the shop or workplace helps.') : t('A photo of what you want helps sellers understand.')}</div>
       </div>
-      <button className="btn block" disabled={busy || Boolean(check.block)}>{busy ? t('Saving…') : editing ? t('Save changes') : ad ? t('Post ad') : t('Post request')}</button>
+      <button className={`btn block ${editing ? '' : 'ok'}`} disabled={busy || Boolean(check.block)}>{busy ? t('Saving…') : editing ? t('Save changes') : ad ? t('Post ad') : t('Post request')}</button>
     </form>
   );
 }

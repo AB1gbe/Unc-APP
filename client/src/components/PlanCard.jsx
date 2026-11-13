@@ -54,7 +54,7 @@ export default function PlanCard({ conv, price }) {
                     <>
                       {p.late && <span className="badge bad">{t('Late')}</span>}{' '}
                       {iAmBuyer
-                        ? <button type="button" className="btn sm" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/paid`, { method: 'POST' }))}>{t("I've paid this")}</button>
+                        ? <button type="button" className="btn sm ok" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/paid`, { method: 'POST' }))}>{t("I've paid this")}</button>
                         : <button type="button" className="btn sm secondary" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/parts/${p.n}/confirm`, { method: 'POST' }))}>{t('Received')}</button>}
                     </>
                   )}
@@ -65,7 +65,7 @@ export default function PlanCard({ conv, price }) {
       {plan.status === 'proposed' && !plan.proposedByMe && (
         <div className="row">
           <button type="button" className="btn sm ok" disabled={busy} onClick={run(async () => { await api(`/plans/${plan.id}/respond`, { method: 'POST', body: { action: 'accept' } }); celebrate({ text: t('Plan agreed') }); })}>{t('Accept plan')}</button>
-          <button type="button" className="btn sm secondary" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/respond`, { method: 'POST', body: { action: 'decline' } }))}>{t('Not for me')}</button>
+          <button type="button" className="btn sm danger-outline" disabled={busy} onClick={run(() => api(`/plans/${plan.id}/respond`, { method: 'POST', body: { action: 'decline' } }))}>{t('Not for me')}</button>
         </div>
       )}
       {plan.status === 'proposed' && plan.proposedByMe && (
@@ -127,7 +127,7 @@ function ProposePlan({ conv, price, onDone }) {
       </div>
       <p className="small muted" style={{ margin: 0 }}>{t('About {each} each, {every}.', { each: money(each, conv.listing.currency), every: EVERY[form.every]() })}</p>
       <div className="row">
-        <button className="btn sm" disabled={busy}>{t('Suggest this plan')}</button>
+        <button className="btn sm ok" disabled={busy}>{t('Suggest this plan')}</button>
         <button type="button" className="btn sm secondary" onClick={() => setOpen(false)}>{t('Cancel')}</button>
       </div>
     </form>

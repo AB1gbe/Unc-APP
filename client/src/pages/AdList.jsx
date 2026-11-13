@@ -113,7 +113,7 @@ export default function AdList({ section }) {
             forsale: () => t('Things for sale in Bahrain from ID-checked people and shops. Ask in a private chat; meet to see it before you pay.'),
           }[section]()}</p>
         </div>
-        <Link className="btn" to={postTo}><Icon name="plus" weight="bold" /> {t('Post an ad')}</Link>
+        <Link className="btn ok" to={postTo}><Icon name="plus" weight="bold" /> {t('Post an ad')}</Link>
       </div>
       <form className="searchbar" onSubmit={apply}>
         <input type="search" enterKeyHint="search" placeholder={section === 'housing' ? t('Search flats, rooms, villas') : section === 'jobs' ? t('Search jobs') : t('Search things for sale')} {...field('q')} aria-label={t('Search')} />

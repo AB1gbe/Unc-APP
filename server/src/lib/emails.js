@@ -29,7 +29,7 @@ function layout(lang, title, bodyHtml, footer = FOOTER[lang]) {
   return `<!doctype html><html lang="${lang}" dir="${dir}"><body dir="${dir}" style="margin:0;background:#f6f7f9;font-family:Tahoma,Arial,Helvetica,sans-serif;color:#16181d">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px">
 <table role="presentation" width="100%" dir="${dir}" style="max-width:520px;background:#ffffff;border:1px solid #e3e6eb;border-radius:12px;text-align:${rtl ? 'right' : 'left'}" cellpadding="24"><tr><td>
-<div dir="ltr" style="font-size:22px;font-weight:800;text-align:${rtl ? 'right' : 'left'}">un<span style="color:#2f6fed">c</span></div>
+<div dir="ltr" style="font-size:22px;font-weight:800;text-align:${rtl ? 'right' : 'left'}"><span style="display:inline-block;width:28px;height:28px;line-height:26px;border-radius:7px;background:#1f5fd6;color:#ffffff;text-align:center;vertical-align:middle;font-size:20px">u</span> <span style="vertical-align:middle;color:#16181d">unc</span></div>
 <h1 style="font-size:20px;margin:16px 0 8px">${esc(title)}</h1>
 ${bodyHtml}
 <p style="color:#5d6573;font-size:12px;margin-top:24px">${footer}</p>
@@ -59,7 +59,7 @@ export function passwordResetEmail(token, language) {
   const lang = pick(language);
   const url = `${config.appUrl}/reset-password?token=${encodeURIComponent(token)}`;
   const mins = config.resetTokenMinutes;
-  const button = (label) => `<p style="margin:20px 0"><a href="${esc(url)}" style="background:#2f6fed;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">${label}</a></p>`;
+  const button = (label) => `<p style="margin:20px 0"><a href="${esc(url)}" style="background:#1f5fd6;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">${label}</a></p>`;
   const rawLink = (label) => `<p style="color:#5d6573;font-size:12px;word-break:break-all">${label} <span dir="ltr">${esc(url)}</span></p>`;
   if (lang === 'ar') {
     return {
@@ -102,6 +102,27 @@ export function passwordChangedEmail(language) {
   };
 }
 
+// A business adds someone to its team (session 88). Member text (the
+// business name) goes through iso() and esc() like other emails.
+export function teamInviteEmail(businessName, language) {
+  const lang = pick(language);
+  const url = `${config.appUrl}/team`;
+  if (lang === 'ar') {
+    return {
+      subject: `دعوة للانضمام إلى فريق ${iso(businessName)} على Unc`,
+      text: `أضافك ${businessName} إلى فريقه على Unc. سجّل الدخول أو أنشئ حساباً بهذا البريد، ثم افتح: ${url}`,
+      html: layout(lang, 'دعوة للانضمام إلى فريق', `<p>أضافك <b>${esc(businessName)}</b> إلى فريقه على Unc، لتنشر الإعلانات وترد على العملاء باسمه.</p>
+<p>سجّل الدخول أو أنشئ حساباً بهذا البريد، ثم <a href="${esc(url)}">اقبل الدعوة</a>.</p>`),
+    };
+  }
+  return {
+    subject: `Join the ${iso(businessName)} team on Unc`,
+    text: `${businessName} added you to their team on Unc. Log in or sign up with this email, then open: ${url}`,
+    html: layout(lang, 'You were invited to a team', `<p><b>${esc(businessName)}</b> added you to their team on Unc, so you can post ads and answer customers for them.</p>
+<p>Log in or sign up with this email, then <a href="${esc(url)}">accept the invitation</a>.</p>`),
+  };
+}
+
 // To the buyer when a seller makes an offer on their request (session 17).
 // Only sent while the buyer's "Email me about new offers" switch is on;
 // the footer says where to turn it off.
@@ -112,7 +133,7 @@ export function newOfferEmail({ sellerName, title, message, offerPrice, currency
   const price = offerPrice == null ? null : formatMoney(offerPrice, { lang, currency });
   const snippet = message.length > 300 ? `${message.slice(0, 300)}…` : message;
   const quote = `<blockquote dir="${textDir(snippet)}" style="margin:16px 0;padding:12px 16px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap;text-align:${textDir(snippet) === 'rtl' ? 'right' : 'left'}">${esc(snippet)}</blockquote>`;
-  const button = (label) => `<p style="margin:20px 0"><a href="${esc(url)}" style="background:#2f6fed;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">${label}</a></p>`;
+  const button = (label) => `<p style="margin:20px 0"><a href="${esc(url)}" style="background:#1f5fd6;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700">${label}</a></p>`;
   if (lang === 'ar') {
     return {
       subject: `عرض جديد على «${iso(title)}»`,

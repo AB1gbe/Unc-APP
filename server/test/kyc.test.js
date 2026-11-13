@@ -52,7 +52,7 @@ test('the same ID document cannot verify two accounts', async () => {
 
 test('business accounts must upload a business document', async () => {
   const u = await t.user('email', 'business');
-  const res = await t.kyc(u, { businessName: 'Shop Ltd', businessRegNumber: 'REG1' });
+  const res = await t.kyc(u, { businessName: 'Shop Ltd', businessRegNumber: '30001-1' });
   assert.equal(res.status, 400);
   assert.equal(res.body.field, 'businessDoc');
 });
@@ -90,3 +90,20 @@ test('full ID numbers are never returned', async () => {
   assert.ok(!text.includes('id_number_hash'));
   assert.equal(own.body.submission.idNumberLast4.length, 4);
 });
+
+// Businesses need a Bahrain CR number (session 88).
+test('a business needs a real CR number, written like 12345-1, used by one account only', async () => {
+  const a = await t.user('email', 'business');
+  const b = await t.user('email', 'business');
+  const bad = await t.kyc(a, { idNumber: 'CRT-0001', businessName: 'Seef Gadgets', businessRegNumber: 'REG1' }, { businessDoc: true });
+  assert.equal(bad.status, 400);
+  assert.equal(bad.body.field, 'businessRegNumber');
+  const ok = await t.kyc(a, { idNumber: 'CRT-0001', businessName: 'Seef Gadgets', businessRegNumber: '45678 / 2' }, { businessDoc: true }).expect(201);
+  assert.equal(t.db.prepare('SELECT business_reg_number AS cr FROM kyc_submissions WHERE id = ?').get(ok.body.submission.id).cr, '45678-2');
+  // The same CR can't verify a second business.
+  const dup = await t.kyc(b, { idNumber: 'CRT-0002', businessName: 'Copy Shop', businessRegNumber: '45678-2' }, { businessDoc: true });
+  assert.equal(dup.status, 409);
+  // A number without a branch is stored as branch 1.
+  await t.kyc(b, { idNumber: 'CRT-0002', businessName: 'Other Shop', businessRegNumber: '98765' }, { businessDoc: true }).expect(201);
+});
+

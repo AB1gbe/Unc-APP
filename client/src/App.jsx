@@ -35,6 +35,9 @@ const Help = lazy(() => import('./pages/Help.jsx'));
 const Categories = lazy(() => import('./pages/Categories.jsx'));
 const Shops = lazy(() => import('./pages/Shops.jsx'));
 const AdList = lazy(() => import('./pages/AdList.jsx'));
+const Business = lazy(() => import('./pages/Business.jsx'));
+const Receipt = lazy(() => import('./pages/Business.jsx').then((m) => ({ default: m.Receipt })));
+const TeamPage = lazy(() => import('./pages/Team.jsx'));
 const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
@@ -49,6 +52,9 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Board />} />
         <Route path="me" element={<RequireAuth><Home /></RequireAuth>} />
+        <Route path="business" element={<RequireAuth><RequireVerified action="business"><Business /></RequireVerified></RequireAuth>} />
+        <Route path="business/receipts/:id" element={<RequireAuth><Receipt /></RequireAuth>} />
+        <Route path="team" element={<RequireAuth><TeamPage /></RequireAuth>} />
         <Route path="housing" element={<AdList section="housing" />} />
         <Route path="jobs" element={<AdList section="jobs" />} />
         <Route path="for-sale" element={<AdList section="forsale" />} />

@@ -286,3 +286,19 @@ Login only (**A**): no email, identity or card check, so members can ask for hel
 Listing objects gain `section`, `bedrooms`, `furnished`, `jobType`, `held`. `/api/meta` gains `sections: {housing, jobs}` and `jobTypes`. New notification kind `ad-reply` (and push text) for a reply to an ad; replies to ads don't send the offer email.
 
 Session 84: `section=forsale` everywhere a section is accepted. Posting For sale needs `price` and `condition` (`new`/`used`); the list filters `min`, `max`, `condition`. `/api/meta` `sections.forsale` = the 16 categories.
+
+## Businesses (session 88)
+| Method | Path | Who | Notes |
+|---|---|---|---|
+| GET | `/api/business/dashboard` | business | `{thisWeek, lastWeek: {views, replies, offersSent, adsPosted}, openAds, unread, credit}` |
+| GET | `/api/business/ads` | business | every ad/request with views, replies, paid, postedBy |
+| GET | `/api/business/billing` | business | `{prices, packs, credit, card, payments, isOwner}` |
+| POST | `/api/business/billing/packs` | owner | `{pack: pack10/pack25/pack50}` → card charged, credit added |
+| GET | `/api/business/billing/receipts/:id` | business | receipt with business name and CR |
+| GET/POST/DELETE | `/api/business/team`, `/team/invites`, `/team/invites/:id`, `/team/members/:userId` | owner | max 10 people |
+| GET | `/api/team` | logged in | my teams and invitations |
+| POST | `/api/team/invites/:id/accept`, `/decline` | logged in | email must match |
+| POST | `/api/team/switch/:businessId`, `/api/team/switch-back` | team member | new session as the business / back |
+| DELETE | `/api/team/:businessId` | team member | leave |
+
+`POST /api/listings` returns `paid: {amount, from: free/credit/card}`; 402 when the card is declined. `/api/auth/me` user has `actor` when a team member is using the business. Team members get 403 on owner-only paths (see `OWNER_ONLY` in `app.js`).

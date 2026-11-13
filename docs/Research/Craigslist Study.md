@@ -92,3 +92,24 @@ Craigslist is an **online noticeboard**, like the paper notes pinned up in a sup
 - [Bollier: Craigslist and the triumph of the commons](https://www.bollier.org/craigslist-and-triumph-commons)
 - [Mequoda: Craigslist design review](https://www.mequoda.com/articles/website-design/craigslist-website-design-review)
 - [NPR: Craigslist shuts down personals (2018)](https://www.npr.org/sections/thetwo-way/2018/03/23/596460672/craigslist-shuts-down-personals-section)
+
+## 7. How Craigslist charges businesses (session 88)
+Researched because the owner wants Unc to "take money from the businesses" like Craigslist.
+- **Per post, not a subscription.** A business pays for each ad when it posts it, in only some sections:
+  - job ads: about **$10–$75** depending on the city;
+  - apartments by brokers in New York, Boston and Chicago: about **$5**;
+  - cars and furniture "by dealer" in some areas: **$3–$5**.
+  
+  The price is shown on the posting page; fees are generally not refunded.
+- **Ordinary people post free** almost everywhere.
+- **Paid posting accounts** for businesses that post a lot:
+  - several staff ("authorised users") share one account;
+  - they can **pre-buy blocks of posts** instead of entering a card each time (one block per city and per type);
+  - invoices only after about $2,000 spent in 3 months.
+- **How Unc copies it:** [[ADR-077 Business accounts, paying for ads and teams]]:
+  - individuals free;
+  - businesses pay per ad (For sale BD 1, Housing BD 3, Jobs BD 5), or buy a pack of ad credit with a bonus (like Craigslist's blocks);
+  - team members share the business account;
+  - every payment has a receipt.
+
+Sources: [Craigslist posting fees](https://www.craigslist.org/about/help/posting_fees), [Craigslist paid posting accounts](https://www.craigslist.org/about/help/paid_posting_accounts), [paid posting account features](https://www.craigslist.org/about/help/billing/paid-posting-account/features), [posting blocks](https://www.craigslist.org/about/help/billing/paid-posting-account/blocks), [Workable: posting jobs on Craigslist](https://resources.workable.com/tutorial/how-to-post-jobs-on-craigslist).

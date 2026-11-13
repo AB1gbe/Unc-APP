@@ -13,7 +13,8 @@ export const SESSION_COOKIE = 'unc_session';
 
 export function loadUser(db) {
   const findSession = db.prepare(`
-    SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
+    SELECT u.*, s.actor_id AS session_actor_id, a.display_name AS session_actor_name
+    FROM sessions s JOIN users u ON u.id = s.user_id LEFT JOIN users a ON a.id = s.actor_id
     WHERE s.token_hash = ? AND s.expires_at > datetime('now')
   `);
   const touch = db.prepare(`UPDATE users SET last_seen_at = datetime('now') WHERE id = ?`);
@@ -21,6 +22,9 @@ export function loadUser(db) {
     const token = req.cookies?.[SESSION_COOKIE];
     req.user = token ? findSession.get(sha256(token)) || null : null;
     req.sessionTokenHash = token ? sha256(token) : null;
+    // A team member acting for a business (session 88): req.user is the
+    // business, req.actorId the staff member who is really using it.
+    req.actorId = req.user?.session_actor_id ?? null;
     // "Active now": remember when the member was last here, at most once a
     // minute, so the 4-second chat polls don't write on every request.
     // Not at all for members who chose "Hide when I'm online".
@@ -87,6 +91,8 @@ export function shopFields(u) {
 export function publicMe(u) {
   if (!u) return null;
   return {
+    // A team member using the business account (session 88).
+    actor: u.session_actor_id ? { id: u.session_actor_id, displayName: u.session_actor_name } : null,
     id: u.id,
     email: u.email,
     displayName: u.display_name,

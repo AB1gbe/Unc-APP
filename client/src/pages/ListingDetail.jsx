@@ -177,7 +177,7 @@ function AdReplyPanel({ listing }) {
           placeholder={jobs ? t('Your experience, when you can start, and a good time to talk…') : listing.section === 'forsale' ? t('Is it still available? When and where could I see it?') : t('When you would like to view it, how long you want to stay, who will live there…')} />
         {hasContacts(message) && <ContactNudge />}
       </div>
-      <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send message')}</button>
+      <button className="btn ok block" disabled={busy}>{busy ? t('Sending…') : t('Send message')}</button>
       <p className="hint"><Icon name="warning" /> {warn}</p>
     </form>
   );
@@ -210,7 +210,7 @@ function AdOwnerPanel({ listing, onChange }) {
             <button className="btn ok block" onClick={() => setStatus('fulfilled', { jobs: () => t('Mark the job as filled? The ad will close.'), forsale: () => t('Mark it as sold? The ad will close.'), housing: () => t('Mark the place as rented? The ad will close.') }[listing.section]())}>
               {{ jobs: () => t('Job filled'), forsale: () => t('Sold'), housing: () => t('Rented') }[listing.section]()}
             </button>
-            <button className="btn secondary block" onClick={() => setStatus('closed', t('Close this ad? Conversations about it will become read-only.'))}>{t('Close ad')}</button>
+            <button className="btn danger-outline block" onClick={() => setStatus('closed', t('Close this ad? Conversations about it will become read-only.'))}>{t('Close ad')}</button>
           </div>
         ) : (
           <button className="btn secondary block" onClick={() => setStatus('open', t('Reopen this ad?'))}>{t('Reopen ad')}</button>
@@ -320,7 +320,7 @@ function OfferPanel({ listing }) {
         )}
         <div className="hint">{t('Show it working: only this buyer can watch it.')}</div>
       </div>
-      <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send offer')}</button>
+      <button className="btn ok block" disabled={busy}>{busy ? t('Sending…') : t('Send offer')}</button>
       <p className="hint">{t('Never pay or ask for payment outside a method you trust. Report anything suspicious.')}</p>
     </form>
   );
@@ -371,7 +371,7 @@ function OwnerPanel({ listing, onChange }) {
           <div className="stack">
             <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>{t('Edit')}</Link>
             <button className="btn ok block" onClick={() => setPicking(true)}>{t('I found it!')}</button>
-            <button className="btn secondary block" onClick={() => confirmThen('closed', t('Close this request without buying? Conversations about it will become read-only.'))}>
+            <button className="btn danger-outline block" onClick={() => confirmThen('closed', t('Close this request without buying? Conversations about it will become read-only.'))}>
               {t('Close without buying')}
             </button>
           </div>
@@ -504,7 +504,7 @@ function RaiseBudget({ listing, onChange }) {
       <label htmlFor="raiseBudget" className="small">{t('New top budget ({currency})', { currency: currencyName(listing.currency) })}</label>
       <div className="row">
         <input id="raiseBudget" type="number" min={(listing.budgetMax ?? listing.budgetMin ?? 0) + 1} required value={amount} onChange={(e) => setAmount(e.target.value)} style={{ width: 120 }} />
-        <button className="btn sm" disabled={busy || amount === ''}>{t('Raise')}</button>
+        <button className="btn sm ok" disabled={busy || amount === ''}>{t('Raise')}</button>
         <button type="button" className="btn sm secondary" onClick={() => setOpen(false)}>{t('Cancel')}</button>
       </div>
       <p className="hint" style={{ margin: 0 }}>{t('Sellers who looked at or saved your request are told. Once a day.')}</p>
@@ -544,7 +544,7 @@ export function ReportLink({ listingId, conversationId }) {
   }
   return (
     <p className="small center" style={{ marginTop: '1rem' }}>
-      {sent ? <span className="muted">{t('Thanks — our team will review it.')}</span> : <button className="linkish" onClick={report}>{t('Report')}</button>}
+      {sent ? <span className="muted">{t('Thanks — our team will review it.')}</span> : <button className="linkish bad-link" onClick={report}>{t('Report')}</button>}
     </p>
   );
 }
