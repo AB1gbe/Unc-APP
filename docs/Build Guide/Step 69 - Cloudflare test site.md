@@ -42,3 +42,10 @@ Open http://localhost:8790. Browser tests against it: start wrangler with `--var
 
 ## E. Starting the test site over (wipe all its data)
 In `wrangler.jsonc`, add a new entry to `migrations`, e.g. `{ "tag": "v2", "deleted_classes": ["UncServer"] }` then `{ "tag": "v3", "new_sqlite_classes": ["UncServer"] }`, and merge. Ask Claude if unsure.
+
+## If builds stop (session 82)
+Symptom: you merge to `main` but unc.b1gbe.org doesn't change, and **unc-app → Settings → Builds** says "This project is disconnected from your Git account".
+1. On GitHub: **Settings → Applications → Installed GitHub Apps → Cloudflare Workers and Pages → Configure**. Under **Repository access**, make sure `AB1gbe/Unc-APP` is included (or "All repositories"). Save.
+2. In Cloudflare: **unc-app → Settings → Builds → Git repository → Disconnect**, then **Connect**, pick your GitHub account and `AB1gbe/Unc-APP`.
+3. Check the settings are still: production branch `main`, build command `npm run build`, deploy command `npm run deploy`, root directory `/`.
+4. **unc-app → Deployments**: a build of the newest `main` should start. If not, push any small change to `main` (or ask Claude to merge).
