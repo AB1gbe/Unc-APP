@@ -9,8 +9,9 @@ export const CURRENCIES = ['BHD'];
 
 // Craigslist-style sections (session 82). "wanted" = the original buyer
 // requests (CATEGORIES above); "housing" and "jobs" = ads posted by
-// landlords and employers, answered in the ad's chat.
-export const SECTIONS = ['wanted', 'housing', 'jobs'];
+// landlords and employers; "forsale" (session 84) = things people sell,
+// in the same categories as requests. All answered in the ad's chat.
+export const SECTIONS = ['wanted', 'housing', 'jobs', 'forsale'];
 export const HOUSING_CATEGORIES = ['Flats & apartments', 'Rooms & shared', 'Villas & houses', 'Offices & shops'];
 export const JOB_CATEGORIES = [
   'Sales & retail', 'Food & hospitality', 'Office & admin', 'Drivers & delivery',

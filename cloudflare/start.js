@@ -20,10 +20,16 @@ export async function start(env) {
   // ADMIN_PASSWORD secret: the default password is public (session 79).
   if (env.ADMIN_PASSWORD) await ensureAdmin(db);
   else console.warn('ADMIN_PASSWORD is not set: no admin account yet. Add it in the dashboard (Settings → Variables and Secrets).');
-  // A test site starts with the demo data (SEED_DEMO=1), once.
-  if (env.SEED_DEMO === '1' && !db.prepare(`SELECT 1 FROM users WHERE email = 'buyer@demo.local'`).get()) {
+  // A test site starts with the demo data (SEED_DEMO=1), once; and again
+  // once when new demo ads are added to the code (session 84: For sale).
+  // seedDemo() never adds the same demo item twice.
+  const { DEMO_ADS } = await import('../server/src/demo-ads.js');
+  const newest = DEMO_ADS.at(-1)[3];
+  const seeded = db.prepare(`SELECT 1 FROM users WHERE email = 'buyer@demo.local'`).get()
+    && db.prepare('SELECT 1 FROM listings WHERE title = ? AND sample = 1').get(newest);
+  if (env.SEED_DEMO === '1' && !seeded) {
     const { DEMO_REQUESTS } = await import('../server/src/demo-requests.js');
-    const names = [...DEMO_PHOTOS, ...DEMO_REQUESTS.map((r) => r[7])];
+    const names = [...DEMO_PHOTOS, ...DEMO_REQUESTS.map((r) => r[7]), ...DEMO_ADS.map((a) => a[13]).filter(Boolean)];
     for (const name of names) {
       const res = await env.ASSETS.fetch(new Request(`https://assets.local/demo-photos/${name}`));
       if (res.ok) fs.writeFileSync(`${process.env.DEMO_PHOTOS_DIR}/${name}`, new Uint8Array(await res.arrayBuffer()));

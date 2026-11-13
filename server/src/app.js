@@ -51,7 +51,7 @@ export function createApp(db) {
   app.use(loadUser(db));
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
-  app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES }, jobTypes: JOB_TYPES }));
+  app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES, forsale: CATEGORIES }, jobTypes: JOB_TYPES }));
   app.use('/api/auth', authRoutes(db));
   app.use('/api/kyc', kycRoutes(db));
   app.use('/api/listings', listingRoutes(db));

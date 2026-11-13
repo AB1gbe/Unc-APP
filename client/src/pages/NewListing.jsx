@@ -13,7 +13,7 @@ import CityField from '../components/CityField.jsx';
 import { checkAd } from '../../../shared/scam-check.js';
 import { JOB_TYPE_LABEL, SECTION_LABEL, SECTION_ORDER } from '../sections.js';
 
-const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'BHD', city: '', neededBy: '', contactRule: 'anyone', condition: 'any', rent: '', bedrooms: '', furnished: '', jobType: '' };
+const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'BHD', city: '', neededBy: '', contactRule: 'anyone', condition: 'any', rent: '', bedrooms: '', furnished: '', jobType: '', price: '' };
 
 export default function NewListing() {
   const { id } = useParams();
@@ -28,7 +28,7 @@ export default function NewListing() {
   const ad = section !== 'wanted';
   // The same scam check the server runs, as a warning while typing.
   const check = checkAd({ section, title: form.title, description: form.description, category: form.category,
-    price: Number(section === 'housing' ? form.rent : form.budgetMin) || null, priceMax: Number(form.budgetMax) || null });
+    price: Number(section === 'housing' ? form.rent : section === 'forsale' ? form.price : form.budgetMin) || null, priceMax: Number(form.budgetMax) || null });
   function pickSection(next) {
     setSection(next);
     setForm({ ...form, category: '' });
@@ -48,7 +48,7 @@ export default function NewListing() {
       setForm({
         title: l.title, description: l.description, category: l.category, budgetMin: l.budgetMin ?? '',
         budgetMax: l.budgetMax ?? '', currency: 'BHD', city: l.city, neededBy: l.neededBy ?? '', contactRule: l.contactRule ?? 'anyone', condition: l.condition ?? 'any',
-        rent: l.section === 'housing' ? l.budgetMin ?? '' : '', bedrooms: l.bedrooms ?? '', furnished: l.furnished == null ? '' : String(l.furnished), jobType: l.jobType ?? '',
+        rent: l.section === 'housing' ? l.budgetMin ?? '' : '', price: l.section === 'forsale' ? l.budgetMin ?? '' : '', bedrooms: l.bedrooms ?? '', furnished: l.furnished == null ? '' : String(l.furnished), jobType: l.jobType ?? '',
       });
       setExisting(l.photos ?? []);
       setLoaded(true);
@@ -108,12 +108,12 @@ export default function NewListing() {
           ))}
         </div>
       )}
-      <h1>{editing ? (ad ? t('Edit your ad') : t('Edit your request')) : section === 'housing' ? t('Post a housing ad') : section === 'jobs' ? t('Post a job ad') : t('What are you looking for?')}</h1>
+      <h1>{editing ? (ad ? t('Edit your ad') : t('Edit your request')) : section === 'forsale' ? t('Sell something') : section === 'housing' ? t('Post a housing ad') : section === 'jobs' ? t('Post a job ad') : t('What are you looking for?')}</h1>
       <p className="muted">{ad ? t('People reply in a private chat on Unc. Your number and email are never shown.') : t('Be specific — sellers will contact you privately about this request.')}</p>
       <ErrorBox error={error} />
       <div className="field">
         <label htmlFor="title">{t('Title')}</label>
-        <input id="title" required minLength={5} maxLength={100} placeholder={section === 'housing' ? t('e.g. 2 bedroom flat in Juffair, sea view') : section === 'jobs' ? t('e.g. Barista for a cafe in Seef') : t('e.g. Looking for an iPhone 15, 128GB, any colour')} value={form.title} onChange={set('title')} />
+        <input id="title" required minLength={5} maxLength={100} placeholder={section === 'forsale' ? t('e.g. iPhone 14 Pro, 256GB, purple') : section === 'housing' ? t('e.g. 2 bedroom flat in Juffair, sea view') : section === 'jobs' ? t('e.g. Barista for a cafe in Seef') : t('e.g. Looking for an iPhone 15, 128GB, any colour')} value={form.title} onChange={set('title')} />
       </div>
       <div className="field">
         <label htmlFor="category">{t('Category')}</label>
@@ -124,7 +124,7 @@ export default function NewListing() {
       </div>
       <div className="field">
         <label htmlFor="description">{t('Details')}</label>
-        <textarea id="description" required minLength={10} maxLength={3000} placeholder={section === 'housing' ? t('Size, floor, bills included, parking, available from…') : section === 'jobs' ? t('Duties, hours, experience needed, how to apply in the chat…') : t('Condition, model, size, colour, must-haves, deal-breakers…')} value={form.description} onChange={set('description')} />
+        <textarea id="description" required minLength={10} maxLength={3000} placeholder={section === 'forsale' ? t('Condition, age, what is included, where to collect it…') : section === 'housing' ? t('Size, floor, bills included, parking, available from…') : section === 'jobs' ? t('Duties, hours, experience needed, how to apply in the chat…') : t('Condition, model, size, colour, must-haves, deal-breakers…')} value={form.description} onChange={set('description')} />
       </div>
       {check.block && <div className="alert error" role="alert">{t(check.block)}</div>}
       {!check.block && check.hold.length > 0 && <div className="alert warn" role="status">{t('This ad will be checked by the Unc team before it shows:')} {check.hold.map((h) => t(h)).join(', ')}</div>}
@@ -157,7 +157,23 @@ export default function NewListing() {
           </select>
         </div>
       )}
-      {section !== 'housing' && (
+      {section === 'forsale' && (
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="price">{t('Price in {currency}', { currency: currencyName() })}</label>
+            <input id="price" type="number" min="1" required value={form.price} onChange={set('price')} />
+          </div>
+          <div className="field">
+            <label htmlFor="condition">{t('Condition')}</label>
+            <select id="condition" required value={form.condition === 'any' ? '' : form.condition} onChange={set('condition')}>
+              <option value="" disabled>{t('Choose')}</option>
+              <option value="new">{t('New')}</option>
+              <option value="used">{t('Used')}</option>
+            </select>
+          </div>
+        </div>
+      )}
+      {(section === 'jobs' || section === 'wanted') && (
       <div className="field">
         <label>{section === 'jobs' ? t('Pay per month in {currency}', { currency: currencyName() }) : t('Budget in {currency}', { currency: currencyName() })} <span className="muted">{t('(optional)')}</span></label>
         <div className="field-row">
@@ -211,7 +227,7 @@ export default function NewListing() {
           </div>
         )}
         <PhotoPicker id="images" files={images} onChange={setImages} max={6} existing={existing.length} />
-        <div className="hint">{section === 'housing' ? t('Real photos of the place get more replies.') : section === 'jobs' ? t('A photo of the shop or workplace helps.') : t('A photo of what you want helps sellers understand.')}</div>
+        <div className="hint">{section === 'forsale' ? t('Clear photos of the real item sell faster.') : section === 'housing' ? t('Real photos of the place get more replies.') : section === 'jobs' ? t('A photo of the shop or workplace helps.') : t('A photo of what you want helps sellers understand.')}</div>
       </div>
       <button className="btn block" disabled={busy || Boolean(check.block)}>{busy ? t('Saving…') : editing ? t('Save changes') : ad ? t('Post ad') : t('Post request')}</button>
     </form>

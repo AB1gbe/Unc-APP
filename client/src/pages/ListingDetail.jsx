@@ -54,6 +54,7 @@ export default function ListingDetail() {
             {l.section === 'housing' && <span><b>{l.bedrooms == null ? t('Not said') : l.bedrooms === 0 ? t('Studio') : l.bedrooms}</b><small>{t('Bedrooms')}</small></span>}
             {l.section === 'housing' && <span><b>{l.furnished == null ? t('Not said') : l.furnished ? t('Furnished') : t('Unfurnished')}</b><small>{t('Furnishing')}</small></span>}
             {l.section === 'jobs' && <span><b>{JOB_TYPE_LABEL[l.jobType]?.() ?? t('Not said')}</b><small>{t('Job type')}</small></span>}
+            {l.section === 'forsale' && <span><b>{l.condition === 'new' ? t('New') : t('Used')}</b><small>{t('Condition')}</small></span>}
           </div>
         ) : (
         <div className="detail-facts">
@@ -124,7 +125,9 @@ function AdReplyPanel({ listing }) {
   const jobs = listing.section === 'jobs';
   const warn = jobs
     ? t('Real employers never ask you to pay for a visa, training or a uniform.')
-    : t('Never pay a deposit before you have seen the place and met the owner.');
+    : listing.section === 'forsale'
+      ? t('Meet in a public place and check the item before you pay.')
+      : t('Never pay a deposit before you have seen the place and met the owner.');
 
   if (listing.status !== 'open') return <div className="card"><p className="muted">{t('This ad is no longer open.')}</p></div>;
   if (listing.myConversationId) {
@@ -163,7 +166,7 @@ function AdReplyPanel({ listing }) {
       <div className="field">
         <label htmlFor="message">{t('Message')}</label>
         <textarea id="message" required minLength={2} maxLength={2000} value={message} onChange={(e) => setMessage(e.target.value)}
-          placeholder={jobs ? t('Your experience, when you can start, and a good time to talk…') : t('When you would like to view it, how long you want to stay, who will live there…')} />
+          placeholder={jobs ? t('Your experience, when you can start, and a good time to talk…') : listing.section === 'forsale' ? t('Is it still available? When and where could I see it?') : t('When you would like to view it, how long you want to stay, who will live there…')} />
         {hasContacts(message) && <ContactNudge />}
       </div>
       <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send message')}</button>
@@ -196,8 +199,8 @@ function AdOwnerPanel({ listing, onChange }) {
         {listing.status === 'open' ? (
           <div className="stack">
             <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>{t('Edit')}</Link>
-            <button className="btn ok block" onClick={() => setStatus('fulfilled', listing.section === 'jobs' ? t('Mark the job as filled? The ad will close.') : t('Mark the place as rented? The ad will close.'))}>
-              {listing.section === 'jobs' ? t('Job filled') : t('Rented')}
+            <button className="btn ok block" onClick={() => setStatus('fulfilled', { jobs: () => t('Mark the job as filled? The ad will close.'), forsale: () => t('Mark it as sold? The ad will close.'), housing: () => t('Mark the place as rented? The ad will close.') }[listing.section]())}>
+              {{ jobs: () => t('Job filled'), forsale: () => t('Sold'), housing: () => t('Rented') }[listing.section]()}
             </button>
             <button className="btn secondary block" onClick={() => setStatus('closed', t('Close this ad? Conversations about it will become read-only.'))}>{t('Close ad')}</button>
           </div>

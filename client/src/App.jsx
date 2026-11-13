@@ -51,6 +51,7 @@ export default function App() {
         <Route path="me" element={<RequireAuth><Home /></RequireAuth>} />
         <Route path="housing" element={<AdList section="housing" />} />
         <Route path="jobs" element={<AdList section="jobs" />} />
+        <Route path="for-sale" element={<AdList section="forsale" />} />
         <Route path="browse" element={<Browse />} />
         <Route path="requests/new" element={<RequireAuth><RequireVerified action="post"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="requests/:id" element={<ListingDetail />} />

@@ -16,6 +16,7 @@ const ICONS = {
   shops: 'M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9h16M9 20v-6h6v6',
   categories: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
   housing: 'M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6',
+  forsale: 'M3 12V4h8l10 10-8 8zM7.5 7.5h.01',
   jobs: 'M4 8h16v12H4zM9 8V5h6v3M4 13h16',
 };
 const Icon = ({ name }) => (
@@ -30,6 +31,7 @@ export default function TabBar({ unread, loggedIn }) {
     return (
       <nav className="tabbar" aria-label={t('Main')}>
         <NavLink to="/" end><Icon name="home" /><span>{t('Home')}</span></NavLink>
+        <NavLink to="/for-sale"><Icon name="forsale" /><span>{t('For sale')}</span></NavLink>
         <NavLink to="/housing"><Icon name="housing" /><span>{t('Housing')}</span></NavLink>
         <NavLink to="/jobs"><Icon name="jobs" /><span>{t('Jobs')}</span></NavLink>
         <NavLink to="/browse"><Icon name="browse" /><span>{t('Wanted')}</span></NavLink>
@@ -39,9 +41,9 @@ export default function TabBar({ unread, loggedIn }) {
   return (
     <nav className="tabbar" aria-label={t('Main')}>
       <NavLink to="/" end><Icon name="home" /><span>{t('Home')}</span></NavLink>
+      <NavLink to="/for-sale"><Icon name="forsale" /><span>{t('For sale')}</span></NavLink>
+      <NavLink to="/requests/new?section=forsale" className="tab-post" aria-label={t('Post an ad')}><Icon name="post" /><span>{t('Post')}</span></NavLink>
       <NavLink to="/housing"><Icon name="housing" /><span>{t('Housing')}</span></NavLink>
-      <NavLink to="/requests/new?section=housing" className="tab-post" aria-label={t('Post an ad')}><Icon name="post" /><span>{t('Post')}</span></NavLink>
-      <NavLink to="/jobs"><Icon name="jobs" /><span>{t('Jobs')}</span></NavLink>
       <NavLink to="/messages">
         <span className="tab-icon"><Icon name="messages" />{unread > 0 && <span className="unread-dot">{unread > 99 ? '99+' : unread}</span>}</span>
         <span>{t('Messages')}</span>

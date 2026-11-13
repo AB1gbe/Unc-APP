@@ -189,3 +189,6 @@ See [[ADR-068 Marketplace first]].
 
 ## Migration 42 (session 82): sections
 - `listings.section` TEXT NOT NULL DEFAULT 'wanted' CHECK IN ('wanted','housing','jobs'); `bedrooms` INTEGER; `furnished` INTEGER (1/0/NULL); `job_type` TEXT CHECK IN ('full-time','part-time','contract'); `held_at`, `held_reason` (held by the scam checks; hidden from others); `checked_at` (approved by an admin; not held again). Housing rent is stored in `budget_min` = `budget_max`. Index `idx_listings_section(section, status, created_at)`. See [[ADR-071 Craigslist-style sections]].
+
+## Migration 43 (session 84): For sale
+- `listings.section` now also allows `'forsale'`. Done by swapping the column (add `section_new` with the new CHECK, copy, drop the index and the old column, rename, recreate `idx_listings_section`), because SQLite can't change a CHECK rule. No rows are deleted. For sale ads keep the asking price in `budget_min` = `budget_max` and New/Used in `item_condition`. See [[ADR-072 For sale section and calmer ad rows]].

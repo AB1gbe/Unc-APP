@@ -10,7 +10,7 @@ import { Loading } from '../components/ui.jsx';
 import { ShopsPreview } from '../components/Showcase.jsx';
 import Icon from '../components/Icon.jsx';
 import { SECTION_LABEL, SECTION_ORDER, SECTION_PATH } from '../sections.js';
-import { AdRow } from './AdList.jsx';
+import { AdRow, SampleNote } from './AdList.jsx';
 
 export default function Board() {
   const { user } = useAuth();
@@ -18,7 +18,7 @@ export default function Board() {
   const { data, loading } = useApi('/listings/sections');
   const navigate = useNavigate();
   const [q, setQ] = useState('');
-  const [section, setSection] = useState('housing');
+  const [section, setSection] = useState('forsale');
   const cats = (s) => (s === 'wanted' ? meta.categories : meta.sections?.[s] ?? []);
   const count = (s, c) => data?.sections?.[s]?.categories?.[c] ?? 0;
   const link = (s, c) => `${SECTION_PATH[s]}${c ? `?category=${encodeURIComponent(c)}` : ''}`;
@@ -34,9 +34,9 @@ export default function Board() {
       <section className="board-intro">
         <div>
           <h1>{t('Bahrain’s classifieds, with ID-checked people')}</h1>
-          <p className="muted">{t('Housing, jobs and things people want. Free to post. Every poster is ID-checked and replies stay in a private chat.')}</p>
+          <p className="muted">{t('Things for sale, housing, jobs and things people want. Free to post. Every poster is ID-checked and replies stay in a private chat.')}</p>
         </div>
-        <Link className="btn" to={user ? '/requests/new?section=housing' : '/register'}><Icon name="plus" weight="bold" /> {t('Post an ad')}</Link>
+        <Link className="btn" to={user ? '/requests/new?section=forsale' : '/register'}><Icon name="plus" weight="bold" /> {t('Post an ad')}</Link>
       </section>
       <form className="searchbar board-search" onSubmit={search}>
         <input type="search" enterKeyHint="search" placeholder={t('Search Unc')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('Search')} />
@@ -60,16 +60,17 @@ export default function Board() {
         ))}
       </div>
 
+      <SampleNote listings={Object.values(data?.latest ?? {}).flat()} />
       <div className="board-latest">
         {SECTION_ORDER.map((s) => (
           <section key={s}>
             <div className="section-head">
-              <h2>{s === 'housing' ? t('Newest housing') : s === 'jobs' ? t('Newest jobs') : t('Newest wanted')}</h2>
+              <h2>{{ forsale: () => t('Newest for sale'), housing: () => t('Newest housing'), jobs: () => t('Newest jobs'), wanted: () => t('Newest wanted') }[s]()}</h2>
               <Link to={SECTION_PATH[s]}>{t('See all')} <span className="flip">→</span></Link>
             </div>
             {loading ? <Loading /> : (data?.latest?.[s] ?? []).length === 0
               ? <p className="muted small">{t('No ads here yet.')}</p>
-              : <ul className="ad-list">{data.latest[s].map((l) => <AdRow key={l.id} listing={l} />)}</ul>}
+              : <ul className="ad-list">{data.latest[s].slice(0, 5).map((l) => <AdRow key={l.id} listing={l} />)}</ul>}
           </section>
         ))}
       </div>

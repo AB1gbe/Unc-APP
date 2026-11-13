@@ -102,3 +102,39 @@ test('the scam check by itself', () => {
   assert.deepEqual(checkAd({ section: 'jobs', category: 'IT & tech', price: 900, priceMax: 4000, description: 'Senior developer role' }).hold, ['Pay much higher than usual']);
   assert.deepEqual(checkAd({ section: 'housing', category: 'Rooms & shared', price: 80, description: 'Room near the souq' }), { block: null, hold: [] });
 });
+
+// For sale (session 84).
+const item = (o = {}) => ({ section: 'forsale', title: 'Used PS5 with two controllers', description: 'Works perfectly, box included.', category: 'Electronics', price: 150, condition: 'used', city: 'Riffa', ...o });
+
+test('for sale ads: an asking price and new/used, listed in their own section', async () => {
+  const seller = await t.user();
+  const ad = (await post(seller, item()).expect(201)).body.listing;
+  assert.deepEqual([ad.section, ad.budgetMin, ad.budgetMax, ad.condition, ad.held], ['forsale', 150, 150, 'used', false]);
+  await post(seller, item({ title: 'Another console', price: undefined })).expect(400);
+  await post(seller, item({ title: 'A third console', condition: 'any' })).expect(400);
+  await post(seller, item({ title: 'Cheap phone', description: 'Pay by gift card and I send it.' })).expect(400);
+  const list = (await t.request(t.app).get('/api/listings?section=forsale&condition=new').expect(200)).body.listings;
+  assert.ok(!list.some((l) => l.id === ad.id), 'the condition filter works');
+  const used = (await t.request(t.app).get('/api/listings?section=forsale&condition=used').expect(200)).body.listings;
+  assert.ok(used.some((l) => l.id === ad.id));
+  assert.ok((await t.request(t.app).get('/api/meta').expect(200)).body.sections.forsale.includes('Electronics'));
+});
+
+test('migration 43 keeps every listing, its section and its chats', async () => {
+  const { DatabaseSync } = await import('node:sqlite');
+  const { MIGRATION_SQL } = await import('../src/db.js');
+  const db = new DatabaseSync(':memory:');
+  db.exec('PRAGMA foreign_keys = ON;');
+  for (const sql of MIGRATION_SQL.slice(0, 42)) db.exec(sql);
+  db.prepare(`INSERT INTO users (email, password_hash, display_name, account_type) VALUES ('a@x', 'h', 'A', 'individual'), ('b@x', 'h', 'B', 'business')`).run();
+  db.prepare(`INSERT INTO listings (buyer_id, title, description, category, city, section) VALUES (1, 'Flat', 'A flat to rent', 'Flats & apartments', 'Juffair', 'housing')`).run();
+  db.prepare(`INSERT INTO conversations (listing_id, buyer_id, vendor_id) VALUES (1, 1, 2)`).run();
+  db.prepare(`INSERT INTO listing_images (listing_id, file) VALUES (1, 'x.jpg')`).run();
+  db.exec(MIGRATION_SQL[42]);
+  assert.equal(db.prepare('SELECT section FROM listings WHERE id = 1').get().section, 'housing');
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM conversations').get().n, 1);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM listing_images').get().n, 1);
+  db.prepare(`UPDATE listings SET section = 'forsale' WHERE id = 1`).run();
+  assert.throws(() => db.prepare(`UPDATE listings SET section = 'cars' WHERE id = 1`).run());
+  assert.ok(db.prepare(`EXPLAIN QUERY PLAN SELECT * FROM listings WHERE section = 'forsale' AND status = 'open' ORDER BY created_at`).all().some((r) => /idx_listings_section/.test(r.detail)));
+});

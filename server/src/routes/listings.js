@@ -488,7 +488,13 @@ function readListingBody(body) {
     data.furnished = f === undefined || f === null || f === '' ? null : (f === true || f === 'true' || f === '1' || f === 1 ? 1 : 0);
   }
   if (section === 'jobs') data.jobType = v.oneOf(body, 'jobType', JOB_TYPES);
-  if (section !== 'wanted') { data.condition = 'any'; data.neededBy = null; data.contactRule = 'anyone'; }
+  // For sale (session 84): one asking price, and new or used.
+  if (section === 'forsale') {
+    data.budgetMin = v.int(body, 'price', { min: 1, max: 10_000_000 });
+    data.budgetMax = data.budgetMin;
+    data.condition = v.oneOf(body, 'condition', ['new', 'used']);
+  }
+  if (section !== 'wanted') { if (section !== 'forsale') data.condition = 'any'; data.neededBy = null; data.contactRule = 'anyone'; }
   return data;
 }
 

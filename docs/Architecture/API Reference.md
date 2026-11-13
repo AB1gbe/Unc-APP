@@ -284,3 +284,5 @@ Login only (**A**): no email, identity or card check, so members can ask for hel
 | POST | `/api/admin/held-ads/:id/decision` | admin | `{decision: 'approve'\|'remove'}`; 🔔 `ad-approved` / `ad-removed` to the poster |
 
 Listing objects gain `section`, `bedrooms`, `furnished`, `jobType`, `held`. `/api/meta` gains `sections: {housing, jobs}` and `jobTypes`. New notification kind `ad-reply` (and push text) for a reply to an ad; replies to ads don't send the offer email.
+
+Session 84: `section=forsale` everywhere a section is accepted. Posting For sale needs `price` and `condition` (`new`/`used`); the list filters `min`, `max`, `condition`. `/api/meta` `sections.forsale` = the 16 categories.

@@ -165,13 +165,14 @@ export async function seedDemo(db) {
   // Demo prices are written in dollars above; turn them into Bahraini Dinar (session 80).
   db.exec(TO_BHD_SQL);
   // Housing and Jobs ads (session 82), already in BD.
-  for (const [email, section, category, title, description, price, priceMax, city, daysAgo, bedrooms, furnished, jobType] of DEMO_ADS) {
+  for (const [email, section, category, title, description, price, priceMax, city, daysAgo, bedrooms, furnished, jobType, condition = 'any', photo] of DEMO_ADS) {
     const who = db.prepare('SELECT id FROM users WHERE email = ?').get(email)?.id;
     if (!who || db.prepare('SELECT 1 FROM listings WHERE buyer_id = ? AND title = ?').get(who, title)) continue;
-    db.prepare(`
-      INSERT INTO listings (buyer_id, section, title, description, category, budget_min, budget_max, currency, city, bedrooms, furnished, job_type, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'BHD', ?, ?, ?, ?, datetime('now', ?), datetime('now', ?))
-    `).run(who, section, title, description, category, price, priceMax, city, bedrooms, furnished, jobType, `-${daysAgo} days`, `-${daysAgo} days`);
+    const id = Number(db.prepare(`
+      INSERT INTO listings (buyer_id, section, title, description, category, budget_min, budget_max, currency, city, bedrooms, furnished, job_type, item_condition, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'BHD', ?, ?, ?, ?, ?, datetime('now', ?), datetime('now', ?))
+    `).run(who, section, title, description, category, price, priceMax, city, bedrooms, furnished, jobType, condition, `-${daysAgo} days`, `-${daysAgo} days`).lastInsertRowid);
+    if (photo) db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(id, demoPhoto(LISTING_DIR, photo));
   }
   // Everything the seed made is sample data (session 77): labelled "Sample"
   // and left out of live counters and the activity list.
