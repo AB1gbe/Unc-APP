@@ -46,3 +46,13 @@ A held ad is hidden from lists, its page, link previews and replies until **Admi
 - `npm test`: `server/test/sections.test.js` (6 tests).
 - `node e2e/smoke.mjs`: posts a Housing ad through the form (the scam text is refused on screen first), finds it under Housing, replies, and checks the notification.
 - `e2e/arabic.mjs` and `e2e/devices.mjs` include `/`, `/housing`, `/jobs`, `/me` and the ad form.
+
+## For sale and calmer rows (session 84)
+See [[ADR-072 For sale section and calmer ad rows]] and [[Step 72 - For sale and calmer rows]].
+- **For sale** (`/for-sale`): things people and shops sell, in the same 16 categories as Wanted. The ad needs an asking price and New or Used. Filters: words, category, area, price, condition. Safety line: "Meet in a public place and check the item before you pay." The owner's button says **Sold**.
+- **Rows** everywhere (front page and lists): small photo (or the section's icon), title, price, one grey line such as "Juffair · 2 bedrooms · yesterday". One "Some ads here are samples" line above a list replaces the per-row badges.
+- **Front page:** For sale, Housing, Jobs, Wanted, as 4 columns on wide screens and 2×2 on smaller ones. On phones, 2×2 boxes without category lists; the whole box opens the section. Then the newest 5 of each section, two side by side on wide screens.
+- **Menus:** side bar adds For sale (first). Visitors' phone tabs: Home, For sale, Housing, Jobs, Wanted. Members' phone tabs: Home, For sale, Post, Housing, Messages. "Post an ad" opens the For sale form first.
+
+## Marketplace look (session 85)
+See [[ADR-073 Marketplace layout and light colours]]. The home page is now **Marketplace**: search, section chips (For sale, Housing, Jobs, Wanted with counts), **Today's picks** (newest For sale and Housing as a photo grid), newest jobs as rows, **What Bahrain is looking for** (Wanted as cards tagged "Looking for"), safety strip, shops. For sale and Housing lists are photo grids with category chips; Jobs stay rows. Ad pages open with one big photo, "Listed yesterday in Sitra", and For sale replies start as "Hi, is this still available?". Colours are light.

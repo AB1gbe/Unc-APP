@@ -68,6 +68,8 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 069 | [[ADR-069 Cloudflare test site]] | All Cloudflare: one Durable Object with SQLite runs the same app; auto-publish on main | PC + tunnel, small server, D1/R2 rewrite, Containers |
 | 070 | [[ADR-070 Bahraini Dinar only]] | Only BHD; "BD 120" / "120 د.ب"; old prices converted by migration 41 | keep five currencies, BHD as default, browser's own format |
 | 071 | [[ADR-071 Craigslist-style sections]] | Housing, Jobs and Wanted sections, Craigslist-style front page, scam checks with a review queue | Craigslist only, keep the old look, auto-hide on reports |
+| 072 | [[ADR-072 For sale section and calmer ad rows]] | For sale (16 categories, price + new/used); photo rows with one grey line; 2×2 section boxes on phones | text-only lines, photo grid, rebuilding the table |
+| 073 | [[ADR-073 Marketplace layout and light colours]] | Photo grid, Marketplace home with chips and Today's picks, light colours | rows only, dark or brighter-dark theme |
 | 068 | [[ADR-068 Marketplace first]] | Shops-not-prices on requests, full filters, sample flag, offer status, marketplace-first home | count only, everything public |
 | 067 | [[ADR-067 App-style side bar]] | Side bar on computers (folds to icons, remembered); slim header + tab bar on phones | top bar designs A/B/C |
 | 066 | [[ADR-066 Calm home page and tabs]] | Calm home; tabs Home/Requests/Shops/Categories; examples in every category | one long page, member-only tab bar |

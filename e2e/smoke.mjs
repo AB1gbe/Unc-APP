@@ -494,7 +494,7 @@ await shot(buyer, '53-help');
 
 // mobile view
 const m = await browser.newContext({ viewport: { width: 390, height: 844 } });
-const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.board-intro'); await mp.waitForSelector('.searchbar'); /* Craigslist-style front page (session 82) */ await mp.waitForSelector('.tabbar a[href="/housing"]'); /* …and the visitor tab bar */ await shot(mp, '14-mobile-home');
+const mp = await m.newPage(); await mp.goto(BASE + '/'); await mp.waitForSelector('.market-top'); await mp.waitForSelector('.market-search'); /* Craigslist-style front page (session 82) */ await mp.waitForSelector('.tabbar a[href="/housing"]'); /* …and the visitor tab bar */ await shot(mp, '14-mobile-home');
 // Housing ad (session 82): posted through the form, listed under Housing,
 // answered in a private chat; a scam-style ad is refused on screen.
 await buyer.goto(BASE + '/requests/new?section=housing');
@@ -512,7 +512,7 @@ await buyer.waitForSelector('.detail-price:has-text("/ month")');
 await shot(buyer, '40-housing-ad');
 const adUrl = buyer.url();
 await vendor.goto(BASE + '/housing');
-await vendor.waitForSelector('.ad-row:has-text("Furnished studio in Juffair")');
+await vendor.waitForSelector('.ad-card:has-text("Furnished studio in Juffair")');
 await shot(vendor, '41-housing-list');
 await vendor.goto(adUrl);
 await vendor.fill('#message', 'Can I view it on Saturday?');
@@ -520,5 +520,20 @@ await vendor.click('button:has-text("Send message")');
 await vendor.waitForURL('**/messages/*');
 await buyer.goto(BASE + '/notifications');
 await buyer.waitForSelector('.inbox-item:has-text("replied to your ad")');
+// For sale (session 84): post an item, find it in the calm list, reply.
+await buyer.goto(BASE + '/requests/new?section=forsale');
+await buyer.fill('#title', 'Used PS5 controller, white');
+await buyer.selectOption('#category', 'Electronics');
+await buyer.fill('#description', 'Works well, small scratch on the back.');
+await buyer.fill('#price', '18');
+await buyer.selectOption('#condition', 'used');
+await buyer.click('button:has-text("Post ad")');
+await buyer.waitForSelector('.detail-price:has-text("BD 18")');
+await vendor.goto(BASE + '/for-sale');
+await vendor.click('.ad-card:has-text("Used PS5 controller, white")');
+await vendor.fill('#message', 'Is it still available?');
+await vendor.click('button:has-text("Send message")');
+await vendor.waitForURL('**/messages/*');
+await shot(vendor, '42-for-sale-reply');
 console.log('E2E OK');
 await browser.close();

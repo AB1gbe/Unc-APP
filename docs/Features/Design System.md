@@ -93,3 +93,5 @@ Phone tab bar (session 74): floating glass bar (blur, see-through, rounded), tab
 
 ![[phone-glass-tabbar.png]]
 
+## Session 85: light colours
+Since [[ADR-073 Marketplace layout and light colours]] the app is light: page `#f0f2f5`, cards `#ffffff`, second surface `#e9ebee`, text `#1c1e21`, muted `#65676b`, borders `#dadde1`, coral `#e8552a` with white text, soft coral `#fdebe4`. All in `:root` at the top of `client/src/styles.css`. Theme colour `#ffffff` (`index.html`, `manifest.webmanifest`).

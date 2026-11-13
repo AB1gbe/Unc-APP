@@ -2,13 +2,16 @@
 // place, written out in full so the translation test finds every text.
 import { t } from './i18n.jsx';
 
-export const SECTION_ORDER = ['housing', 'jobs', 'wanted'];
+export const SECTION_ORDER = ['forsale', 'housing', 'jobs', 'wanted'];
 export const SECTION_LABEL = {
   housing: () => t('Housing'),
   jobs: () => t('Jobs'),
+  forsale: () => t('For sale'),
   wanted: () => t('Wanted'),
 };
-export const SECTION_PATH = { housing: '/housing', jobs: '/jobs', wanted: '/browse' };
+export const SECTION_PATH = { forsale: '/for-sale', housing: '/housing', jobs: '/jobs', wanted: '/browse' };
+// The icon shown when an ad has no photo (session 84).
+export const SECTION_ICON = { forsale: 'tag', housing: 'building', jobs: 'briefcase', wanted: 'search' };
 export const JOB_TYPE_LABEL = {
   'full-time': () => t('Full-time'),
   'part-time': () => t('Part-time'),
@@ -29,6 +32,7 @@ export const SCAM_TEXT = () => [
 // One-line price for an ad or request row: "BD 350 / month", "BD 300–400 / month".
 export function adPrice(l, money) {
   if (l.section === 'housing') return l.budgetMin != null ? t('{price} / month', { price: money(l.budgetMin, l.currency) }) : null;
+  if (l.section === 'forsale') return l.budgetMin != null ? money(l.budgetMin, l.currency) : null;
   const lo = l.budgetMin != null ? money(l.budgetMin, l.currency) : null;
   const hi = l.budgetMax != null && l.budgetMax !== l.budgetMin ? money(l.budgetMax, l.currency) : null;
   const range = lo && hi ? `${lo} – ${hi}` : lo || hi;

@@ -553,10 +553,24 @@ const MIGRATIONS = [
   ALTER TABLE listings ADD COLUMN checked_at TEXT;
   CREATE INDEX idx_listings_section ON listings(section, status, created_at);
   `,
+  // 43: a For sale section (session 84). SQLite can't change a CHECK rule,
+  // so the section column is swapped for a new one that also allows
+  // 'forsale'. DROP COLUMN only removes the column: no rows are deleted, so
+  // nothing that points at a listing (chats, photos, deals) is touched.
+  `
+  ALTER TABLE listings ADD COLUMN section_new TEXT NOT NULL DEFAULT 'wanted' CHECK (section_new IN ('wanted', 'housing', 'jobs', 'forsale'));
+  UPDATE listings SET section_new = section;
+  DROP INDEX idx_listings_section;
+  ALTER TABLE listings DROP COLUMN section;
+  ALTER TABLE listings RENAME COLUMN section_new TO section;
+  CREATE INDEX idx_listings_section ON listings(section, status, created_at);
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.
 export const MIGRATION_COUNT = MIGRATIONS.length;
+// For the migration tests (session 84).
+export const MIGRATION_SQL = MIGRATIONS;
 
 export function openDb(file = config.dbFile) {
   if (file !== ':memory:') fs.mkdirSync(path.dirname(file), { recursive: true });

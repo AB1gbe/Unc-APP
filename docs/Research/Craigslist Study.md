@@ -8,6 +8,9 @@ The owner asked: "do a study on craigslist and tell me what they do, business mo
 
 > **How sure are these numbers?** Craigslist is private and publishes no accounts. Revenue and traffic figures are **estimates**, mostly from the AIM Group (a classifieds research firm), repeated by other sites. Treat them as "about right", not exact. Items marked *(known history)* come from widely reported events, not from this session's searches.
 
+## 0. In one minute (plain words, session 83)
+Craigslist is an **online noticeboard**, like the paper notes pinned up in a supermarket, but on a website, one page per city. Anyone pins a free note ("ad"): a room for rent, a sofa for sale, a job, "looking for a bicycle". Notes sit in sections (Housing, Jobs, For sale, Services), newest first, and you message the poster if interested. It sells nothing itself, looks very plain (blue text links, few pictures), and only businesses pay (e.g. job ads). Its weakness: no ID checks, so many scams. Unc copies the noticeboard idea (Housing, Jobs, Wanted) and adds safety: ID-checked members, scam checks, chat only inside the app.
+
 ## 1. What Craigslist is
 - A **classified-ads website**: one plain page per city with sections for jobs, housing, for sale, services, gigs, community and (once) personals. Anyone posts, anyone browses.
 - **Started in 1995** by Craig Newmark as an **email list** of arts and tech events in San Francisco. People forwarded it and asked to add more things (jobs, apartments), so it grew into a website. It became a company in **1999**; Jim Buckmaster joined in 2000 and later became CEO.

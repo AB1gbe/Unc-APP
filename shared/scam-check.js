@@ -1,5 +1,5 @@
 // Scam checks for ads (session 82). Craigslist's weakness was scams; Unc
-// checks every Housing and Jobs ad before it goes up. Used by the server
+// checks every Housing, Jobs and (session 84) For sale ad before it goes up. Used by the server
 // (the real check) and by the posting form (a warning while typing).
 //
 // checkAd() returns { block, hold }:
@@ -30,6 +30,7 @@ const TOO_GOOD = [
   /work\s+from\s+home.{0,60}no\s+experience|no\s+experience.{0,60}work\s+from\s+home/i,
   /earn\s+(bd\s*)?\d[\d,]*\s*(bd\s*)?(a|per)\s+(day|week)/i,
   /(i\s*'?\s*a?m|we\s+are|currently|living)\s+(abroad|overseas|out\s+of\s+(the\s+)?country)/i,
+  /(ship|send|deliver)\w*\s+(it\s+)?(from|via)\s+(abroad|overseas|dhl|courier)\s+after\s+(payment|you\s+pay)/i,
   /keys?\s+(by|via|through)\s+(post|courier|mail|dhl|aramex)/i,
   /العمل\s+من\s+المنزل.{0,40}بدون\s+خبرة|بدون\s+خبرة.{0,40}العمل\s+من\s+المنزل/, /(أنا|انا)\s+(خارج|في\s+الخارج)/, /المفاتيح\s+(بالبريد|عبر\s+البريد|مع\s+المندوب)/,
 ];
@@ -41,7 +42,7 @@ export const MIN_RENT = { 'Rooms & shared': 40, 'Flats & apartments': 100, 'Vill
 export const MAX_PAY = 3000;
 
 export function checkAd({ section, title = '', description = '', category = '', price = null, priceMax = null }) {
-  if (section !== 'housing' && section !== 'jobs') return { block: null, hold: [] };
+  if (section !== 'housing' && section !== 'jobs' && section !== 'forsale') return { block: null, hold: [] };
   const text = `${title}\n${description}`;
   if (PAY_FIRST.some((re) => re.test(text))) {
     return { block: 'Ads may not ask for money before a viewing or before a job starts (transfers, gift cards, crypto, fees). Unc removes these: they are the most common scam.', hold: [] };

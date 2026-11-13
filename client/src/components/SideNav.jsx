@@ -40,6 +40,7 @@ export default function SideNav({ unread, bell }) {
       </div>
       <nav className="nav side-links" aria-label={t('Main')}>
         <Item to="/" end icon="home" label={t('Home')} />
+        <Item to="/for-sale" icon="tag" label={t('For sale')} />
         <Item to="/housing" icon="building" label={t('Housing')} />
         <Item to="/jobs" icon="briefcase" label={t('Jobs')} />
         <Item to="/browse" icon="search" label={t('Wanted')} />
@@ -51,7 +52,7 @@ export default function SideNav({ unread, bell }) {
         {user?.role === 'admin' && <Item to="/admin" icon="admin" label={t('Admin')} />}
       </nav>
       {user
-        ? <Link className="btn side-post" to="/requests/new?section=housing" title={t('Post an ad')}><Icon name="plus" weight="bold" /> <span className="side-label">{t('Post an ad')}</span></Link>
+        ? <Link className="btn side-post" to="/requests/new?section=forsale" title={t('Post an ad')}><Icon name="plus" weight="bold" /> <span className="side-label">{t('Post an ad')}</span></Link>
         : <Link className="btn side-post" to="/register" title={t('Sign up')}><Icon name="user" weight="bold" /> <span className="side-label">{t('Sign up')}</span></Link>}
       <div className="side-bottom">
         <button className="side-lang" onClick={() => setLang(other)} lang={other} title={t('Change language')}>
