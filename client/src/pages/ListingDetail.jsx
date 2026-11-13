@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { categoryArt } from '../art.js';
 import Icon from '../components/Icon.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api, ago, budget, currencyName, toDate } from '../api.js';
+import { api, ago, budget, currencyName, money, toDate } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
 import { Activity, Avatar, Badges, ClosesBadge, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt, conditionLabel, daysLeft, replyLabel } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
@@ -18,6 +18,7 @@ import { EMPTY_DETAILS, OfferDetailFields, addDetails } from '../components/Offe
 import { hasContacts } from '../../../shared/contact-mask.js';
 import ContactNudge from '../components/ContactNudge.jsx';
 import { VideoPreview, pickVideo } from '../components/VideoPicker.jsx';
+import { JOB_TYPE_LABEL, SECTION_LABEL, SECTION_PATH, adPrice } from '../sections.js';
 
 export default function ListingDetail() {
   const { id } = useParams();
@@ -29,38 +30,49 @@ export default function ListingDetail() {
   if (error) return <ErrorBox error={error} />;
   const l = data.listing;
   const isOwner = user?.id === l.buyer.id;
+  // Housing and Jobs ads (session 82) share this page with requests.
+  const ad = l.section && l.section !== 'wanted';
 
   return (
     <>
     <div className="two-col">
       <article className="card">
         <div className="row spread">
-          <span className="cat-label">{t(l.category)}</span>
+          <span className="cat-label">{ad && <><Link to={SECTION_PATH[l.section]}>{SECTION_LABEL[l.section]()}</Link> › </>}{t(l.category)}</span>
           <div className="row" style={{ gap: '.5rem' }}>
             {l.status === 'open' && <ShareButton listing={l} mine={isOwner} />}
             {user && !isOwner && l.status === 'open' && <SaveButton listing={l} />}
             <StatusBadge status={l.status} />
           </div>
         </div>
-        {l.sample && <p className="sample-note small">{t('Sample request from the demo data. It shows how Unc works; it is not a real buyer.')}</p>}
+        {l.held && <p className="alert warn small">{t('The Unc team is checking this ad before it shows to others. This usually takes less than a day.')}</p>}
+        {l.sample && <p className="sample-note small">{ad ? t('Sample ad from the demo data. It shows how Unc works; it is not a real advertiser.') : t('Sample request from the demo data. It shows how Unc works; it is not a real buyer.')}</p>}
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
-        <p className="detail-price">{budget(l)}</p>
+        <p className="detail-price">{ad ? adPrice(l, money) ?? t('Pay not stated') : budget(l)}</p>
+        {ad ? (
+          <div className="detail-facts">
+            {l.section === 'housing' && <span><b>{l.bedrooms == null ? t('Not said') : l.bedrooms === 0 ? t('Studio') : l.bedrooms}</b><small>{t('Bedrooms')}</small></span>}
+            {l.section === 'housing' && <span><b>{l.furnished == null ? t('Not said') : l.furnished ? t('Furnished') : t('Unfurnished')}</b><small>{t('Furnishing')}</small></span>}
+            {l.section === 'jobs' && <span><b>{JOB_TYPE_LABEL[l.jobType]?.() ?? t('Not said')}</b><small>{t('Job type')}</small></span>}
+          </div>
+        ) : (
         <div className="detail-facts">
           <span><b>{conditionLabel(l.condition)}</b><small>{t('Condition')}</small></span>
           <span><b>{tn(l.offerCount ?? 0, '{n} offer', '{n} offers')}</b><small>{t('So far')}</small></span>
           {l.status === 'open' && daysLeft(l.closesAt) !== null && <span><b>{daysLeft(l.closesAt) === 0 ? t('Last day') : tn(daysLeft(l.closesAt), '{n} day left', '{n} days left')}</b><small>{t('Open for offers')}</small></span>}
         </div>
+        )}
         <div className="meta" style={{ marginBottom: '1rem' }}>
           <span><Place city={l.city} /></span>
           <span>{t('Posted {time}', { time: ago(l.createdAt) })}</span>
           {l.neededBy && <span>{t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
-          <ContactRule rule={l.contactRule} />
+          {!ad && <ContactRule rule={l.contactRule} />}
           {!isOwner && <ClosesBadge closesAt={l.closesAt} />}
         </div>
         <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{l.description}</p>
         {/* No photo: show the category's picture, marked as an example, so the
             page isn't just text (session 68). */}
-        {l.images.length === 0 && (
+        {l.images.length === 0 && !ad && (
           <figure className="gallery-fallback">
             <img src={categoryArt(l.category)} alt="" />
             <figcaption>{t('Example picture. The buyer hasn’t added a photo.')}</figcaption>
@@ -81,21 +93,133 @@ export default function ListingDetail() {
           <Avatar name={l.buyer.displayName} src={l.buyer.avatarUrl} />
           <div>
             <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status="approved" />
-            <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {t('Requested by a verified member')}</span></div>
+            <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {ad ? t('Posted by an ID-checked member') : t('Requested by a verified member')}</span></div>
             {!isOwner && <Activity activity={l.buyer.activity} />} <Badges badges={l.buyer.badges} />
           </div>
         </div>
       </article>
       <aside>
-        {isOwner ? <OwnerPanel listing={l} onChange={reload} /> : <OfferPanel listing={l} />}
+        {ad
+          ? (isOwner ? <AdOwnerPanel listing={l} onChange={reload} /> : <AdReplyPanel listing={l} />)
+          : (isOwner ? <OwnerPanel listing={l} onChange={reload} /> : <OfferPanel listing={l} />)}
         {!isOwner && user && <ReportLink listingId={l.id} />}
       </aside>
     </div>
-    {isOwner && <CompareOffers listing={l} />}
-    {isOwner && l.status === 'open' && (l.offerCount ?? 0) > 0 && <ChoosingSteps />}
+    {isOwner && !ad && <CompareOffers listing={l} />}
+    {isOwner && !ad && l.status === 'open' && (l.offerCount ?? 0) > 0 && <ChoosingSteps />}
     {/* The buyer sees every offer above; everyone else sees who answered. */}
-    {!isOwner && <WhoAnswered listing={l} isOwner={false} />}
+    {!isOwner && !ad && <WhoAnswered listing={l} isOwner={false} />}
     </>
+  );
+}
+
+// Housing and Jobs ads (session 82): reply to the advertiser in a private
+// chat about this ad. No price or offer: just a message (and a photo).
+function AdReplyPanel({ listing }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const jobs = listing.section === 'jobs';
+  const warn = jobs
+    ? t('Real employers never ask you to pay for a visa, training or a uniform.')
+    : t('Never pay a deposit before you have seen the place and met the owner.');
+
+  if (listing.status !== 'open') return <div className="card"><p className="muted">{t('This ad is no longer open.')}</p></div>;
+  if (listing.myConversationId) {
+    return (
+      <div className="card">
+        <h2>{t('You replied to this ad')}</h2>
+        <Link className="btn block" to={`/messages/${listing.myConversationId}`}>{t('Open conversation')}</Link>
+      </div>
+    );
+  }
+  if (!isVerified(user)) return <div className="card"><h2>{jobs ? t('Apply for this job') : t('Interested?')}</h2><VerifyPrompt action="reply" /><p className="hint">{warn}</p></div>;
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append('message', message);
+      const { conversation } = await api(`/listings/${listing.id}/contact`, { method: 'POST', form: fd });
+      celebrate({ text: t("Sent! You'll be notified when they reply.") });
+      navigate(`/messages/${conversation.id}`);
+    } catch (err) {
+      if (err.body?.conversationId) return navigate(`/messages/${err.body.conversationId}`);
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="card" onSubmit={submit}>
+      <h2>{jobs ? t('Apply for this job') : t('Interested? Send a message')}</h2>
+      <p className="muted small">{tj('Your message goes privately to {name}. Your number and email stay hidden.', { name: <bdi>{listing.buyer.displayName}</bdi> })}</p>
+      <ErrorBox error={error} />
+      <div className="field">
+        <label htmlFor="message">{t('Message')}</label>
+        <textarea id="message" required minLength={2} maxLength={2000} value={message} onChange={(e) => setMessage(e.target.value)}
+          placeholder={jobs ? t('Your experience, when you can start, and a good time to talk…') : t('When you would like to view it, how long you want to stay, who will live there…')} />
+        {hasContacts(message) && <ContactNudge />}
+      </div>
+      <button className="btn block" disabled={busy}>{busy ? t('Sending…') : t('Send message')}</button>
+      <p className="hint"><Icon name="warning" /> {warn}</p>
+    </form>
+  );
+}
+
+// The advertiser's panel on their own ad: replies, edit, taken, close.
+function AdOwnerPanel({ listing, onChange }) {
+  const { data } = useApi(`/listings/${listing.id}/conversations`);
+  const [error, setError] = useState(null);
+  const replies = data?.conversations ?? [];
+  async function setStatus(status, message) {
+    if (message && !window.confirm(message)) return;
+    setError(null);
+    try {
+      await api(`/listings/${listing.id}/status`, { method: 'POST', body: { status } });
+      onChange();
+    } catch (err) {
+      setError(err);
+    }
+  }
+  return (
+    <div className="stack">
+      <div className="card">
+        <h2>{t('Your ad')}</h2>
+        {listing.status === 'open' && <p className="small muted"><Icon name="eye" /> {tn(listing.viewCount ?? 0, '{n} person looked at it', '{n} people looked at it')} · <Icon name="chat" /> {tn(replies.length, '{n} reply', '{n} replies')}</p>}
+        <ErrorBox error={error} />
+        {listing.status === 'open' ? (
+          <div className="stack">
+            <Link className="btn secondary block" to={`/requests/${listing.id}/edit`}>{t('Edit')}</Link>
+            <button className="btn ok block" onClick={() => setStatus('fulfilled', listing.section === 'jobs' ? t('Mark the job as filled? The ad will close.') : t('Mark the place as rented? The ad will close.'))}>
+              {listing.section === 'jobs' ? t('Job filled') : t('Rented')}
+            </button>
+            <button className="btn secondary block" onClick={() => setStatus('closed', t('Close this ad? Conversations about it will become read-only.'))}>{t('Close ad')}</button>
+          </div>
+        ) : (
+          <button className="btn secondary block" onClick={() => setStatus('open', t('Reopen this ad?'))}>{t('Reopen ad')}</button>
+        )}
+      </div>
+      <div className="card" style={{ padding: 0 }}>
+        <h2 style={{ padding: '1rem 1rem 0' }}>{t('Replies ({count})', { count: replies.length })}</h2>
+        {!data ? <p className="muted" style={{ padding: '1rem' }}>{t('Loading…')}</p> : replies.length === 0 ? (
+          <p className="muted" style={{ padding: '0 1rem 1rem' }}>{t('No replies yet. People who are interested will message you here.')}</p>
+        ) : replies.map((c) => (
+          <Link key={c.id} className="inbox-item" to={`/messages/${c.id}`}>
+            <Avatar name={c.other.displayName} src={c.other.avatarUrl} />
+            <div>
+              <b><bdi>{c.other.displayName}</bdi></b>
+              <div><RatingBadge rating={c.other.rating} /> <span className="muted small">· {ago(c.lastMessageAt)}</span></div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 

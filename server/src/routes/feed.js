@@ -41,6 +41,7 @@ export function feedRoutes(db) {
     SELECT 'request' AS kind, l.created_at AS at, l.city, l.category, l.id AS listing_id, l.title
     FROM listings l JOIN users u ON u.id = l.buyer_id
     WHERE l.status = 'open' AND l.created_at >= datetime('now', '-${DAYS} days') AND u.banned_at IS NULL AND l.sample = 0
+      AND l.held_at IS NULL
       AND l.buyer_id <> ? -- not the member's own requests
       AND ${NOT_BLOCKED_BUYER}
     ORDER BY l.created_at DESC LIMIT 20

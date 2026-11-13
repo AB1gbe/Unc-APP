@@ -189,7 +189,7 @@ export function conversationRoutes(db) {
     const listing = db.prepare(`
       SELECT l.*, u.banned_at AS buyer_banned_at FROM listings l JOIN users u ON u.id = l.buyer_id WHERE l.id = ?
     `).get(Number(req.params.id));
-    if (!listing || listing.buyer_banned_at) throw notFound('Request not found.');
+    if (!listing || listing.buyer_banned_at || listing.held_at) throw notFound('Request not found.');
     if (listing.status !== 'open') throw new HttpError(409, 'This request is no longer accepting offers.');
     if (listing.buyer_id === req.user.id) throw new HttpError(403, 'You cannot make an offer on your own request.');
     if (blockedBetween(db, listing.buyer_id, req.user.id)) throw new HttpError(403, "You can't contact this member.");
@@ -214,7 +214,7 @@ export function conversationRoutes(db) {
         const id = Number(info.lastInsertRowid);
         insertMessage(id, req.user.id, body, offerPrice, photo.image, null, null, null, details, photo.video);
         audit(db, req.user.id, 'conversation.started', `conversation:${id}`, { listingId: listing.id });
-        notify(db, listing.buyer_id, 'offer', { actorId: req.user.id, listingId: listing.id, conversationId: id });
+        notify(db, listing.buyer_id, listing.section === 'wanted' ? 'offer' : 'ad-reply', { actorId: req.user.id, listingId: listing.id, conversationId: id });
         return id;
       });
     } catch (err) {
@@ -222,12 +222,12 @@ export function conversationRoutes(db) {
       throw err;
     }
     // After the transaction, so a push never announces an offer that was rolled back.
-    pushTo(db, listing.buyer_id, 'offer', { actor: req.user.display_name, title: listing.title }, `/messages/${convId}`)
+    pushTo(db, listing.buyer_id, listing.section === 'wanted' ? 'offer' : 'ad-reply', { actor: req.user.display_name, title: listing.title }, `/messages/${convId}`)
       .catch((err) => console.warn('[push]', err.message));
     // And an email, unless the buyer switched those off. trySendMail never
     // throws, and the offer doesn't wait for the email provider.
     const buyer = db.prepare('SELECT email, language, email_offers FROM users WHERE id = ?').get(listing.buyer_id);
-    if (buyer.email_offers) {
+    if (buyer.email_offers && listing.section === 'wanted') {
       trySendMail({ to: buyer.email, ...newOfferEmail({
         sellerName: req.user.display_name, title: listing.title, message: maskContacts(body).text,
         offerPrice, currency: listing.currency, conversationId: convId,

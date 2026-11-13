@@ -19,11 +19,13 @@ export default function AdminHome() {
       <h1>{t('Admin')}</h1>
       {stats.data && (
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
-          {[[t('Users'), 'users'], [t('Pending KYC'), 'pendingKyc'], [t('Open requests'), 'openListings'], [t('Conversations'), 'conversations'], [t('Open reports'), 'openReports'], [t('Help questions'), 'openHelp']].map(([label, k]) => (
+          {[[t('Users'), 'users'], [t('Pending KYC'), 'pendingKyc'], [t('Open requests'), 'openListings'], [t('Conversations'), 'conversations'], [t('Open reports'), 'openReports'], [t('Help questions'), 'openHelp'], [t('Ads to check'), 'heldAds']].map(([label, k]) => (
             <div key={k} className="card"><div className="muted small">{label}</div><div style={{ fontSize: '1.6rem', fontWeight: 700 }}>{stats.data[k]}</div></div>
           ))}
         </div>
       )}
+
+      <HeldAds onChange={() => stats.reload()} />
 
       <Dashboard />
 
@@ -68,6 +70,40 @@ export default function AdminHome() {
 }
 
 // Get Help (session 60): members' questions to the Unc team. Oldest first.
+// Ads held by the scam checks (session 82): read them, then approve or remove.
+function HeldAds({ onChange }) {
+  const { data, loading, reload } = useApi('/admin/held-ads');
+  const [error, setError] = useState(null);
+  async function decide(id, decision) {
+    setError(null);
+    try {
+      await api(`/admin/held-ads/${id}/decision`, { method: 'POST', body: { decision } });
+      reload(); onChange();
+    } catch (err) { setError(err); }
+  }
+  return (
+    <section className="card">
+      <h2>{t('Ads to check')}</h2>
+      <p className="muted small">{t('Held by the scam checks. Approve to show them, or remove them.')}</p>
+      <ErrorBox error={error} />
+      {loading ? <Loading /> : (data?.ads ?? []).length === 0 ? <p className="muted">{t('Nothing here.')}</p> : data.ads.map((a) => (
+        <div key={a.id} className="held-ad">
+          <div className="row spread">
+            <Link to={`/requests/${a.id}`}><b><bdi>{a.title}</bdi></b></Link>
+            <span className="badge warn">{a.reasons.map((r) => t(r)).join(', ')}</span>
+          </div>
+          <p dir="auto" className="small" style={{ whiteSpace: 'pre-wrap' }}>{a.description}</p>
+          <div className="muted small"><bdi>{a.poster.displayName}</bdi> · <bdi>{a.city}</bdi> · {formatDateTime(toDate(a.heldAt))}</div>
+          <div className="row" style={{ marginTop: '.5rem' }}>
+            <button className="btn sm ok" onClick={() => decide(a.id, 'approve')}>{t('Approve')}</button>
+            <button className="btn sm secondary" onClick={() => decide(a.id, 'remove')}>{t('Remove')}</button>
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function HelpQueue({ onChange }) {
   const [status, setStatus] = useState('open');
   const help = useApi(`/support/admin?status=${status}`);

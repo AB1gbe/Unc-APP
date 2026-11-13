@@ -274,3 +274,13 @@ Login only (**A**): no email, identity or card check, so members can ask for hel
 - Offer details (contact and new messages) also take `stock` = `in-stock` | `order` and `delivery` = `pickup` | `delivery` | `both`.
 - `GET /api/feed/pulse` and `GET /api/feed` leave out sample (demo) requests.
 
+## Sections (session 82)
+| Method | Path | Who | Notes |
+|---|---|---|---|
+| GET | `/api/listings?section=housing\|jobs\|wanted` | public | Default `wanted`. Extra filters: `bedrooms` (minimum), `furnished=yes\|no` (housing), `jobType` (jobs). Held ads never listed. `responders` only for `wanted` |
+| GET | `/api/listings/sections` | public | `{sections: {wanted\|housing\|jobs: {total, categories: {name: n}}}, latest: {section: [listing ×8]}}` |
+| POST/PATCH | `/api/listings` | V | Also `section`; housing needs `rent` (+ optional `bedrooms`, `furnished`), jobs need `jobType` (+ optional `budgetMin/Max` = pay). Scam check: 400 (`scam: true`), 409 same title within 7 days, 429 over 5 ads a day. Response may include `held: [reasons]` |
+| GET | `/api/admin/held-ads` | admin | Held ads, oldest first, with reasons |
+| POST | `/api/admin/held-ads/:id/decision` | admin | `{decision: 'approve'\|'remove'}`; 🔔 `ad-approved` / `ad-removed` to the poster |
+
+Listing objects gain `section`, `bedrooms`, `furnished`, `jobType`, `held`. `/api/meta` gains `sections: {housing, jobs}` and `jobTypes`. New notification kind `ad-reply` (and push text) for a reply to an ad; replies to ads don't send the offer email.

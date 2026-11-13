@@ -15,6 +15,9 @@ function describe(n) {
   const title = <bdi>{n.listing?.title ?? ''}</bdi>;
   const chat = n.conversationId ? `/messages/${n.conversationId}` : '/messages';
   switch (n.kind) {
+    case 'ad-reply': return [tj('{name} replied to your ad “{title}”', { name, title }), chat];
+    case 'ad-approved': return [tj('Your ad “{title}” was checked and is now showing.', { title }), `/requests/${n.listing?.id}`];
+    case 'ad-removed': return [tj('Your ad “{title}” was removed after a safety check. Ask us on the Help page if you think this is a mistake.', { title }), '/help'];
     case 'offer': return [tj('{name} made an offer on “{title}”', { name, title }), chat];
     case 'deal': return [tj('{name} picked your offer for “{title}”. Deal done!', { name, title }), chat];
     case 'rating': return [tj('{name} rated your deal on “{title}”.', { name, title }), chat];

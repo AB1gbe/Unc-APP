@@ -4,7 +4,7 @@ import Layout from './components/Layout.jsx';
 import { RequireAdmin, RequireAuth, RequireVerified } from './components/ui.jsx';
 import Browse from './pages/Browse.jsx';
 import Home from './pages/Home.jsx';
-import { useAuth } from './auth.jsx';
+import Board from './pages/Board.jsx';
 import ListingDetail from './pages/ListingDetail.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -34,23 +34,23 @@ const Invite = lazy(() => import('./pages/Invite.jsx'));
 const Help = lazy(() => import('./pages/Help.jsx'));
 const Categories = lazy(() => import('./pages/Categories.jsx'));
 const Shops = lazy(() => import('./pages/Shops.jsx'));
-const Landing = lazy(() => import('./pages/Landing.jsx'));
+const AdList = lazy(() => import('./pages/AdList.jsx'));
 const Saved = lazy(() => import('./pages/Saved.jsx'));
 const MemberProfile = lazy(() => import('./pages/MemberProfile.jsx'));
 const AdminHome = lazy(() => import('./pages/admin/AdminHome.jsx'));
 const KycReview = lazy(() => import('./pages/admin/KycReview.jsx'));
 
-// Members land on their personal home; visitors see the request list.
-function HomeOrBrowse() {
-  const { user } = useAuth();
-  return user ? <Home /> : <Landing />;
-}
+// Everyone lands on the Craigslist-style front page (session 82); a
+// member's own dashboard is at /me ("My Unc").
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<HomeOrBrowse />} />
+        <Route index element={<Board />} />
+        <Route path="me" element={<RequireAuth><Home /></RequireAuth>} />
+        <Route path="housing" element={<AdList section="housing" />} />
+        <Route path="jobs" element={<AdList section="jobs" />} />
         <Route path="browse" element={<Browse />} />
         <Route path="requests/new" element={<RequireAuth><RequireVerified action="post"><NewListing /></RequireVerified></RequireAuth>} />
         <Route path="requests/:id" element={<ListingDetail />} />

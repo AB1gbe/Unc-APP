@@ -130,7 +130,7 @@ const listingUrl = buyer.url();
 await check(buyer, 'request-owner');
 
 // vendor makes an offer
-await vendor.goto(BASE + '/');
+await vendor.goto(BASE + '/me'); // member dashboard (session 82)
 await vendor.waitForSelector('.grid .card');
 await check(vendor, 'browse');
 await vendor.goto(listingUrl);
@@ -175,9 +175,9 @@ await buyer.click('.chat-head a[href^="/members/"]');
 await buyer.waitForSelector('.review');
 await check(buyer, 'profile');
 
-for (const [pg, path] of [[buyer, '/my-requests'], [buyer, '/notifications'], [vendor, '/notifications'], [vendor, '/saved'], [buyer, '/account'], [buyer, '/verification'], [buyer, '/forgot-password'], [buyer, '/no-such-page']]) {
+for (const [pg, path] of [[buyer, '/my-requests'], [buyer, '/notifications'], [vendor, '/notifications'], [vendor, '/saved'], [buyer, '/account'], [buyer, '/verification'], [buyer, '/forgot-password'], [buyer, '/no-such-page'], [buyer, '/'], [buyer, '/housing'], [buyer, '/jobs'], [buyer, '/me'], [buyer, '/requests/new?section=jobs']]) {
   await pg.goto(BASE + path);
-  await check(pg, path.slice(1));
+  await check(pg, path.slice(1).replace(/[?=]/g, '-') || 'board');
 }
 
 await browser.close();

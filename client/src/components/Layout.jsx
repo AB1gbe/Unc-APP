@@ -58,6 +58,7 @@ export default function Layout() {
         <div className="topbar-inner">
           <Link to="/" className="logo">un<span>c</span></Link>
           <nav className="nav">
+            {user && <NavLink to="/me" className="top-bell" aria-label={t('My Unc')} title={t('My Unc')}><Icon name="user" size="1.5em" /></NavLink>}
             {user ? (
               <NavLink to="/notifications" className="top-bell" aria-label={bell > 0 ? t('Notifications ({n} new)', { n: bell }) : t('Notifications')} title={t('Notifications')}>
                 <Icon name="bell" size="1.5em" />

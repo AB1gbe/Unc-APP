@@ -30,7 +30,7 @@ export function demandRoutes(db) {
   const r = Router();
 
   r.get('/', requireVerified, (req, res) => {
-    const where = [`l.status = 'open'`, `l.created_at >= datetime('now', '-${DEMAND_DAYS} days')`, 'u.banned_at IS NULL'];
+    const where = [`l.status = 'open'`, `l.section = 'wanted'`, 'l.held_at IS NULL', `l.created_at >= datetime('now', '-${DEMAND_DAYS} days')`, 'u.banned_at IS NULL'];
     const params = [];
     // ?area=Capital (a governorate key) narrows it to that governorate.
     const gov = GOVERNORATES.some((g) => g.key === req.query.area) ? req.query.area : null;

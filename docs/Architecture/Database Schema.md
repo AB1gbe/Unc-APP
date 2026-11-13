@@ -186,3 +186,6 @@ See [[ADR-068 Marketplace first]].
 
 ## Migration 41 (session 80): Bahraini Dinar
 - **41:** `TO_BHD_SQL` (exported from `db.js`, also run by the seed). Converts `messages.offer_price` (by the listing's currency), `installment_parts.amount`, `installment_plans.total` and `listings.budget_min/max` from USD/EUR/GBP/CAD/AUD to BHD and sets `currency = 'BHD'`. No new columns; the `currency` columns stay for later. See [[ADR-070 Bahraini Dinar only]].
+
+## Migration 42 (session 82): sections
+- `listings.section` TEXT NOT NULL DEFAULT 'wanted' CHECK IN ('wanted','housing','jobs'); `bedrooms` INTEGER; `furnished` INTEGER (1/0/NULL); `job_type` TEXT CHECK IN ('full-time','part-time','contract'); `held_at`, `held_reason` (held by the scam checks; hidden from others); `checked_at` (approved by an admin; not held again). Housing rent is stored in `budget_min` = `budget_max`. Index `idx_listings_section(section, status, created_at)`. See [[ADR-071 Craigslist-style sections]].
