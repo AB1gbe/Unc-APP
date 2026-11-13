@@ -192,3 +192,13 @@ See [[ADR-068 Marketplace first]].
 
 ## Migration 43 (session 84): For sale
 - `listings.section` now also allows `'forsale'`. Done by swapping the column (add `section_new` with the new CHECK, copy, drop the index and the old column, rename, recreate `idx_listings_section`), because SQLite can't change a CHECK rule. No rows are deleted. For sale ads keep the asking price in `budget_min` = `budget_max` and New/Used in `item_condition`. See [[ADR-072 For sale section and calmer ad rows]].
+
+## Migration 44 (session 88): businesses
+- `ad_credit` (user_id, amount fils ±, reason pack/ad/refund/grant, listing_id, payment_id): balance = SUM(amount).
+- `ad_payments` (user_id, receipt_no UNIQUE, kind pack/ad, pack, amount, credit, listing_id, card_brand, card_last4, provider_ref, actor_id).
+- `listings.paid_fils`, `listings.posted_by`.
+- `team_members` (business_id, user_id).
+- `team_invites` (business_id, email).
+- `sessions.actor_id` (a team member using the business).
+
+See [[ADR-077 Business accounts, paying for ads and teams]].

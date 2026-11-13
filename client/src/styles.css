@@ -1005,3 +1005,25 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 /* 'Rate' reminders are a good next step (session 87): green, not a warning. */
 .badge.todo { background: var(--ok-soft); color: var(--ok); }
 .big-deal, .contact-nudge { border: 1px solid #f5c2c0; color: var(--bad); }
+
+/* ---- Business panel and teams (session 88) ---- */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .75rem; }
+.stat { padding: .9rem 1rem; }
+.stat-n { font-size: 1.6rem; font-weight: 800; line-height: 1.2; }
+.stat .up { color: var(--ok); font-weight: 600; }
+.stat .down { color: var(--bad); font-weight: 600; }
+.link-card { color: var(--text); text-decoration: none; }
+.link-card:hover { border-color: var(--brand); text-decoration: none; }
+.packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .75rem; }
+.pack { display: flex; flex-direction: column; gap: .4rem; align-items: flex-start; }
+.biz-ads .ad-row { align-items: center; }
+.biz-link { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; color: var(--text); text-decoration: none; }
+.biz-link:hover { border-color: var(--brand); text-decoration: none; }
+.acting-bar { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; justify-content: center; background: var(--brand); color: #fff; padding: .5rem 1rem; font-size: .9rem; }
+.acting-bar .btn { background: #fff; color: var(--brand); border-color: #fff; }
+.receipt table { width: 100%; margin: 1rem 0; }
+.receipt th { text-align: start; color: var(--muted); font-weight: 500; width: 35%; padding: .4rem 0; }
+@media print {
+  .sidenav, .topbar, .tabbar, .no-print, .acting-bar { display: none !important; }
+  .receipt { box-shadow: none; border: 0; }
+}

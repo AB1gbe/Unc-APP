@@ -94,3 +94,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-13 | [[2026-11-13 Session 85]] | Facebook Marketplace–style photo grid and home, light colours, housing photos |
 | 2026-11-13 | [[2026-11-13 Session 86]] | Colours that mean something: green positive, red negative, blue neutral, yellow careful |
 | 2026-11-13 | [[2026-11-13 Session 87]] | Warnings are red; non-warnings get their real colour (green, blue, grey) |
+| 2026-11-13 | [[2026-11-13 Session 88]] | Business accounts: CR required, pay per ad or packs, business panel, team members |

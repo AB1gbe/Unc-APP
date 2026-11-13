@@ -78,6 +78,7 @@ export default function Layout() {
           </nav>
         </div>
       </header>
+      {user?.actor && <ActingBanner user={user} />}
       {user && !user.emailVerified && (
         <div className="container" style={{ paddingBottom: 0 }}>
           <div className="alert warn" style={{ margin: 0 }}>{tj('Confirm your email to get started. {link}', { link: <Link to="/verify-email">{t('Enter code')}</Link> })}</div>
@@ -97,5 +98,17 @@ export default function Layout() {
       <TabBar unread={unread} loggedIn={loggedIn} />
       <Celebrations />
     </>
+  );
+}
+
+// Shown while a team member uses a business account (session 88).
+function ActingBanner({ user }) {
+  const { refresh } = useAuth();
+  const back = async () => { await api('/team/switch-back', { method: 'POST' }); await refresh(); window.location.assign('/team'); };
+  return (
+    <div className="acting-bar" role="status">
+      <Icon name="team" /> {tj('You are using {business} as {name}.', { business: <b><bdi>{user.displayName}</bdi></b>, name: <bdi>{user.actor.displayName}</bdi> })}
+      <button type="button" className="btn sm secondary" onClick={back}>{t('Switch back')}</button>
+    </div>
   );
 }

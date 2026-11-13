@@ -7,6 +7,7 @@
 // Team members (step 4) use the same panel while "acting as" the business;
 // some things stay with the owner (buying, the team itself).
 import { Router } from 'express';
+import { config } from '../config.js';
 import { audit, tx } from '../db.js';
 import * as v from '../lib/validate.js';
 import { notify } from '../lib/notify.js';
@@ -110,7 +111,7 @@ export function businessRoutes(db) {
     `).get(Number(req.params.id), req.user.id);
     if (!p) throw notFound('Receipt not found.');
     const k = db.prepare(`SELECT business_name, business_reg_number FROM kyc_submissions WHERE user_id = ? AND status = 'approved' ORDER BY id DESC LIMIT 1`).get(req.user.id);
-    res.json({ receipt: { ...paymentView(p), business: { name: k?.business_name ?? req.user.display_name, cr: k?.business_reg_number ?? null } } });
+    res.json({ receipt: { ...paymentView(p), test: config.paymentProvider === 'test', business: { name: k?.business_name ?? req.user.display_name, cr: k?.business_reg_number ?? null } } });
   });
 
   // ---- Team (owner side) ----

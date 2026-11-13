@@ -34,6 +34,8 @@ export default function Account() {
           <Link to="/orders">{t('Orders')} <span className="flip">→</span></Link>
           <Link to="/wallet">{t('My wallet')} <span className="flip">→</span></Link>
           <Link to="/invite">{t('Invite friends')} <span className="flip">→</span></Link>
+          <Link to="/team">{t('Teams')} <span className="flip">→</span></Link>
+          {user.accountType === 'business' && <Link to="/business">{t('Business panel')} <span className="flip">→</span></Link>}
           <Link to="/help">{t('Get help')} <span className="flip">→</span></Link>
         </div>
         {user.kycStatus !== 'approved' && user.emailVerified && (

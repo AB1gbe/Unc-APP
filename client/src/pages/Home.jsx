@@ -8,6 +8,7 @@ import { partOfDay, season } from '../seasons.js';
 import { useApi } from '../hooks.js';
 import { t, tj, tn } from '../i18n.jsx';
 import LivePulse from '../components/LivePulse.jsx';
+import Icon from '../components/Icon.jsx';
 
 // Written out in full so the translation test can find every text.
 const GREETING = {
@@ -48,6 +49,9 @@ export default function Home() {
         <Link className="btn ok hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
       </div>
 
+      {user.accountType === 'business' && (
+        <Link to="/business" className="card biz-link"><Icon name="chart" /> <b>{t('Business panel')}</b> <span className="muted small">{t('Your ads, numbers, billing and team')}</span> <span className="flip">→</span></Link>
+      )}
       <LivePulse />
       <ProfileChecklist user={user} />
 

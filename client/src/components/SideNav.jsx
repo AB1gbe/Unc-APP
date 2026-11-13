@@ -46,6 +46,7 @@ export default function SideNav({ unread, bell }) {
         <Item to="/jobs" icon="briefcase" label={t('Jobs')} />
         <Item to="/browse" icon="search" label={t('Wanted')} />
         <Item to="/shops" icon="shop" label={t('Shops')} />
+        {user?.accountType === 'business' && <Item to="/business" icon="chart" label={t('Business panel')} />}
         {user && <Item to="/me" icon="user" label={t('My Unc')} />}
         {user && <Item to="/messages" icon="chat" label={t('Messages')} count={unread} />}
         {user && <Item to="/notifications" icon="bell" label={t('Notifications')} count={bell} className="bell" />}
