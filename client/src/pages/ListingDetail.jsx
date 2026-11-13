@@ -37,6 +37,12 @@ export default function ListingDetail() {
     <>
     <div className="two-col">
       <article className="card">
+        {/* Ads lead with one big photo (session 85, like Facebook Marketplace). */}
+        {ad && l.images.length > 0 && (
+          <button type="button" className="ad-hero" onClick={() => setViewing(0)} aria-label={t('Photo {n} of {total}', { n: 1, total: l.images.length })}>
+            <img src={l.images[0]} alt="" />
+          </button>
+        )}
         <div className="row spread">
           <span className="cat-label">{ad && <><Link to={SECTION_PATH[l.section]}>{SECTION_LABEL[l.section]()}</Link> › </>}{t(l.category)}</span>
           <div className="row" style={{ gap: '.5rem' }}>
@@ -49,6 +55,7 @@ export default function ListingDetail() {
         {l.sample && <p className="sample-note small">{ad ? t('Sample ad from the demo data. It shows how Unc works; it is not a real advertiser.') : t('Sample request from the demo data. It shows how Unc works; it is not a real buyer.')}</p>}
         <h1 dir="auto" style={{ marginTop: '.75rem' }}>{l.title}</h1>
         <p className="detail-price">{ad ? adPrice(l, money) ?? t('Pay not stated') : budget(l)}</p>
+        {ad && <p className="muted small" style={{ marginTop: '-.4rem' }}>{tj('Listed {time} in {place}', { time: ago(l.createdAt), place: <Place city={l.city} /> })}</p>}
         {ad ? (
           <div className="detail-facts">
             {l.section === 'housing' && <span><b>{l.bedrooms == null ? t('Not said') : l.bedrooms === 0 ? t('Studio') : l.bedrooms}</b><small>{t('Bedrooms')}</small></span>}
@@ -64,8 +71,8 @@ export default function ListingDetail() {
         </div>
         )}
         <div className="meta" style={{ marginBottom: '1rem' }}>
-          <span><Place city={l.city} /></span>
-          <span>{t('Posted {time}', { time: ago(l.createdAt) })}</span>
+          {!ad && <span><Place city={l.city} /></span>}
+          {!ad && <span>{t('Posted {time}', { time: ago(l.createdAt) })}</span>}
           {l.neededBy && <span>{t('Needed by {date}', { date: formatDate(toDate(l.neededBy)) })}</span>}
           {!ad && <ContactRule rule={l.contactRule} />}
           {!isOwner && <ClosesBadge closesAt={l.closesAt} />}
@@ -79,9 +86,9 @@ export default function ListingDetail() {
             <figcaption>{t('Example picture. The buyer hasn’t added a photo.')}</figcaption>
           </figure>
         )}
-        {l.images.length > 0 && (
+        {l.images.length > (ad ? 1 : 0) && (
           <div className="gallery">
-            {l.images.map((src, i) => (
+            {l.images.map((src, i) => (ad && i === 0 ? null :
               <button type="button" key={src} onClick={() => setViewing(i)} aria-label={t('Photo {n} of {total}', { n: i + 1, total: l.images.length })}>
                 <img src={src} alt={t('Reference photo')} loading="lazy" />
               </button>
@@ -119,10 +126,11 @@ export default function ListingDetail() {
 function AdReplyPanel({ listing }) {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [message, setMessage] = useState('');
+  const jobs = listing.section === 'jobs';
+  // Ready to send in one tap, like Facebook Marketplace (session 85).
+  const [message, setMessage] = useState(listing.section === 'forsale' ? t('Hi, is this still available?') : '');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
-  const jobs = listing.section === 'jobs';
   const warn = jobs
     ? t('Real employers never ask you to pay for a visa, training or a uniform.')
     : listing.section === 'forsale'

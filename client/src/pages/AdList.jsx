@@ -46,6 +46,27 @@ export function AdRow({ listing: l }) {
   );
 }
 
+// A photo card for the grid (session 85, inspired by Facebook Marketplace):
+// a big square photo, the price in bold, the title on one or two lines,
+// and the area. Wanted requests say "Looking for" above their budget.
+export function AdCard({ listing: l }) {
+  const section = l.section ?? 'wanted';
+  const price = adPrice(l, money);
+  return (
+    <li>
+      <Link to={`/requests/${l.id}`} className="ad-card">
+        <span className="ad-card-photo">
+          {l.images?.length > 0 ? <img src={l.images[0]} alt="" loading="lazy" /> : <Icon name={SECTION_ICON[section]} size="2.2em" />}
+          {section === 'wanted' && <span className="ad-card-tag">{t('Looking for')}</span>}
+        </span>
+        {price && <span className="ad-card-price">{price}</span>}
+        <span className="ad-card-title"><bdi>{l.title}</bdi></span>
+        <span className="ad-card-place"><Place city={l.city} /></span>
+      </Link>
+    </li>
+  );
+}
+
 // One line above a list that has demo ads, instead of a badge on each row.
 export function SampleNote({ listings }) {
   if (!listings?.some((l) => l.sample)) return null;
@@ -130,6 +151,15 @@ export default function AdList({ section }) {
           </div>
         </details>
       </form>
+      {/* Category chips (session 85), one tap to filter. */}
+      <div className="chips" role="list">
+        {['', ...categories].map((c) => (
+          <button key={c || 'all'} type="button" role="listitem" className={`chip ${(params.get('category') || '') === c ? 'on' : ''}`}
+            onClick={() => { const n = new URLSearchParams(params); if (c) n.set('category', c); else n.delete('category'); n.delete('page'); setParams(n); }}>
+            {c ? t(c) : t('All')}
+          </button>
+        ))}
+      </div>
       <div className="safety-line small"><Icon name="lock" /> {{
         housing: () => t('Never pay a deposit before you have seen the place and met the owner.'),
         jobs: () => t('Real employers never ask you to pay for a visa, training or a uniform.'),
@@ -139,7 +169,13 @@ export default function AdList({ section }) {
       {loading ? <Loading /> : result.listings.length === 0 ? (
         <p className="muted empty-line">{t('No ads here yet.')} <Link to={postTo}>{t('Post the first one')}</Link></p>
       ) : (
-        <><SampleNote listings={result.listings} /><ul className="ad-list">{result.listings.map((l) => <AdRow key={l.id} listing={l} />)}</ul></>
+        <>
+          <SampleNote listings={result.listings} />
+          {/* Things with photos (For sale, Housing) as a photo grid; jobs as rows. */}
+          {section === 'jobs'
+            ? <ul className="ad-list">{result.listings.map((l) => <AdRow key={l.id} listing={l} />)}</ul>
+            : <ul className="ad-grid">{result.listings.map((l) => <AdCard key={l.id} listing={l} />)}</ul>}
+        </>
       )}
       {(page > 1 || result.hasMore) && (
         <div className="row pager">

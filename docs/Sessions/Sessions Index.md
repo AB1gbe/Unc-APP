@@ -91,3 +91,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-13 | [[2026-11-13 Session 82]] | Craigslist-style: Housing, Jobs and Wanted sections, new front page, scam checks with an admin review queue |
 | 2026-11-13 | [[2026-11-13 Session 83]] | Plain explanation of what Craigslist is |
 | 2026-11-13 | [[2026-11-13 Session 84]] | For sale section; calmer ad rows with photos; phone front page as 2×2 boxes |
+| 2026-11-13 | [[2026-11-13 Session 85]] | Facebook Marketplace–style photo grid and home, light colours, housing photos |

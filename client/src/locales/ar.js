@@ -1258,4 +1258,14 @@ export default {
   "Is it still available? When and where could I see it?": "هل ما زال متاحاً؟ متى وأين يمكنني رؤيته؟",
   "Mark it as sold? The ad will close.": "هل تم البيع؟ سيُغلق الإعلان.",
   "Sold": "تم البيع",
+  // ---- Marketplace look (session 85) ----
+  "Looking for": "مطلوب",
+  "Marketplace": "السوق",
+  "Sell": "بِع",
+  "Sections": "الأقسام",
+  "Today’s picks": "مختارات اليوم",
+  "Bahrain": "البحرين",
+  "Have one of these? Make an offer.": "لديك واحد منها؟ قدّم عرضاً.",
+  "Listed {time} in {place}": "نُشر {time} في {place}",
+  "Hi, is this still available?": "مرحباً، هل ما زال متاحاً؟",
 };

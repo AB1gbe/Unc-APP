@@ -6,6 +6,7 @@
 // inside Unc-APP:
 //   set PEXELS_API_KEY=your-key
 //   node scripts/fetch-photos.mjs
+// Only some files (e.g. the housing ones):  set ONLY=home-  first.
 // The photos are committed, so you only run this to change them. Each entry
 // has a fixed Pexels photo id, so a re-run downloads the same pictures; set
 // id to null and run again to pick the first search result instead.
@@ -42,6 +43,13 @@ const PHOTOS = [
   [DEMO, 'avatar-phonefix.jpg', 512, 512, 'smartphone repair technician', 19518397],
   // One example request per line of server/src/demo-requests.js (session 72)
   ...DEMO_REQUESTS.map((r) => [DEMO, r[7], 1200, 900, r[8], r[9]]),
+  // Housing demo ads (session 85: photo grid like Facebook Marketplace)
+  [DEMO, 'home-juffair-flat.jpg', 1200, 900, 'modern apartment living room sea view', 27051764],
+  [DEMO, 'home-shared-room.jpg', 1200, 900, 'bedroom with bed and desk', 6782479],
+  [DEMO, 'home-shop-unit.jpg', 1200, 900, 'empty retail shop front glass', 32367382],
+  [DEMO, 'home-villa-saar.jpg', 1200, 900, 'white villa exterior with swimming pool', 37070080],
+  [DEMO, 'home-seef-studio.jpg', 1200, 900, 'studio apartment interior', 7045996],
+  [DEMO, 'home-hoora-flat.jpg', 1200, 900, 'cozy apartment living room sofa', 36363110],
   // How Unc works
   [ART, 'step-post.jpg', 480, 360, 'person typing on smartphone', 6260105],
   [ART, 'step-offers.jpg', 480, 360, 'shop owner using phone counter', 6612691],
@@ -82,7 +90,14 @@ const used = new Set();
 const credits = { [ART]: {}, [DEMO]: {} };
 const browser = await chromium.launch();
 const page = await browser.newPage();
+// ONLY=home- downloads just the files whose names start with that, and
+// keeps every other credit as it is (session 85).
+const ONLY = process.env.ONLY;
+for (const dir of [ART, DEMO]) {
+  if (ONLY && fs.existsSync(`${dir}credits.json`)) credits[dir] = JSON.parse(fs.readFileSync(`${dir}credits.json`, 'utf8'));
+}
 for (const [dir, file, w, h, words, id] of PHOTOS) {
+  if (ONLY && !file.startsWith(ONLY)) { if (id) used.add(id); continue; }
   let photo;
   if (id) photo = await api(`photos/${id}`);
   else {

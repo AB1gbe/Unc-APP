@@ -25,8 +25,11 @@ export async function start(env) {
   // seedDemo() never adds the same demo item twice.
   const { DEMO_ADS } = await import('../server/src/demo-ads.js');
   const newest = DEMO_ADS.at(-1)[3];
+  // ...or when a demo ad that should have a photo has none (session 85).
+  const hasPhoto = db.prepare('SELECT 1 FROM listings l JOIN listing_images i ON i.listing_id = l.id WHERE l.title = ? AND l.sample = 1');
   const seeded = db.prepare(`SELECT 1 FROM users WHERE email = 'buyer@demo.local'`).get()
-    && db.prepare('SELECT 1 FROM listings WHERE title = ? AND sample = 1').get(newest);
+    && db.prepare('SELECT 1 FROM listings WHERE title = ? AND sample = 1').get(newest)
+    && DEMO_ADS.every((a) => !a[13] || hasPhoto.get(a[3]));
   if (env.SEED_DEMO === '1' && !seeded) {
     const { DEMO_REQUESTS } = await import('../server/src/demo-requests.js');
     const names = [...DEMO_PHOTOS, ...DEMO_REQUESTS.map((r) => r[7]), ...DEMO_ADS.map((a) => a[13]).filter(Boolean)];

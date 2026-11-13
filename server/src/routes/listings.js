@@ -193,7 +193,7 @@ export function listingRoutes(db) {
     `).all();
     const latest = {};
     for (const section of SECTIONS) {
-      latest[section] = db.prepare(`${BASE_SELECT} WHERE l.status = 'open' AND l.section = ? AND l.held_at IS NULL AND u.banned_at IS NULL ORDER BY l.created_at DESC, l.id DESC LIMIT 8`)
+      latest[section] = db.prepare(`${BASE_SELECT} WHERE l.status = 'open' AND l.section = ? AND l.held_at IS NULL AND u.banned_at IS NULL ORDER BY l.created_at DESC, l.id DESC LIMIT 12`)
         .all(section).map(withImages);
     }
     const out = Object.fromEntries(SECTIONS.map((sec) => [sec, { total: 0, categories: {} }]));

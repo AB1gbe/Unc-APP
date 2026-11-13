@@ -103,6 +103,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 70 - Bahraini Dinar]]
 - [[Step 71 - Craigslist-style sections]]
 - [[Step 72 - For sale and calmer rows]]
+- [[Step 73 - Marketplace layout and light colours]]
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
@@ -170,6 +171,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Test site sign-up fix ("Request failed (500)") | ✅ **live** → [[Mistakes and Fixes#M143]] |
 | Craigslist-style: Housing, Jobs and Wanted sections, front page, scam checks + review queue | ✅ **live** on unc.b1gbe.org → [[Housing, Jobs and Wanted]] |
 | For sale section; calmer ad rows with photos | ✅ on the branch, live after the next merge → [[Step 72 - For sale and calmer rows]] |
+| Marketplace layout (photo grid, Today's picks) and light colours | ✅ on the branch, live after the next merge → [[Step 73 - Marketplace layout and light colours]] |
 | API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

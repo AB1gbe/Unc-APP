@@ -167,7 +167,15 @@ export async function seedDemo(db) {
   // Housing and Jobs ads (session 82), already in BD.
   for (const [email, section, category, title, description, price, priceMax, city, daysAgo, bedrooms, furnished, jobType, condition = 'any', photo] of DEMO_ADS) {
     const who = db.prepare('SELECT id FROM users WHERE email = ?').get(email)?.id;
-    if (!who || db.prepare('SELECT 1 FROM listings WHERE buyer_id = ? AND title = ?').get(who, title)) continue;
+    if (!who) continue;
+    const old = db.prepare('SELECT id FROM listings WHERE buyer_id = ? AND title = ?').get(who, title);
+    if (old) {
+      // A demo ad made before it had a photo (session 85: housing photos) gets it now.
+      if (photo && !db.prepare('SELECT 1 FROM listing_images WHERE listing_id = ?').get(old.id)) {
+        db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(old.id, demoPhoto(LISTING_DIR, photo));
+      }
+      continue;
+    }
     const id = Number(db.prepare(`
       INSERT INTO listings (buyer_id, section, title, description, category, budget_min, budget_max, currency, city, bedrooms, furnished, job_type, item_condition, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, 'BHD', ?, ?, ?, ?, ?, datetime('now', ?), datetime('now', ?))

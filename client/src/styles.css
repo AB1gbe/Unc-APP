@@ -1,25 +1,27 @@
 /* ===== Design tokens (change these to re-theme the whole app) ===== */
 :root {
-  /* Session 62: one dark, grown-up look for everyone (like Siin), with a
-     warm coral accent. Text on coral is dark for contrast. */
-  color-scheme: dark;
-  --bg: #0b0c0f;
-  --surface: #15171c;
-  --surface-2: #1d2027;
-  --text: #f2f2f4;
-  --muted: #9ba1ab;
-  --border: #262a32;
-  --brand: #ff7a4d;
-  --brand-ink: #1b0d06;
-  --brand-soft: #2e1c15;
-  --ok: #4fd18b;
-  --ok-soft: #10291c;
-  --warn: #f2b34f;
-  --warn-soft: #33260f;
-  --bad: #ff6b6b;
-  --bad-soft: #3a1717;
+  /* Session 85: light, like Facebook Marketplace (the owner: "the colours
+     are very dull"). White cards on a soft grey page, dark text, a bold
+     coral for prices and buttons with white text. Session 62's dark look
+     is in git history (ADR-060). */
+  color-scheme: light;
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --surface-2: #e9ebee;
+  --text: #1c1e21;
+  --muted: #65676b;
+  --border: #dadde1;
+  --brand: #e8552a;
+  --brand-ink: #ffffff;
+  --brand-soft: #fdebe4;
+  --ok: #167a45;
+  --ok-soft: #e3f4ea;
+  --warn: #8a5a00;
+  --warn-soft: #fff3d6;
+  --bad: #c62828;
+  --bad-soft: #fdecea;
   --radius: 6px;
-  --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 8px 24px rgba(0, 0, 0, .35);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 1px 1px rgba(0, 0, 0, .04);
   --font-display: 'Plus Jakarta Sans Variable', 'Almarai', sans-serif;
   font-family: 'Plus Jakarta Sans Variable', 'Almarai', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
@@ -127,7 +129,7 @@ input[type="file"] { padding: .5rem; }
 .alert.ok { background: var(--ok-soft); color: var(--ok); }
 
 /* ===== Hero / search ===== */
-.hero { background: radial-gradient(120% 140% at 0% 0%, #5a3a26 0%, #2a1d16 45%, #15171c 100%); color: #f7efe9; border: 1px solid #3a2a20; border-radius: 8px; padding: 2.4rem; margin-bottom: 1.75rem; }
+.hero { background: linear-gradient(135deg, #fff1ea 0%, #ffe0d1 100%); color: var(--text); border: 1px solid #f7cdb9; border-radius: 8px; padding: 2.4rem; margin-bottom: 1.75rem; }
 .hero h1 { font-size: 2.4rem; }
 .hero p { opacity: .92; max-width: 560px; }
 .hero .btn { background: var(--brand); color: var(--brand-ink); }
@@ -348,7 +350,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .offer-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
 .bubble.mine .offer-card .badge { background: rgba(0,0,0,.15); color: var(--brand-ink); }
 .answer-line { align-self: center; text-align: center; font-size: .85rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: .35rem .9rem; max-width: 90%; }
-.answer-line.ok { color: var(--ok); border-color: #1f4d33; background: var(--ok-soft); }
+.answer-line.ok { color: var(--ok); border-color: #b7e4c7; background: var(--ok-soft); }
 .quick-replies { display: flex; gap: .4rem; overflow-x: auto; padding: .5rem .75rem 0; scrollbar-width: none; }
 .quick-replies .chip { white-space: nowrap; flex-shrink: 0; }
 
@@ -431,12 +433,12 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .compare-sort select { width: auto; margin: 0; }
 
 /* Scam warning under a message (session 31) */
-.scam-warning { margin-top: .4rem; padding: .45rem .6rem; border-radius: 8px; background: var(--warn-soft); color: var(--warn); border: 1px solid #5a4318; font-size: .8rem; }
+.scam-warning { margin-top: .4rem; padding: .45rem .6rem; border-radius: 8px; background: var(--warn-soft); color: var(--warn); border: 1px solid #f0d9a8; font-size: .8rem; }
 .linkish.small { font-size: .875rem; } /* .linkish's 'font: inherit' came after .small and undid it (session 31) */
 
 /* Expiry + tips on your own request (session 31) */
 .expiry-soon { color: #b45309; font-weight: 600; }
-.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 6px; background: var(--warn-soft); border: 1px solid #5a4318; font-size: .9rem; }
+.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: 6px; background: var(--warn-soft); border: 1px solid #f0d9a8; font-size: .9rem; }
 .tips ul { margin: .35rem 0 .4rem; padding-inline-start: 1.1rem; }
 
 /* "What people are asking for" (session 34) */
@@ -632,7 +634,7 @@ p.plan { display: block; }
 .glow-wrap { position: relative; isolation: isolate; }
 .glow-wrap > .card { position: relative; z-index: 1; height: 100%; }
 .glow { position: absolute; z-index: 0; pointer-events: none; object-fit: cover;
-  filter: blur(44px) saturate(1.3); opacity: .35; transition: opacity .3s; }
+  filter: blur(44px) saturate(1.3); opacity: .22; transition: opacity .3s; }
 .glow-wrap > .glow { top: -6%; inset-inline-start: -8%; width: 116%; height: 86%; }
 .glow-wrap:hover > .glow { opacity: .55; }
 .hero-glow { top: -20%; inset-inline-start: -20%; width: 140%; height: 140%; opacity: .45; filter: blur(56px) saturate(1.3); }
@@ -693,7 +695,7 @@ html, body { overflow-x: clip; }
 .shop-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
 .shop-grid-all { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
 .shop-card { position: relative; z-index: 1; display: block; height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; color: var(--text); text-decoration: none; }
-.shop-card:hover { text-decoration: none; border-color: #3a3f49; }
+.shop-card:hover { text-decoration: none; border-color: var(--muted); }
 .shop-card-cover { aspect-ratio: 16 / 9; background: var(--surface-2); }
 .shop-card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .shop-card-body { padding: .7rem .85rem .8rem; }
@@ -797,16 +799,16 @@ input[type=search]::-webkit-search-cancel-button { filter: invert(1); opacity: .
     grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; align-items: center;
     inset-inline: 14px; bottom: calc(10px + env(safe-area-inset-bottom)); height: 64px;
     max-width: 520px; margin-inline: auto; padding: 0 6px;
-    background: rgba(28, 31, 38, .55); -webkit-backdrop-filter: blur(20px) saturate(1.5); backdrop-filter: blur(20px) saturate(1.5);
-    border: 1px solid rgba(255, 255, 255, .09); border-radius: 22px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .06);
+    background: rgba(255, 255, 255, .78); -webkit-backdrop-filter: blur(20px) saturate(1.5); backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid rgba(0, 0, 0, .08); border-radius: 22px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
   }
   .tabbar a { min-height: 52px; border-radius: 16px; }
-  .tabbar a.active { background: rgba(255, 255, 255, .06); }
+  .tabbar a.active { background: var(--brand-soft); }
   .tab-post svg { margin-top: 0; width: 38px; height: 38px; box-shadow: none; }
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  @media (max-width: 899px) { .tabbar { background: rgba(28, 31, 38, .96); } }
+  @media (max-width: 899px) { .tabbar { background: rgba(255, 255, 255, .96); } }
 }
 
 /* ===== Marketplace requests (session 77) ===== */
@@ -943,4 +945,34 @@ a.req-card { display: flex; flex-direction: column; }
   .board-cats, .board-post { display: none; }
   .ad-thumb { flex-basis: 56px; width: 56px; height: 56px; }
   .page-head.row .btn { width: 100%; }
+}
+
+/* ---- Marketplace look (session 85, inspired by Facebook Marketplace) ---- */
+.market-top { display: flex; justify-content: space-between; align-items: center; margin: .25rem 0 .75rem; }
+.market-top h1 { margin: 0; font-size: 1.6rem; }
+.market-search { display: flex; align-items: center; gap: .5rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 0 1rem; margin-bottom: .75rem; color: var(--muted); }
+.market-search input { flex: 1; background: transparent; border: 0; outline: 0; padding: .7rem 0; color: var(--text); font: inherit; min-width: 0; }
+.market-search:focus-within { border-color: var(--brand); }
+.chips { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .25rem; margin-bottom: 1rem; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: .4rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: .45rem .9rem; font: inherit; font-size: .9rem; font-weight: 600; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.chip:hover { border-color: var(--muted); }
+.chip.on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.chip-count { color: var(--muted); font-weight: 500; font-size: .8rem; }
+.market-block { margin-bottom: 1.75rem; }
+.market-block .section-head { align-items: flex-end; }
+.ad-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.25rem .9rem; }
+.ad-card { display: flex; flex-direction: column; gap: .15rem; color: var(--text); text-decoration: none; min-width: 0; }
+.ad-card-photo { position: relative; aspect-ratio: 1 / 1; border-radius: 8px; overflow: hidden; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); margin-bottom: .35rem; }
+.ad-card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s; }
+.ad-card:hover .ad-card-photo img { transform: scale(1.03); }
+.ad-card-tag { position: absolute; inset-block-start: .5rem; inset-inline-start: .5rem; background: rgba(0, 0, 0, .65); color: #fff; font-size: .72rem; font-weight: 700; padding: .2rem .5rem; border-radius: 999px; }
+.ad-card-price { font-weight: 800; font-size: 1.05rem; color: var(--text); }
+.ad-card-title { line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ad-card-place { color: var(--muted); font-size: .82rem; }
+.ad-hero { display: block; width: calc(100% + 2.5rem); margin: -1.25rem -1.25rem 1rem; padding: 0; border: 0; background: #000; cursor: zoom-in; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
+.ad-hero img { display: block; width: 100%; max-height: 520px; object-fit: contain; margin: 0 auto; }
+@media (max-width: 700px) {
+  .ad-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem .6rem; }
+  .market-top h1 { font-size: 1.35rem; }
 }
