@@ -16,14 +16,27 @@ export class UncServer extends DurableObject {
     store.storage = ctx.storage;
     globalThis.UNC_ON_CLOUDFLARE = true;
     this.ready = ctx.blockConcurrencyWhile(async () => {
-      const { start } = await import('./start.js');
-      this.app = await start(env);
-      if (!(await ctx.storage.getAlarm())) await ctx.storage.setAlarm(Date.now() + HOUR);
+      // A failed start used to surface only as Cloudflare's "error 1101"
+      // (session 85, M153). Now it is kept and shown below.
+      try {
+        const { start } = await import('./start.js');
+        this.app = await start(env);
+        if (!(await ctx.storage.getAlarm())) await ctx.storage.setAlarm(Date.now() + HOUR);
+      } catch (err) {
+        console.error('Unc could not start:', err?.stack || err);
+        this.startError = err;
+      }
     });
   }
 
   async fetch(request) {
     await this.ready;
+    if (this.startError) {
+      // On the test site (TEST_SITE=1) the reason is shown, so it can be
+      // read from a browser; a real site would only say it is down.
+      const detail = this.env.TEST_SITE === '1' ? String(this.startError?.message || this.startError) : undefined;
+      return Response.json({ error: 'Unc could not start. Please try again soon.', detail }, { status: 503 });
+    }
     // Rate limits and logs need the visitor's address (TRUST_PROXY=1).
     const headers = new Headers(request.headers);
     const ip = request.headers.get('CF-Connecting-IP');
@@ -34,6 +47,7 @@ export class UncServer extends DurableObject {
   // Hourly jobs (expiry, reminders, deletions), like setInterval on a server.
   async alarm() {
     await this.ready;
+    if (this.startError) return;
     this.app.hourly();
     await this.ctx.storage.setAlarm(Date.now() + HOUR);
   }

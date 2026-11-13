@@ -33,11 +33,20 @@ export async function start(env) {
   if (env.SEED_DEMO === '1' && !seeded) {
     const { DEMO_REQUESTS } = await import('../server/src/demo-requests.js');
     const names = [...DEMO_PHOTOS, ...DEMO_REQUESTS.map((r) => r[7]), ...DEMO_ADS.map((a) => a[13]).filter(Boolean)];
-    for (const name of names) {
-      const res = await env.ASSETS.fetch(new Request(`https://assets.local/demo-photos/${name}`));
-      if (res.ok) fs.writeFileSync(`${process.env.DEMO_PHOTOS_DIR}/${name}`, new Uint8Array(await res.arrayBuffer()));
+    // Demo data must never take the site down (session 85, M153): on an
+    // existing site only the missing photos are fetched, and any error is
+    // logged and skipped so the app still starts.
+    try {
+      for (const name of names) {
+        const file = `${process.env.DEMO_PHOTOS_DIR}/${name}`;
+        if (fs.existsSync(file)) continue;
+        const res = await env.ASSETS.fetch(new Request(`https://assets.local/demo-photos/${name}`));
+        if (res.ok) fs.writeFileSync(file, new Uint8Array(await res.arrayBuffer()));
+      }
+      await seedDemo(db);
+    } catch (err) {
+      console.error('Demo data was not added:', err?.stack || err);
     }
-    await seedDemo(db);
   }
   const app = createApp(db);
   app.listen(PORT);
