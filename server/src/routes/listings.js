@@ -8,6 +8,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import { LISTING_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES, JOB_TYPES, SECTIONS, categoriesFor } from '../lib/categories.js';
 import { checkAd } from '../../../shared/scam-check.js';
+import { payForAd, settleAd } from '../lib/billing.js';
 import * as v from '../lib/validate.js';
 import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
@@ -286,9 +287,13 @@ export function listingRoutes(db) {
     res.json({ listing });
   });
 
-  r.post('/', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
+  r.post('/', requireVerified, upload.array('images', MAX_PHOTOS), async (req, res) => {
     const data = readListingBody(req.body);
     const held = adChecks(db, req.user.id, data);
+    // Businesses pay for For sale, Housing and Jobs ads (session 88): from
+    // their ad credit, or their card is charged now, before anything is
+    // saved, so a declined card leaves no half-made ad.
+    const payment = data.section === 'wanted' ? { from: 'free', price: 0 } : await payForAd(db, req.user, data.section);
     // All photos are checked before anything is saved, and the listing +
     // photo rows are written in one transaction: a bad photo means nothing
     // is created (no half-made listing that a retry would duplicate).
@@ -307,7 +312,9 @@ export function listingRoutes(db) {
         for (const name of photos.names) {
           db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(newId, name);
         }
-        audit(db, req.user.id, 'listing.created', `listing:${newId}`);
+        if (req.actorId) db.prepare('UPDATE listings SET posted_by = ? WHERE id = ?').run(req.actorId, newId);
+        settleAd(db, req.user, req.actorId, newId, payment);
+        audit(db, req.actorId ?? req.user.id, 'listing.created', `listing:${newId}`, req.actorId ? { for: req.user.id } : undefined);
         return newId;
       });
     } catch (err) {
@@ -316,7 +323,7 @@ export function listingRoutes(db) {
     }
     // Ads (Housing, Jobs) and held posts don't go out as request alerts.
     if (data.section !== 'wanted' || held.length) {
-      return res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)), held });
+      return res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)), held, paid: { amount: payment.price, from: payment.from } });
     }
     // Sellers who were favourited by this buyer hear about it first.
     // Then everyone whose request alert matches (session 31), once each.
@@ -325,7 +332,7 @@ export function listingRoutes(db) {
       id, title: data.title, description: data.description, category: data.category, city: data.city,
       budget_min: data.budgetMin, budget_max: data.budgetMax, contact_rule: data.contactRule, buyer_id: req.user.id,
     }, told);
-    res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)) });
+    res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)), paid: { amount: payment.price, from: payment.from } });
   });
 
   r.patch('/:id', requireVerified, (req, res) => {

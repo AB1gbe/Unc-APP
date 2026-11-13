@@ -102,6 +102,27 @@ export function passwordChangedEmail(language) {
   };
 }
 
+// A business adds someone to its team (session 88). Member text (the
+// business name) goes through iso() and esc() like other emails.
+export function teamInviteEmail(businessName, language) {
+  const lang = pick(language);
+  const url = `${config.appUrl}/team`;
+  if (lang === 'ar') {
+    return {
+      subject: `دعوة للانضمام إلى فريق ${iso(businessName)} على Unc`,
+      text: `أضافك ${businessName} إلى فريقه على Unc. سجّل الدخول أو أنشئ حساباً بهذا البريد، ثم افتح: ${url}`,
+      html: layout(lang, 'دعوة للانضمام إلى فريق', `<p>أضافك <b>${esc(businessName)}</b> إلى فريقه على Unc، لتنشر الإعلانات وترد على العملاء باسمه.</p>
+<p>سجّل الدخول أو أنشئ حساباً بهذا البريد، ثم <a href="${esc(url)}">اقبل الدعوة</a>.</p>`),
+    };
+  }
+  return {
+    subject: `Join the ${iso(businessName)} team on Unc`,
+    text: `${businessName} added you to their team on Unc. Log in or sign up with this email, then open: ${url}`,
+    html: layout(lang, 'You were invited to a team', `<p><b>${esc(businessName)}</b> added you to their team on Unc, so you can post ads and answer customers for them.</p>
+<p>Log in or sign up with this email, then <a href="${esc(url)}">accept the invitation</a>.</p>`),
+  };
+}
+
 // To the buyer when a seller makes an offer on their request (session 17).
 // Only sent while the buyer's "Email me about new offers" switch is on;
 // the footer says where to turn it off.

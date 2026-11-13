@@ -32,10 +32,21 @@ const providers = {
       if (last4 === '0002') throw new HttpError(402, 'Your bank declined this card. Please try another card.', { field: 'token' });
       return { providerRef: token, brand, last4, expMonth: month, expYear: year };
     },
+    // Charges a saved card (session 88: businesses paying for ads). In the
+    // showcase no money moves; cards ending 0341 are declined at payment.
+    async charge(card, amount) {
+      if (!(amount > 0)) throw new HttpError(400, 'Nothing to pay.');
+      if (card.last4 === '0341') throw new HttpError(402, 'Your bank declined the payment. Please update your card and try again.');
+      return `test_charge_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    },
   },
   tap: {
     async verifyCard() {
       // Not connected yet: needs a Tap merchant account and TAP_SECRET_KEY.
+      throw new HttpError(503, 'Card payments are not connected yet. Please try again later.');
+    },
+    async charge() {
+      // Tap "charges" API with the saved card, to connect later.
       throw new HttpError(503, 'Card payments are not connected yet. Please try again later.');
     },
   },

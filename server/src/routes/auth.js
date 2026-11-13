@@ -8,6 +8,7 @@ import { HttpError } from '../lib/http.js';
 import { audit, tx } from '../db.js';
 import * as v from '../lib/validate.js';
 import { SESSION_COOKIE, requireAuth, publicMe } from '../middleware/auth.js';
+import { startSession as startSessionFor } from '../lib/sessions.js';
 import { trySendMail } from '../lib/mailer.js';
 import { verificationCodeEmail, passwordResetEmail, passwordChangedEmail } from '../lib/emails.js';
 import { LANGS, langOf, translateMessage } from '../lib/i18n.js';
@@ -50,19 +51,7 @@ export function authRoutes(db) {
     changePassword: limit(10),
   };
 
-  function startSession(res, userId) {
-    const token = randomToken();
-    const expires = new Date(Date.now() + config.sessionDays * 864e5);
-    db.prepare('INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)')
-      .run(sha256(token), userId, expires.toISOString().replace('T', ' ').slice(0, 19));
-    res.cookie(SESSION_COOKIE, token, {
-      httpOnly: true,       // JavaScript in the page can't read it (XSS protection)
-      sameSite: 'lax',      // not sent on cross-site POSTs (CSRF protection)
-      secure: config.isProd,
-      expires,
-      path: '/',
-    });
-  }
+  const startSession = (res, userId) => startSessionFor(db, res, userId);
 
   // Saves a new code and returns it. The caller sends the email.
   function issueEmailCode(user) {

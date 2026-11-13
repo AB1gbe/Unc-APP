@@ -10,6 +10,8 @@ import { config } from './config.js';
 import { errorHandler, notFound } from './lib/http.js';
 import { AVATAR_DIR, COVER_DIR, LISTING_DIR, STORY_DIR, sendStored } from './lib/uploads.js';
 import { CATEGORIES, CURRENCIES, HOUSING_CATEGORIES, JOB_CATEGORIES, JOB_TYPES } from './lib/categories.js';
+import { businessRoutes } from './routes/business.js';
+import { HttpError } from './lib/http.js';
 import { loadUser } from './middleware/auth.js';
 import { withPreview } from './lib/previews.js';
 import { authRoutes } from './routes/auth.js';
@@ -49,6 +51,20 @@ export function createApp(db) {
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
   app.use(loadUser(db));
+  // A team member using a business account (session 88) can post, reply
+  // and see the business panel, but not the owner's private things: the
+  // password, identity check, card, profile, data export, account deletion.
+  const OWNER_ONLY = [
+    /^\/api\/auth\/(change-password|me\/delete|me\/delete\/cancel|me\/export|avatar|cover|terms)(\/|$)/,
+    /^\/api\/kyc(\/|$)/, /^\/api\/payments(\/|$)/, /^\/api\/admin(\/|$)/, /^\/api\/wallet(\/|$)/, /^\/api\/referrals(\/|$)/,
+  ];
+  app.use((req, _res, next) => {
+    if (!req.actorId) return next();
+    const p = req.path;
+    const ownerOnly = OWNER_ONLY.some((re) => re.test(p)) || (p === '/api/auth/me' && req.method !== 'GET');
+    if (ownerOnly) return next(new HttpError(403, 'Only the business owner can do this.'));
+    next();
+  });
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
   app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES, forsale: CATEGORIES }, jobTypes: JOB_TYPES }));
@@ -71,6 +87,7 @@ export function createApp(db) {
   app.use('/api', walletRoutes(db));
   app.use('/api/support', supportRoutes(db));
   app.use('/api', shopRoutes(db));
+  app.use('/api', businessRoutes(db));
   app.use('/api', (_req, _res, next) => next(notFound('Unknown API route')));
 
   // Listing photos are public. KYC files are NOT served statically - only
