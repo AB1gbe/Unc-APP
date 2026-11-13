@@ -89,3 +89,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-12 | [[2026-11-12 Session 80]] | Pull request #26 (Cloudflare test site) merged; `npm run deploy` copies the admin password; pull request #27 merged; live-site 500 fixed (TEST_SITE); prices in Bahraini Dinar |
 | 2026-11-13 | [[2026-11-13 Session 81]] | Craigslist study (business model, success, marketing, lessons for Unc) |
 | 2026-11-13 | [[2026-11-13 Session 82]] | Craigslist-style: Housing, Jobs and Wanted sections, new front page, scam checks with an admin review queue |
+| 2026-11-13 | [[2026-11-13 Session 83]] | Plain explanation of what Craigslist is |
