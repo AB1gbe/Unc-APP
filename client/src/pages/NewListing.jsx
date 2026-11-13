@@ -229,7 +229,7 @@ export default function NewListing() {
         <PhotoPicker id="images" files={images} onChange={setImages} max={6} existing={existing.length} />
         <div className="hint">{section === 'forsale' ? t('Clear photos of the real item sell faster.') : section === 'housing' ? t('Real photos of the place get more replies.') : section === 'jobs' ? t('A photo of the shop or workplace helps.') : t('A photo of what you want helps sellers understand.')}</div>
       </div>
-      <button className="btn block" disabled={busy || Boolean(check.block)}>{busy ? t('Saving…') : editing ? t('Save changes') : ad ? t('Post ad') : t('Post request')}</button>
+      <button className={`btn block ${editing ? '' : 'ok'}`} disabled={busy || Boolean(check.block)}>{busy ? t('Saving…') : editing ? t('Save changes') : ad ? t('Post ad') : t('Post request')}</button>
     </form>
   );
 }

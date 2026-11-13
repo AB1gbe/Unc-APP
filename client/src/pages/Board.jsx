@@ -35,7 +35,7 @@ export default function Board() {
     <>
       <div className="market-top">
         <h1>{t('Marketplace')}</h1>
-        <Link className="btn sm accent" to={postTo}><Icon name="plus" weight="bold" /> {t('Sell')}</Link>
+        <Link className="btn sm ok" to={postTo}><Icon name="plus" weight="bold" /> {t('Sell')}</Link>
       </div>
       <form className="market-search" onSubmit={search}>
         <Icon name="search" />

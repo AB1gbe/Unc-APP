@@ -92,3 +92,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-13 | [[2026-11-13 Session 83]] | Plain explanation of what Craigslist is |
 | 2026-11-13 | [[2026-11-13 Session 84]] | For sale section; calmer ad rows with photos; phone front page as 2×2 boxes |
 | 2026-11-13 | [[2026-11-13 Session 85]] | Facebook Marketplace–style photo grid and home, light colours, housing photos |
+| 2026-11-13 | [[2026-11-13 Session 86]] | Colours that mean something: green positive, red negative, blue neutral, yellow careful |

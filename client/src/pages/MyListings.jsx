@@ -12,7 +12,7 @@ export default function MyListings() {
     <>
       <div className="row spread" style={{ marginBottom: '1rem' }}>
         <h1>{t('My requests')}</h1>
-        {isVerified(user) && <Link className="btn" to="/requests/new">{t('+ Post a request')}</Link>}
+        {isVerified(user) && <Link className="btn ok" to="/requests/new">{t('+ Post a request')}</Link>}
       </div>
       {!isVerified(user) && <VerifyPrompt action="postMany" />}
       <ErrorBox error={error} />

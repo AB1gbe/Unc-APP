@@ -45,7 +45,7 @@ export default function Home() {
             <div className="muted small">{SEASON[season()]?.() ?? t('Here is what is happening with your requests and offers.')}</div>
           </div>
         </div>
-        <Link className="btn hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
+        <Link className="btn ok hide-phone" to="/requests/new">{t('+ Post a request')}</Link>
       </div>
 
       <LivePulse />
@@ -83,7 +83,7 @@ export default function Home() {
         {mine.loading ? <CardsLoading /> : openRequests.length === 0 ? (
           <div className="card empty">
             <p>{t('Looking for something? Post it and let sellers come to you.')}</p>
-            {isVerified(user) && <Link className="btn" to="/requests/new">{t('Post a request')}</Link>}
+            {isVerified(user) && <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>}
           </div>
         ) : (
           <div className="grid">

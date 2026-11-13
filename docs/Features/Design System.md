@@ -101,3 +101,6 @@ Replaced the coral: [[ADR-074 White, grey, blue and yellow]]. In `:root` of `cli
 
 ## Logo (session 85)
 See [[ADR-075 Logo]]. Tile `client/public/icons/logo-mark.svg`, component `client/src/components/Logo.jsx`, icons via `node scripts/make-icons.mjs`.
+
+## Colours that mean something (session 86)
+See [[ADR-076 Colours that mean something]]. When adding a button: positive buy/sell step → `btn ok`; negative → `btn danger` (can't undo) or `btn danger-outline`; neutral → `btn` (blue) or `btn secondary`; red text link → `linkish bad-link`.

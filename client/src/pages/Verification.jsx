@@ -49,7 +49,7 @@ export default function Verification() {
           <h1>{t("You're verified")}</h1>
           <p className="muted">{t('You can now post requests and contact buyers.')}</p>
           <div className="row" style={{ justifyContent: 'center' }}>
-            <Link className="btn" to="/requests/new">{t('Post a request')}</Link>
+            <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>
             <Link className="btn secondary" to="/">{t('Browse requests')}</Link>
           </div>
         </div>

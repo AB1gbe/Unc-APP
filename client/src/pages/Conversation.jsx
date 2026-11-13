@@ -419,7 +419,7 @@ function OfferCard({ m, conv, answer, newest, onDone }) {
         <div className="offer-actions">
           {!expired && <button type="button" className="btn sm ok" disabled={busy} onClick={respond('accept')}>{t('Accept')}</button>}
           <button type="button" className="btn sm secondary" disabled={busy} onClick={() => setCountering(true)}>{t('Counter')}</button>
-          <button type="button" className="btn sm secondary" disabled={busy} onClick={respond('decline')}>{t('Not for me')}</button>
+          <button type="button" className="btn sm danger-outline" disabled={busy} onClick={respond('decline')}>{t('Not for me')}</button>
           {!expired && <div className="small muted accept-terms">{tj('Accepting means you both finish this deal on Unc ({terms}).', { terms: <Link to="/terms">{t('Terms of use')}</Link> })}</div>}
         </div>
       )}
@@ -500,7 +500,7 @@ function BlockLink({ conv, onChange }) {
     await api(`/members/${conv.other.id}/block`, { method: 'POST' });
     await onChange();
   }
-  return <button type="button" className="linkish small" onClick={block}>{t('Block')}</button>;
+  return <button type="button" className="linkish small bad-link" onClick={block}>{t('Block')}</button>;
 }
 
 function BlockedNotice({ conv, onChange }) {
