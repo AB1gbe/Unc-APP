@@ -104,3 +104,6 @@ See [[ADR-075 Logo]]. Tile `client/public/icons/logo-mark.svg`, component `clien
 
 ## Colours that mean something (session 86)
 See [[ADR-076 Colours that mean something]]. When adding a button: positive buy/sell step → `btn ok`; negative → `btn danger` (can't undo) or `btn danger-outline`; neutral → `btn` (blue) or `btn secondary`; red text link → `linkish bad-link`.
+
+## Corners (session 89)
+See [[ADR-078 Square corners]]: always `border-radius: var(--radius)` (2px) or `0` for photos; `50%` only for profile pictures and dots. Never pill shapes (999px).
