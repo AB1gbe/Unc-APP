@@ -105,7 +105,7 @@ function FileField({ name, label, hint, accept = 'image/jpeg,image/png,image/web
           onChange(name, f);
         }} />
       {hint && <div className="hint">{hint}</div>}
-      {preview && <img src={preview} alt="" style={{ marginTop: '.5rem', maxHeight: 160, borderRadius: 8 }} />}
+      {preview && <img src={preview} alt="" style={{ marginTop: '.5rem', maxHeight: 160, borderRadius: 2 }} />}
     </div>
   );
 }

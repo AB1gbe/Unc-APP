@@ -95,3 +95,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-13 | [[2026-11-13 Session 86]] | Colours that mean something: green positive, red negative, blue neutral, yellow careful |
 | 2026-11-13 | [[2026-11-13 Session 87]] | Warnings are red; non-warnings get their real colour (green, blue, grey) |
 | 2026-11-13 | [[2026-11-13 Session 88]] | Business accounts: CR required, pay per ad or packs, business panel, team members |
+| 2026-11-14 | [[2026-11-14 Session 89]] | Square corners (2px), square photos, no pills; no sticky underline on tapped cards |

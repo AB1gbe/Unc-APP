@@ -74,6 +74,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 075 | [[ADR-075 Logo]] | Blue rounded tile with a white "u" and a yellow dot, then "unc" | price tag, map pin, chat bubbles |
 | 076 | [[ADR-076 Colours that mean something]] | Green = positive buy/sell step, red = negative and warnings, blue = neutral | yellow main actions, yellow warnings |
 | 077 | [[ADR-077 Business accounts, paying for ads and teams]] | CR required; businesses pay per ad or by pack; business panel; team members switch to the business | monthly plan, paid offers, shared passwords |
+| 078 | [[ADR-078 Square corners]] | 2px corners everywhere, square photos, no pill shapes | rounded 6–8px and pills, fully square |
 | 068 | [[ADR-068 Marketplace first]] | Shops-not-prices on requests, full filters, sample flag, offer status, marketplace-first home | count only, everything public |
 | 067 | [[ADR-067 App-style side bar]] | Side bar on computers (folds to icons, remembered); slim header + tab bar on phones | top bar designs A/B/C |
 | 066 | [[ADR-066 Calm home page and tabs]] | Calm home; tabs Home/Requests/Shops/Categories; examples in every category | one long page, member-only tab bar |
