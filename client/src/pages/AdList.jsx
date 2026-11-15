@@ -152,7 +152,7 @@ export default function AdList({ section }) {
         </details>
       </form>
       {/* Category chips (session 85), one tap to filter. */}
-      <div className="chips" role="list">
+      <div className="chips scroll" role="list">
         {['', ...categories].map((c) => (
           <button key={c || 'all'} type="button" role="listitem" className={`chip ${(params.get('category') || '') === c ? 'on' : ''}`}
             onClick={() => { const n = new URLSearchParams(params); if (c) n.set('category', c); else n.delete('category'); n.delete('page'); setParams(n); }}>

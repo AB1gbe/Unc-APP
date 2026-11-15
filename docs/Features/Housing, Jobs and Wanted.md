@@ -56,3 +56,6 @@ See [[ADR-072 For sale section and calmer ad rows]] and [[Step 72 - For sale and
 
 ## Marketplace look (session 85)
 See [[ADR-073 Marketplace layout and light colours]]. The home page is now **Marketplace**: search, section chips (For sale, Housing, Jobs, Wanted with counts), **Today's picks** (newest For sale and Housing as a photo grid), newest jobs as rows, **What Bahrain is looking for** (Wanted as cards tagged "Looking for"), safety strip, shops. For sale and Housing lists are photo grids with category chips; Jobs stay rows. Ad pages open with one big photo, "Listed yesterday in Sitra", and For sale replies start as "Hi, is this still available?". Colours are light.
+
+## Home page top (session 91)
+See [[ADR-079 Tagline, featured tiles, one ad per row]]: tagline "Buy, sell and connect with people near you", search, then a sideways row of featured tiles (`FEATURED` in `client/src/pages/Board.jsx`, pictures in `client/public/art/`), then Today's picks. On phones every ad gets its own row.

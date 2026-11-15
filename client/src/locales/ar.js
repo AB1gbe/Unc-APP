@@ -1339,4 +1339,13 @@ export default {
   "wants you on their team": "يريدك في فريقه",
   "{bonus} free": "{bonus} مجاناً",
   '{n} of {max} places used': { zero: '0 من {max} أماكن مستخدمة', one: 'مكان واحد من {max} مستخدم', two: 'مكانان من {max} مستخدمان', few: '{n} من {max} أماكن مستخدمة', many: '{n} من {max} مكاناً مستخدماً', other: '{n} من {max} مكان مستخدم' },
+  // ---- Home tagline and tiles (session 91) ----
+  "Buy, sell and connect with people near you": "بِع واشترِ وتواصل مع الناس من حولك",
+  "Things for sale, homes, jobs and requests across Bahrain. Every member is ID-checked.": "أغراض للبيع وسكن ووظائف وطلبات في كل البحرين. كل عضو تم التحقق من هويته.",
+  "Featured categories": "فئات مميزة",
+  "Phones": "هواتف",
+  "Homes for rent": "بيوت للإيجار",
+  "Cars & parts": "سيارات وقطع غيار",
+  "Furniture": "أثاث",
+  "Sports": "رياضة",
 };
