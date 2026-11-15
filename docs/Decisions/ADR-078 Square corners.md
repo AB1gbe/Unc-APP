@@ -13,7 +13,7 @@ The owner (phone screenshot of the home page): **"This rounded look gives it mor
 | **Nearly square: one 2px corner everywhere, photos fully square, no pills** | ✅ |
 | Fully square (0px) everywhere | (too harsh on buttons and inputs) |
 
-Kept round: profile pictures, small count dots, the logo tile (chosen in [[ADR-075 Logo]]).
+Kept round: profile pictures and small count dots. The logo tile ([[ADR-075 Logo]]) was squared too in session 90 (`rx="4"` of 64, about the same 2px look); phones still round home-screen icons themselves.
 
 How: `--radius: 2px` in `client/src/styles.css`; every `border-radius` (6px, 8px, 10px, 16px, 22px, 999px…) now uses `var(--radius)` (69 places), except circles (`50%`); photos get `border-radius: 0` (block "Square photos" at the end of the file).
 

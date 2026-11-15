@@ -33,7 +33,7 @@ export default function Business() {
         </div>
         <Link className="btn ok" to="/requests/new?section=forsale"><Icon name="plus" weight="bold" /> {t('Post an ad')}</Link>
       </div>
-      <nav className="chips" aria-label={t('Business panel')}>
+      <nav className="chips scroll" aria-label={t('Business panel')}>
         {tabs.map((x) => <button key={x} type="button" className={`chip ${tab === x ? 'on' : ''}`} onClick={() => setParams({ tab: x })}>{label[x]}</button>)}
       </nav>
       {tab === 'dashboard' && <Dashboard />}

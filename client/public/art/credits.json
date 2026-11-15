@@ -21,7 +21,7 @@
   },
   "cat-phones.jpg": {
     "pexelsId": 242427,
-    "photographer": "JÉSHOOTS",
+    "photographer": "J\u00c9SHOOTS",
     "page": "https://www.pexels.com/photo/device-electronics-hands-mobile-phone-242427/"
   },
   "cat-computers.jpg": {
@@ -41,7 +41,7 @@
   },
   "cat-vehicles.jpg": {
     "pexelsId": 10971731,
-    "photographer": "Mario Amé",
+    "photographer": "Mario Am\u00e9",
     "page": "https://www.pexels.com/photo/cars-parked-on-the-street-10971731/"
   },
   "cat-fashion.jpg": {
@@ -56,7 +56,7 @@
   },
   "cat-sports.jpg": {
     "pexelsId": 32403277,
-    "photographer": "Bayram  Yalçın",
+    "photographer": "Bayram  Yal\u00e7\u0131n",
     "page": "https://www.pexels.com/photo/rusty-vintage-bicycle-against-urban-wall-32403277/"
   },
   "cat-toys.jpg": {
@@ -71,7 +71,7 @@
   },
   "cat-tools.jpg": {
     "pexelsId": 7423708,
-    "photographer": "Karen Laårk Boshoff",
+    "photographer": "Karen La\u00e5rk Boshoff",
     "page": "https://www.pexels.com/photo/part-of-machine-in-workshop-7423708/"
   },
   "cat-garden.jpg": {
@@ -81,7 +81,7 @@
   },
   "cat-pets.jpg": {
     "pexelsId": 32949053,
-    "photographer": "Жанна  Алимкулова",
+    "photographer": "\u0416\u0430\u043d\u043d\u0430  \u0410\u043b\u0438\u043c\u043a\u0443\u043b\u043e\u0432\u0430",
     "page": "https://www.pexels.com/photo/close-up-portrait-of-a-cute-puppy-with-fluffy-ears-32949053/"
   },
   "cat-services.jpg": {
@@ -123,5 +123,15 @@
     "pexelsId": 14566062,
     "photographer": "Luthfi Ramaditya",
     "page": "https://www.pexels.com/photo/close-up-shot-of-a-curly-haired-woman-wearing-hoop-earrings-and-eyeglasses-14566062/"
+  },
+  "feat-housing.jpg": {
+    "pexelsId": 7045996,
+    "photographer": "Max Vakhtbovych",
+    "page": "https://www.pexels.com/photo/modern-bedroom-and-kitchen-interior-with-furniture-at-home-7045996/"
+  },
+  "feat-jobs.jpg": {
+    "pexelsId": 6612691,
+    "photographer": "Pavel Danilyuk",
+    "page": "https://www.pexels.com/photo/woman-in-black-crew-neck-shirt-taking-online-order-using-smartphone-6612691/"
   }
 }

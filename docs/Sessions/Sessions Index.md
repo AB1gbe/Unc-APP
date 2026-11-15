@@ -96,3 +96,5 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-13 | [[2026-11-13 Session 87]] | Warnings are red; non-warnings get their real colour (green, blue, grey) |
 | 2026-11-13 | [[2026-11-13 Session 88]] | Business accounts: CR required, pay per ad or packs, business panel, team members |
 | 2026-11-14 | [[2026-11-14 Session 89]] | Square corners (2px), square photos, no pills; no sticky underline on tapped cards |
+| 2026-11-15 | [[2026-11-15 Session 90]] | Square logo tile and icons |
+| 2026-11-15 | [[2026-11-15 Session 91]] | Tagline first, Siin-style featured tiles, one ad per row on phones |
