@@ -99,3 +99,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-15 | [[2026-11-15 Session 90]] | Square logo tile and icons |
 | 2026-11-15 | [[2026-11-15 Session 91]] | Tagline first, Siin-style featured tiles, one ad per row on phones |
 | 2026-11-15 | [[2026-11-15 Session 92]] | Featured tiles as small real photos with names; one-line tagline |
+| 2026-11-15 | [[2026-11-15 Session 93]] | Compact category cards (photo + name, shadow, hover lift); 3px corners |
