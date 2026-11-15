@@ -45,8 +45,8 @@ export default function Browse() {
   return (
     <>
       <div className="page-head">
-        <h1>{t('Requests')}</h1>
-        <p className="muted">{t('What people in Bahrain are looking for right now. Shops and finders answer with offers.')}</p>
+        <h1>{t('Wanted')}</h1>
+        <p className="muted">{t('What people in Bahrain are looking for right now. ID-checked shops and sellers answer with offers.')}</p>
       </div>
       <LivePulse />
       <form className="searchbar" onSubmit={search}>

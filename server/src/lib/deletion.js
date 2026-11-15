@@ -56,7 +56,7 @@ export function deleteNow(db, u) {
     files.push([AVATAR_DIR, u.avatar], [COVER_DIR, u.cover]);
 
     db.prepare(`UPDATE listings SET status = 'closed', updated_at = datetime('now') WHERE buyer_id = ? AND status = 'open'`).run(u.id);
-    for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views', 'payment_cards', 'wallet_entries']) {
+    for (const table of ['sessions', 'email_codes', 'password_resets', 'push_subscriptions', 'alerts', 'saved_listings', 'notifications', 'listing_views', 'payment_cards', 'wallet_entries', 'phone_codes']) {
       db.prepare(`DELETE FROM ${table} WHERE user_id = ?`).run(u.id);
     }
     db.prepare('DELETE FROM support_messages WHERE ticket_id IN (SELECT id FROM support_tickets WHERE user_id = ?)').run(u.id);
@@ -65,7 +65,7 @@ export function deleteNow(db, u) {
     db.prepare('DELETE FROM blocks WHERE user_id = ? OR blocked_id = ?').run(u.id, u.id);
     db.prepare(`
       UPDATE users SET email = ?, password_hash = ?, display_name = ?, city = NULL, avatar = NULL, cover = NULL, bio = NULL,
-        interests = '[]', shop_area = NULL, shop_hours = NULL, last_seen_at = NULL, short_name = 0,
+        interests = '[]', phone = NULL, phone_verified_at = NULL, shop_area = NULL, shop_hours = NULL, last_seen_at = NULL, short_name = 0,
         banned_at = COALESCE(banned_at, datetime('now')), deleted_at = datetime('now')
       WHERE id = ?
     `).run(`deleted-${u.id}@deleted.invalid`, `deleted:${randomToken()}`, DELETED_NAME, u.id);
@@ -82,7 +82,7 @@ export function exportData(db, u) {
   return {
     exportedAt: new Date().toISOString(),
     profile: {
-      email: u.email, displayName: u.display_name, accountType: u.account_type, city: u.city, bio: u.bio,
+      email: u.email, phone: u.phone_verified_at ? u.phone : null, displayName: u.display_name, accountType: u.account_type, city: u.city, bio: u.bio,
       interests: JSON.parse(u.interests || '[]'), language: u.language, createdAt: u.created_at,
       shopArea: u.shop_area, shopHours: u.shop_hours ? JSON.parse(u.shop_hours) : null,
       settings: { emailOffers: u.email_offers !== 0, hideActivity: u.hide_activity === 1, shortName: u.short_name === 1 },

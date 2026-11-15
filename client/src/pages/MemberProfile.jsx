@@ -31,7 +31,7 @@ export default function MemberProfile() {
           <div style={{ flex: 1 }}>
             <h1 dir="auto" style={{ margin: 0 }}>{m.displayName}</h1>
             <div className="meta">
-              <KycBadge status="approved" />
+              <KycBadge status={m.idChecked === false ? 'phone' : 'approved'} />
               {m.accountType === 'business' && <span className="badge grey">{t('Business')}</span>}
               <span>{t('Member since {date}', { date: formatDate(toDate(m.memberSince), { month: 'long', year: 'numeric' }) })}</span>
               <span>{tn(m.deals, '{n} deal', '{n} deals')}</span>

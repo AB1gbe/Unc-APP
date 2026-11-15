@@ -8,6 +8,7 @@ import { HttpError } from '../lib/http.js';
 import { avatarUrl, coverUrl } from '../lib/uploads.js';
 import { DELETE_AFTER_DAYS } from '../lib/deletion.js';
 import { termsAccepted } from '../lib/terms.js';
+import { maskPhone, postNeeds } from '../../../shared/trust.js';
 
 export const SESSION_COOKIE = 'unc_session';
 
@@ -75,6 +76,20 @@ export function requireVerified(req, res, next) {
   });
 }
 
+// May this member post in this section? (session 102, ADR-082: a phone
+// code is enough for a person selling their own things or asking for
+// something; Housing, Jobs and businesses need the ID check.) Call after
+// requireMember. Throws the step that is missing.
+export function assertCanPost(user, section) {
+  const need = postNeeds({
+    accountType: user.account_type, kycStatus: user.kyc_status,
+    phoneVerified: Boolean(user.phone_verified_at), hasCard: Boolean(user.card_added_at),
+  }, section);
+  if (need === 'phone') throw new HttpError(403, 'Please confirm your mobile number first.', { code: 'PHONE_REQUIRED' });
+  if (need === 'kyc') throw new HttpError(403, 'You need to complete identity verification (KYC) first.', { code: 'KYC_REQUIRED' });
+  if (need === 'card') throw new HttpError(403, 'Please add a payment card first.', { code: 'CARD_REQUIRED' });
+}
+
 export function requireAdmin(req, res, next) {
   requireAuth(req, res, (err) => {
     if (err) return next(err);
@@ -114,6 +129,9 @@ export function publicMe(u) {
     city: u.city,
     emailVerified: Boolean(u.email_verified_at),
     kycStatus: u.kyc_status,
+    // Phone code (session 102): only the member sees their number, masked.
+    phoneVerified: Boolean(u.phone_verified_at),
+    phone: u.phone_verified_at ? maskPhone(u.phone) : null,
     createdAt: u.created_at,
     language: u.language,
     avatarUrl: avatarUrl(u.avatar),

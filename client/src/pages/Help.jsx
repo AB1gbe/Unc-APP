@@ -13,7 +13,7 @@ import { art } from '../art.js';
 
 const FAQ = () => [
   ['start', t('Getting started'), [
-    [t('What is Unc?'), t('Unc turns shopping around: you post what you need, and verified shops and finders in Bahrain come to you with offers. You choose the best one.')],
+    [t('What is Unc?'), t('Unc turns shopping around: you post what you need, and verified shops and sellers in Bahrain come to you with offers. You choose the best one.')],
     [t('Why do I need to verify my identity?'), t('So everyone you deal with is a real, checked person or shop. You need it to post requests and make offers; browsing is open to all.')],
     [t('How long does verification take?'), t('Usually within a day. You get a notification when it is done. Clear photos of your ID and a selfie in good light make it faster.')],
   ]],

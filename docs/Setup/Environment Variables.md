@@ -34,6 +34,10 @@ All settings live in `server/src/config.js`. Each reads an environment variable 
 | `SMTP_SECURE` | `false` | `true` only for port 465 |
 | `SMTP_USER` / `SMTP_PASS` | — | Login from your provider. For `smtp.gmail.com` spaces in `SMTP_PASS` are removed automatically (App Passwords are shown with spaces). |
 | `RESEND_API_KEY` | — | For `MAIL_TRANSPORT=resend` |
+| `SMS_TRANSPORT` | `console` | Phone codes ([[Phone Codes]]): `console` (print; the test site shows the code on screen) or `twilio`. A real site with `console` turns phone codes off. |
+| `TWILIO_ACCOUNT_SID` | — | For `SMS_TRANSPORT=twilio` |
+| `TWILIO_AUTH_TOKEN` | — | For `SMS_TRANSPORT=twilio` (a secret) |
+| `TWILIO_FROM` | — | The number or sender name texts come from |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | generated | **Optional.** Keys for phone notifications ([[Push Notifications]]). Empty = made automatically once and kept in `server/data/vapid.json`. Set them only if that folder isn't kept between deploys. Make a pair with `npx web-push generate-vapid-keys` (inside `Unc-APP`). Never change them casually: every phone would have to turn notifications on again. |
 | `VAPID_SUBJECT` | `APP_URL` if it starts with https, else `mailto:admin@unc.local` | Contact the push services can use. iPhones refuse fake addresses: set your real site address (`https://…`) or `mailto:you@yourdomain.com` when you go live. |
 

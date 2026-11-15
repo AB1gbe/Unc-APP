@@ -10,7 +10,7 @@ import { CATEGORIES, CURRENCIES, JOB_TYPES, SECTIONS, categoriesFor } from '../l
 import { checkAd } from '../../../shared/scam-check.js';
 import { payForAd, settleAd } from '../lib/billing.js';
 import * as v from '../lib/validate.js';
-import { parseInterests, requireAuth, requireVerified } from '../middleware/auth.js';
+import { assertCanPost, parseInterests, requireAuth, requireMember, requireVerified } from '../middleware/auth.js';
 import { ratingQueries } from '../lib/ratings.js';
 import { notify, thankOtherSellers } from '../lib/notify.js';
 import { activityQueries } from '../lib/activity.js';
@@ -59,7 +59,9 @@ export function listingView(row, images = []) {
     held: Boolean(row.held_at),
     // Demo data from `npm run seed` (session 77): shown as "Sample", never as live.
     sample: row.sample === 1,
-    buyer: { id: row.buyer_id, displayName: nameFor(row.buyer_name, row.buyer_short), accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
+    buyer: { id: row.buyer_id, displayName: nameFor(row.buyer_name, row.buyer_short), accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar),
+      // false = posted with a phone code only (session 102); unknown when the query didn't ask.
+      ...(row.buyer_kyc != null ? { idChecked: row.buyer_kyc === 'approved' } : {}) },
     images: images.map((i) => `/uploads/listings/${i.file}`),
     // Small copies for grids and lists (session 102); the full photo when none.
     thumbs: images.map((i) => `/uploads/listings/${i.thumb || i.file}`),
@@ -71,7 +73,7 @@ export function listingView(row, images = []) {
 }
 
 const BASE_SELECT = `
-  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.short_name AS buyer_short, u.banned_at IS NOT NULL AS buyer_banned,
+  SELECT l.*, u.display_name AS buyer_name, u.account_type AS buyer_type, u.avatar AS buyer_avatar, u.short_name AS buyer_short, u.banned_at IS NOT NULL AS buyer_banned, u.kyc_status AS buyer_kyc,
          (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS offer_count,
          datetime(COALESCE(l.renewed_at, l.created_at), '+${LIFE_DAYS} days') AS closes_at
   FROM listings l JOIN users u ON u.id = l.buyer_id
@@ -305,7 +307,9 @@ export function listingRoutes(db) {
     res.json({ listing });
   });
 
-  r.post('/', requireVerified, photoFields, async (req, res) => {
+  r.post('/', requireMember, photoFields, async (req, res) => {
+    // Who may post here (session 102, ADR-082): checked before the form.
+    assertCanPost(req.user, SECTIONS.includes(req.body?.section) ? req.body.section : 'wanted');
     const data = readListingBody(req.body);
     const held = adChecks(db, req.user.id, data);
     // Businesses pay for For sale, Housing and Jobs ads (session 88): from
@@ -352,8 +356,9 @@ export function listingRoutes(db) {
     res.status(201).json({ listing: withImages(db.prepare(`${BASE_SELECT} WHERE l.id = ?`).get(id)), paid: { amount: payment.price, from: payment.from } });
   });
 
-  r.patch('/:id', requireVerified, (req, res) => {
+  r.patch('/:id', requireMember, (req, res) => {
     const row = ownListing(db, req);
+    assertCanPost(req.user, row.section);
     if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
     // The section can't change after posting (session 82).
     const data = readListingBody({ ...req.body, section: row.section });
@@ -370,8 +375,9 @@ export function listingRoutes(db) {
   // Mark as fulfilled / closed / reopen. Once not open, all its
   // conversations become read-only.
   // Add photos to an open request (owner only), up to MAX_PHOTOS in total.
-  r.post('/:id/images', requireVerified, photoFields, (req, res) => {
+  r.post('/:id/images', requireMember, photoFields, (req, res) => {
     const row = ownListing(db, req);
+    assertCanPost(req.user, row.section);
     if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
     const { images: files, thumbs } = photoFiles(req);
     if (!files.length) throw new HttpError(400, 'Please upload images.', { field: 'images' });
@@ -413,8 +419,9 @@ export function listingRoutes(db) {
   // "Raise my budget" (session 37): once a day, the buyer raises the top of
   // the budget, and sellers who looked at or saved the request (and may
   // still answer it) hear about it. 🔔 only.
-  r.post('/:id/budget', requireVerified, (req, res) => {
+  r.post('/:id/budget', requireMember, (req, res) => {
     const row = ownListing(db, req);
+    assertCanPost(req.user, row.section);
     if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
     const budgetMax = v.int(req.body, 'budgetMax', { min: 1 });
     if (budgetMax <= (row.budget_max ?? row.budget_min ?? 0)) throw new HttpError(400, 'The new budget must be higher than the current one.', { field: 'budgetMax' });

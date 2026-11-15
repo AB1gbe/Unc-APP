@@ -29,12 +29,26 @@ if (isProd && !testSite && ['console', 'memory'].includes(mailTransport)) {
   throw new Error('In production set MAIL_TRANSPORT to smtp or resend so emails are really sent');
 }
 
+// How text messages leave the server (session 102, ADR-082): 'console'
+// (print it), 'twilio', and 'memory' in tests. Unlike email, a real site
+// may start without an SMS provider: phone codes are then turned off and
+// casual sellers use the ID check instead.
+const smsTransport = isTest ? 'memory' : process.env.SMS_TRANSPORT || 'console';
+
 export const config = {
   isProd,
   testSite,
   // Sign-up and reset codes shown on screen: development and the test site only.
   showDevCodes: (!isProd || testSite) && ['console', 'memory'].includes(mailTransport),
   isTest,
+  sms: {
+    transport: smsTransport,
+    // Phone codes work in development, tests, the test site, or with a real provider.
+    enabled: !isProd || testSite || !['console', 'memory'].includes(smsTransport),
+    // The code shown on screen, like the email codes: never on a real site.
+    showDevCodes: (!isProd || testSite) && ['console', 'memory'].includes(smsTransport),
+    twilio: { sid: process.env.TWILIO_ACCOUNT_SID, token: process.env.TWILIO_AUTH_TOKEN, from: process.env.TWILIO_FROM },
+  },
   port: Number(process.env.PORT || 4000),
   // How many proxies sit in front of the app (Render/Railway/Fly/nginx: 1).
   // Needed so rate limits see each visitor's real IP. Leave 0 when the app

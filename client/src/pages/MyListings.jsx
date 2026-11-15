@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuth, isVerified } from '../auth.jsx';
+import { useAuth, canChat } from '../auth.jsx';
 import { ErrorBox, ListingCard, Loading, StatusBadge, VerifyPrompt } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { t } from '../i18n.jsx';
@@ -12,9 +12,9 @@ export default function MyListings() {
     <>
       <div className="row spread" style={{ marginBottom: '1rem' }}>
         <h1>{t('My requests')}</h1>
-        {isVerified(user) && <Link className="btn ok" to="/requests/new">{t('+ Post a request')}</Link>}
+        {canChat(user) && <Link className="btn ok" to="/requests/new">{t('+ Post a request')}</Link>}
       </div>
-      {!isVerified(user) && <VerifyPrompt action="postMany" />}
+      {!canChat(user) && <VerifyPrompt action="postMany" />}
       <ErrorBox error={error} />
       {loading ? <Loading /> : data?.listings.length === 0 ? (
         <div className="card empty">{t('What are you looking for? Post your first request — it takes a minute.')}</div>

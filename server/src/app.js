@@ -55,7 +55,7 @@ export function createApp(db) {
   // and see the business panel, but not the owner's private things: the
   // password, identity check, card, profile, data export, account deletion.
   const OWNER_ONLY = [
-    /^\/api\/auth\/(change-password|me\/delete|me\/delete\/cancel|me\/export|avatar|cover|terms)(\/|$)/,
+    /^\/api\/auth\/(change-password|me\/delete|me\/delete\/cancel|me\/export|avatar|cover|terms|phone)(\/|$)/,
     /^\/api\/kyc(\/|$)/, /^\/api\/payments(\/|$)/, /^\/api\/admin(\/|$)/, /^\/api\/wallet(\/|$)/, /^\/api\/referrals(\/|$)/,
   ];
   app.use((req, _res, next) => {
