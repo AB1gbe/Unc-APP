@@ -3,11 +3,11 @@
 // of section chips, then "Today's picks" as a grid of big photos with the
 // price first. Jobs follow as rows (they rarely have photos), then what
 // people in Bahrain are looking for (Wanted, Unc's own idea), then shops.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth.jsx';
 import { useApi } from '../hooks.js';
-import { t } from '../i18n.jsx';
+import { t, tj } from '../i18n.jsx';
 import { CardsLoading } from '../components/ui.jsx';
 import { ShopsPreview } from '../components/Showcase.jsx';
 import Icon from '../components/Icon.jsx';
@@ -47,14 +47,23 @@ export default function Board() {
   return (
     <>
       {/* First thing people see (session 91): what Unc is, in one line. */}
+      {/* Session 94: the tagline stands alone, "near you" marked in blue
+          on a yellow highlighter stroke (the logo's colours); Sell moved
+          next to the search box. */}
       <div className="market-top">
-        <h1 className="tagline">{t('Buy, sell and connect with people near you')}</h1>
-        <Link className="btn sm ok" to={postTo}><Icon name="plus" weight="bold" /> {t('Sell')}</Link>
+        <h1 className="tagline">
+          {/* Screen readers hear the whole idea once; the moving words are hidden from them. */}
+          <span className="visually-hidden">{t('Buy, sell or trade and connect near you')}</span>
+          <span aria-hidden="true">{tj('{verb} and connect {near}', { verb: <RotatingWord words={[t('Buy'), t('Sell'), t('Trade')]} />, near: t('near you') })}</span>
+        </h1>
       </div>
-      <form className="market-search" onSubmit={search}>
-        <Icon name="search" />
-        <input type="search" enterKeyHint="search" placeholder={t('Search Unc')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('Search')} />
-      </form>
+      <div className="market-search-row">
+        <form className="market-search" onSubmit={search}>
+          <Icon name="search" />
+          <input type="search" enterKeyHint="search" placeholder={t('Search Unc')} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t('Search')} />
+        </form>
+        <Link className="btn ok sell-btn" to={postTo}><Icon name="plus" weight="bold" /> {t('Sell')}</Link>
+      </div>
       {/* Featured categories (session 91; session 92: plain small photos
           with the name under them, no colour glow: "make them look real"). */}
       <nav className="feature-row" aria-label={t('Featured categories')}>
@@ -109,3 +118,16 @@ export default function Board() {
     </>
   );
 }
+
+// "Buy" → "Sell" → "Trade": the highlighted word slides up every 2.4 s
+// (session 94). People who turned off animations see "Buy" only.
+function RotatingWord({ words }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const id = setInterval(() => setI((n) => (n + 1) % words.length), 2400);
+    return () => clearInterval(id);
+  }, [words.length]);
+  return <span className="tagline-mark rotator"><span key={i} className="rotator-word">{words[i]}</span></span>;
+}
+

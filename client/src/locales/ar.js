@@ -1349,4 +1349,10 @@ export default {
   "Furniture": "أثاث",
   "Sports": "رياضة",
   "Settings": "الإعدادات",
+  "Buy, sell and connect with people {near}": "بِع واشترِ وتواصل مع الناس {near}",
+  "near you": "من حولك",
+  "{verb} and connect {near}": "{verb} وتواصل {near}",
+  "Buy": "اشترِ",
+  "Trade": "بادِل",
+  "Buy, sell or trade and connect near you": "اشترِ أو بِع أو بادِل وتواصل مع من حولك",
 };

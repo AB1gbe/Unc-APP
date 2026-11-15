@@ -28,3 +28,10 @@ The owner (screenshot of the live page): "The tiles still look too AI, make them
 The owner: "The design still looks unfinished, the squares look bad, give it 3px rounded or something, but it needs flair, and the size is too big."
 - Tiles are now **compact category cards**: a 34px photo with the name beside it, white card, thin border, soft shadow; on a computer they lift slightly and the border turns blue on hover. About a third of the height of the session-92 tiles.
 - `--radius` 2px → **3px** everywhere ([[ADR-078 Square corners]]).
+
+## Session 96 change
+The owner: "I don't like how the +Sell is sticking so close to the tagline, add a design or style for the tagline", then "Buy and connect near you … the word Buy highlighted … it swipes to Sell, Trade", then "don't highlight the near you".
+- Tagline: **"[Buy] and connect near you"**. The first word changes every 2.4 s, **Buy → Sell → Trade**, sliding up, in brand blue on a yellow highlighter stroke (the logo's colours). "near you" is plain. People who turn off animations see "Buy". Screen readers hear "Buy, sell or trade and connect near you" once.
+- **Sell** moved from the tagline to beside the search box.
+- Arabic: "{اشترِ / بِع / بادِل} وتواصل من حولك".
+- Code: `RotatingWord` in `client/src/pages/Board.jsx`; styles `.tagline-mark`, `.rotator`, `.market-search-row` in `client/src/styles.css`.
