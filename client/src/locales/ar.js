@@ -1375,4 +1375,5 @@ export default {
   "Looking for something?": "تبحث عن شيء؟",
   "Post it once. Verified shops near you send offers.": "انشره مرة واحدة، وسترسل لك المحلات الموثّقة القريبة عروضها.",
   "Reported by several members": "أبلغ عنه عدة أعضاء",
+  "Download backup": "تنزيل نسخة احتياطية",
 };

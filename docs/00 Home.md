@@ -106,6 +106,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 73 - Marketplace layout and light colours]]
 - [[Step 74 - Business panel, billing and teams]]
 - [[Step 75 - Trust ladder]]
+- [[Step 76 - Launch readiness]]
 - [[Test Logins]] (demo accounts for the test site)
 
 ### How it works
@@ -175,8 +176,9 @@ This vault is the complete record of the project: **how** everything was built, 
 | Craigslist-style: Housing, Jobs and Wanted sections, front page, scam checks + review queue | ✅ **live** on unc.b1gbe.org → [[Housing, Jobs and Wanted]] |
 | For sale section; calmer ad rows with photos | ✅ **live** → [[Step 72 - For sale and calmer rows]] |
 | Marketplace layout (photo grid, Today's picks) and light colours | ✅ **live**; colours now white/grey/blue/yellow and the new logo (on the branch) → [[ADR-074 White, grey, blue and yellow]], [[ADR-075 Logo]], [[ADR-076 Colours that mean something]] |
-| Business accounts: CR required, pay per ad / packs, business panel, team members | ✅ on the branch (test payments, no real money) → [[Business Accounts and Billing]] |
-| Trust ladder: reply with an email code; ID check to post and offer; card only for businesses | ✅ on the branch → [[ADR-080 Trust ladder]] |
-| API tests | ✅ 192 passing |
+| Business accounts: CR required, pay per ad / packs, business panel, team members | ✅ **live** (test payments, no real money; free during launch) → [[Business Accounts and Billing]] |
+| Trust ladder: reply with an email code; ID check to post and offer; card only for businesses | ✅ **live** → [[ADR-080 Trust ladder]] |
+| Launch readiness: photo thumbnails, free for businesses, extra features hidden, Wanted first, report-to-hide, disguised scam words, backup download | ✅ on the branch → [[Step 76 - Launch readiness]], [[Launch Plan]] |
+| API tests | ✅ 225 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

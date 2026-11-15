@@ -16,7 +16,11 @@ export default function AdminHome() {
 
   return (
     <div className="stack">
-      <h1>{t('Admin')}</h1>
+      <div className="row spread">
+        <h1 style={{ margin: 0 }}>{t('Admin')}</h1>
+        {/* Session 102: a copy of the whole database, kept off Cloudflare. */}
+        <a className="btn secondary sm" href="/api/admin/backup" download>{t('Download backup')}</a>
+      </div>
       {stats.data && (
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
           {[[t('Users'), 'users'], [t('Pending KYC'), 'pendingKyc'], [t('Open requests'), 'openListings'], [t('Conversations'), 'conversations'], [t('Open reports'), 'openReports'], [t('Help questions'), 'openHelp'], [t('Ads to check'), 'heldAds']].map(([label, k]) => (
