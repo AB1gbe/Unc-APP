@@ -18,7 +18,8 @@ export async function start(env) {
   const db = openDb(process.env.DB_FILE || '/data/unc.sqlite');
   // The admin account is only created once the owner has set their own
   // ADMIN_PASSWORD secret: the default password is public (session 79).
-  if (env.ADMIN_PASSWORD) await ensureAdmin(db);
+  // The secret is the admin's password: changing it resets it (session 95).
+  if (env.ADMIN_PASSWORD) await ensureAdmin(db, { syncPassword: true });
   else console.warn('ADMIN_PASSWORD is not set: no admin account yet. Add it in the dashboard (Settings → Variables and Secrets).');
   // A test site starts with the demo data (SEED_DEMO=1), once; and again
   // once when new demo ads are added to the code (session 84: For sale).
