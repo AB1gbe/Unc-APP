@@ -101,3 +101,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-15 | [[2026-11-15 Session 92]] | Featured tiles as small real photos with names; one-line tagline |
 | 2026-11-15 | [[2026-11-15 Session 93]] | Compact category cards (photo + name, shadow, hover lift); 3px corners |
 | 2026-11-15 | [[2026-11-15 Session 94]] | Settings gear in the phone header; test logins written down |
+| 2026-11-15 | [[2026-11-15 Session 95]] | Admin password follows the ADMIN_PASSWORD secret (reset steps) |

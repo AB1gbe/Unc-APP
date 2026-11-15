@@ -118,3 +118,20 @@ test('team: only members can switch, and removing someone logs them out of the b
   const person = await t.user();
   await person.post('/api/business/team/invites').send({ email: 'x@y.z' }).expect(403);
 });
+
+// Session 95: on the test site the ADMIN_PASSWORD secret resets the admin's
+// password (and logs the admin out everywhere).
+test('ensureAdmin with syncPassword sets the admin password from the secret', async () => {
+  const { ensureAdmin } = await import('../src/seed.js');
+  const { config } = await import('../src/config.js');
+  const id = t.db.prepare('SELECT id FROM users WHERE email = ?').get(config.adminEmail).id;
+  t.db.prepare(`UPDATE users SET password_hash = 'old' WHERE id = ?`).run(id);
+  await ensureAdmin(t.db); // without sync: unchanged
+  assert.equal(t.db.prepare('SELECT password_hash FROM users WHERE id = ?').get(id).password_hash, 'old');
+  await ensureAdmin(t.db, { syncPassword: true });
+  const fresh = t.request.agent(t.app);
+  await fresh.post('/api/auth/login').send({ email: config.adminEmail, password: config.adminPassword }).expect(200);
+  // Already right: nothing changes and the session stays.
+  await ensureAdmin(t.db, { syncPassword: true });
+  await fresh.get('/api/admin/stats').expect(200);
+});

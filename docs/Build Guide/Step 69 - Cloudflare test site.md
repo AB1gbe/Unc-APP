@@ -49,3 +49,6 @@ Symptom: you merge to `main` but unc.b1gbe.org doesn't change, and **unc-app →
 2. In Cloudflare: **unc-app → Settings → Builds → Git repository → Disconnect**, then **Connect**, pick your GitHub account and `AB1gbe/Unc-APP`.
 3. Check the settings are still: production branch `main`, build command `npm run build`, deploy command `npm run deploy`, root directory `/`.
 4. **unc-app → Deployments**: a build of the newest `main` should start. If not, push any small change to `main` (or ask Claude to merge).
+
+## Reset the admin password (session 95)
+See [[Test Logins#Reset the admin password (session 95)]]. `cloudflare/start.js` calls `ensureAdmin(db, { syncPassword: true })`, which sets the admin password to `ADMIN_PASSWORD` whenever they differ.

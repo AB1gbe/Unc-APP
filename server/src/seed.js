@@ -6,13 +6,21 @@ import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { openDb, TO_BHD_SQL } from './db.js';
 import { DEMO_ADS } from './demo-ads.js';
-import { hashPassword } from './lib/crypto.js';
+import { hashPassword, verifyPassword } from './lib/crypto.js';
 import { DEMO_BUYERS, DEMO_REQUESTS } from './demo-requests.js';
 import { TERMS_VERSION } from './lib/terms.js';
 import { AVATAR_DIR, CHAT_DIR, COVER_DIR, LISTING_DIR, STORY_DIR, saveFiles } from './lib/uploads.js';
 
-export async function ensureAdmin(db) {
-  const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(config.adminEmail);
+// syncPassword (session 95, the Cloudflare test site): the ADMIN_PASSWORD
+// secret is the admin's password. When the owner changes the secret, the
+// next start sets the new password and logs the admin out everywhere.
+export async function ensureAdmin(db, { syncPassword = false } = {}) {
+  const exists = db.prepare('SELECT id, password_hash FROM users WHERE email = ?').get(config.adminEmail);
+  if (exists && syncPassword && !(await verifyPassword(config.adminPassword, exists.password_hash))) {
+    db.prepare(`UPDATE users SET password_hash = ?, role = 'admin', banned_at = NULL WHERE id = ?`).run(await hashPassword(config.adminPassword), exists.id);
+    db.prepare('DELETE FROM sessions WHERE user_id = ?').run(exists.id);
+    if (!config.isTest) console.log(`Admin password updated from ADMIN_PASSWORD for ${config.adminEmail}`);
+  }
   if (exists) return exists.id;
   const info = db.prepare(`
     INSERT INTO users (email, password_hash, display_name, account_type, role, email_verified_at, kyc_status, terms_version, terms_accepted_at)
