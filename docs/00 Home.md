@@ -178,7 +178,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Marketplace layout (photo grid, Today's picks) and light colours | ✅ **live**; colours now white/grey/blue/yellow and the new logo (on the branch) → [[ADR-074 White, grey, blue and yellow]], [[ADR-075 Logo]], [[ADR-076 Colours that mean something]] |
 | Business accounts: CR required, pay per ad / packs, business panel, team members | ✅ **live** (test payments, no real money; free during launch) → [[Business Accounts and Billing]] |
 | Trust ladder: reply with an email code; ID check to post and offer; card only for businesses | ✅ **live** → [[ADR-080 Trust ladder]] |
-| Launch readiness: photo thumbnails, free for businesses, extra features hidden, Wanted first, report-to-hide, disguised scam words, backup download | ✅ on the branch → [[Step 76 - Launch readiness]], [[Launch Plan]] |
+| Launch readiness: photo thumbnails, free for businesses, extra features hidden, Wanted first, report-to-hide, disguised scam words, backup download | ✅ **live** (PR #43) → [[Step 76 - Launch readiness]], [[Launch Plan]] |
 | API tests | ✅ 225 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
