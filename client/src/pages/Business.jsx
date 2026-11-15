@@ -2,6 +2,7 @@
 // Dashboard: this week vs last week. Ads: every ad and request with its
 // numbers. Billing: ad credit, packs, card, receipts. Team: staff who post
 // and answer for the business (the owner only).
+import { FEATURES } from '../features.js';
 import { useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ago, api, moneyExact } from '../api.js';
@@ -21,7 +22,7 @@ export default function Business() {
   const { user } = useAuth();
   const [params, setParams] = useSearchParams();
   const isOwner = !user.actor;
-  const tabs = TABS.filter((x) => x !== 'team' || isOwner);
+  const tabs = TABS.filter((x) => x !== 'team' || (isOwner && FEATURES.teams));
   const tab = tabs.includes(params.get('tab')) ? params.get('tab') : 'dashboard';
   const label = { dashboard: t('Dashboard'), ads: t('Ads'), billing: t('Billing'), team: t('Team') };
   return (
@@ -39,7 +40,7 @@ export default function Business() {
       {tab === 'dashboard' && <Dashboard />}
       {tab === 'ads' && <Ads />}
       {tab === 'billing' && <Billing isOwner={isOwner} />}
-      {tab === 'team' && isOwner && <Team />}
+      {tab === 'team' && isOwner && FEATURES.teams && <Team />}
     </div>
   );
 }

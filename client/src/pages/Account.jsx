@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FEATURES } from '../features.js';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, toDate } from '../api.js';
 import { useAuth } from '../auth.jsx';
@@ -30,11 +31,11 @@ export default function Account() {
           <span>{t('Identity:')} <KycBadge status={user.kycStatus} /></span>
           {user.kycStatus === 'approved' && <Link to={`/members/${user.id}`}>{t('View my public profile & ratings')} <span className="flip">→</span></Link>}
           <Link to="/saved">{t('Saved requests')} <span className="flip">→</span></Link>
-          <Link to="/alerts">{t('Request alerts')} <span className="flip">→</span></Link>
+          {FEATURES.alerts && <Link to="/alerts">{t('Request alerts')} <span className="flip">→</span></Link>}
           <Link to="/orders">{t('Orders')} <span className="flip">→</span></Link>
-          <Link to="/wallet">{t('My wallet')} <span className="flip">→</span></Link>
-          <Link to="/invite">{t('Invite friends')} <span className="flip">→</span></Link>
-          <Link to="/team">{t('Teams')} <span className="flip">→</span></Link>
+          {FEATURES.wallet && <Link to="/wallet">{t('My wallet')} <span className="flip">→</span></Link>}
+          {FEATURES.referrals && <Link to="/invite">{t('Invite friends')} <span className="flip">→</span></Link>}
+          {FEATURES.teams && <Link to="/team">{t('Teams')} <span className="flip">→</span></Link>}
           {user.accountType === 'business' && <Link to="/business">{t('Business panel')} <span className="flip">→</span></Link>}
           <Link to="/help">{t('Get help')} <span className="flip">→</span></Link>
         </div>
@@ -50,7 +51,7 @@ export default function Account() {
       {user.accountType === 'business' && <ShopEditor />}
       <EmailSettings />
       <PrivacySettings />
-      <AwayMode />
+      {FEATURES.awayMode && <AwayMode />}
       <PushSettings />
       <ChangePassword />
       <CardSettings />

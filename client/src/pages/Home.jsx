@@ -1,5 +1,6 @@
 // The logged-in member's home: what needs attention, their requests, and
 // requests they could help with. Logged-out visitors get Browse instead.
+import { FEATURES } from '../features.js';
 import { Link } from 'react-router-dom';
 import { ago } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
@@ -123,7 +124,7 @@ export default function Home() {
             </div>
           </div>
           <span className="row" style={{ gap: '1rem' }}>
-            <Link to="/demand">{t('What people ask for')}</Link>
+            {FEATURES.demand && <Link to="/demand">{t('What people ask for')}</Link>}
             <Link to="/browse">{t('Browse all')} <span className="flip">→</span></Link>
           </span>
         </div>

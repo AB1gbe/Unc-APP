@@ -1,5 +1,6 @@
 // A single conversation. Polls every 4 seconds for new messages (simple and
 // reliable; see docs/Decisions for why not WebSockets yet).
+import { FEATURES } from '../features.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { Link, useParams } from 'react-router-dom';
@@ -151,8 +152,8 @@ export default function Conversation() {
         </div>
         {conv.deal && <DealBanner conv={conv} onRated={load} />}
         {conv.deal && <DealProblem conv={conv} onDone={load} />}
-        {(accepted || conv.deal) && <PickupCard convId={conv.id} category={l.category} price={agreed} currency={l.currency} />}
-        {accepted && <PlanCard key={accepted.id} conv={conv} price={agreed} />}
+        {FEATURES.pickupChecklist && (accepted || conv.deal) && <PickupCard convId={conv.id} category={l.category} price={agreed} currency={l.currency} />}
+        {FEATURES.installments && accepted && <PlanCard key={accepted.id} conv={conv} price={agreed} />}
         <div className="chat-body" ref={bodyRef}>
           {messages.map((m) => m.kind === 'proof-ask' ? (
             <ProofAskLine key={m.id} m={m} conv={conv} />
@@ -237,7 +238,7 @@ export default function Conversation() {
         )}
       </div>
       <div className="row" style={{ justifyContent: 'center', gap: '1.25rem' }}>
-        {conv.myRole === 'buyer' && !conv.readOnly && !conv.blocked && <ProofAskButton conv={conv} onDone={load} />}
+        {FEATURES.proofPhotos && conv.myRole === 'buyer' && !conv.readOnly && !conv.blocked && <ProofAskButton conv={conv} onDone={load} />}
         <ReportLink conversationId={conv.id} />
         {!conv.iBlocked && <BlockLink conv={conv} onChange={load} />}
       </div>
@@ -281,7 +282,7 @@ function DealBanner({ conv, onRated }) {
         {conv.myRole === 'buyer' && !conv.otherFavourite && (
           <div style={{ marginTop: '.6rem' }}><FavouriteButton memberId={other.id} name={other.displayName} wide /></div>
         )}
-        {!deal.myStory && <StoryForm dealId={deal.id} otherName={other.displayName} onShared={onRated} />}
+        {FEATURES.stories && !deal.myStory && <StoryForm dealId={deal.id} otherName={other.displayName} onShared={onRated} />}
       </div>
     );
   }
