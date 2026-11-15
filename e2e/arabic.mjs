@@ -132,7 +132,7 @@ await check(buyer, 'request-owner');
 
 // vendor makes an offer
 await vendor.goto(BASE + '/me'); // member dashboard (session 82)
-await vendor.waitForSelector('.grid .card');
+await vendor.waitForSelector('.ad-grid .want-card');
 await check(vendor, 'browse');
 await vendor.goto(listingUrl);
 await check(vendor, 'request-vendor');

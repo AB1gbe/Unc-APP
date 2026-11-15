@@ -81,7 +81,7 @@ export default function MemberProfile() {
       {openRequests.length > 0 && (
         <div>
           <h2>{t('Looking for right now')}</h2>
-          <div className="grid">{openRequests.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+          <div className="ad-grid">{openRequests.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
         </div>
       )}
       {stories.length > 0 && (

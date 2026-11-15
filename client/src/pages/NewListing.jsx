@@ -11,6 +11,7 @@ import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import CityField from '../components/CityField.jsx';
 import { checkAd } from '../../../shared/scam-check.js';
+import { appendPhotos } from '../images.js';
 import { JOB_TYPE_LABEL, SECTION_LABEL, SECTION_ORDER } from '../sections.js';
 
 const EMPTY = { title: '', description: '', category: '', budgetMin: '', budgetMax: '', currency: 'BHD', city: '', neededBy: '', contactRule: 'anyone', condition: 'any', rent: '', bedrooms: '', furnished: '', jobType: '', price: '' };
@@ -31,7 +32,7 @@ export default function NewListing() {
   useEffect(() => {
     if (user.accountType === 'business' && !editing) api('/business/billing').then(setBilling).catch(() => {});
   }, [user.accountType, editing]);
-  const price = ad && billing ? billing.prices[section] : 0;
+  const price = ad && billing && !billing.free ? billing.prices[section] : 0;
   // The same scam check the server runs, as a warning while typing.
   const check = checkAd({ section, title: form.title, description: form.description, category: form.category,
     price: Number(section === 'housing' ? form.rent : section === 'forsale' ? form.price : form.budgetMin) || null, priceMax: Number(form.budgetMax) || null });
@@ -84,13 +85,13 @@ export default function NewListing() {
         ({ listing } = await api(`/listings/${id}`, { method: 'PATCH', body }));
         if (images.length) {
           const fd = new FormData();
-          images.forEach((f) => fd.append('images', f));
+          await appendPhotos(fd, images);
           ({ listing } = await api(`/listings/${id}/images`, { method: 'POST', form: fd }));
         }
       } else {
         const fd = new FormData();
         Object.entries(body).forEach(([k, v]) => v !== '' && fd.append(k, v));
-        images.forEach((f) => fd.append('images', f));
+        await appendPhotos(fd, images);
         ({ listing, held = [] } = await api('/listings', { method: 'POST', form: fd }));
         celebrate({ text: held.length ? t('Posted. The Unc team will check it before it shows.') : ad ? t('Posted! Your ad is up.') : t('Posted! Sellers can see your request now.'), confetti: !held.length });
       }

@@ -22,3 +22,5 @@ How a business ad is paid: ad credit first; if too low, the saved card is charge
 **Not real money yet:** the payment company is the showcase "test" provider; `tap` (Tap Payments) needs a merchant account and TAP_SECRET_KEY. Prices and VAT on receipts need checking with an accountant before launch.
 
 **Revisit when:** connecting Tap; if businesses ask for a monthly plan; when VAT registration applies.
+
+**Session 102:** charging is **off** during a free launch period (env `CHARGE_BUSINESSES=1` turns it on), following [[Honest Review 2026-11-15]] point 3.

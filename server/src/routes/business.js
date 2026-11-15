@@ -68,7 +68,7 @@ export function businessRoutes(db) {
       SELECT l.id, l.title, l.section, l.category, l.status, l.budget_min, l.budget_max, l.currency, l.city, l.created_at, l.held_at, l.paid_fils,
              (SELECT COUNT(*) FROM listing_views v WHERE v.listing_id = l.id) AS views,
              (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS replies,
-             (SELECT file FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS photo,
+             (SELECT COALESCE(thumb, file) FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS photo,
              p.display_name AS posted_by_name
       FROM listings l LEFT JOIN users p ON p.id = l.posted_by
       WHERE l.buyer_id = ? ORDER BY (l.status = 'open') DESC, l.created_at DESC, l.id DESC LIMIT 200
@@ -93,10 +93,13 @@ export function businessRoutes(db) {
       card: cardView(db.prepare('SELECT * FROM payment_cards WHERE user_id = ?').get(req.user.id)),
       payments: paymentsOf.all(req.user.id).map(paymentView),
       isOwner: !req.actorId,
+      // Free launch period (session 102): ads cost nothing, packs can't be bought.
+      free: !config.chargeBusinesses,
     });
   });
 
   r.post('/business/billing/packs', ownerOnly, async (req, res) => {
+    if (!config.chargeBusinesses) throw new HttpError(409, 'Ads are free for businesses during the launch period.');
     const paymentId = await buyPack(db, req.user, null, req.body?.pack);
     audit(db, req.user.id, 'billing.pack', `payment:${paymentId}`, { pack: req.body.pack });
     const p = db.prepare('SELECT * FROM ad_payments WHERE id = ?').get(paymentId);

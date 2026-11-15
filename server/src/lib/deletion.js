@@ -38,8 +38,9 @@ export function deleteNow(db, u) {
     for (const k of kyc) for (const f of [k.doc_front, k.doc_back, k.selfie, k.business_doc]) files.push([KYC_DIR, f]);
     db.prepare('DELETE FROM kyc_submissions WHERE user_id = ?').run(u.id);
 
-    for (const i of db.prepare('SELECT li.id, li.file FROM listing_images li JOIN listings l ON l.id = li.listing_id WHERE l.buyer_id = ?').all(u.id)) {
+    for (const i of db.prepare('SELECT li.id, li.file, li.thumb FROM listing_images li JOIN listings l ON l.id = li.listing_id WHERE l.buyer_id = ?').all(u.id)) {
       files.push([LISTING_DIR, i.file]);
+      if (i.thumb) files.push([LISTING_DIR, i.thumb]);
       db.prepare('DELETE FROM listing_images WHERE id = ?').run(i.id);
     }
     for (const m of db.prepare('SELECT id, image FROM messages WHERE sender_id = ? AND image IS NOT NULL').all(u.id)) {

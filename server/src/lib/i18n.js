@@ -71,6 +71,7 @@ const AR = {
   'This is for business accounts.': 'هذه الصفحة للحسابات التجارية.',
   'Only the business owner can do this.': 'صاحب النشاط التجاري فقط يمكنه القيام بذلك.',
   'Receipt not found.': 'الإيصال غير موجود.',
+  'Ads are free for businesses during the launch period.': 'الإعلانات مجانية للأنشطة التجارية خلال فترة الإطلاق.',
   'Members without an ID check can start 5 new chats a day. Get ID-checked to message more people.': 'يمكن للأعضاء غير الموثّقين بدء 5 محادثات جديدة في اليوم. وثّق هويتك لمراسلة المزيد.',
   'This advertiser only takes messages from ID-checked members.': 'يقبل هذا المعلن الرسائل من الأعضاء الموثّقين فقط.',
   'You are already the owner of this business.': 'أنت صاحب هذا النشاط التجاري بالفعل.',

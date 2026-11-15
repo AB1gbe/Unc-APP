@@ -7,6 +7,7 @@
 // ad. Every card payment gets a receipt (UNC-2026-000123).
 // Amounts are in fils: 1000 = BD 1.000.
 import crypto from 'node:crypto';
+import { config } from '../config.js';
 import { HttpError } from './http.js';
 import { paymentProvider } from './payments.js';
 
@@ -18,7 +19,8 @@ export const PACKS = [
   { id: 'pack50', price: 50000, credit: 57500 },
 ];
 
-export const priceFor = (user, section) => (user?.account_type === 'business' ? AD_PRICES[section] ?? 0 : 0);
+// Nothing to pay while config.chargeBusinesses is off (free launch period).
+export const priceFor = (user, section) => (config.chargeBusinesses && user?.account_type === 'business' ? AD_PRICES[section] ?? 0 : 0);
 export const creditOf = (db, userId) => db.prepare('SELECT COALESCE(SUM(amount), 0) AS n FROM ad_credit WHERE user_id = ?').get(userId).n;
 
 const receiptNo = (id) => `UNC-${new Date().getUTCFullYear()}-${String(id).padStart(6, '0')}`;

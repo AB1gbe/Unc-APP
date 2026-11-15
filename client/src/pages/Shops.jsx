@@ -1,6 +1,7 @@
 // All verified shops (session 72), with a search bar (name, area or what
 // they sell, from their bio). Shops can't be messaged from here: they reply
 // to requests, inside each request's chat.
+import { FEATURES } from '../features.js';
 import { useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { useApi } from '../hooks.js';
@@ -24,7 +25,7 @@ export default function Shops() {
       {loading ? <CardsLoading /> : data?.shops.length === 0
         ? <p className="muted">{t('No shops match that yet.')}</p>
         : <div className="shop-grid shop-grid-all">{data?.shops.map((s) => <ShopCard key={s.id} shop={s} />)}</div>}
-      <div style={{ marginTop: '2rem' }}><StoriesStrip /></div>
+      {FEATURES.stories && <div style={{ marginTop: '2rem' }}><StoriesStrip /></div>}
     </div>
   );
 }

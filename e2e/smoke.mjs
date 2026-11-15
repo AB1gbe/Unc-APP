@@ -124,12 +124,12 @@ await vendor.goto(BASE + '/notifications');
 await vendor.waitForSelector('.inbox-item:has-text("New request matching your alert")');
 
 await vendor.goto(BASE + '/me'); // the member dashboard moved to /me (session 82)
-await vendor.waitForSelector('.card h3');
+await vendor.waitForSelector('.want-card h3');
 await shot(vendor, '09-browse');
 await vendor.goto(listingUrl);
 // Save it for later, see it on the Saved page and the home page, then come back.
 await vendor.click('.save-btn'); await vendor.waitForSelector('.save-btn.on');
-await vendor.goto(BASE + '/saved'); await vendor.waitForSelector('.card h3:has-text("PS5")');
+await vendor.goto(BASE + '/saved'); await vendor.waitForSelector('.want-card h3:has-text("PS5")');
 await shot(vendor, '09b-saved');
 await vendor.goto(BASE + '/me'); await vendor.waitForSelector('h2:has-text("Saved for later")');
 await vendor.goto(listingUrl); await vendor.waitForSelector('.save-btn.on');
@@ -540,26 +540,20 @@ await vendor.fill('#message', 'Is it still available?');
 await vendor.click('button:has-text("Send message")');
 await vendor.waitForURL('**/messages/*');
 await shot(vendor, '42-for-sale-reply');
-// Business panel (session 88): the shop buys ad credit, posts a paid ad
-// (the form says what it costs), and finds the receipt.
+// Business panel (session 88). Session 102: ads are free for businesses
+// during the launch period (CHARGE_BUSINESSES unset), so the Billing tab
+// says so, the form shows no price and no receipt is made. Paying is
+// tested in server/test/business.test.js.
 await vendor.goto(BASE + '/business?tab=billing');
-await vendor.waitForSelector('.pack');
-vendor.once('dialog', (d) => d.accept());
-await vendor.click('.pack >> nth=0 >> button');
-await vendor.waitForSelector('.stat-n:has-text("11.000")');
+await vendor.waitForSelector('.alert.ok:has-text("free for businesses")');
 await vendor.goto(BASE + '/requests/new?section=jobs');
-await vendor.waitForSelector('.alert.info:has-text("paid from your ad credit")');
 await vendor.fill('#title', 'Shop assistant, weekends');
 await vendor.selectOption('#category', 'Sales & retail');
 await vendor.fill('#description', 'Help customers in the shop on Fridays and Saturdays.');
 await vendor.selectOption('#jobType', 'part-time');
+if (await vendor.locator('.alert.info:has-text("This ad costs")').count()) throw new Error('no price during the free launch period');
 await vendor.click('button:has-text("Post ad")');
 await vendor.waitForSelector('h1:has-text("Shop assistant, weekends")');
-await vendor.goto(BASE + '/business?tab=billing');
-await vendor.waitForSelector('.stat-n:has-text("6.000")');
-await vendor.click('td a[href^="/business/receipts/"]');
-await vendor.waitForSelector('.receipt:has-text("UNC-")');
-await shot(vendor, '50-business-receipt');
 await vendor.goto(BASE + '/business');
 await vendor.waitForSelector('.stats-grid');
 await shot(vendor, '51-business-dashboard');

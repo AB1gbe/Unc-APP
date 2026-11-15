@@ -19,7 +19,7 @@ export default function MyListings() {
       {loading ? <Loading /> : data?.listings.length === 0 ? (
         <div className="card empty">{t('What are you looking for? Post your first request — it takes a minute.')}</div>
       ) : (
-        <div className="grid">
+        <div className="ad-grid">
           {data?.listings.map((l) => (
             <div key={l.id} style={{ position: 'relative' }}>
               <ListingCard listing={l} />

@@ -19,7 +19,7 @@ export default function Saved() {
           <Link className="btn" to="/browse">{t('Browse requests')}</Link>
         </div>
       ) : (
-        <div className="grid">{data?.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+        <div className="ad-grid">{data?.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
       )}
       <FavouriteSellers />
     </>

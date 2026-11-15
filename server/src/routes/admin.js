@@ -186,6 +186,23 @@ export function adminRoutes(db) {
     res.json({ ok: true });
   });
 
+  // Backup (session 102, honest review point 8): every table's rows as one
+  // JSON file, downloaded by an admin and kept off Cloudflare. Not included:
+  // uploaded files (photos, ID documents) and log-in sessions. Restore into
+  // a new database with: node scripts/restore-backup.mjs <file> <new .sqlite>
+  r.get('/backup', (req, res) => {
+    const skip = new Set(['sessions', '_files', '_meta']);
+    const tables = db.prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY name`).all()
+      .map((t) => t.name).filter((n) => !skip.has(n));
+    const version = db.prepare('PRAGMA user_version').get()?.user_version ?? null;
+    const data = {};
+    for (const name of tables) data[name] = db.prepare(`SELECT * FROM "${name}"`).all().map((row) => ({ ...row }));
+    audit(db, req.user.id, 'admin.backup', 'database', { tables: tables.length });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    res.set('Content-Disposition', `attachment; filename="unc-backup-${stamp}.json"`);
+    res.json({ app: 'unc', version, createdAt: new Date().toISOString(), tables: data });
+  });
+
   r.post('/users/:id/ban', (req, res) => {
     const id = Number(req.params.id);
     if (id === req.user.id) throw new HttpError(400, 'You cannot ban yourself.');

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FEATURES } from '../features.js';
 import { categoryArt } from '../art.js';
 import Icon from '../components/Icon.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -113,7 +114,7 @@ export default function ListingDetail() {
         {!isOwner && user && <ReportLink listingId={l.id} />}
       </aside>
     </div>
-    {isOwner && !ad && <CompareOffers listing={l} />}
+    {FEATURES.compareOffers && isOwner && !ad && <CompareOffers listing={l} />}
     {isOwner && !ad && l.status === 'open' && (l.offerCount ?? 0) > 0 && <ChoosingSteps />}
     {/* The buyer sees every offer above; everyone else sees who answered. */}
     {!isOwner && !ad && <WhoAnswered listing={l} isOwner={false} />}

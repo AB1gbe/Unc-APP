@@ -2,6 +2,7 @@
 // Dashboard: this week vs last week. Ads: every ad and request with its
 // numbers. Billing: ad credit, packs, card, receipts. Team: staff who post
 // and answer for the business (the owner only).
+import { FEATURES } from '../features.js';
 import { useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ago, api, moneyExact } from '../api.js';
@@ -21,7 +22,7 @@ export default function Business() {
   const { user } = useAuth();
   const [params, setParams] = useSearchParams();
   const isOwner = !user.actor;
-  const tabs = TABS.filter((x) => x !== 'team' || isOwner);
+  const tabs = TABS.filter((x) => x !== 'team' || (isOwner && FEATURES.teams));
   const tab = tabs.includes(params.get('tab')) ? params.get('tab') : 'dashboard';
   const label = { dashboard: t('Dashboard'), ads: t('Ads'), billing: t('Billing'), team: t('Team') };
   return (
@@ -39,7 +40,7 @@ export default function Business() {
       {tab === 'dashboard' && <Dashboard />}
       {tab === 'ads' && <Ads />}
       {tab === 'billing' && <Billing isOwner={isOwner} />}
-      {tab === 'team' && isOwner && <Team />}
+      {tab === 'team' && isOwner && FEATURES.teams && <Team />}
     </div>
   );
 }
@@ -128,8 +129,11 @@ function Billing({ isOwner }) {
           <div><div className="muted small">{t('Ad credit')}</div><div className="stat-n">{bd(data.credit)}</div></div>
           {data.card && <div className="muted small"><Icon name="card" /> {t('Card ending {last4}', { last4: data.card.last4 })}</div>}
         </div>
-        <p className="muted small">{t('People post for free. Businesses pay per ad: For sale {forsale}, Housing {housing}, Jobs {jobs}. Wanted requests and offers are free. Ads are paid from your credit first, then your card.', { forsale: bd(data.prices.forsale), housing: bd(data.prices.housing), jobs: bd(data.prices.jobs) })}</p>
+        {data.free
+          ? <p className="alert ok small">{t('Ads are free for businesses during the launch period. Nothing will be charged.')}</p>
+          : <p className="muted small">{t('People post for free. Businesses pay per ad: For sale {forsale}, Housing {housing}, Jobs {jobs}. Wanted requests and offers are free. Ads are paid from your credit first, then your card.', { forsale: bd(data.prices.forsale), housing: bd(data.prices.housing), jobs: bd(data.prices.jobs) })}</p>}
       </div>
+      {!data.free && <>
       <h2>{t('Buy ad credit')}</h2>
       <ErrorBox error={err} />
       <div className="packs">
@@ -144,6 +148,7 @@ function Billing({ isOwner }) {
           </div>
         ))}
       </div>
+      </>}
       <h2>{t('Payments and receipts')}</h2>
       {data.payments.length === 0 ? <p className="muted">{t('No payments yet.')}</p> : (
         <div className="table-scroll"><table>

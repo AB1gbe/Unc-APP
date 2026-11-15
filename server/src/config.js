@@ -52,6 +52,10 @@ export const config = {
   adminEmail: (process.env.ADMIN_EMAIL || 'admin@unc.local').toLowerCase(),
   adminPassword: process.env.ADMIN_PASSWORD || 'ChangeMe123!',
   kycProvider: process.env.KYC_PROVIDER || 'manual',
+  // Session 102: businesses are NOT charged for ads until this is '1' (a
+  // free launch period; the honest review, point 3). The billing code
+  // stays ready.
+  chargeBusinesses: process.env.CHARGE_BUSINESSES === '1',
   // Payment cards (session 40): 'test' (showcase, no money moves) or 'tap'.
   paymentProvider: process.env.PAYMENT_PROVIDER || 'test',
   minAge: 18,

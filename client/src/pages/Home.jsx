@@ -1,5 +1,6 @@
 // The logged-in member's home: what needs attention, their requests, and
 // requests they could help with. Logged-out visitors get Browse instead.
+import { FEATURES } from '../features.js';
 import { Link } from 'react-router-dom';
 import { ago } from '../api.js';
 import { useAuth, isVerified } from '../auth.jsx';
@@ -90,7 +91,7 @@ export default function Home() {
             {isVerified(user) && <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>}
           </div>
         ) : (
-          <div className="grid">
+          <div className="ad-grid">
             {openRequests.slice(0, 3).map((l) => (
               <div key={l.id} style={{ position: 'relative' }}>
                 <ListingCard listing={l} />
@@ -108,7 +109,7 @@ export default function Home() {
             <h2 style={{ margin: 0 }}>{t('Saved for later')}</h2>
             <Link to="/saved">{t('See all')} <span className="flip">→</span></Link>
           </div>
-          <div className="grid">{saved.data.listings.slice(0, 3).map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+          <div className="ad-grid">{saved.data.listings.slice(0, 3).map((l) => <ListingCard key={l.id} listing={l} />)}</div>
         </section>
       )}
 
@@ -123,14 +124,14 @@ export default function Home() {
             </div>
           </div>
           <span className="row" style={{ gap: '1rem' }}>
-            <Link to="/demand">{t('What people ask for')}</Link>
+            {FEATURES.demand && <Link to="/demand">{t('What people ask for')}</Link>}
             <Link to="/browse">{t('Browse all')} <span className="flip">→</span></Link>
           </span>
         </div>
         {forYou.loading ? <CardsLoading /> : (forYou.data?.listings.length ?? 0) === 0 ? (
           <div className="card empty">{t("You're all caught up! New requests show up here as soon as they're posted.")}</div>
         ) : (
-          <div className="grid">{forYou.data.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+          <div className="ad-grid">{forYou.data.listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
         )}
       </section>
     </div>

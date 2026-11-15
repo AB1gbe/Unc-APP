@@ -108,3 +108,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-15 | [[2026-11-15 Session 99]] | Honest review: identity, sign-up friction, empty marketplace, feature bloat, design consistency, photo sizes |
 | 2026-11-15 | [[2026-11-15 Session 100]] | Proposal: trust ladder (phone code to chat, ID check to post) instead of ID for everyone |
 | 2026-11-15 | [[2026-11-15 Session 101]] | Trust ladder: reply with an email code, ID check to post/offer, card only for businesses |
+| 2026-11-15 | [[2026-11-15 Session 102]] | Photo thumbnails, ID photos shrunk; then the rest of the honest review |

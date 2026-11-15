@@ -27,7 +27,7 @@ export const AD_CATEGORY_TEXT = () => [
 export const SCAM_TEXT = () => [
   t('Ads may not ask for money before a viewing or before a job starts (transfers, gift cards, crypto, fees). Unc removes these: they are the most common scam.'),
   t("Please don't put phone numbers, links or emails in the ad. People reply through the ad's chat on Unc, so your number stays private."),
-  t('Wording often used in scams'), t('Rent much lower than usual'), t('Pay much higher than usual'),
+  t('Wording often used in scams'), t('Rent much lower than usual'), t('Pay much higher than usual'), t('Reported by several members'),
 ];
 // One-line price for an ad or request row: "BD 350 / month", "BD 300–400 / month".
 export function adPrice(l, money) {

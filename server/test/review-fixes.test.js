@@ -138,3 +138,32 @@ test('a vendor can still open a closed request they talked about; strangers cann
 test('the app trusts the configured number of proxies', () => {
   assert.equal(t.app.get('trust proxy'), 0);
 });
+
+// Session 102: Admin → Download backup, and restoring it.
+test('an admin can download a backup of every table (no sessions), and it restores into a new database', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const member = await t.user();
+  await t.listing(member, { title: 'Need a backup test lamp' });
+  await member.get('/api/admin/backup').expect(403);
+  const res = await t.admin.get('/api/admin/backup').expect(200);
+  assert.match(res.headers['content-disposition'], /unc-backup-.*\.json/);
+  const b = res.body;
+  assert.equal(b.app, 'unc');
+  assert.ok(b.tables.users.length >= 2 && b.tables.listings.some((l) => l.title === 'Need a backup test lamp'));
+  assert.equal(b.tables.sessions, undefined, 'log-in sessions are not in the backup');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'unc-restore-'));
+  fs.writeFileSync(path.join(dir, 'b.json'), JSON.stringify(b));
+  const out = path.join(dir, 'restored.sqlite');
+  const r = spawnSync(process.execPath, ['--disable-warning=ExperimentalWarning', new URL('../../scripts/restore-backup.mjs', import.meta.url).pathname, path.join(dir, 'b.json'), out], { encoding: 'utf8', env: { ...process.env, NODE_ENV: 'test' } });
+  assert.equal(r.status, 0, r.stderr);
+  const { DatabaseSync } = await import('node:sqlite');
+  const db = new DatabaseSync(out);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM users').get().n, b.tables.users.length);
+  assert.ok(db.prepare(`SELECT 1 FROM listings WHERE title = 'Need a backup test lamp'`).get());
+  db.close();
+  // It never overwrites an existing file.
+  assert.notEqual(spawnSync(process.execPath, [new URL('../../scripts/restore-backup.mjs', import.meta.url).pathname, path.join(dir, 'b.json'), out], { encoding: 'utf8' }).status, 0);
+});
