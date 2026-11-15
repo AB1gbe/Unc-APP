@@ -53,8 +53,8 @@ export default function Board() {
       <div className="market-top">
         <h1 className="tagline">
           {/* Screen readers hear the whole idea once; the moving words are hidden from them. */}
-          <span className="visually-hidden">{t('Buy, sell or trade and connect near you')}</span>
-          <span aria-hidden="true">{tj('{verb} and connect {near}', { verb: <RotatingWord words={[t('Buy'), t('Sell'), t('Trade')]} />, near: t('near you') })}</span>
+          <span className="visually-hidden">{t('Buy, Sell or Trade and Connect Near You')}</span>
+          <span aria-hidden="true">{tj('{verb} and Connect {near}', { verb: <RotatingWord words={[t('Buy'), t('Sell'), t('Trade')]} />, near: t('Near You') })}</span>
         </h1>
       </div>
       <div className="market-search-row">
