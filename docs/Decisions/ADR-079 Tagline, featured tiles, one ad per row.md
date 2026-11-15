@@ -18,3 +18,8 @@ The owner (screenshots of the live home page, a description of Craigslist, and t
 | Category chips on lists | Wrap onto many lines; **one line that scrolls** | Scroll (`.chips.scroll`) | On phones they took six lines. Interest chips on profiles still wrap. |
 
 **Revisit when:** real cut-out product pictures exist for the tiles.
+
+## Session 92 change
+The owner (screenshot of the live page): "The tiles still look too AI, make them look real; they also look huge; the text is too much, just a tagline."
+- Tiles: **plain small square photos (76px, 68px on phones) with the name underneath**, thin border, no colour glow or fading mask, like a real shop's category row.
+- Text: only the tagline "Buy, sell and connect with people near you", smaller (1.2rem); the second sentence is removed.
