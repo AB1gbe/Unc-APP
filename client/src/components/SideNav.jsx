@@ -41,10 +41,11 @@ export default function SideNav({ unread, bell }) {
       </div>
       <nav className="nav side-links" aria-label={t('Main')}>
         <Item to="/" end icon="home" label={t('Home')} />
+        {/* Wanted first: shops answering requests is Unc's core (ADR-081). */}
+        <Item to="/browse" icon="search" label={t('Wanted')} />
         <Item to="/for-sale" icon="tag" label={t('For sale')} />
         <Item to="/housing" icon="building" label={t('Housing')} />
         <Item to="/jobs" icon="briefcase" label={t('Jobs')} />
-        <Item to="/browse" icon="search" label={t('Wanted')} />
         <Item to="/shops" icon="shop" label={t('Shops')} />
         {user?.accountType === 'business' && <Item to="/business" icon="chart" label={t('Business panel')} />}
         {user && <Item to="/me" icon="user" label={t('My Unc')} />}

@@ -111,40 +111,33 @@ export function Responders({ responders, count }) {
 }
 
 export function ListingCard({ listing }) {
-  // A request as a marketplace card (session 77): photo, item and condition,
-  // budget, area, time left, who answered, and one clear action.
+  // A request as a card (session 77; session 102: the same look as the
+  // marketplace cards, ADR-079): photo with "Looking for", the budget
+  // first, the item, one grey line (area, days left, when), then who has
+  // answered and the one action. Requests are Unc's core (ADR-081).
   const { user } = useAuth();
   const photo = listing.thumbs?.[0] || listing.images?.[0] || categoryArt(listing.category);
   const left = daysLeft(listing.closesAt);
   const mine = user && listing.buyer?.id === user.id;
   const action = mine ? t('See offers') : user ? t('Make an offer') : t('View request');
   return (
-    <div className="glow-wrap">
-      <img className="glow" src={photo} alt="" aria-hidden="true" loading="lazy" />
-    <Link className="card req-card" to={`/requests/${listing.id}`}>
-      {/* No photo? The category's picture, so every card has an image (session 62). */}
-      <div className={`card-photo${listing.images?.[0] ? '' : ' card-art'}`}>
+    <Link className="ad-card want-card" to={`/requests/${listing.id}`}>
+      <span className="ad-card-photo">
         <img src={photo} alt="" loading="lazy" />
-        {listing.sample && <span className="sample-tag" title={t('Example request from the demo data, not a real buyer.')}>{t('Sample')}</span>}
-        {!listing.images?.[0] && <span className="example-tag">{t('Example picture')}</span>}
-      </div>
-      <div className="req-top">
-        <span className="cat-label">{t(listing.category)} · {conditionLabel(listing.condition)}</span>
-        <ContactRule rule={listing.contactRule} />
-      </div>
-      <h3 dir="auto">{listing.title}</h3>
-      <div className="req-price">{budget(listing)}</div>
-      <div className="meta">
-        <span><Icon name="pin" /> <Place city={listing.city} /></span>
-        {left !== null && <span className={left <= 3 ? 'closing-soon' : ''}><Icon name="hourglass" /> {left === 0 ? t('Last day') : tn(left, '{n} day left', '{n} days left')}</span>}
-        <span><Icon name="clock" /> {ago(listing.createdAt)}</span>
-      </div>
-      <div className="req-foot">
+        <span className="ad-card-tag">{t('Looking for')}</span>
+      </span>
+      <span className="ad-card-price">{budget(listing)}</span>
+      <h3 className="ad-card-title" dir="auto">{listing.title}</h3>
+      <span className="ad-card-place">
+        <Place city={listing.city} />
+        {left !== null && <> · <span className={left <= 3 ? 'closing-soon' : ''}>{left === 0 ? t('Last day') : tn(left, '{n} day left', '{n} days left')}</span></>}
+        {' · '}{ago(listing.createdAt)}
+      </span>
+      <span className="want-foot">
         <Responders responders={listing.responders} count={listing.offerCount} />
         <span className="req-action">{action} <span className="flip">→</span></span>
-      </div>
+      </span>
     </Link>
-    </div>
   );
 }
 

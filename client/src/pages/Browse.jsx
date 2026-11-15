@@ -102,7 +102,7 @@ export default function Browse() {
           {user && <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>}
         </div>
       ) : (
-        <div className="grid">
+        <div className="ad-grid">
           {result.listings.map((l) => <ListingCard key={l.id} listing={l} />)}
         </div>
       )}

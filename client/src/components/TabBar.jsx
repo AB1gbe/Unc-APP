@@ -31,10 +31,10 @@ export default function TabBar({ unread, loggedIn }) {
     return (
       <nav className="tabbar" aria-label={t('Main')}>
         <NavLink to="/" end><Icon name="home" /><span>{t('Home')}</span></NavLink>
+        <NavLink to="/browse"><Icon name="browse" /><span>{t('Wanted')}</span></NavLink>
         <NavLink to="/for-sale"><Icon name="forsale" /><span>{t('For sale')}</span></NavLink>
         <NavLink to="/housing"><Icon name="housing" /><span>{t('Housing')}</span></NavLink>
         <NavLink to="/jobs"><Icon name="jobs" /><span>{t('Jobs')}</span></NavLink>
-        <NavLink to="/browse"><Icon name="browse" /><span>{t('Wanted')}</span></NavLink>
       </nav>
     );
   }

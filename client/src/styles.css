@@ -1079,3 +1079,17 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 @keyframes word-up { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .rotator-word { animation: none; } }
 .market-top h1.tagline { max-width: none; }
+
+/* ---- Session 102: request cards in the marketplace style ---- */
+.want-card .ad-card-title { font-size: 1rem; font-weight: 500; margin: 0; }
+.want-card .ad-card-place .closing-soon { color: var(--bad); }
+.want-foot { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin-top: .35rem; font-size: .85rem; }
+.want-foot .req-action { color: var(--ok); font-weight: 700; white-space: nowrap; }
+.ad-grid > div { min-width: 0; }
+.ask-shops { display: flex; align-items: center; gap: .8rem; padding: .85rem 1rem; margin: 0 0 1.5rem; background: var(--brand-soft); border: 1px solid #c9dafb; border-radius: var(--radius); color: var(--text); text-decoration: none; }
+.ask-shops:hover { text-decoration: none; border-color: var(--brand); }
+.ask-shops > .icon, .ask-shops > svg { color: var(--brand); flex: 0 0 auto; }
+.ask-shops-text { display: flex; flex-direction: column; flex: 1; min-width: 0; font-size: .9rem; }
+.ask-shops-text span { color: var(--muted); }
+.ask-shops .btn { flex: 0 0 auto; }
+@media (max-width: 480px) { .ask-shops { flex-wrap: wrap; } .ask-shops .btn { width: 100%; } }

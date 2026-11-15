@@ -16,6 +16,7 @@ import { AdCard, AdRow, SampleNote } from './AdList.jsx';
 // Featured tiles: label, where they go, picture.
 const cat = (c) => `/for-sale?category=${encodeURIComponent(c)}`;
 const FEATURED = [
+  { label: () => t('Wanted'), to: '/browse', img: '/art/cat-other.jpg' },
   { label: () => t('Phones'), to: cat('Phones & Tablets'), img: '/art/cat-phones.jpg' },
   { label: () => t('Homes for rent'), to: '/housing', img: '/art/feat-housing.jpg' },
   { label: () => t('Cars & parts'), to: cat('Vehicles & Parts'), img: '/art/cat-vehicles.jpg' },
@@ -24,7 +25,6 @@ const FEATURED = [
   { label: () => t('Electronics'), to: cat('Electronics'), img: '/art/cat-electronics.jpg' },
   { label: () => t('Fashion'), to: cat('Fashion'), img: '/art/cat-fashion.jpg' },
   { label: () => t('Sports'), to: cat('Sports & Outdoors'), img: '/art/cat-sports.jpg' },
-  { label: () => t('Wanted'), to: '/browse', img: '/art/cat-other.jpg' },
 ];
 
 const byNewest = (a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : b.id - a.id);
@@ -74,6 +74,16 @@ export default function Board() {
           </Link>
         ))}
       </nav>
+
+      {/* Unc's core (ADR-081): tell verified shops what you need. */}
+      <Link to={user ? '/requests/new' : '/register'} className="ask-shops">
+        <Icon name="shop" size="1.6em" />
+        <span className="ask-shops-text">
+          <b>{t('Looking for something?')}</b>
+          <span>{t('Post it once. Verified shops near you send offers.')}</span>
+        </span>
+        <span className="btn ok sm">{t('Post what you need')}</span>
+      </Link>
 
       <section className="market-block">
         <div className="section-head">
