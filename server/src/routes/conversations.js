@@ -33,6 +33,7 @@ import { isExpired, offerDetailsView, readOfferDetails } from '../lib/offers.js'
 import { hasContacts, maskContacts } from '../../../shared/contact-mask.js';
 
 export const NEW_CHATS_PER_DAY = 5;
+export const REPORTS_TO_HIDE = 3;
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -458,6 +459,21 @@ export function conversationRoutes(db) {
     if (listingId && !db.prepare('SELECT 1 FROM listings WHERE id = ?').get(listingId)) throw notFound('Request not found.');
     db.prepare('INSERT INTO reports (reporter_id, listing_id, conversation_id, reason) VALUES (?, ?, ?, ?)')
       .run(req.user.id, listingId, conversationId, reason);
+    // Session 102 (honest review point 7): REPORTS_TO_HIDE different members
+    // with a confirmed email reporting the same ad hides it until an admin
+    // checks it (Admin → Ads to check). An ad an admin already approved
+    // (checked_at) isn't hidden again by reports.
+    if (listingId) {
+      const n = db.prepare(`
+        SELECT COUNT(DISTINCT r.reporter_id) AS n FROM reports r JOIN users u ON u.id = r.reporter_id
+        WHERE r.listing_id = ? AND r.status = 'open' AND u.email_verified_at IS NOT NULL
+      `).get(listingId).n;
+      if (n >= REPORTS_TO_HIDE) {
+        const info = db.prepare(`UPDATE listings SET held_at = datetime('now'), held_reason = 'Reported by several members'
+          WHERE id = ? AND held_at IS NULL AND checked_at IS NULL AND status = 'open'`).run(listingId);
+        if (info.changes) audit(db, req.user.id, 'listing.auto_hidden', `listing:${listingId}`, { reports: n });
+      }
+    }
     res.status(201).json({ ok: true });
   });
 

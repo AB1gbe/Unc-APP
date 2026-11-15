@@ -1374,4 +1374,5 @@ export default {
   "Ads are free for businesses during the launch period. Nothing will be charged.": "الإعلانات مجانية للأنشطة التجارية خلال فترة الإطلاق. لن يُخصم أي مبلغ.",
   "Looking for something?": "تبحث عن شيء؟",
   "Post it once. Verified shops near you send offers.": "انشره مرة واحدة، وسترسل لك المحلات الموثّقة القريبة عروضها.",
+  "Reported by several members": "أبلغ عنه عدة أعضاء",
 };

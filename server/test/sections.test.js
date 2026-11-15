@@ -138,3 +138,36 @@ test('migration 43 keeps every listing, its section and its chats', async () => 
   assert.throws(() => db.prepare(`UPDATE listings SET section = 'cars' WHERE id = 1`).run());
   assert.ok(db.prepare(`EXPLAIN QUERY PLAN SELECT * FROM listings WHERE section = 'forsale' AND status = 'open' ORDER BY created_at`).all().some((r) => /idx_listings_section/.test(r.detail)));
 });
+
+// Session 102 (honest review point 7): disguised scam words and reports.
+test('the scam check sees through spaced-out and look-alike letters', () => {
+  const block = (d) => Boolean(checkAd({ section: 'housing', description: d }).block);
+  assert.ok(block('Pay by W e s t e r n  U n i o n please'));
+  assert.ok(block('w3stern un1on only'));
+  assert.ok(block('send a g.i.f.t c.a.r.d first'));
+  assert.ok(block('Pay the v1sa fee before you start'));
+  assert.equal(block('Nice flat near the sea, 2 bedrooms, 1 bathroom'), false);
+  assert.equal(block('Close to the bus stop and the mall'), false);
+});
+
+test('three members reporting an ad hide it until an admin checks it; approved ads stay up', async () => {
+  const landlord = await t.user();
+  const ad = (await post(landlord, flat({ title: 'Flat to report, Hoora' })).expect(201)).body.listing;
+  const report = async () => (await t.user()).post('/api/reports').send({ listingId: ad.id, reason: 'Looks like a scam to me' }).expect(201);
+  await report(); await report();
+  await t.request(t.app).get(`/api/listings/${ad.id}`).expect(200);
+  await report();
+  await t.request(t.app).get(`/api/listings/${ad.id}`).expect(404);
+  const queue = (await t.admin.get('/api/admin/held-ads').expect(200)).body.ads;
+  assert.ok(queue.some((a) => a.id === ad.id && a.reasons.includes('Reported by several members')));
+  await t.admin.post(`/api/admin/held-ads/${ad.id}/decision`).send({ decision: 'approve' }).expect(200);
+  await report();
+  await t.request(t.app).get(`/api/listings/${ad.id}`).expect(200);
+});
+
+test('reports from members without a confirmed email do not count', async () => {
+  const landlord = await t.user();
+  const ad = (await post(landlord, flat({ title: 'Flat with fake reports' })).expect(201)).body.listing;
+  for (let i = 0; i < 3; i += 1) await (await t.user('registered')).post('/api/reports').send({ listingId: ad.id, reason: 'Fake reports from new accounts' }).expect(201);
+  await t.request(t.app).get(`/api/listings/${ad.id}`).expect(200);
+});

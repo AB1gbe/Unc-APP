@@ -41,10 +41,27 @@ export const MIN_RENT = { 'Rooms & shared': 40, 'Flats & apartments': 100, 'Vill
 // Monthly pay above this is held: rare for a public job ad in Bahrain.
 export const MAX_PAY = 3000;
 
+// Scammers disguise words (session 102): "W e s t e r n  U n i o n",
+// "w3stern-un1on", "gift.card". normalize() lowercases, turns look-alike
+// digits/symbols into letters and joins letters split by spaces or dots;
+// squash() also removes everything that isn't a letter. The checks run on
+// the original text and both versions.
+const LOOKALIKE = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', '@': 'a', $: 's', '!': 'i' };
+export function normalize(text) {
+  const t = String(text).toLowerCase().replace(/[013457@$!]/g, (c) => LOOKALIKE[c]);
+  // "w e s t e r n" / "w.e.s.t.e.r.n" / "w-e-s-t" → "western"
+  return t.replace(/\b(?:[a-z\u0600-\u06ff][\s.\-_*]){2,}[a-z\u0600-\u06ff]\b/g, (m) => m.replace(/[\s.\-_*]/g, ''));
+}
+const squash = (text) => normalize(text).replace(/[^a-z\u0600-\u06ff]/g, '');
+// Words that are a scam sign however they're written (checked on the squashed text).
+const SQUASHED = ['westernunion', 'moneygram', 'giftcard', 'itunescard', 'bitcoin', 'usdt', 'visafee', 'registrationfee', 'depositbeforeviewing', 'ويسترنيونيون', 'رسومتسجيل', 'رسومتأشيرة'];
+
 export function checkAd({ section, title = '', description = '', category = '', price = null, priceMax = null }) {
   if (section !== 'housing' && section !== 'jobs' && section !== 'forsale') return { block: null, hold: [] };
-  const text = `${title}\n${description}`;
-  if (PAY_FIRST.some((re) => re.test(text))) {
+  const raw = `${title}\n${description}`;
+  const text = `${raw}\n${normalize(raw)}`;
+  const squashed = squash(raw);
+  if (PAY_FIRST.some((re) => re.test(text)) || SQUASHED.some((w) => squashed.includes(w))) {
     return { block: 'Ads may not ask for money before a viewing or before a job starts (transfers, gift cards, crypto, fees). Unc removes these: they are the most common scam.', hold: [] };
   }
   if (hasContactDetails(text)) {
