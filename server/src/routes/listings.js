@@ -25,6 +25,7 @@ import { NOT_AWAY } from '../lib/activity.js';
 import { nameFor } from '../../../shared/names.js';
 
 export const MAX_PHOTOS = 6;
+export const THUMB_MAX_BYTES = 150 * 1024;
 export const CONDITIONS = ['any', 'new', 'used'];
 export const SORTS = ['newest', 'closing', 'offers'];
 // Housing and Jobs ads (session 82): how many a member may post a day, and
@@ -60,7 +61,9 @@ export function listingView(row, images = []) {
     sample: row.sample === 1,
     buyer: { id: row.buyer_id, displayName: nameFor(row.buyer_name, row.buyer_short), accountType: row.buyer_type, avatarUrl: avatarUrl(row.buyer_avatar) },
     images: images.map((i) => `/uploads/listings/${i.file}`),
-    photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}` })),
+    // Small copies for grids and lists (session 102); the full photo when none.
+    thumbs: images.map((i) => `/uploads/listings/${i.thumb || i.file}`),
+    photos: images.map((i) => ({ id: i.id, url: `/uploads/listings/${i.file}`, thumbUrl: `/uploads/listings/${i.thumb || i.file}` })),
     offerCount: row.offer_count ?? undefined,
     // When an open request closes by itself (session 56: "Closes in 2 days" on cards).
     closesAt: row.status === 'open' && row.closes_at ? row.closes_at : undefined,
@@ -76,8 +79,23 @@ const BASE_SELECT = `
 
 export function listingRoutes(db) {
   const r = Router();
-  const upload = memoryUpload(MAX_PHOTOS);
-  const imagesFor = db.prepare('SELECT id, file FROM listing_images WHERE listing_id = ? ORDER BY id');
+  const upload = memoryUpload(MAX_PHOTOS * 2);
+  // Photos and their thumbnails (session 102): "thumbs" are optional, one
+  // per photo in the same order. A thumbnail bigger than THUMB_MAX_BYTES
+  // isn't a thumbnail: it is dropped and the full photo is used.
+  const photoFields = upload.fields([{ name: 'images', maxCount: MAX_PHOTOS }, { name: 'thumbs', maxCount: MAX_PHOTOS }]);
+  const photoFiles = (req) => {
+    const images = req.files?.images ?? [];
+    const thumbs = images.map((_, n) => { const t = req.files?.thumbs?.[n]; return t && t.size <= THUMB_MAX_BYTES ? t : null; });
+    return { images, thumbs };
+  };
+  // names = saved photo names, then one slot per thumbnail (null when none).
+  const insertPhotos = (listingId, names, count) => {
+    for (let n = 0; n < count; n += 1) {
+      db.prepare('INSERT INTO listing_images (listing_id, file, thumb) VALUES (?, ?, ?)').run(listingId, names[n], names[count + n] ?? null);
+    }
+  };
+  const imagesFor = db.prepare('SELECT id, file, thumb FROM listing_images WHERE listing_id = ? ORDER BY id');
   const withImages = (row) => listingView(row, imagesFor.all(row.id));
   const ratings = ratingQueries(db);
   const activity = activityQueries(db);
@@ -287,7 +305,7 @@ export function listingRoutes(db) {
     res.json({ listing });
   });
 
-  r.post('/', requireVerified, upload.array('images', MAX_PHOTOS), async (req, res) => {
+  r.post('/', requireVerified, photoFields, async (req, res) => {
     const data = readListingBody(req.body);
     const held = adChecks(db, req.user.id, data);
     // Businesses pay for For sale, Housing and Jobs ads (session 88): from
@@ -297,7 +315,8 @@ export function listingRoutes(db) {
     // All photos are checked before anything is saved, and the listing +
     // photo rows are written in one transaction: a bad photo means nothing
     // is created (no half-made listing that a retry would duplicate).
-    const photos = saveFiles(LISTING_DIR(), (req.files || []).map((file) => ({ file })));
+    const { images, thumbs } = photoFiles(req);
+    const photos = saveFiles(LISTING_DIR(), [...images, ...thumbs].map((file) => file && { file }));
     let id;
     try {
       id = tx(db, () => {
@@ -309,9 +328,7 @@ export function listingRoutes(db) {
           data.currency, data.city, data.neededBy, data.contactRule, data.condition,
           data.section, data.bedrooms, data.furnished, data.jobType, held.length ? held.join('; ') : null);
         const newId = Number(info.lastInsertRowid);
-        for (const name of photos.names) {
-          db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(newId, name);
-        }
+        insertPhotos(newId, photos.names, images.length);
         if (req.actorId) db.prepare('UPDATE listings SET posted_by = ? WHERE id = ?').run(req.actorId, newId);
         settleAd(db, req.user, req.actorId, newId, payment);
         audit(db, req.actorId ?? req.user.id, 'listing.created', `listing:${newId}`, req.actorId ? { for: req.user.id } : undefined);
@@ -353,20 +370,18 @@ export function listingRoutes(db) {
   // Mark as fulfilled / closed / reopen. Once not open, all its
   // conversations become read-only.
   // Add photos to an open request (owner only), up to MAX_PHOTOS in total.
-  r.post('/:id/images', requireVerified, upload.array('images', MAX_PHOTOS), (req, res) => {
+  r.post('/:id/images', requireVerified, photoFields, (req, res) => {
     const row = ownListing(db, req);
     if (row.status !== 'open') throw new HttpError(409, 'Only open requests can be edited.');
-    const files = req.files || [];
+    const { images: files, thumbs } = photoFiles(req);
     if (!files.length) throw new HttpError(400, 'Please upload images.', { field: 'images' });
     const have = db.prepare('SELECT COUNT(*) AS n FROM listing_images WHERE listing_id = ?').get(row.id).n;
     if (have + files.length > MAX_PHOTOS) {
       throw new HttpError(400, `A request can have at most ${MAX_PHOTOS} photos.`, { field: 'images' });
     }
-    const photos = saveFiles(LISTING_DIR(), files.map((file) => ({ file })));
+    const photos = saveFiles(LISTING_DIR(), [...files, ...thumbs].map((file) => file && { file }));
     try {
-      tx(db, () => {
-        for (const name of photos.names) db.prepare('INSERT INTO listing_images (listing_id, file) VALUES (?, ?)').run(row.id, name);
-      });
+      tx(db, () => insertPhotos(row.id, photos.names, files.length));
     } catch (err) {
       photos.discard();
       throw err;
@@ -380,6 +395,7 @@ export function listingRoutes(db) {
     if (!img) throw notFound('File not found');
     db.prepare('DELETE FROM listing_images WHERE id = ?').run(img.id);
     fs.rmSync(path.join(LISTING_DIR(), img.file), { force: true });
+    if (img.thumb) fs.rmSync(path.join(LISTING_DIR(), img.thumb), { force: true });
     res.json({ listing: detailView(row.id, req.user) });
   });
 

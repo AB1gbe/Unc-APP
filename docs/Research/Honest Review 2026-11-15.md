@@ -39,7 +39,9 @@ That's 38 routes. Each one is more to explain, test and maintain, and makes the 
 ## 5. The design is inconsistent between pages
 The home page, For sale and Housing got the new marketplace look. The Wanted page, request pages, My Unc, Messages, Settings and the Business panel still use older styles. That's why the app "looks unfinished" even when one screen looks good. It needs one pass over every page with the same components, ideally with a real designer and a small design system (it changed ~10 times by feedback on screenshots).
 
-## 6. Photos will make it slow
+## 6. Photos will make it slow (corrected in session 102)
+**Correction:** the browser already shrank photos to about 1600px before upload ([[Mistakes and Fixes#M158]]). What was really missing: thumbnails for grids and shrinking ID-check photos. Both done in [[2026-11-15 Session 102]].
+
 Uploaded photos are saved at full size and never resized. A phone photo is often 3–5 MB; a grid of 12 would be 40+ MB on mobile data. Needed: resize to about 1200px and make small thumbnails (about 400px) on upload, served for grids.
 
 ## 7. "Safety" is a promise the code only partly keeps

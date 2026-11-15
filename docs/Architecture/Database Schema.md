@@ -202,3 +202,6 @@ See [[ADR-068 Marketplace first]].
 - `sessions.actor_id` (a team member using the business).
 
 See [[ADR-077 Business accounts, paying for ads and teams]].
+
+## Migration 45 (session 102): thumbnails
+- `listing_images.thumb` TEXT: a ~480px copy made by the browser (NULL for older photos; the full photo is used).

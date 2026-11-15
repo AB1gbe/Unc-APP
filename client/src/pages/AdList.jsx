@@ -34,7 +34,7 @@ export function AdRow({ listing: l }) {
     <li>
       <Link to={`/requests/${l.id}`} className="ad-row">
         <span className="ad-thumb">
-          {l.images?.length > 0 ? <img src={l.images[0]} alt="" loading="lazy" /> : <Icon name={SECTION_ICON[section]} size="1.4em" />}
+          {l.images?.length > 0 ? <img src={l.thumbs?.[0] ?? l.images[0]} alt="" loading="lazy" /> : <Icon name={SECTION_ICON[section]} size="1.4em" />}
         </span>
         <span className="ad-main">
           <span className="ad-title"><bdi>{l.title}</bdi></span>
@@ -56,7 +56,7 @@ export function AdCard({ listing: l }) {
     <li>
       <Link to={`/requests/${l.id}`} className="ad-card">
         <span className="ad-card-photo">
-          {l.images?.length > 0 ? <img src={l.images[0]} alt="" loading="lazy" /> : <Icon name={SECTION_ICON[section]} size="2.2em" />}
+          {l.images?.length > 0 ? <img src={l.thumbs?.[0] ?? l.images[0]} alt="" loading="lazy" /> : <Icon name={SECTION_ICON[section]} size="2.2em" />}
           {section === 'wanted' && <span className="ad-card-tag">{t('Looking for')}</span>}
         </span>
         {price && <span className="ad-card-price">{price}</span>}

@@ -1,5 +1,6 @@
 // Identity verification (KYC) form + status page.
 import { useEffect, useState } from 'react';
+import { shrinkImage } from '../images.js';
 import { Link, Navigate } from 'react-router-dom';
 import { api, toDate } from '../api.js';
 import { reasonText } from '../kycReasons.js';
@@ -101,8 +102,10 @@ function FileField({ name, label, hint, accept = 'image/jpeg,image/png,image/web
     <div className="field">
       <label htmlFor={name}>{label}</label>
       <input id={name} name={name} type="file" accept={accept} capture={capture} required={required}
-        onChange={(e) => {
-          const f = e.target.files[0];
+        onChange={async (e) => {
+          // ID photos are shrunk too (session 102), but kept big enough to
+          // read: at most 2400 px. PDFs are sent as they are.
+          const f = await shrinkImage(e.target.files[0], 2400, 0.9);
           setPreview(f && f.type.startsWith('image/') ? URL.createObjectURL(f) : null);
           onChange(name, f);
         }} />

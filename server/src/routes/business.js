@@ -68,7 +68,7 @@ export function businessRoutes(db) {
       SELECT l.id, l.title, l.section, l.category, l.status, l.budget_min, l.budget_max, l.currency, l.city, l.created_at, l.held_at, l.paid_fils,
              (SELECT COUNT(*) FROM listing_views v WHERE v.listing_id = l.id) AS views,
              (SELECT COUNT(*) FROM conversations c WHERE c.listing_id = l.id) AS replies,
-             (SELECT file FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS photo,
+             (SELECT COALESCE(thumb, file) FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS photo,
              p.display_name AS posted_by_name
       FROM listings l LEFT JOIN users p ON p.id = l.posted_by
       WHERE l.buyer_id = ? ORDER BY (l.status = 'open') DESC, l.created_at DESC, l.id DESC LIMIT 200

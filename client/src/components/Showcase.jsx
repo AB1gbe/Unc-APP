@@ -17,7 +17,7 @@ export function HeroStack({ listings }) {
       <img className="glow hero-glow" src={top[top.length - 1].images?.[0] || categoryArt(top[top.length - 1].category)} alt="" />
       {top.map((l, i) => (
         <div key={l.id} className={`hero-card hero-card-${i}`}>
-          <img src={l.images?.[0] || categoryArt(l.category)} alt="" />
+          <img src={l.thumbs?.[0] || l.images?.[0] || categoryArt(l.category)} alt="" />
           <div className="hero-card-body">
             <div className="hero-card-title" dir="auto">{l.title}</div>
             <div className="hero-card-price">{budget(l)}</div>

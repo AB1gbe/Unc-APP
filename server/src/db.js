@@ -619,6 +619,12 @@ const MIGRATIONS = [
   CREATE INDEX idx_team_invites_email ON team_invites(email);
   ALTER TABLE sessions ADD COLUMN actor_id INTEGER REFERENCES users(id) ON DELETE CASCADE;
   `,
+  // 45: thumbnails (session 102). The browser uploads a small copy (about
+  // 480 px) next to each listing photo; grids show it, the ad page the
+  // full photo. NULL for older photos (the full one is used).
+  `
+  ALTER TABLE listing_images ADD COLUMN thumb TEXT;
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

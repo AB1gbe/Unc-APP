@@ -56,3 +56,6 @@ Test: `server/test/demo-photos.test.js`.
 
 ## Short videos (session 58)
 Chats and offers can also carry a short video (≤ 1 minute, 25 MB), private like chat photos → [[Orders, Wallet, Invites and Video#3. Short videos with offers and in chats]].
+
+## Thumbnails (session 102)
+The browser shrinks photos to ~1600px (`shrinkImage`) and also makes a ~480px thumbnail (`makeThumb`), sent as `thumbs` next to `images` (`appendPhotos` in `client/src/images.js`). The server stores it in `listing_images.thumb` (max 150 KB, else ignored); lists and grids use `listing.thumbs`, the ad page the full photo. ID-check photos are shrunk to 2400px.

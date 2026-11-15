@@ -114,7 +114,7 @@ export function ListingCard({ listing }) {
   // A request as a marketplace card (session 77): photo, item and condition,
   // budget, area, time left, who answered, and one clear action.
   const { user } = useAuth();
-  const photo = listing.images?.[0] || categoryArt(listing.category);
+  const photo = listing.thumbs?.[0] || listing.images?.[0] || categoryArt(listing.category);
   const left = daysLeft(listing.closesAt);
   const mine = user && listing.buyer?.id === user.id;
   const action = mine ? t('See offers') : user ? t('Make an offer') : t('View request');
