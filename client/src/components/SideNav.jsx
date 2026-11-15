@@ -61,9 +61,9 @@ export default function SideNav({ unread, bell }) {
           <Icon name="language" size="1.3em" /> <span className="side-label">{LANGUAGES[other]}</span>
         </button>
         {user ? (
-          <NavLink to="/account" className="side-me" title={t('Account')}>
+          <NavLink to="/account" className="side-me" title={t('Settings')}>
             <Avatar name={user.displayName} src={user.avatarUrl} size={34} />
-            <span><bdi>{user.displayName}</bdi><small>{t('Account')}</small></span>
+            <span><bdi>{user.displayName}</bdi><small>{t('Settings')}</small></span>
           </NavLink>
         ) : (
           <NavLink to="/login" className="side-me" title={t('Log in')}><Icon name="user" size="1.6em" /> <span>{t('Log in')}</span></NavLink>

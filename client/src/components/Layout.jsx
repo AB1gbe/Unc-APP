@@ -60,6 +60,8 @@ export default function Layout() {
           <Link to="/" className="logo" aria-label="Unc"><Logo size={26} /></Link>
           <nav className="nav">
             {user && <NavLink to="/me" className="top-bell" aria-label={t('My Unc')} title={t('My Unc')}><Icon name="user" size="1.5em" /></NavLink>}
+            {/* Settings (session 94): the Account page, one tap away on phones. */}
+            {user && <NavLink to="/account" className="top-bell" aria-label={t('Settings')} title={t('Settings')}><Icon name="settings" size="1.5em" /></NavLink>}
             {user ? (
               <NavLink to="/notifications" className="top-bell" aria-label={bell > 0 ? t('Notifications ({n} new)', { n: bell }) : t('Notifications')} title={t('Notifications')}>
                 <Icon name="bell" size="1.5em" />

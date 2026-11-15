@@ -1348,4 +1348,5 @@ export default {
   "Cars & parts": "سيارات وقطع غيار",
   "Furniture": "أثاث",
   "Sports": "رياضة",
+  "Settings": "الإعدادات",
 };

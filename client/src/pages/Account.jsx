@@ -21,7 +21,7 @@ export default function Account() {
         <div className="row">
           <Avatar name={user.displayName} src={user.avatarUrl} size={56} />
           <div style={{ flex: 1 }}>
-            <h1 style={{ margin: 0 }}>{t('Account')}</h1>
+            <h1 style={{ margin: 0 }}>{t('Settings')}</h1>
             <p className="muted" style={{ margin: 0 }}><span className="ltr">{user.email}</span> · {user.accountType === 'business' ? t('Business') : t('Individual')} · {t('member since {date}', { date: formatDate(toDate(user.createdAt)) })}</p>
           </div>
         </div>

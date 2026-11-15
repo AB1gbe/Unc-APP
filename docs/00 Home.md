@@ -105,6 +105,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 72 - For sale and calmer rows]]
 - [[Step 73 - Marketplace layout and light colours]]
 - [[Step 74 - Business panel, billing and teams]]
+- [[Test Logins]] (demo accounts for the test site)
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
