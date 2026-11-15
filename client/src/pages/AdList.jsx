@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ago, api, money } from '../api.js';
 import { useAuth } from '../auth.jsx';
-import { ErrorBox, Loading } from '../components/ui.jsx';
+import { ErrorBox, ListingCard, Loading } from '../components/ui.jsx';
 import CityField, { Place } from '../components/CityField.jsx';
 import Icon from '../components/Icon.jsx';
 import { useMeta } from '../hooks.js';
@@ -51,13 +51,14 @@ export function AdRow({ listing: l }) {
 // and the area. Wanted requests say "Looking for" above their budget.
 export function AdCard({ listing: l }) {
   const section = l.section ?? 'wanted';
+  // Requests use their own card (no stock photo; session 102).
+  if (section === 'wanted') return <li><ListingCard listing={l} /></li>;
   const price = adPrice(l, money);
   return (
     <li>
       <Link to={`/requests/${l.id}`} className="ad-card">
         <span className="ad-card-photo">
           {l.images?.length > 0 ? <img src={l.thumbs?.[0] ?? l.images[0]} alt="" loading="lazy" /> : <Icon name={SECTION_ICON[section]} size="2.2em" />}
-          {section === 'wanted' && <span className="ad-card-tag">{t('Looking for')}</span>}
         </span>
         {price && <span className="ad-card-price">{price}</span>}
         <span className="ad-card-title"><bdi>{l.title}</bdi></span>

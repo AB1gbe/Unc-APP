@@ -4,7 +4,6 @@
 // other way round) keeps its own direction and punctuation.
 import { useState } from 'react';
 import Icon from './Icon.jsx';
-import { categoryArt } from '../art.js';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, isVerified } from '../auth.jsx';
 import { budget, ago, toDate } from '../api.js';
@@ -112,21 +111,27 @@ export function Responders({ responders, count }) {
 
 export function ListingCard({ listing }) {
   // A request as a card (session 77; session 102: the same look as the
-  // marketplace cards, ADR-079): photo with "Looking for", the budget
-  // first, the item, one grey line (area, days left, when), then who has
-  // answered and the one action. Requests are Unc's core (ADR-081).
+  // marketplace cards, ADR-079): "Looking for", the budget first, the
+  // item, one grey line (area, days left, when), then who has answered
+  // and the one action. Requests are Unc's core (ADR-081).
+  // Session 102 (second review): no big photo. A request has nothing to
+  // photograph yet, and a stock picture made it look like an item for
+  // sale. A bordered card with a blue edge instead; the buyer's own photo,
+  // if they added one ("like this"), shows small.
   const { user } = useAuth();
-  const photo = listing.thumbs?.[0] || listing.images?.[0] || categoryArt(listing.category);
+  const photo = listing.thumbs?.[0] || listing.images?.[0] || null;
   const left = daysLeft(listing.closesAt);
   const mine = user && listing.buyer?.id === user.id;
   const action = mine ? t('See offers') : user ? t('Make an offer') : t('View request');
   return (
     <Link className="ad-card want-card" to={`/requests/${listing.id}`}>
-      <span className="ad-card-photo">
-        <img src={photo} alt="" loading="lazy" />
-        <span className="ad-card-tag">{t('Looking for')}</span>
+      <span className="want-head">
+        <span className="want-main">
+          <span className="want-tag"><Icon name="search" weight="bold" /> {t('Looking for')}</span>
+          <span className="ad-card-price">{budget(listing)}</span>
+        </span>
+        {photo && <img className="want-pic" src={photo} alt="" loading="lazy" />}
       </span>
-      <span className="ad-card-price">{budget(listing)}</span>
       <h3 className="ad-card-title" dir="auto">{listing.title}</h3>
       <span className="ad-card-place">
         <Place city={listing.city} />

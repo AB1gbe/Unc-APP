@@ -36,7 +36,7 @@ export default function Board() {
   const [q, setQ] = useState('');
   const latest = data?.latest ?? {};
   // Today's picks: the newest things for sale and places to rent, mixed.
-  const picks = [...(latest.forsale ?? []), ...(latest.housing ?? [])].sort(byNewest).slice(0, 12);
+  const picks = [...(latest.forsale ?? []), ...(latest.housing ?? [])].sort(byNewest).slice(0, 10);
   const postTo = user ? '/requests/new?section=forsale' : '/register';
 
   function search(e) {
@@ -85,27 +85,8 @@ export default function Board() {
         <span className="btn ok sm">{t('Post what you need')}</span>
       </Link>
 
-      <section className="market-block">
-        <div className="section-head">
-          <h2>{t('Today’s picks')}</h2>
-          <span className="muted small"><Icon name="pin" /> {t('Bahrain')}</span>
-        </div>
-        <SampleNote listings={picks} />
-        {loading ? <CardsLoading /> : picks.length === 0
-          ? <p className="muted">{t('No ads here yet.')} <Link to={postTo}>{t('Post the first one')}</Link></p>
-          : <ul className="ad-grid">{picks.map((l) => <AdCard key={l.id} listing={l} />)}</ul>}
-      </section>
-
-      {(latest.jobs ?? []).length > 0 && (
-        <section className="market-block">
-          <div className="section-head">
-            <h2>{t('Newest jobs')}</h2>
-            <Link to="/jobs">{t('See all')} <span className="flip">→</span></Link>
-          </div>
-          <ul className="ad-list">{latest.jobs.slice(0, 4).map((l) => <AdRow key={l.id} listing={l} />)}</ul>
-        </section>
-      )}
-
+      {/* Session 102 (second review): what people are looking for comes
+          before the things for sale; on phones Today's picks shows 6. */}
       {(latest.wanted ?? []).length > 0 && (
         <section className="market-block">
           <div className="section-head">
@@ -119,8 +100,29 @@ export default function Board() {
         </section>
       )}
 
+      <section className="market-block">
+        <div className="section-head">
+          <h2>{t('Today’s picks')}</h2>
+          <Link to="/for-sale">{t('See all')} <span className="flip">→</span></Link>
+        </div>
+        <SampleNote listings={picks} />
+        {loading ? <CardsLoading /> : picks.length === 0
+          ? <p className="muted">{t('No ads here yet.')} <Link to={postTo}>{t('Post the first one')}</Link></p>
+          : <ul className="ad-grid picks">{picks.map((l) => <AdCard key={l.id} listing={l} />)}</ul>}
+      </section>
+
+      {(latest.jobs ?? []).length > 0 && (
+        <section className="market-block">
+          <div className="section-head">
+            <h2>{t('Newest jobs')}</h2>
+            <Link to="/jobs">{t('See all')} <span className="flip">→</span></Link>
+          </div>
+          <ul className="ad-list">{latest.jobs.slice(0, 4).map((l) => <AdRow key={l.id} listing={l} />)}</ul>
+        </section>
+      )}
+
       <div className="safety-strip">
-        <div><Icon name="admin" /> <b>{t('ID-checked posters')}</b><span className="muted small">{t('Everyone who posts or replies has passed an ID check.')}</span></div>
+        <div><Icon name="admin" /> <b>{t('ID-checked posters')}</b><span className="muted small">{t('Everyone who posts has passed an ID check.')}</span></div>
         <div><Icon name="chat" /> <b>{t('Private chat only')}</b><span className="muted small">{t('Numbers and emails stay hidden; you talk inside the ad.')}</span></div>
         <div><Icon name="warning" /> <b>{t('Scam checks')}</b><span className="muted small">{t('Ads asking for money up front are blocked; doubtful ones are checked by a person.')}</span></div>
       </div>
