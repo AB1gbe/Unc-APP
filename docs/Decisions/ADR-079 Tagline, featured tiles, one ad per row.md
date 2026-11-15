@@ -35,3 +35,6 @@ The owner: "I don't like how the +Sell is sticking so close to the tagline, add 
 - **Sell** moved from the tagline to beside the search box.
 - Arabic: "{اشترِ / بِع / بادِل} وتواصل من حولك".
 - Code: `RotatingWord` in `client/src/pages/Board.jsx`; styles `.tagline-mark`, `.rotator`, `.market-search-row` in `client/src/styles.css`.
+
+## Session 97 change
+The owner: "make the ad photos on phones shorter". Phone ad photos 4:3 → **16:9** (`.ad-card-photo` in the phone block of `client/src/styles.css`); about a quarter less tall, so the first ad's price and title fit on the first screen.
