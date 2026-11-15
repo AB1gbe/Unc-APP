@@ -34,33 +34,31 @@ test('every member gets one invite code and link', async () => {
   assert.deepEqual([a.joined, a.verified, a.earned, a.reward, a.welcome, a.currency], [0, 0, 0, 1000, 500, 'BHD']);
 });
 
-test('the inviter is rewarded only when the friend is fully verified, and only once', async () => {
+test('the inviter is rewarded only when the friend is fully verified (email + ID check), and only once', async () => {
   const inviter = await t.user();
   const { code } = (await inviter.get('/api/referrals')).body;
 
-  const friend = await invited(code.toLowerCase(), 'approved'); // codes are not case-sensitive
+  // Session 101: people no longer need a card, so the ID check is the last step.
+  const pending = await invited(code.toLowerCase(), 'kyc-only'); // codes are not case-sensitive
   let r = (await inviter.get('/api/referrals')).body;
-  assert.deepEqual([r.joined, r.verified, r.earned], [1, 0, 0], 'approved, but no card yet: no reward');
+  assert.deepEqual([r.joined, r.verified, r.earned], [1, 0, 0], 'ID check not approved yet: no reward');
   assert.equal(await balance(inviter), 0);
 
-  await friend.post('/api/payments/card').send({ token: 'tok_test_visa_4242_12_39' }).expect(201);
+  const sub = t.db.prepare('SELECT id FROM kyc_submissions WHERE user_id = ?').get(pending.id);
+  await t.admin.post(`/api/admin/kyc/${sub.id}/decision`).send({ decision: 'approved' }).expect(200);
   r = (await inviter.get('/api/referrals')).body;
   assert.deepEqual([r.verified, r.earned], [1, 1000]);
   assert.equal(await balance(inviter), 1000);
-  assert.equal(await balance(friend), 500, 'the friend gets a welcome credit');
+  assert.equal(await balance(pending), 500, 'the friend gets a welcome credit');
   assert.ok((await inviter.get('/api/notifications')).body.notifications.some((x) => x.kind === 'referral-reward'));
 
-  // Replacing the card, or calling it again, pays nothing more.
-  await friend.post('/api/payments/card').send({ token: 'tok_test_mastercard_4444_12_39' }).expect(201);
-  assert.equal(rewardReferral(t.db, friend.id), false);
+  // Adding a card later, or calling it again, pays nothing more.
+  await pending.post('/api/payments/card').send({ token: 'tok_test_visa_4242_12_39' }).expect(201);
+  assert.equal(rewardReferral(t.db, pending.id), false);
   assert.equal(await balance(inviter), 1000);
 
-  // The order doesn't matter: card first, identity approved last also pays.
-  const other = await invited(code, 'kyc-only');
-  await other.post('/api/payments/card').send({ token: 'tok_test_visa_4242_12_39' }).expect(201);
-  assert.equal(await balance(inviter), 1000, 'identity not approved yet');
-  const sub = t.db.prepare('SELECT id FROM kyc_submissions WHERE user_id = ?').get(other.id);
-  await t.admin.post(`/api/admin/kyc/${sub.id}/decision`).send({ decision: 'approved' }).expect(200);
+  // A second friend: rewarded too, once.
+  await invited(code, 'approved');
   assert.equal(await balance(inviter), 2000);
 });
 

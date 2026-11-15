@@ -105,6 +105,7 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 72 - For sale and calmer rows]]
 - [[Step 73 - Marketplace layout and light colours]]
 - [[Step 74 - Business panel, billing and teams]]
+- [[Step 75 - Trust ladder]]
 - [[Test Logins]] (demo accounts for the test site)
 
 ### How it works
@@ -175,6 +176,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | For sale section; calmer ad rows with photos | ✅ **live** → [[Step 72 - For sale and calmer rows]] |
 | Marketplace layout (photo grid, Today's picks) and light colours | ✅ **live**; colours now white/grey/blue/yellow and the new logo (on the branch) → [[ADR-074 White, grey, blue and yellow]], [[ADR-075 Logo]], [[ADR-076 Colours that mean something]] |
 | Business accounts: CR required, pay per ad / packs, business panel, team members | ✅ on the branch (test payments, no real money) → [[Business Accounts and Billing]] |
+| Trust ladder: reply with an email code; ID check to post and offer; card only for businesses | ✅ on the branch → [[ADR-080 Trust ladder]] |
 | API tests | ✅ 192 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

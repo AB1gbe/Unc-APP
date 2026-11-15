@@ -37,5 +37,9 @@ export function AuthProvider({ children }) {
 
 export const useAuth = () => useContext(AuthContext);
 
-// Verified = email confirmed, identity approved and a payment card added (session 40).
-export const isVerified = (u) => Boolean(u && u.emailVerified && u.kycStatus === 'approved' && u.hasCard);
+// The trust ladder (session 101, ADR-080):
+// canChat = email confirmed + Terms: reply to ads and chat.
+// isVerified = canChat + ID check approved (+ a card for businesses, who
+// pay for ads): post, make offers on Wanted requests.
+export const canChat = (u) => Boolean(u && u.emailVerified && u.termsAccepted);
+export const isVerified = (u) => Boolean(canChat(u) && u.kycStatus === 'approved' && (u.accountType !== 'business' || u.hasCard));

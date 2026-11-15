@@ -501,7 +501,9 @@ function readListingBody(body) {
     data.budgetMax = data.budgetMin;
     data.condition = v.oneOf(body, 'condition', ['new', 'used']);
   }
-  if (section !== 'wanted') { if (section !== 'forsale') data.condition = 'any'; data.neededBy = null; data.contactRule = 'anyone'; }
+  // Ads: anyone, or only ID-checked members (session 101).
+  if (section !== 'wanted') { if (section !== 'forsale') data.condition = 'any'; data.neededBy = null; data.contactRule = data.contactRule === 'verified' ? 'verified' : 'anyone'; }
+  else if (data.contactRule === 'verified') data.contactRule = 'anyone'; // requests: offers already need the ID check
   return data;
 }
 

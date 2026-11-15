@@ -71,8 +71,12 @@ export default function VerifyEmail() {
 }
 
 // The 3-step progress bar shown during onboarding.
+// Session 101: the card step only for businesses (they pay for ads); the
+// ID check says what it unlocks (posting), since chatting doesn't need it.
 export function Steps({ current }) {
-  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Profile'), t('Photo & interests')], [t('Identity'), t('Verify (KYC)')], [t('Card'), t('Add a payment card')]];
+  const { user } = useAuth();
+  const steps = [[t('Account'), t('Created')], [t('Email'), t('Confirm address')], [t('Profile'), t('Photo & interests')], [t('Identity'), t('Needed to post ads')]];
+  if (user?.accountType === 'business') steps.push([t('Card'), t('Add a payment card')]);
   return (
     <div className="steps">
       {steps.map(([title, sub], i) => (

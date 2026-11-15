@@ -22,13 +22,19 @@ test('a card is added from a token; Unc keeps only brand, last 4 and expiry', as
   assert.ok(!cols.some((c) => /number|pan|cvc|cvv/.test(c)), 'no column could hold a card number');
 });
 
-test('without a card, a verified member cannot offer or post', async () => {
+// Session 101 (trust ladder): people never need a card; businesses do,
+// because they pay for ads.
+test('without a card a verified person can still offer and post; a business cannot post', async () => {
   const buyer = await t.user();
   const seller = await t.user();
   const l = await t.listing(buyer, { title: 'Need a lamp, card test' });
   t.db.prepare('UPDATE users SET card_added_at = NULL WHERE id = ?').run(seller.id);
   t.db.prepare('DELETE FROM payment_cards WHERE user_id = ?').run(seller.id);
-  const res = await seller.post(`/api/listings/${l.id}/contact`).send({ message: 'I have one' }).expect(403);
+  await seller.post(`/api/listings/${l.id}/contact`).send({ message: 'I have one' }).expect(201);
+  await t.listing(seller, { title: 'Need a desk, no card' });
+  const shop = await t.user('approved', 'business');
+  t.db.prepare('UPDATE users SET card_added_at = NULL WHERE id = ?').run(shop.id);
+  const res = await shop.post('/api/listings').send({ title: 'Need shelving', description: 'Metal shelves for the stock room', category: 'Tools & DIY', city: 'Seef' }).expect(403);
   assert.equal(res.body.code, 'CARD_REQUIRED');
 });
 

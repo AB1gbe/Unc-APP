@@ -35,7 +35,8 @@ export const inviterByCode = (db, code) => (code
 // nothing the second time.
 export function rewardReferral(db, userId) {
   const u = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-  if (!u?.referred_by || !u.email_verified_at || u.kyc_status !== 'approved' || !u.card_added_at) return false;
+  // Fully verified = email + ID check (+ card for businesses, session 101).
+  if (!u?.referred_by || !u.email_verified_at || u.kyc_status !== 'approved' || (u.account_type === 'business' && !u.card_added_at)) return false;
   const inviter = db.prepare('SELECT id, banned_at FROM users WHERE id = ?').get(u.referred_by);
   if (!inviter || inviter.banned_at) return false;
   const ref = `user:${u.id}`;

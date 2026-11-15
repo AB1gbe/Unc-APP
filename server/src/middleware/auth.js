@@ -41,22 +41,35 @@ export function requireAuth(req, _res, next) {
   next();
 }
 
-export function requireVerified(req, res, next) {
+// The trust ladder (session 101, docs/Decisions/ADR-080):
+//   requireMember   -> logged in + email confirmed + Terms: may reply to ads
+//                      and chat (shown as "Not ID-checked" to others)
+//   requireVerified -> requireMember + ID check approved (+ a payment card
+//                      for businesses, who pay for ads): may post, make
+//                      offers on Wanted requests, payment plans
+export function requireMember(req, res, next) {
   requireAuth(req, res, (err) => {
     if (err) return next(err);
     if (!req.user.email_verified_at) {
       return next(new HttpError(403, 'Please verify your email address first.', { code: 'EMAIL_UNVERIFIED' }));
     }
+    if (!termsAccepted(req.user)) {
+      return next(new HttpError(403, 'Please read and accept the Terms first.', { code: 'TERMS_REQUIRED' }));
+    }
+    next();
+  });
+}
+
+export function requireVerified(req, res, next) {
+  requireMember(req, res, (err) => {
+    if (err) return next(err);
     if (req.user.kyc_status !== 'approved') {
       return next(new HttpError(403, 'You need to complete identity verification (KYC) first.', { code: 'KYC_REQUIRED' }));
     }
-    // And a payment card on file (session 40), checked by the payment company.
-    if (!req.user.card_added_at) {
+    // A payment card only for businesses (they pay for ads); people never
+    // need one since session 101 (it was everyone, session 40).
+    if (req.user.account_type === 'business' && !req.user.card_added_at) {
       return next(new HttpError(403, 'Please add a payment card first.', { code: 'CARD_REQUIRED' }));
-    }
-    // Posting, offering and answering need the current Terms (session 40).
-    if (!termsAccepted(req.user)) {
-      return next(new HttpError(403, 'Please read and accept the Terms first.', { code: 'TERMS_REQUIRED' }));
     }
     next();
   });

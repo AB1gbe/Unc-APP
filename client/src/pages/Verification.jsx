@@ -34,20 +34,22 @@ export default function Verification() {
   const status = data.kycStatus;
   const sub = data.submission;
 
+  const needsCard = user.accountType === 'business';
   return (
     <div className="narrow">
-      <Steps current={status === 'approved' ? (user.hasCard ? 5 : 4) : 3} />
-      {!user.hasCard && status !== 'unverified' && status !== 'rejected' && (
+      {/* Session 101: only businesses add a card (they pay for ads). */}
+      <Steps current={status === 'approved' ? (!needsCard || user.hasCard ? 5 : 4) : 3} />
+      {needsCard && !user.hasCard && status !== 'unverified' && status !== 'rejected' && (
         <div className="card add-card-step">
           <h2>{status === 'approved' ? t('One last step: add a payment card') : t('While you wait: add a payment card')}</h2>
-          <p className="muted">{t('Every member adds a card, so people who break the rules can be held to them. Nothing is charged now.')}</p>
+          <p className="muted">{t('Businesses pay for ads with this card. Nothing is charged now.')}</p>
           <Link className="btn" to="/payment-card">{t('Add a payment card')}</Link>
         </div>
       )}
-      {status === 'approved' && user.hasCard && (
+      {status === 'approved' && (!needsCard || user.hasCard) && (
         <div className="card center">
           <h1>{t("You're verified")}</h1>
-          <p className="muted">{t('You can now post requests and contact buyers.')}</p>
+          <p className="muted">{t('You can now post ads and requests, and make offers.')}</p>
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link className="btn ok" to="/requests/new">{t('Post a request')}</Link>
             <Link className="btn secondary" to="/">{t('Browse requests')}</Link>

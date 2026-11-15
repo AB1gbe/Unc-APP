@@ -29,7 +29,7 @@ export function walletRoutes(db) {
     const code = referralCodeOf(db, req.user.id);
     const stats = db.prepare(`
       SELECT COUNT(*) AS joined,
-             COALESCE(SUM(email_verified_at IS NOT NULL AND kyc_status = 'approved' AND card_added_at IS NOT NULL), 0) AS verified
+             COALESCE(SUM(email_verified_at IS NOT NULL AND kyc_status = 'approved' AND (account_type <> 'business' OR card_added_at IS NOT NULL)), 0) AS verified
       FROM users WHERE referred_by = ? AND deleted_at IS NULL
     `).get(req.user.id);
     const earned = db.prepare(`SELECT COALESCE(SUM(amount), 0) AS n FROM wallet_entries WHERE user_id = ? AND reason = 'referral'`).get(req.user.id).n;
