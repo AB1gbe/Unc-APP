@@ -1059,3 +1059,22 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 }
 /* Category chips: one line that scrolls sideways (session 91). */
 .chips.scroll { flex-wrap: nowrap; }
+
+/* ---- Session 94: tagline style; Sell beside the search box ---- */
+.market-top { display: block; margin: .5rem 0 1rem; }
+.market-top h1.tagline { font-size: 1.45rem; line-height: 1.25; font-weight: 800; letter-spacing: -.02em; margin: 0; max-width: 22ch; }
+/* "near you": brand blue on a yellow highlighter stroke. */
+.tagline-mark { color: var(--brand); white-space: nowrap;
+  background: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 70%, transparent) 62%, color-mix(in srgb, var(--accent) 70%, transparent) 92%, transparent 92%);
+  padding-inline: .1em; }
+.market-search-row { display: flex; gap: .6rem; align-items: stretch; margin-bottom: .9rem; }
+.market-search-row .market-search { flex: 1; margin-bottom: 0; }
+.market-search-row .sell-btn { flex: 0 0 auto; padding-inline: 1.1rem; }
+@media (max-width: 700px) { .market-top h1.tagline { font-size: 1.3rem; } }
+[dir="rtl"] .market-top h1.tagline { letter-spacing: 0; }
+/* The rotating word (session 94): it slides up into place. */
+.rotator { display: inline-block; overflow: hidden; vertical-align: bottom; padding-top: .2em; margin-top: -.2em; }
+.rotator-word { display: inline-block; animation: word-up .45s cubic-bezier(.2, .8, .2, 1); }
+@keyframes word-up { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .rotator-word { animation: none; } }
+.market-top h1.tagline { max-width: none; }
