@@ -32,7 +32,7 @@ export default function NewListing() {
   useEffect(() => {
     if (user.accountType === 'business' && !editing) api('/business/billing').then(setBilling).catch(() => {});
   }, [user.accountType, editing]);
-  const price = ad && billing ? billing.prices[section] : 0;
+  const price = ad && billing && !billing.free ? billing.prices[section] : 0;
   // The same scam check the server runs, as a warning while typing.
   const check = checkAd({ section, title: form.title, description: form.description, category: form.category,
     price: Number(section === 'housing' ? form.rent : section === 'forsale' ? form.price : form.budgetMin) || null, priceMax: Number(form.budgetMax) || null });

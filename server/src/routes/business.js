@@ -93,10 +93,13 @@ export function businessRoutes(db) {
       card: cardView(db.prepare('SELECT * FROM payment_cards WHERE user_id = ?').get(req.user.id)),
       payments: paymentsOf.all(req.user.id).map(paymentView),
       isOwner: !req.actorId,
+      // Free launch period (session 102): ads cost nothing, packs can't be bought.
+      free: !config.chargeBusinesses,
     });
   });
 
   r.post('/business/billing/packs', ownerOnly, async (req, res) => {
+    if (!config.chargeBusinesses) throw new HttpError(409, 'Ads are free for businesses during the launch period.');
     const paymentId = await buyPack(db, req.user, null, req.body?.pack);
     audit(db, req.user.id, 'billing.pack', `payment:${paymentId}`, { pack: req.body.pack });
     const p = db.prepare('SELECT * FROM ad_payments WHERE id = ?').get(paymentId);

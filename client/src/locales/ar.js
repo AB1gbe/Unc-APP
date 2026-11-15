@@ -1371,4 +1371,5 @@ export default {
   "Only ID-checked members": "الأعضاء الموثّقون فقط",
   "ID-checked members have shown an ID to Unc. Choosing them means fewer, safer messages.": "الأعضاء الموثّقون قدّموا هويتهم لـUnc. اختيارهم يعني رسائل أقل وأكثر أماناً.",
   "This advertiser only takes messages from ID-checked members.": "يقبل هذا المعلن الرسائل من الأعضاء الموثّقين فقط.",
+  "Ads are free for businesses during the launch period. Nothing will be charged.": "الإعلانات مجانية للأنشطة التجارية خلال فترة الإطلاق. لن يُخصم أي مبلغ.",
 };

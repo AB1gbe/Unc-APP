@@ -5,6 +5,10 @@ import assert from 'node:assert/strict';
 import { setup } from './helpers.js';
 
 const t = await setup();
+// These tests check paying for ads, so charging is on (it's off by default
+// during the free launch period, session 102).
+const { config } = await import('../src/config.js');
+config.chargeBusinesses = true;
 const item = (o = {}) => ({ section: 'forsale', title: `Phone case ${Math.random().toString(36).slice(2, 7)}`, description: 'New, in the box.', category: 'Phones & Tablets', price: 5, condition: 'new', city: 'Seef', ...o });
 const job = (o = {}) => ({ section: 'jobs', title: `Cashier ${Math.random().toString(36).slice(2, 7)}`, description: 'Evening shifts, training given.', category: 'Sales & retail', jobType: 'part-time', city: 'Seef', ...o });
 
@@ -134,4 +138,21 @@ test('ensureAdmin with syncPassword sets the admin password from the secret', as
   // Already right: nothing changes and the session stays.
   await ensureAdmin(t.db, { syncPassword: true });
   await fresh.get('/api/admin/stats').expect(200);
+  // The reset logged the shared test admin out: log it back in for later tests.
+  await t.admin.post('/api/auth/login').send({ email: config.adminEmail, password: config.adminPassword }).expect(200);
 });
+
+test('free launch period: with charging off, businesses post ads for free and cannot buy packs', async () => {
+  config.chargeBusinesses = false;
+  try {
+    const shop = await t.user('approved', 'business');
+    assert.deepEqual((await shop.post('/api/listings').send(job()).expect(201)).body.paid, { amount: 0, from: 'free' });
+    const billing = (await shop.get('/api/business/billing').expect(200)).body;
+    assert.equal(billing.free, true);
+    assert.equal(billing.payments.length, 0);
+    await shop.post('/api/business/billing/packs').send({ pack: 'pack10' }).expect(409);
+  } finally {
+    config.chargeBusinesses = true;
+  }
+});
+

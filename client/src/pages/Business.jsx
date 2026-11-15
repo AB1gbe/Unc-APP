@@ -128,8 +128,11 @@ function Billing({ isOwner }) {
           <div><div className="muted small">{t('Ad credit')}</div><div className="stat-n">{bd(data.credit)}</div></div>
           {data.card && <div className="muted small"><Icon name="card" /> {t('Card ending {last4}', { last4: data.card.last4 })}</div>}
         </div>
-        <p className="muted small">{t('People post for free. Businesses pay per ad: For sale {forsale}, Housing {housing}, Jobs {jobs}. Wanted requests and offers are free. Ads are paid from your credit first, then your card.', { forsale: bd(data.prices.forsale), housing: bd(data.prices.housing), jobs: bd(data.prices.jobs) })}</p>
+        {data.free
+          ? <p className="alert ok small">{t('Ads are free for businesses during the launch period. Nothing will be charged.')}</p>
+          : <p className="muted small">{t('People post for free. Businesses pay per ad: For sale {forsale}, Housing {housing}, Jobs {jobs}. Wanted requests and offers are free. Ads are paid from your credit first, then your card.', { forsale: bd(data.prices.forsale), housing: bd(data.prices.housing), jobs: bd(data.prices.jobs) })}</p>}
       </div>
+      {!data.free && <>
       <h2>{t('Buy ad credit')}</h2>
       <ErrorBox error={err} />
       <div className="packs">
@@ -144,6 +147,7 @@ function Billing({ isOwner }) {
           </div>
         ))}
       </div>
+      </>}
       <h2>{t('Payments and receipts')}</h2>
       {data.payments.length === 0 ? <p className="muted">{t('No payments yet.')}</p> : (
         <div className="table-scroll"><table>
