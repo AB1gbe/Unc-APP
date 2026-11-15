@@ -103,3 +103,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-15 | [[2026-11-15 Session 94]] | Settings gear in the phone header; test logins written down |
 | 2026-11-15 | [[2026-11-15 Session 95]] | Admin password follows the ADMIN_PASSWORD secret (reset steps) |
 | 2026-11-15 | [[2026-11-15 Session 96]] | Tagline "[Buy/Sell/Trade] and connect near you" with a sliding highlighted word; Sell beside search |
+| 2026-11-15 | [[2026-11-15 Session 97]] | Shorter ad photos on phones (16:9) |
