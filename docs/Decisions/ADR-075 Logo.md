@@ -27,3 +27,5 @@ Why B: the cleanest as a phone icon and at tiny sizes (browser tab).
 - Emails (`server/src/lib/emails.js`): a blue square with "u", then "unc" (emails can't show SVG reliably); email buttons are now blue #1f5fd6.
 
 **Revisit when:** a designer makes a full brand identity.
+
+**Session 90:** the owner asked for a square tile: corner `rx` 16 → 4 in `client/public/icons/logo-mark.svg` and `client/src/components/Logo.jsx`, icons remade with `node scripts/make-icons.mjs`, email tile 2px.
