@@ -111,7 +111,7 @@ export default function AdList({ section }) {
           <p className="muted">{{
             housing: () => t('Flats, rooms and villas for rent in Bahrain. Every advertiser is ID-checked; reply in a private chat.'),
             jobs: () => t('Jobs in Bahrain from ID-checked employers. Apply in a private chat; never pay to get a job.'),
-            forsale: () => t('Things for sale in Bahrain from ID-checked people and shops. Ask in a private chat; meet to see it before you pay.'),
+            forsale: () => t('Things for sale in Bahrain from ID-checked shops and phone-checked people. Ask in a private chat; meet to see it before you pay.'),
           }[section]()}</p>
         </div>
         <Link className="btn ok" to={postTo}><Icon name="plus" weight="bold" /> {t('Post an ad')}</Link>

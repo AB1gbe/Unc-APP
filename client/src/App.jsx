@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
-import { RequireAdmin, RequireAuth, RequireVerified } from './components/ui.jsx';
+import { RequireAdmin, RequireAuth, RequireMember, RequireVerified } from './components/ui.jsx';
 import Browse from './pages/Browse.jsx';
 import Home from './pages/Home.jsx';
 import Board from './pages/Board.jsx';
@@ -59,9 +59,9 @@ export default function App() {
         <Route path="jobs" element={<AdList section="jobs" />} />
         <Route path="for-sale" element={<AdList section="forsale" />} />
         <Route path="browse" element={<Browse />} />
-        <Route path="requests/new" element={<RequireAuth><RequireVerified action="post"><NewListing /></RequireVerified></RequireAuth>} />
+        <Route path="requests/new" element={<RequireAuth><RequireMember action="post"><NewListing /></RequireMember></RequireAuth>} />
         <Route path="requests/:id" element={<ListingDetail />} />
-        <Route path="requests/:id/edit" element={<RequireAuth><RequireVerified action="edit"><NewListing /></RequireVerified></RequireAuth>} />
+        <Route path="requests/:id/edit" element={<RequireAuth><RequireMember action="edit"><NewListing /></RequireMember></RequireAuth>} />
         <Route path="my-requests" element={<RequireAuth><MyListings /></RequireAuth>} />
         <Route path="notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
         <Route path="alerts" element={<RequireAuth><Alerts /></RequireAuth>} />

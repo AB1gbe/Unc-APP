@@ -78,6 +78,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 079 | [[ADR-079 Tagline, featured tiles, one ad per row]] | Short tagline, compact category cards (photo + name), one ad per row on phones | Craigslist sentence as is, chips, two per row |
 | 080 | [[ADR-080 Trust ladder]] | Email code to reply/chat; ID check to post and offer; card only for businesses; limits and labels for unchecked members | ID for everyone, no checks |
 | 081 | [[ADR-081 Launch focus]] | One identity (shops answer requests + safe housing/jobs), free for businesses, extra features hidden | keep everything visible, charge now |
+| 082 | [[ADR-082 Phone code for casual sellers]] | People sell (For sale) and ask (Wanted) with an SMS code; ID check for Housing, Jobs, businesses and offers | ID check for everyone, email only |
 | 068 | [[ADR-068 Marketplace first]] | Shops-not-prices on requests, full filters, sample flag, offer status, marketplace-first home | count only, everything public |
 | 067 | [[ADR-067 App-style side bar]] | Side bar on computers (folds to icons, remembered); slim header + tab bar on phones | top bar designs A/B/C |
 | 066 | [[ADR-066 Calm home page and tabs]] | Calm home; tabs Home/Requests/Shops/Categories; examples in every category | one long page, member-only tab bar |

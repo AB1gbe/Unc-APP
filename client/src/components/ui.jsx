@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import Icon from './Icon.jsx';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { useAuth, isVerified } from '../auth.jsx';
+import { useAuth, isVerified, canChat } from '../auth.jsx';
 import { budget, ago, toDate } from '../api.js';
 import { t, tj, tn, formatDate } from '../i18n.jsx';
 import { Place } from './CityField.jsx';
@@ -52,6 +52,7 @@ export function KycBadge({ status }) {
     pending: ['warn', t('Verification pending')],
     rejected: ['bad', t('Verification rejected')],
     unverified: ['warn', t('Not ID-checked')], // red: be careful (ADR-076)
+    phone: ['', t('Phone-checked')], // blue: neutral; posted with a phone code (session 102)
   };
   const [cls, text] = map[status] || map.unverified;
   return <span className={`badge ${cls}`}>{text}</span>;
@@ -209,6 +210,15 @@ export function RequireVerified({ children, action }) {
   const { user } = useAuth();
   if (user === undefined) return <Loading />;
   if (!isVerified(user)) return <div className="narrow"><VerifyPrompt action={action} /></div>;
+  return children;
+}
+
+// Email confirmed + Terms (session 102): the posting page then shows the
+// step still missing for the chosen section (phone code or ID check).
+export function RequireMember({ children, action }) {
+  const { user } = useAuth();
+  if (user === undefined) return <Loading />;
+  if (!canChat(user)) return <div className="narrow"><VerifyPrompt action={action} /></div>;
   return children;
 }
 

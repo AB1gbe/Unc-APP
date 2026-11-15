@@ -101,8 +101,8 @@ export default function ListingDetail() {
         <div className="row">
           <Avatar name={l.buyer.displayName} src={l.buyer.avatarUrl} />
           <div>
-            <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status="approved" />
-            <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {ad ? t('Posted by an ID-checked member') : t('Requested by a verified member')}</span></div>
+            <Link to={`/members/${l.buyer.id}`}><b><bdi>{l.buyer.displayName}</bdi></b></Link> <KycBadge status={l.buyer.idChecked === false ? 'phone' : 'approved'} />
+            <div className="small"><RatingBadge rating={l.buyer.rating} /> <span className="muted">· {l.buyer.idChecked === false ? t('Mobile number confirmed; no ID check') : ad ? t('Posted by an ID-checked member') : t('Requested by a verified member')}</span></div>
             {!isOwner && <Activity activity={l.buyer.activity} />} <Badges badges={l.buyer.badges} />
           </div>
         </div>

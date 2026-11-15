@@ -30,7 +30,7 @@ Why: [[Honest Review 2026-11-15]] point 3 and [[ADR-081 Launch focus]]. A market
 | Tap Payments account | Cards for businesses and paid ads later | [[Business Accounts and Billing]] |
 | A lawyer to read the Terms and Privacy pages | Bahrain law (PDPL), selling rules, liability | `client/src/pages/Terms.jsx` |
 | Decide where ID photos are kept (PDPL) | ID photos are personal data; Bahrain's law has rules on keeping them and sending them abroad | [[KYC Verification]] |
-| SMS provider for phone codes | Phone checks for sellers | Not built yet: phone codes need a provider (for example Twilio) first |
+| SMS provider for phone codes (Twilio or Unifonic) | People selling their own things confirm their phone; without it a real site can't send codes | [[Phone Codes]] |
 | An ID-check provider (instead of checking IDs by hand) | Checking by hand doesn't scale and makes mistakes | [[KYC Verification]] |
 | Someone reads reports and the review queue **every day** | Scams hidden by reports wait for a person to check them | [[Admin and Moderation]] |
 | Weekly backup download | See [[Step 76 - Launch readiness]] | Admin page |

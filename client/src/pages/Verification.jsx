@@ -68,6 +68,13 @@ export default function Verification() {
       {(status === 'unverified' || status === 'rejected') && !showForm && (
         <div className="card">
           <h1>{t('Verify your identity')}</h1>
+          {/* Session 102 (ADR-082): people who only sell their own things or
+              ask for something don't need this; a phone code is enough. */}
+          {user.accountType !== 'business' && status === 'unverified' && (
+            <div className="alert info">
+              {tj('Only selling your own things or looking for something? You can skip this: you confirm your phone when you post. The ID check is for housing and job ads. {skip}', { skip: <Link to="/">{t('Skip for now')}</Link> })}
+            </div>
+          )}
           {status === 'rejected' && (
             <div className="alert error">
               <b>{t('Your last verification was not approved.')}</b>

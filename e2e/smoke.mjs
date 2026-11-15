@@ -580,5 +580,38 @@ await shot(vendor, '51-business-dashboard');
   await shot(buyer, '43-not-id-checked');
   await ctx.close();
 }
+// Casual seller (session 102, ADR-082): a person selling their own things
+// confirms a phone with a texted code instead of the ID check.
+{
+  const ctx = await browser.newContext({ viewport: { width: 1200, height: 900 } });
+  const s = await ctx.newPage();
+  s.on('pageerror', (e) => console.log('PAGEERROR', e.message));
+  await s.goto(BASE + '/register');
+  await s.fill('#displayName', 'Casual Seller'); await s.fill('#email', 'casual@x.test'); await s.fill('#password', 'Password123'); await s.fill('#city', 'Manama');
+  await s.check('#acceptTerms');
+  await s.click('button:has-text("Create account")');
+  await s.waitForURL('**/verify-email');
+  await s.fill('#code', (await s.textContent('.alert.info b')).trim()); await s.click('button:has-text("Confirm email")');
+  await s.waitForURL('**/welcome');
+  await s.goto(BASE + '/requests/new?section=forsale');
+  await s.waitForSelector('text=Confirm your mobile number');
+  await s.fill('#phone', '3612 3456'); await s.click('button:has-text("Text me a code")');
+  await s.fill('#phone-code', (await s.textContent('.phone-check .alert.info b')).trim());
+  await shot(s, '44-phone-code');
+  await s.click('.phone-check button:has-text("Confirm")');
+  await s.fill('#title', 'Road bike, 54cm frame');
+  await s.fill('#description', 'Used road bike in good condition, recently serviced.');
+  await s.selectOption('#category', 'Sports & Outdoors');
+  await s.fill('#price', '95'); await s.selectOption('#condition', 'used');
+  await s.click('button:has-text("Post ad")');
+  await s.waitForURL(/\/requests\/\d+$/);
+  await s.waitForSelector('.badge:has-text("Phone-checked")');
+  await s.waitForSelector('text=Mobile number confirmed; no ID check');
+  await shot(s, '45-phone-checked-ad');
+  // Housing still asks for the ID check.
+  await s.goto(BASE + '/requests/new?section=housing');
+  await s.waitForSelector('text=Housing and job ads need an ID check');
+  await ctx.close();
+}
 console.log('E2E OK');
 await browser.close();

@@ -41,6 +41,13 @@ const AR = {
   'Please log in first.': 'يُرجى تسجيل الدخول أولًا.',
   'This account has been suspended.': 'تم إيقاف هذا الحساب.',
   'Please verify your email address first.': 'يُرجى تأكيد بريدك الإلكتروني أولًا.',
+  // Phone codes (session 102)
+  'Please confirm your mobile number first.': 'يُرجى تأكيد رقم هاتفك المحمول أولًا.',
+  'Phone codes are not available yet. Please use the ID check.': 'رموز الهاتف غير متاحة بعد. يُرجى استخدام التحقق من الهوية.',
+  'Please enter a Bahrain mobile number: 8 digits starting with 3 or 6.': 'يُرجى إدخال رقم هاتف محمول بحريني: 8 أرقام تبدأ بـ 3 أو 6.',
+  'This number is already used by another account.': 'هذا الرقم مستخدم في حساب آخر.',
+  'Too many codes today. Please try again tomorrow.': 'طلبت رموزًا كثيرة اليوم. يُرجى المحاولة غدًا.',
+  "We couldn't send the text. Please try again later.": 'تعذّر إرسال الرسالة النصية. يُرجى المحاولة لاحقًا.',
   'You need to complete identity verification (KYC) first.': 'يجب عليك إكمال التحقق من الهوية أولًا.',
   'Admins only.': 'للمشرفين فقط.',
   'An account with this email already exists.': 'يوجد حساب بهذا البريد الإلكتروني بالفعل.',

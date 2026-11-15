@@ -625,6 +625,24 @@ const MIGRATIONS = [
   `
   ALTER TABLE listing_images ADD COLUMN thumb TEXT;
   `,
+  // 46: phone codes for casual sellers (session 102, ADR-082). A person
+  // selling their own things (For sale) or asking for something (Wanted)
+  // confirms a mobile number by SMS instead of an ID check. One account
+  // per number. The number is never shown to other members.
+  `
+  ALTER TABLE users ADD COLUMN phone TEXT;
+  ALTER TABLE users ADD COLUMN phone_verified_at TEXT;
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users(phone) WHERE phone IS NOT NULL;
+  CREATE TABLE IF NOT EXISTS phone_codes (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    phone TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    sends INTEGER NOT NULL DEFAULT 0,
+    first_sent_at TEXT NOT NULL
+  );
+  `,
 ];
 
 // How many migrations exist = the user_version of an up-to-date database.

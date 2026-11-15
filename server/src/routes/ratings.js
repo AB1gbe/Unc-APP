@@ -65,8 +65,9 @@ export function ratingRoutes(db) {
 
   r.get('/members/:id', (req, res) => {
     const m = db.prepare('SELECT * FROM users WHERE id = ?').get(Number(req.params.id));
-    // Only verified, non-banned members have a public profile.
-    if (!m || m.kyc_status !== 'approved' || (m.banned_at && req.user?.role !== 'admin')) {
+    // Only checked, non-banned members have a public profile: ID-checked,
+    // or (session 102) a person who posts with a confirmed phone.
+    if (!m || (m.kyc_status !== 'approved' && !m.phone_verified_at) || (m.banned_at && req.user?.role !== 'admin')) {
       throw notFound('Member not found.');
     }
     const reviews = db.prepare(`
@@ -94,6 +95,7 @@ export function ratingRoutes(db) {
         displayName: req.user?.id === m.id ? m.display_name : nameFor(m.display_name, m.short_name),
         accountType: m.account_type,
         verified: true,
+        idChecked: m.kyc_status === 'approved',
         memberSince: m.created_at,
         avatarUrl: avatarUrl(m.avatar),
         bio: m.bio,

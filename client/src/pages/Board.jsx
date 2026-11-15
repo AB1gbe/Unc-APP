@@ -122,7 +122,7 @@ export default function Board() {
       )}
 
       <div className="safety-strip">
-        <div><Icon name="admin" /> <b>{t('ID-checked posters')}</b><span className="muted small">{t('Everyone who posts has passed an ID check.')}</span></div>
+        <div><Icon name="admin" /> <b>{t('Checked posters')}</b><span className="muted small">{t('Shops, landlords and employers pass an ID check; people selling their own things confirm their phone.')}</span></div>
         <div><Icon name="chat" /> <b>{t('Private chat only')}</b><span className="muted small">{t('Numbers and emails stay hidden; you talk inside the ad.')}</span></div>
         <div><Icon name="warning" /> <b>{t('Scam checks')}</b><span className="muted small">{t('Ads asking for money up front are blocked; doubtful ones are checked by a person.')}</span></div>
       </div>

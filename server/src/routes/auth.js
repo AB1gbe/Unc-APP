@@ -7,7 +7,9 @@ import { hashPassword, verifyPassword, randomToken, sha256, pepperedHash, sixDig
 import { HttpError } from '../lib/http.js';
 import { audit, tx } from '../db.js';
 import * as v from '../lib/validate.js';
-import { SESSION_COOKIE, requireAuth, publicMe } from '../middleware/auth.js';
+import { SESSION_COOKIE, requireAuth, requireMember, publicMe } from '../middleware/auth.js';
+import { sendSms, phoneCodeText } from '../lib/sms.js';
+import { maskPhone, normalizePhone } from '../../../shared/trust.js';
 import { startSession as startSessionFor } from '../lib/sessions.js';
 import { trySendMail } from '../lib/mailer.js';
 import { verificationCodeEmail, passwordResetEmail, passwordChangedEmail } from '../lib/emails.js';
@@ -52,6 +54,7 @@ export function authRoutes(db) {
   };
 
   const startSession = (res, userId) => startSessionFor(db, res, userId);
+  const PHONE_SENDS_PER_DAY = 5;
 
   // Saves a new code and returns it. The caller sends the email.
   function issueEmailCode(user) {
@@ -244,6 +247,61 @@ export function authRoutes(db) {
       db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?').run(req.user.id, req.sessionTokenHash);
       audit(db, req.user.id, 'user.delete_requested', `user:${req.user.id}`, { days: DELETE_AFTER_DAYS });
     });
+    res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
+  });
+
+  // Phone codes (session 102, ADR-082): a person selling their own things
+  // or asking for something confirms a Bahrain mobile number instead of an
+  // ID check. One account per number; at most PHONE_SENDS_PER_DAY texts a
+  // day per member (texts cost money); 5 wrong tries per code.
+  r.post('/phone', limits.resendCode, requireMember, async (req, res) => {
+    if (!config.sms.enabled) {
+      throw new HttpError(503, 'Phone codes are not available yet. Please use the ID check.', { code: 'SMS_OFF' });
+    }
+    const phone = normalizePhone(req.body?.phone);
+    if (!phone) throw new HttpError(400, 'Please enter a Bahrain mobile number: 8 digits starting with 3 or 6.', { field: 'phone' });
+    if (db.prepare('SELECT 1 FROM users WHERE phone = ? AND id <> ?').get(phone, req.user.id)) {
+      throw new HttpError(409, 'This number is already used by another account.', { field: 'phone' });
+    }
+    const row = db.prepare(`SELECT sends, first_sent_at < datetime('now', '-1 day') AS old FROM phone_codes WHERE user_id = ?`).get(req.user.id);
+    const fresh = !row || row.old ? 1 : 0;
+    if (!fresh && row.sends >= PHONE_SENDS_PER_DAY) throw new HttpError(429, 'Too many codes today. Please try again tomorrow.');
+    const code = sixDigitCode();
+    db.prepare(`
+      INSERT INTO phone_codes (user_id, phone, code_hash, expires_at, attempts, sends, first_sent_at)
+      VALUES (?, ?, ?, datetime('now', '+10 minutes'), 0, 1, datetime('now'))
+      ON CONFLICT(user_id) DO UPDATE SET phone = excluded.phone, code_hash = excluded.code_hash, expires_at = excluded.expires_at, attempts = 0,
+        sends = CASE WHEN ? THEN 1 ELSE phone_codes.sends + 1 END,
+        first_sent_at = CASE WHEN ? THEN datetime('now') ELSE phone_codes.first_sent_at END
+    `).run(req.user.id, phone, pepperedHash(code), fresh, fresh);
+    try {
+      await sendSms(phone, phoneCodeText(code, req.user.language));
+    } catch (err) {
+      console.error('[sms] could not send:', err.message);
+      throw new HttpError(502, "We couldn't send the text. Please try again later.");
+    }
+    audit(db, req.user.id, 'phone.code_sent', `user:${req.user.id}`);
+    res.json({ ok: true, phone: maskPhone(phone), ...(config.sms.showDevCodes ? { devCode: code } : {}) });
+  });
+
+  r.post('/phone/verify', limits.verifyEmail, requireMember, (req, res) => {
+    const code = v.str(req.body, 'code', { min: 6, max: 6 });
+    const row = db.prepare(`SELECT *, expires_at < datetime('now') AS expired FROM phone_codes WHERE user_id = ?`).get(req.user.id);
+    if (!row || row.expired) throw new HttpError(400, 'This code has expired. Request a new one.');
+    if (row.attempts >= 5) throw new HttpError(429, 'Too many wrong codes. Request a new one.');
+    if (row.code_hash !== pepperedHash(code)) {
+      db.prepare('UPDATE phone_codes SET attempts = attempts + 1 WHERE user_id = ?').run(req.user.id);
+      throw new HttpError(400, 'That code is not correct.', { field: 'code' });
+    }
+    tx(db, () => {
+      if (db.prepare('SELECT 1 FROM users WHERE phone = ? AND id <> ?').get(row.phone, req.user.id)) {
+        throw new HttpError(409, 'This number is already used by another account.', { field: 'phone' });
+      }
+      db.prepare(`UPDATE users SET phone = ?, phone_verified_at = datetime('now') WHERE id = ?`).run(row.phone, req.user.id);
+      // Used up, but the row stays so the daily text count still holds.
+      db.prepare(`UPDATE phone_codes SET code_hash = '', expires_at = '1970-01-01 00:00:00' WHERE user_id = ?`).run(req.user.id);
+    });
+    audit(db, req.user.id, 'phone.verified', `user:${req.user.id}`);
     res.json({ user: publicMe(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) });
   });
 

@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api, currencyName, moneyExact } from '../api.js';
 import { useAuth } from '../auth.jsx';
-import { ErrorBox, Loading } from '../components/ui.jsx';
+import { ErrorBox, Loading, VerifyPrompt } from '../components/ui.jsx';
+import PhoneCheck from '../components/PhoneCheck.jsx';
+import { postNeeds } from '../../../shared/trust.js';
 import { useMeta } from '../hooks.js';
-import { t } from '../i18n.jsx';
+import { t, tj } from '../i18n.jsx';
 import PhotoPicker from '../components/PhotoPicker.jsx';
 import { celebrate } from '../components/Celebrate.jsx';
 import CityField from '../components/CityField.jsx';
@@ -106,15 +108,41 @@ export default function NewListing() {
 
   if (!loaded) return error ? <ErrorBox error={error} /> : <Loading />;
 
+  const picker = !editing && (
+    <div className="section-pick" role="radiogroup" aria-label={t('Section')}>
+      {SECTION_ORDER.map((s) => (
+        <button key={s} type="button" role="radio" aria-checked={section === s} className={section === s ? 'on' : ''} onClick={() => pickSection(s)}>{SECTION_LABEL[s]()}</button>
+      ))}
+    </div>
+  );
+  // What this member still needs to post here (session 102, ADR-082): a
+  // phone code for a person selling or asking, the ID check for Housing,
+  // Jobs and businesses, a card for businesses.
+  const need = postNeeds(user, section);
+  if (need) {
+    return (
+      <div className="narrow card">
+        {picker}
+        {need === 'phone' ? (
+          <>
+            <PhoneCheck />
+            <p className="hint">{tj('Housing and job ads need an ID check instead. {link}', { link: <Link to="/verification">{t('Get ID-checked')}</Link> })}</p>
+          </>
+        ) : (
+          <>
+            {user.accountType !== 'business' && (section === 'housing' || section === 'jobs') && (
+              <p className="muted">{t('Housing and job ads need an ID check: most scams are rent and job scams.')}</p>
+            )}
+            <VerifyPrompt action={ad ? 'postAd' : 'post'} />
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <form className="narrow card" onSubmit={submit}>
-      {!editing && (
-        <div className="section-pick" role="radiogroup" aria-label={t('Section')}>
-          {SECTION_ORDER.map((s) => (
-            <button key={s} type="button" role="radio" aria-checked={section === s} className={section === s ? 'on' : ''} onClick={() => pickSection(s)}>{SECTION_LABEL[s]()}</button>
-          ))}
-        </div>
-      )}
+      {picker}
       <h1>{editing ? (ad ? t('Edit your ad') : t('Edit your request')) : section === 'forsale' ? t('Sell something') : section === 'housing' ? t('Post a housing ad') : section === 'jobs' ? t('Post a job ad') : t('What are you looking for?')}</h1>
       <p className="muted">{ad ? t('People reply in a private chat on Unc. Your number and email are never shown.') : t('Be specific — sellers will contact you privately about this request.')}</p>
       <ErrorBox error={error} />
