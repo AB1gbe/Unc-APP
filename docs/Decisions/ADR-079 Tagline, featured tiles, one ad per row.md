@@ -18,3 +18,13 @@ The owner (screenshots of the live home page, a description of Craigslist, and t
 | Category chips on lists | Wrap onto many lines; **one line that scrolls** | Scroll (`.chips.scroll`) | On phones they took six lines. Interest chips on profiles still wrap. |
 
 **Revisit when:** real cut-out product pictures exist for the tiles.
+
+## Session 92 change
+The owner (screenshot of the live page): "The tiles still look too AI, make them look real; they also look huge; the text is too much, just a tagline."
+- Tiles: **plain small square photos (76px, 68px on phones) with the name underneath**, thin border, no colour glow or fading mask, like a real shop's category row.
+- Text: only the tagline "Buy, sell and connect with people near you", smaller (1.2rem); the second sentence is removed.
+
+## Session 93 change
+The owner: "The design still looks unfinished, the squares look bad, give it 3px rounded or something, but it needs flair, and the size is too big."
+- Tiles are now **compact category cards**: a 34px photo with the name beside it, white card, thin border, soft shadow; on a computer they lift slightly and the border turns blue on hover. About a third of the height of the session-92 tiles.
+- `--radius` 2px → **3px** everywhere ([[ADR-078 Square corners]]).

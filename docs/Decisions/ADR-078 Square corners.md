@@ -20,3 +20,5 @@ How: `--radius: 2px` in `client/src/styles.css`; every `border-radius` (6px, 8px
 Also fixed: on phones a tapped card stayed underlined (sticky hover): cards are never underlined, and the hover colour/zoom only applies on devices with a mouse (`@media (hover: none)`).
 
 **Revisit when:** a designer defines the brand's shapes.
+
+**Session 93:** `--radius` raised to **3px** (the owner: "give it 3px rounded or something"). Photos in the grid stay square.
