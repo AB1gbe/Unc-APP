@@ -52,7 +52,12 @@ async function onboard(name, email, type) {
   await p.click('button:has-text("Submit for verification")');
   await p.waitForSelector('text=We\'re checking your documents');
   await shot(p, '04-kyc-pending');
-  // Payment card (session 40), in showcase mode: a declined card first, then a good one.
+  // Payment card: only businesses need one since session 101 (they pay for
+  // ads); people go straight on. Showcase mode: a declined card first.
+  if (type !== 'business') {
+    if (await p.locator('.add-card-step').count()) throw new Error('people must not be asked for a card');
+    return p;
+  }
   await p.click('.add-card-step a:has-text("Add a payment card")');
   await p.fill('#cardNumber', '4000 0000 0000 0002'); await p.fill('#cardExpiry', '12/39'); await p.fill('#cardCvc', '123'); await p.fill('#cardName', name);
   await p.click('button:has-text("Save card")');
@@ -558,5 +563,28 @@ await shot(vendor, '50-business-receipt');
 await vendor.goto(BASE + '/business');
 await vendor.waitForSelector('.stats-grid');
 await shot(vendor, '51-business-dashboard');
+// Trust ladder (session 101): someone with only a confirmed email replies
+// to the housing ad; the advertiser sees them as "Not ID-checked".
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const n = await ctx.newPage();
+  await n.goto(BASE + '/register');
+  await n.fill('#displayName', 'Newbie Renter'); await n.fill('#email', `newbie${Date.now()}@test.local`); await n.fill('#password', 'Password123'); await n.fill('#city', 'Juffair');
+  await n.check('#acceptTerms');
+  await n.click('button:has-text("Create account")');
+  await n.waitForURL('**/verify-email');
+  const code = (await n.textContent('.alert.info b')).trim();
+  await n.fill('#code', code); await n.click('button:has-text("Confirm email")');
+  await n.waitForURL('**/welcome');
+  await n.goto(adUrl);
+  await n.fill('#message', 'Hi, is the studio still free?');
+  await n.click('button:has-text("Send message")');
+  await n.waitForURL('**/messages/*');
+  await buyer.goto(adUrl);
+  await buyer.click('.inbox-item:has-text("Newbie")');
+  await buyer.waitForSelector('.chat-head .badge:has-text("Not ID-checked")');
+  await shot(buyer, '43-not-id-checked');
+  await ctx.close();
+}
 console.log('E2E OK');
 await browser.close();

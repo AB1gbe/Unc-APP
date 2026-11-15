@@ -88,6 +88,7 @@ async function onboard(p, { name, email, business, idNumber }) {
   await p.click('form button.btn.block');
   await p.waitForSelector('.card .badge.warn');
   await check(p, 'kyc-pending');
+  if (!business) return; // people need no card since session 101
   await p.click('.add-card-step a.btn');
   await p.waitForURL('**/payment-card');
   await check(p, 'payment-card');

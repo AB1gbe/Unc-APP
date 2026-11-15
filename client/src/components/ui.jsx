@@ -52,7 +52,7 @@ export function KycBadge({ status }) {
     approved: ['ok', t('Verified')],
     pending: ['warn', t('Verification pending')],
     rejected: ['bad', t('Verification rejected')],
-    unverified: ['grey', t('Not verified')],
+    unverified: ['warn', t('Not ID-checked')], // red: be careful (ADR-076)
   };
   const [cls, text] = map[status] || map.unverified;
   return <span className={`badge ${cls}`}>{text}</span>;
@@ -155,6 +155,7 @@ const ACTIONS = {
   edit: () => t('edit a request'),
   contact: () => t('contact this buyer'),
   reply: () => t('reply to this ad'),
+  offer: () => t('make offers'),
   postAd: () => t('post an ad'),
   business: () => t('use the business panel'),
   postMany: () => t('post requests'),
@@ -178,7 +179,10 @@ export function VerifyPrompt({ action = 'post' }) {
   if (!user.emailVerified) {
     return <div className="alert warn">{tj('Please {confirm} to {action}.', { confirm: <Link to="/verify-email">{t('confirm your email')}</Link>, action: what })}</div>;
   }
-  if (user.kycStatus === 'approved' && !user.hasCard) {
+  if (!user.termsAccepted) {
+    return <div className="alert warn">{tj('Please {accept} to {action}.', { accept: <Link to="/terms">{t('accept the Terms')}</Link>, action: what })}</div>;
+  }
+  if (user.kycStatus === 'approved' && !user.hasCard && user.accountType === 'business') {
     return <div className="alert warn">{tj('{add} to {action}. Nothing is charged.', { add: <Link to="/payment-card">{t('Add a payment card')}</Link>, action: what })}</div>;
   }
   if (user.kycStatus === 'pending') {

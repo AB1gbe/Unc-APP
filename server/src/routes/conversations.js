@@ -13,7 +13,7 @@ import { Router } from 'express';
 import { audit, tx } from '../db.js';
 import { HttpError, notFound } from '../lib/http.js';
 import * as v from '../lib/validate.js';
-import { requireAuth, requireVerified } from '../middleware/auth.js';
+import { requireAuth, requireMember, requireVerified } from '../middleware/auth.js';
 import { canStillRate, ratingQueries } from '../lib/ratings.js';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -31,6 +31,8 @@ import { CONTACT_MESSAGES, contactBlocker } from '../lib/contact.js';
 import { nameFor } from '../../../shared/names.js';
 import { isExpired, offerDetailsView, readOfferDetails } from '../lib/offers.js';
 import { hasContacts, maskContacts } from '../../../shared/contact-mask.js';
+
+export const NEW_CHATS_PER_DAY = 5;
 
 export function conversationRoutes(db) {
   const r = Router();
@@ -185,13 +187,24 @@ export function conversationRoutes(db) {
   const proofCode = (c) => `UNC-${1000 + (crypto.createHash('sha256').update(`unc-proof:${c.id}:${c.created_at}`).digest().readUInt32BE(0) % 9000)}`;
 
   // ---- Start a conversation ABOUT A LISTING (vendor -> buyer) ----
-  r.post('/listings/:id/contact', requireVerified, chatUpload, (req, res) => {
+  // Trust ladder (session 101): anyone with a confirmed email may reply to
+  // a Housing, Jobs or For sale ad; making an OFFER on a Wanted request
+  // (the seller side) needs the ID check. Members without the ID check
+  // can start at most NEW_CHATS_PER_DAY chats a day.
+  r.post('/listings/:id/contact', requireMember, chatUpload, (req, res) => {
     const listing = db.prepare(`
       SELECT l.*, u.banned_at AS buyer_banned_at FROM listings l JOIN users u ON u.id = l.buyer_id WHERE l.id = ?
     `).get(Number(req.params.id));
     if (!listing || listing.buyer_banned_at || listing.held_at) throw notFound('Request not found.');
     if (listing.status !== 'open') throw new HttpError(409, 'This request is no longer accepting offers.');
     if (listing.buyer_id === req.user.id) throw new HttpError(403, 'You cannot make an offer on your own request.');
+    const idChecked = req.user.kyc_status === 'approved';
+    if (listing.section === 'wanted' && !idChecked) {
+      throw new HttpError(403, 'You need to complete identity verification (KYC) first.', { code: 'KYC_REQUIRED' });
+    }
+    if (!idChecked && db.prepare(`SELECT COUNT(*) AS n FROM conversations WHERE vendor_id = ? AND created_at >= datetime('now', '-1 day')`).get(req.user.id).n >= NEW_CHATS_PER_DAY) {
+      throw new HttpError(429, 'Members without an ID check can start 5 new chats a day. Get ID-checked to message more people.');
+    }
     if (blockedBetween(db, listing.buyer_id, req.user.id)) throw new HttpError(403, "You can't contact this member.");
     const rule = contactBlocker(db, listing, req.user);
     if (rule) throw new HttpError(403, CONTACT_MESSAGES[rule], { rule });
@@ -342,7 +355,7 @@ export function conversationRoutes(db) {
     });
   });
 
-  r.post('/conversations/:id/messages', requireVerified, chatUpload, (req, res) => {
+  r.post('/conversations/:id/messages', requireMember, chatUpload, (req, res) => {
     const c = participantConv(req);
     if (c.listing_status !== 'open') {
       throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
@@ -373,7 +386,7 @@ export function conversationRoutes(db) {
   // Answer the other side's price with one tap: accept or decline
   // (session 20). Only the newest price in the chat can be answered, once;
   // a counter-offer is just a new message with a price.
-  r.post('/conversations/:id/messages/:messageId/respond', requireVerified, (req, res) => {
+  r.post('/conversations/:id/messages/:messageId/respond', requireMember, (req, res) => {
     const c = participantConv(req);
     if (c.listing_status !== 'open') throw new HttpError(409, 'This request is closed, so the conversation is read-only.');
     const otherBanned = c.buyer_id === req.user.id ? c.vendor_banned_at : c.buyer_banned_at;
@@ -396,7 +409,7 @@ export function conversationRoutes(db) {
 
   // The buyer asks for a proof photo (session 34). One open ask at a time:
   // asking again only works after the seller has sent one.
-  r.post('/conversations/:id/proof-request', requireVerified, (req, res) => {
+  r.post('/conversations/:id/proof-request', requireMember, (req, res) => {
     const c = participantConv(req);
     if (req.user.id !== c.buyer_id) throw new HttpError(403, 'Only the buyer can ask for a proof photo.');
     if (c.listing_status !== 'open') throw new HttpError(409, 'This request is closed, so the conversation is read-only.');

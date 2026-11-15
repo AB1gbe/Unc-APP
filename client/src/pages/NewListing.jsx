@@ -208,6 +208,16 @@ export default function NewListing() {
         </div>
         )}
       </div>
+      {ad && (
+        <div className="field">
+          <label htmlFor="contactRule">{t('Who can message you?')}</label>
+          <select id="contactRule" value={form.contactRule === 'verified' ? 'verified' : 'anyone'} onChange={set('contactRule')}>
+            <option value="anyone">{t('Anyone with a confirmed email')}</option>
+            <option value="verified">{t('Only ID-checked members')}</option>
+          </select>
+          <div className="hint">{t('ID-checked members have shown an ID to Unc. Choosing them means fewer, safer messages.')}</div>
+        </div>
+      )}
       {!ad && <>
       <div className="field">
         <label htmlFor="condition">{t('Condition')}</label>

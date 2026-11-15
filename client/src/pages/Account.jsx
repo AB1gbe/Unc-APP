@@ -301,7 +301,7 @@ function CardSettings() {
           <Link className="btn sm secondary" to="/payment-card?next=/account">{t('Replace card')}</Link>
         </div>
       ) : (
-        <p>{tj('{add}: every member needs one to post and make offers.', { add: <Link to="/payment-card?next=/account">{t('Add a payment card')}</Link> })}</p>
+        <p>{tj('{add}: businesses need one to pay for ads. People don’t need a card.', { add: <Link to="/payment-card?next=/account">{t('Add a payment card')}</Link> })}</p>
       )}
     </div>
   );

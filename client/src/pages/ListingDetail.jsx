@@ -3,7 +3,7 @@ import { categoryArt } from '../art.js';
 import Icon from '../components/Icon.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, ago, budget, currencyName, money, toDate } from '../api.js';
-import { useAuth, isVerified } from '../auth.jsx';
+import { useAuth, canChat, isVerified } from '../auth.jsx';
 import { Activity, Avatar, Badges, ClosesBadge, ContactRule, ErrorBox, KycBadge, Loading, RatingBadge, StatusBadge, VerifyPrompt, conditionLabel, daysLeft, replyLabel } from '../components/ui.jsx';
 import { useApi } from '../hooks.js';
 import { formatDate, t, tj, tn } from '../i18n.jsx';
@@ -146,7 +146,17 @@ function AdReplyPanel({ listing }) {
       </div>
     );
   }
-  if (!isVerified(user)) return <div className="card"><h2>{jobs ? t('Apply for this job') : t('Interested?')}</h2><VerifyPrompt action="reply" /><p className="hint">{warn}</p></div>;
+  // Trust ladder (session 101): a confirmed email is enough to reply.
+  if (!canChat(user)) return <div className="card"><h2>{jobs ? t('Apply for this job') : t('Interested?')}</h2><VerifyPrompt action="reply" /><p className="hint">{warn}</p></div>;
+  if (listing.contactBlocked === 'verified') {
+    return (
+      <div className="card">
+        <h2>{jobs ? t('Apply for this job') : t('Interested?')}</h2>
+        <p className="muted">{t('This advertiser only takes messages from ID-checked members.')}</p>
+        <Link className="btn block" to="/verification">{t('Get ID-checked')}</Link>
+      </div>
+    );
+  }
 
   async function submit(e) {
     e.preventDefault();
@@ -178,6 +188,7 @@ function AdReplyPanel({ listing }) {
         {hasContacts(message) && <ContactNudge />}
       </div>
       <button className="btn ok block" disabled={busy}>{busy ? t('Sending…') : t('Send message')}</button>
+      {user.kycStatus !== 'approved' && <p className="hint">{tj('You’ll show as “Not ID-checked”. {link} to get the badge and message more people.', { link: <Link to="/verification">{t('Get ID-checked')}</Link> })}</p>}
       <p className="hint"><Icon name="warning" /> {warn}</p>
     </form>
   );

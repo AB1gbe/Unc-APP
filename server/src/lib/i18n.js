@@ -71,6 +71,8 @@ const AR = {
   'This is for business accounts.': 'هذه الصفحة للحسابات التجارية.',
   'Only the business owner can do this.': 'صاحب النشاط التجاري فقط يمكنه القيام بذلك.',
   'Receipt not found.': 'الإيصال غير موجود.',
+  'Members without an ID check can start 5 new chats a day. Get ID-checked to message more people.': 'يمكن للأعضاء غير الموثّقين بدء 5 محادثات جديدة في اليوم. وثّق هويتك لمراسلة المزيد.',
+  'This advertiser only takes messages from ID-checked members.': 'يقبل هذا المعلن الرسائل من الأعضاء الموثّقين فقط.',
   'You are already the owner of this business.': 'أنت صاحب هذا النشاط التجاري بالفعل.',
   'A team can have up to 10 people.': 'يمكن أن يضم الفريق 10 أشخاص كحد أقصى.',
   'This person is already on your team.': 'هذا الشخص في فريقك بالفعل.',
