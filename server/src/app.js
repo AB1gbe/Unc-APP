@@ -13,7 +13,7 @@ import { CATEGORIES, CURRENCIES, HOUSING_CATEGORIES, JOB_CATEGORIES, JOB_TYPES }
 import { businessRoutes } from './routes/business.js';
 import { HttpError } from './lib/http.js';
 import { loadUser } from './middleware/auth.js';
-import { withPreview } from './lib/previews.js';
+import { pageMeta, withPreview } from './lib/previews.js';
 import { authRoutes } from './routes/auth.js';
 import { notificationRoutes } from './routes/notifications.js';
 import { storyRoutes } from './routes/stories.js';
@@ -67,6 +67,42 @@ export function createApp(db) {
   });
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
+  // Link previews and page titles (session 20; session 103). An ad page
+  // gets its own title, price and photo, but only while it is open, not
+  // held for a check, and its poster isn't banned.
+  const findPreview = db.prepare(`
+    SELECT l.*, u.language AS buyer_language,
+           (SELECT file FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS first_image
+    FROM listings l JOIN users u ON u.id = l.buyer_id
+    WHERE l.id = ? AND l.status = 'open' AND l.held_at IS NULL AND u.banned_at IS NULL
+  `);
+  const previewFor = (p) => {
+    const id = String(p).match(/^\/requests\/(\d+)\/?$/)?.[1];
+    return id ? findPreview.get(Number(id)) ?? null : null;
+  };
+  // On Cloudflare the pages are static files, so the worker asks here for
+  // a page's title and tags and puts them in (cloudflare/worker.js, M162).
+  app.get('/api/page-meta', (req, res) => {
+    const p = typeof req.query.path === 'string' && req.query.path.startsWith('/') ? req.query.path.slice(0, 200) : '/';
+    res.set('Cache-Control', 'no-cache');
+    res.json(pageMeta(previewFor(p), p));
+  });
+  // Search engines (session 103). The test site stays out of Google.
+  app.get('/robots.txt', (_req, res) => {
+    res.type('text/plain').send(config.testSite
+      ? 'User-agent: *\nDisallow: /\n'
+      : `User-agent: *\nDisallow: /api/\nDisallow: /admin\nDisallow: /messages\nAllow: /\nSitemap: ${config.appUrl}/sitemap.xml\n`);
+  });
+  const sitemapAds = db.prepare(`
+    SELECT l.id, COALESCE(l.updated_at, l.created_at) AS changed FROM listings l JOIN users u ON u.id = l.buyer_id
+    WHERE l.status = 'open' AND l.held_at IS NULL AND l.sample = 0 AND u.banned_at IS NULL
+    ORDER BY l.created_at DESC LIMIT 5000
+  `);
+  app.get('/sitemap.xml', (_req, res) => {
+    const urls = ['/', '/for-sale', '/housing', '/jobs', '/browse', '/shops'].map((p) => `<url><loc>${config.appUrl}${p}</loc></url>`);
+    for (const a of sitemapAds.all()) urls.push(`<url><loc>${config.appUrl}/requests/${a.id}</loc><lastmod>${String(a.changed).slice(0, 10)}</lastmod></url>`);
+    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
+  });
   app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES, forsale: CATEGORIES }, jobTypes: JOB_TYPES }));
   app.use('/api/auth', authRoutes(db));
   app.use('/api/kyc', kycRoutes(db));
@@ -115,18 +151,9 @@ export function createApp(db) {
     // Everything else (index.html) must be re-checked so new deploys show up.
     // index: false -> "/" also goes through the page handler below.
     app.use(express.static(config.clientDist, { index: false, setHeaders: (res) => res.set('Cache-Control', 'no-cache') }));
-    // Every page is index.html with link-preview tags for WhatsApp & co.
-    // (lib/previews.js). A request page gets its own title, price and photo,
-    // but only while it is open and its buyer isn't banned.
-    const findPreview = db.prepare(`
-      SELECT l.*, u.language AS buyer_language,
-             (SELECT file FROM listing_images i WHERE i.listing_id = l.id ORDER BY i.id LIMIT 1) AS first_image
-      FROM listings l JOIN users u ON u.id = l.buyer_id
-      WHERE l.id = ? AND l.status = 'open' AND l.held_at IS NULL AND u.banned_at IS NULL
-    `);
+    // Every page is index.html with its title and link-preview tags.
     app.get(/^(?!\/api|\/uploads).*/, (req, res) => {
-      const id = req.path.match(/^\/requests\/(\d+)\/?$/)?.[1];
-      const listing = id ? findPreview.get(Number(id)) : null;
+      const listing = previewFor(req.path);
       const html = fs.readFileSync(path.join(config.clientDist, 'index.html'), 'utf8');
       res.set('Cache-Control', 'no-cache');
       res.type('html').send(withPreview(html, listing ?? null, req.path));
