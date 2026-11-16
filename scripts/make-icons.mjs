@@ -2,7 +2,7 @@
 // Screen" into client/public/icons/. Re-run after changing the logo/colours:
 //   node scripts/make-icons.mjs
 // The logo (session 85, ADR-075) is client/public/icons/logo-mark.svg: a
-// blue rounded tile with a white "u" and a yellow dot. Uses Playwright's
+// blue rounded tile with a white "u" and a red dot (session 104 colorway; was yellow). Uses Playwright's
 // browser to turn it into images.
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -16,7 +16,7 @@ const inner = svg.replace(/<rect[^>]*\/>/, '').replace('<svg ', '<svg width="100
 // full: a full blue square (iPhone rounds it itself), the mark at `scale`.
 const draw = (size, kind, scale = 1) => kind === 'rounded'
   ? `<div style="width:${size}px;height:${size}px">${svg.replace('<svg ', `<svg width="${size}" height="${size}" `)}</div>`
-  : `<div style="width:${size}px;height:${size}px;background:#1f5fd6;display:grid;place-items:center"><div style="width:${Math.round(size * scale)}px;height:${Math.round(size * scale)}px">${inner}</div></div>`;
+  : `<div style="width:${size}px;height:${size}px;background:#2c99d6;display:grid;place-items:center"><div style="width:${Math.round(size * scale)}px;height:${Math.round(size * scale)}px">${inner}</div></div>`;
 
 const browser = await chromium.launch();
 const page = await browser.newPage();

@@ -9,30 +9,40 @@
        BLUE   = neutral steps and "you are here" (Search, Log in, Save,
                 links, the selected chip/tab)
        RED also = warnings / be careful (session 87; was yellow)
-       YELLOW = only the logo dot
+       SCARLET = only the logo dot and the tagline underline (session 104;
+                was yellow)
        GREY   = everything else.
      Session 62's dark look is in git history (ADR-060). */
   color-scheme: light;
-  --bg: #f5f6f8;
+  /* Session 104 colorway (ADR-084, the owner's reference image): Sky
+     Blue #2C99D6, Cloud White #F8FAFC, Scarlet Red #EB2F33. The exact
+     colours go where they are big or decorative (logo, highlights, tags,
+     the active tab); small text and button fills use a deeper shade of
+     the same colour so words stay readable (4.5:1). Green stays "go",
+     red stays "careful". */
+  --sky: #2c99d6;
+  --scarlet: #eb2f33;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-2: #eef0f3;
-  --text: #16181d;
-  --muted: #6b7280;
-  --border: #e1e4e8;
-  --brand: #1f5fd6;
+  --surface-2: #eef3f8;
+  --text: #121a24;
+  --muted: #64707d;
+  --border: #dfe6ee;
+  --brand: #1877af;
   --brand-ink: #ffffff;
-  --brand-soft: #e8f0fd;
-  --accent: #ffc928;
-  --accent-ink: #1a1a1a;
-  --accent-soft: #fff6d6;
+  --brand-soft: #e7f4fb;
+  --brand-line: #bfe1f4;
+  --accent: var(--scarlet);
+  --accent-ink: #ffffff;
+  --accent-soft: #fdeaea;
   --ok: #15803d;
   --ok-soft: #dcfce7;
   /* Warnings are RED (session 87): same as --bad, so 'be careful'
      looks dangerous without reading. */
-  --warn: #c62828;
-  --warn-soft: #fdecea;
-  --bad: #c62828;
-  --bad-soft: #fdecea;
+  --warn: #d6262a;
+  --warn-soft: #fdecec;
+  --bad: #d6262a;
+  --bad-soft: #fdecec;
   /* Session 89: nearly square everywhere (the owner: "this rounded look
      gives it more of an AI look"). Circles only for profile pictures and
      small count dots; photos fully square. */
@@ -146,7 +156,7 @@ input[type="file"] { padding: .5rem; }
 .alert.ok { background: var(--ok-soft); color: var(--ok); }
 
 /* ===== Hero / search ===== */
-.hero { background: linear-gradient(135deg, #fff8dc 0%, #e8f0fd 100%); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 2.4rem; margin-bottom: 1.75rem; }
+.hero { background: linear-gradient(135deg, var(--surface) 0%, var(--brand-soft) 100%); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 2.4rem; margin-bottom: 1.75rem; }
 .hero h1 { font-size: 2.4rem; }
 .hero p { opacity: .92; max-width: 560px; }
 .hero .btn { background: var(--brand); color: var(--brand-ink); }
@@ -337,7 +347,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 @media (max-width: 759px) { .card-photo { margin: -1rem -1rem .8rem; } }
 
 /* ♡ Save button on a request (session 13) */
-.save-btn.on { color: #e0245e; border-color: #e0245e; }
+.save-btn.on { color: var(--scarlet); border-color: var(--scarlet); }
 
 /* 🔔 in the header (session 13); shown on every screen size */
 .nav a.bell { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: .4rem .55rem; }
@@ -432,7 +442,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 .feed-time { white-space: nowrap; }
 
 /* ♡ Favourite seller (session 28) */
-.fav-btn.on { color: #e0245e; border-color: #e0245e; }
+.fav-btn.on { color: var(--scarlet); border-color: var(--scarlet); }
 
 /* ===== Compare offers (session 31) ===== */
 .compare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .75rem; margin-top: 1rem; }
@@ -455,7 +465,7 @@ a.chip { text-decoration: none; display: inline-flex; align-items: center; }
 
 /* Expiry + tips on your own request (session 31) */
 .expiry-soon { color: var(--bad); font-weight: 600; }
-.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: var(--radius); background: var(--brand-soft); border: 1px solid #c9dafb; font-size: .9rem; }
+.tips { margin: .25rem 0 1rem; padding: .7rem .85rem; border-radius: var(--radius); background: var(--brand-soft); border: 1px solid var(--brand-line); font-size: .9rem; }
 .tips ul { margin: .35rem 0 .4rem; padding-inline-start: 1.1rem; }
 
 /* "What people are asking for" (session 34) */
@@ -1064,10 +1074,11 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 /* ---- Session 94: tagline style; Sell beside the search box ---- */
 .market-top { display: block; margin: .5rem 0 1rem; }
 .market-top h1.tagline { font-size: 1.45rem; line-height: 1.25; font-weight: 800; letter-spacing: -.02em; margin: 0; max-width: 22ch; }
-/* "near you": brand blue on a yellow highlighter stroke. */
-.tagline-mark { color: var(--brand); white-space: nowrap;
-  background: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 70%, transparent) 62%, color-mix(in srgb, var(--accent) 70%, transparent) 92%, transparent 92%);
-  padding-inline: .1em; }
+/* The rotating word: sky blue with a scarlet underline stroke (session
+   104 colorway; was blue on a yellow highlighter). */
+.tagline-mark { color: var(--sky); white-space: nowrap;
+  background: linear-gradient(transparent 80%, var(--scarlet) 80%, var(--scarlet) 92%, transparent 92%);
+  padding-inline: .05em; }
 .market-search-row { display: flex; gap: .6rem; align-items: stretch; margin-bottom: .9rem; }
 .market-search-row .market-search { flex: 1; margin-bottom: 0; }
 .market-search-row .sell-btn { flex: 0 0 auto; padding-inline: 1.1rem; }
@@ -1086,7 +1097,7 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 .want-foot { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin-top: .35rem; font-size: .85rem; }
 .want-foot .req-action { color: var(--ok); font-weight: 700; white-space: nowrap; }
 .ad-grid > div { min-width: 0; }
-.ask-shops { display: flex; align-items: center; gap: .8rem; padding: .85rem 1rem; margin: 0 0 1.5rem; background: var(--brand-soft); border: 1px solid #c9dafb; border-radius: var(--radius); color: var(--text); text-decoration: none; }
+.ask-shops { display: flex; align-items: center; gap: .8rem; padding: .85rem 1rem; margin: 0 0 1.5rem; background: var(--brand-soft); border: 1px solid var(--brand-line); border-radius: var(--radius); color: var(--text); text-decoration: none; }
 .ask-shops:hover { text-decoration: none; border-color: var(--brand); }
 .ask-shops > .icon, .ask-shops > svg { color: var(--brand); flex: 0 0 auto; }
 .ask-shops-text { display: flex; flex-direction: column; flex: 1; min-width: 0; font-size: .9rem; }
@@ -1096,7 +1107,7 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 
 /* Requests (session 102, second review): a bordered card with a blue edge,
    no stock photo, so a request never looks like an item for sale. */
-.want-card { border: 1px solid var(--border); border-inline-start: 3px solid var(--brand); background: var(--surface); padding: .75rem .85rem; border-radius: var(--radius); gap: .3rem; }
+.want-card { border: 1px solid var(--border); border-inline-start: 3px solid var(--sky); background: var(--surface); padding: .75rem .85rem; border-radius: var(--radius); gap: .3rem; }
 .want-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .6rem; }
 .want-main { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
 .want-tag { display: inline-flex; align-items: center; gap: .3rem; font-size: .75rem; font-weight: 700; color: var(--brand); }

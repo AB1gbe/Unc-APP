@@ -78,6 +78,7 @@ Each ADR (Architecture Decision Record) answers: **What did we decide? What else
 | 079 | [[ADR-079 Tagline, featured tiles, one ad per row]] | Short tagline, compact category cards (photo + name), one ad per row on phones | Craigslist sentence as is, chips, two per row |
 | 080 | [[ADR-080 Trust ladder]] | Email code to reply/chat; ID check to post and offer; card only for businesses; limits and labels for unchecked members | ID for everyone, no checks |
 | 081 | [[ADR-081 Launch focus]] | One identity (shops answer requests + safe housing/jobs), free for businesses, extra features hidden | keep everything visible, charge now |
+| 084 | [[ADR-084 Sky blue, cloud white and scarlet]] | Owner's colorway; green stays "go", red stays "careful"; deeper shades for small text | red buttons like the reference, sky-blue buttons |
 | 083 | [[ADR-083 Search and link previews]] | Worker fills page titles/tags; Arabic-aware, any-order search; test site closed to Google | pre-render, FTS5, open to Google |
 | 082 | [[ADR-082 Phone code for casual sellers]] | People sell (For sale) and ask (Wanted) with an SMS code; ID check for Housing, Jobs, businesses and offers | ID check for everyone, email only |
 | 068 | [[ADR-068 Marketplace first]] | Shops-not-prices on requests, full filters, sample flag, offer status, marketplace-first home | count only, everything public |

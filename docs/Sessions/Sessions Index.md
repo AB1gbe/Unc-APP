@@ -110,3 +110,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-15 | [[2026-11-15 Session 101]] | Trust ladder: reply with an email code, ID check to post/offer, card only for businesses |
 | 2026-11-15 | [[2026-11-15 Session 102]] | Photo thumbnails, ID photos shrunk; then the rest of the honest review |
 | 2026-11-16 | [[2026-11-16 Session 103]] | Third honest review; then WhatsApp/Google previews fixed on Cloudflare, robots/sitemap, Arabic-aware search |
+| 2026-11-16 | [[2026-11-16 Session 104]] | Colorway: sky blue, cloud white, scarlet (green stays for go) |
