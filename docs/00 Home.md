@@ -182,7 +182,8 @@ This vault is the complete record of the project: **how** everything was built, 
 | Trust ladder: reply with an email code; ID check to post and offer; card only for businesses | ✅ **live** → [[ADR-080 Trust ladder]] |
 | Launch readiness: photo thumbnails, free for businesses, extra features hidden, Wanted first, report-to-hide, disguised scam words, backup download | ✅ **live** (PR #43) → [[Step 76 - Launch readiness]], [[Launch Plan]] |
 | Phone code for casual sellers (For sale, Wanted); ID check for Housing, Jobs, businesses; requests first on home; wording fixes | ✅ **live** (PR #44) → [[ADR-082 Phone code for casual sellers]], [[Phone Codes]] |
-| WhatsApp/Google previews and page titles on Cloudflare, robots.txt + sitemap.xml, Arabic-aware any-order search | ✅ on the branch → [[ADR-083 Search and link previews]], [[Search]] |
+| WhatsApp/Google previews and page titles on Cloudflare, robots.txt + sitemap.xml, Arabic-aware any-order search | ✅ **live** (PR #45) → [[ADR-083 Search and link previews]], [[Search]] |
+| Colorway: sky blue, cloud white, scarlet logo dot; green still means go | ✅ on the branch → [[ADR-084 Sky blue, cloud white and scarlet]] |
 | API tests | ✅ 242 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

@@ -107,3 +107,20 @@ See [[ADR-076 Colours that mean something]]. When adding a button: positive buy/
 
 ## Corners (session 89)
 See [[ADR-078 Square corners]]: always `border-radius: var(--radius)` (2px) or `0` for photos; `50%` only for profile pictures and dots. Never pill shapes (999px).
+
+## Sky blue, cloud white and scarlet (session 104)
+[[ADR-084 Sky blue, cloud white and scarlet]].
+
+![[s104-colorway-phone.png|300]]
+
+- **Tokens** (in `:root` of `client/src/styles.css`):
+  - `--sky` #2c99d6 and `--scarlet` #eb2f33 are the exact colours;
+  - `--bg` #f8fafc;
+  - `--brand` #1877af for links and blue buttons;
+  - `--brand-soft` #e7f4fb and `--brand-line` #bfe1f4 for soft boxes;
+  - `--warn` and `--bad` #d6262a;
+  - `--accent` = scarlet.
+- **Green (`--ok`) is unchanged:** Sell, Post and other "go" buttons.
+- **Logo:** a sky tile with a scarlet dot.
+- **Tagline:** the rotating word is sky blue with a scarlet underline (`.tagline-mark`).
+- **To change the colours again:** edit those tokens. Then edit the two hex values in `client/src/components/Logo.jsx` and `client/public/icons/logo-mark.svg`, and in `scripts/make-icons.mjs` (the full-square icon), and run `node scripts/make-icons.mjs` from the `Unc-APP` folder.
