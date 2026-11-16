@@ -108,11 +108,12 @@ This vault is the complete record of the project: **how** everything was built, 
 - [[Step 75 - Trust ladder]]
 - [[Step 76 - Launch readiness]]
 - [[Step 77 - Phone code for casual sellers]]
+- [[Step 78 - Search and link previews]]
 - [[Test Logins]] (demo accounts for the test site)
 
 ### How it works
 - [[Architecture Overview]] · [[Folder Map]] · [[Database Schema]] · [[API Reference]]
-- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Your Data, Dashboard and Care]] · [[Deals, Terms, Cards and Installments]] · [[Orders, Wallet, Invites and Video]] · [[Get Help]] · [[Admin and Moderation]] · [[Phone Codes]] · [[Design System]]
+- Features: [[KYC Verification]] · [[Listing-Bound Messaging]] · [[Email Verification]] · [[Email Sending]] · [[Password Reset]] · [[Ratings]] · [[Arabic and RTL]] · [[Profiles and Onboarding]] · [[Phones and Devices]] · [[Photos]] · [[Saved Requests and Notifications]] · [[Push Notifications]] · [[Social Touches]] · [[Shop Pages]] · [[Choosing, Alerts and Safety]] · [[Privacy, Demand and Trust]] · [[Your Data, Dashboard and Care]] · [[Deals, Terms, Cards and Installments]] · [[Orders, Wallet, Invites and Video]] · [[Get Help]] · [[Admin and Moderation]] · [[Phone Codes]] · [[Search]] · [[Design System]]
 
 ### Why it is built this way
 - [[Decisions Index]] — every decision record (ADR) with the options we compared
@@ -181,6 +182,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Trust ladder: reply with an email code; ID check to post and offer; card only for businesses | ✅ **live** → [[ADR-080 Trust ladder]] |
 | Launch readiness: photo thumbnails, free for businesses, extra features hidden, Wanted first, report-to-hide, disguised scam words, backup download | ✅ **live** (PR #43) → [[Step 76 - Launch readiness]], [[Launch Plan]] |
 | Phone code for casual sellers (For sale, Wanted); ID check for Housing, Jobs, businesses; requests first on home; wording fixes | ✅ **live** (PR #44) → [[ADR-082 Phone code for casual sellers]], [[Phone Codes]] |
-| API tests | ✅ 234 passing |
+| WhatsApp/Google previews and page titles on Cloudflare, robots.txt + sitemap.xml, Arabic-aware any-order search | ✅ on the branch → [[ADR-083 Search and link previews]], [[Search]] |
+| API tests | ✅ 242 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |

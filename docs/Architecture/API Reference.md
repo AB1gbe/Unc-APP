@@ -12,7 +12,10 @@ Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (ses
 | Method | Path | Gate | Notes |
 |---|---|---|---|
 | GET | `/api/health` | — | `{ok:true}` |
+| POST | `/api/auth/phone`, `/api/auth/phone/verify` | email + Terms | Phone codes, session 102 ([[Phone Codes]]) |
 | GET | `/api/meta` | — | categories + currencies |
+| GET | `/api/page-meta?path=` | — | `{title, description, tags}` for a page (session 103): used by the Cloudflare worker for link previews and titles |
+| GET | `/robots.txt`, `/sitemap.xml` | — | Session 103. Test site: `Disallow: /`. Sitemap: section pages + open, real (not sample) ads |
 
 ## Auth — `server/src/routes/auth.js`
 | Method | Path | Gate | Body → Response |
@@ -50,7 +53,7 @@ Files: `/uploads/listings/*`, `/uploads/avatars/*` and `/uploads/stories/*` (ses
 ## Requests — `server/src/routes/listings.js`
 | Method | Path | Gate | Notes |
 |---|---|---|---|
-| GET | `/api/listings?q=&category=&city=&page=` | — | open only, 20/page (page capped at 10,000), `{listings, page, hasMore}`. Session 31: `city` may be a governorate name (`Capital Governorate`, `محافظة العاصمة`…) = all its areas; a known area matches however it is spelled. Logged in: requests from members I blocked are left out |
+| GET | `/api/listings?q=&category=&city=&page=` | — | Session 103: `q` = every word must match title/description/area/category, Arabic-spelling aware ([[Search]]). Open only, 20/page (page capped at 10,000), `{listings, page, hasMore}`. Session 31: `city` may be a governorate name (`Capital Governorate`, `محافظة العاصمة`…) = all its areas; a known area matches however it is spelled. Logged in: requests from members I blocked are left out |
 | GET | `/api/listings/for-you` | A | Home page: up to 6 open requests in my interests (all if none), not mine, not already answered, not from members I blocked (session 31); my city first → `{listings, basedOnInterests}`. Session 13. Session 34: also leaves out requests whose "who can make offers" rule doesn't let me answer (`CONTACT_ALLOWED_SQL`) |
 | GET | `/api/listings/saved` | A | my saved requests that are still open, newest saved first (≤100). Session 13 |
 | PUT | `/api/listings/:id/save` | A | save → `{saved:true}`; 404 if not open, 400 for your own request. Session 13 |

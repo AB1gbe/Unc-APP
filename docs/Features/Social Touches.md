@@ -41,7 +41,7 @@ The five "recommended first" ideas from [[Social Marketplace Ideas]], all built 
 
 ## 4. Share to WhatsApp, with preview cards
 **Why:** [[ADR-027 Link previews]] · **Build:** [[Step 27 - Share and link previews]]
-**Where:** `client/src/components/ShareButton.jsx`, `server/src/lib/previews.js`, the page handler in `server/src/app.js`
+**Where:** `client/src/components/ShareButton.jsx`, `server/src/lib/previews.js` (`pageMeta`), `shared/page-meta.js` (`applyMeta`), the page handler in `server/src/app.js`. On Cloudflare: `cloudflare/worker.js` + `GET /api/page-meta` (session 103, [[ADR-083 Search and link previews]]; before that previews didn't work there, [[Mistakes and Fixes#M162]]). Every section has its own call to action, rent and pay show "/ month", and section pages have their own titles.
 
 ![[s20-share.png]]
 

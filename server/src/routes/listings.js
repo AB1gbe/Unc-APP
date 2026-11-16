@@ -8,6 +8,7 @@ import { HttpError, notFound } from '../lib/http.js';
 import { LISTING_DIR, avatarUrl, memoryUpload, saveFiles } from '../lib/uploads.js';
 import { CATEGORIES, CURRENCIES, JOB_TYPES, SECTIONS, categoriesFor } from '../lib/categories.js';
 import { checkAd } from '../../../shared/scam-check.js';
+import { likeEscape, searchTerms, sqlNormalize } from '../../../shared/search.js';
 import { payForAd, settleAd } from '../lib/billing.js';
 import * as v from '../lib/validate.js';
 import { assertCanPost, parseInterests, requireAuth, requireMember, requireVerified } from '../middleware/auth.js';
@@ -78,6 +79,9 @@ const BASE_SELECT = `
          datetime(COALESCE(l.renewed_at, l.created_at), '+${LIFE_DAYS} days') AS closes_at
   FROM listings l JOIN users u ON u.id = l.buyer_id
 `;
+
+// What search looks through, in one spelling (session 103).
+const SEARCH_TEXT = sqlNormalize(`(l.title || ' ' || l.description || ' ' || l.city || ' ' || l.category)`);
 
 export function listingRoutes(db) {
   const r = Router();
@@ -150,10 +154,13 @@ export function listingRoutes(db) {
     const params = [section];
     if (req.user) { where.push(NOT_BLOCKED_BUYER); params.push(req.user.id); }
     if (req.query.q) {
-      // Words match the item, the description or the area (session 77).
-      where.push('(l.title LIKE ? OR l.description LIKE ? OR l.city LIKE ?)');
-      const like = `%${String(req.query.q).slice(0, 100)}%`;
-      params.push(like, like, like);
+      // Every word must match the item, description, area or category, in
+      // any order; Arabic spellings and a few English/Arabic twins count
+      // (session 103, shared/search.js).
+      for (const alts of searchTerms(req.query.q)) {
+        where.push(`(${alts.map(() => `${SEARCH_TEXT} LIKE ? ESCAPE '\\'`).join(' OR ')})`);
+        params.push(...alts.map((w) => `%${likeEscape(w)}%`));
+      }
     }
     // Budget: requests whose range overlaps the one asked for (session 77).
     const min = Number.parseInt(req.query.min, 10);
