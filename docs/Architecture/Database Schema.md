@@ -205,3 +205,7 @@ See [[ADR-077 Business accounts, paying for ads and teams]].
 
 ## Migration 45 (session 102): thumbnails
 - `listing_images.thumb` TEXT: a ~480px copy made by the browser (NULL for older photos; the full photo is used).
+
+## Migration 46 (session 102): phone codes
+- `users.phone` (`+973XXXXXXXX`, unique when set), `users.phone_verified_at`.
+- `phone_codes` (one row per member): `phone`, `code_hash`, `expires_at`, `attempts`, `sends`, `first_sent_at` (for the 5-a-day limit). See [[Phone Codes]].

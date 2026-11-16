@@ -27,6 +27,9 @@ Unc-APP/
 │   ├── names.js            "Show only my first name": shortName() ("Sam Buyer" → "Sam B."), nameFor() (session 34)
 │   ├── scam-check.js       checkAd(): ad scam rules for Housing/Jobs (session 82)
 │   ├── contact-details.js  hasContactDetails() (moved from server, session 82)
+│   ├── trust.js            postNeeds(): who needs what to post; normalizePhone(), maskPhone() (session 102, ADR-082)
+│   ├── search.js           normalizeSearch(), sqlNormalize(), searchTerms(): Arabic-aware search (session 103)
+│   ├── page-meta.js        applyMeta(): page title, description, preview tags (session 103)
 │   ├── money.js            formatMoney(): "BD 120" / "120 د.ب", CURRENCY = 'BHD' (session 80)
 │   └── contact-mask.js     Hides numbers, emails, links and @handles as 📵 until a price is agreed: maskContacts(), hasContacts(), HIDDEN (session 40)
 ├── server/

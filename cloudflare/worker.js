@@ -1,11 +1,13 @@
 // Unc on Cloudflare, test version (session 79, ADR-069).
-// - Pages, scripts and images of the website: Cloudflare's static assets
-//   (client/dist), served without touching this code.
+// - Scripts and images of the website: Cloudflare's static assets
+//   (client/dist), served without touching this code. Ad and section pages
+//   come through here to get their own title and preview tags (session 103).
 // - /api/* and /uploads/*: forwarded to ONE Durable Object ("main") that runs
 //   the normal Unc server (Express) with its database in the Durable
 //   Object's own SQLite. See shims/sqlite.js and shims/fs.js.
 import { DurableObject } from 'cloudflare:workers';
 import { store } from './shims/storage.js';
+import { applyMeta } from '../shared/page-meta.js';
 
 const HOUR = 60 * 60 * 1000;
 
@@ -53,16 +55,34 @@ export class UncServer extends DurableObject {
   }
 }
 
+// Pages that get their own title and link-preview tags (session 103, M162):
+// ads and the section pages. Other pages are plain static files.
+const META_PAGE = /^\/(?:requests\/\d+|for-sale|housing|jobs|browse|shops)?\/?$/;
+
 export default {
   async fetch(request, env) {
-    const { pathname } = new URL(request.url);
-    if (pathname.startsWith('/api/') || pathname.startsWith('/uploads/')) {
-      return env.UNC.get(env.UNC.idFromName('main')).fetch(request);
+    const url = new URL(request.url);
+    const { pathname } = url;
+    const server = () => env.UNC.get(env.UNC.idFromName('main'));
+    if (pathname.startsWith('/api/') || pathname.startsWith('/uploads/') || pathname === '/robots.txt' || pathname === '/sitemap.xml') {
+      return server().fetch(request);
+    }
+    if (request.method === 'GET' && META_PAGE.test(pathname)) {
+      const [shell, meta] = await Promise.all([
+        env.ASSETS.fetch(new Request(new URL('/', url), request)),
+        server().fetch(new Request(new URL(`/api/page-meta?path=${encodeURIComponent(pathname)}`, url))).catch(() => null),
+      ]);
+      let html = await shell.text();
+      // If the server is down the page still works, just without the tags.
+      if (meta?.ok) html = applyMeta(html, await meta.json());
+      const headers = { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' };
+      if (env.TEST_SITE === '1') headers['X-Robots-Tag'] = 'noindex, nofollow';
+      return new Response(html, { status: 200, headers });
     }
     // A test site: keep it out of search engines.
     const res = await env.ASSETS.fetch(request);
     const out = new Response(res.body, res);
-    out.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    if (env.TEST_SITE === '1') out.headers.set('X-Robots-Tag', 'noindex, nofollow');
     return out;
   },
 };
