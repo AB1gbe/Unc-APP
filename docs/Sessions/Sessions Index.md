@@ -111,3 +111,4 @@ One note per working session (each chat with the AI, or each time you work on it
 | 2026-11-15 | [[2026-11-15 Session 102]] | Photo thumbnails, ID photos shrunk; then the rest of the honest review |
 | 2026-11-16 | [[2026-11-16 Session 103]] | Third honest review; then WhatsApp/Google previews fixed on Cloudflare, robots/sitemap, Arabic-aware search |
 | 2026-11-16 | [[2026-11-16 Session 104]] | Colorway: sky blue, cloud white, scarlet (green stays for go) |
+| 2026-11-17 | [[2026-11-17 Session 105]] | Colour options A–E drawn on the real app; waiting for the owner's pick |
