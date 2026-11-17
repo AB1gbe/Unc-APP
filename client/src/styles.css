@@ -1123,3 +1123,14 @@ html.side-collapsed .side-logo .logo-word { display: none; }
 .phone-prefix { display: grid; place-items: center; padding: 0 .7rem; background: var(--surface-2); border: 1px solid var(--border); border-inline-end: 0; border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); font-weight: 600; }
 .phone-row input { flex: 1; min-width: 0; border-start-start-radius: 0; border-end-start-radius: 0; }
 #phone-code { max-width: 160px; letter-spacing: .2em; font-size: 1.2rem; }
+
+/* Colour switcher, test site only (session 105). */
+.palette-switch { position: fixed; z-index: 60; inset-inline-end: 12px; bottom: calc(var(--tabbar-h) + 12px); display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.palette-toggle, .palette-panel button { display: inline-flex; align-items: center; gap: .5rem; font: inherit; font-size: .85rem; font-weight: 600; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .45rem .7rem; cursor: pointer; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+.palette-panel { display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; box-shadow: 0 8px 28px rgba(0, 0, 0, .16); max-width: min(92vw, 300px); }
+.palette-panel button { box-shadow: none; justify-content: flex-start; text-align: start; }
+.palette-toggle, .palette-panel button { min-height: 44px; }
+.palette-panel button.on { border-color: var(--brand); outline: 2px solid var(--brand); outline-offset: -2px; }
+.palette-dots { display: inline-flex; gap: 2px; flex: 0 0 auto; }
+.palette-dots i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0, 0, 0, .15); display: block; }
+@media print { .palette-switch { display: none; } }

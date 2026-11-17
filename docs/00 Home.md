@@ -184,6 +184,7 @@ This vault is the complete record of the project: **how** everything was built, 
 | Phone code for casual sellers (For sale, Wanted); ID check for Housing, Jobs, businesses; requests first on home; wording fixes | ✅ **live** (PR #44) → [[ADR-082 Phone code for casual sellers]], [[Phone Codes]] |
 | WhatsApp/Google previews and page titles on Cloudflare, robots.txt + sitemap.xml, Arabic-aware any-order search | ✅ **live** (PR #45) → [[ADR-083 Search and link previews]], [[Search]] |
 | Colorway: sky blue, cloud white, scarlet logo dot; green still means go | ✅ **live** (PR #46) → [[ADR-084 Sky blue, cloud white and scarlet]] |
+| Colour switcher on the test site (options A–E) while the owner picks colours | ✅ live after PR #47 → [[Colour Options 2026-11-17]] |
 | API tests | ✅ 242 passing |
 | Browser tests: English journey, Arabic journey, all devices | ✅ passing (`npm run e2e`, `e2e:ar`, `e2e:devices`) |
 | Automated KYC provider (Stripe Identity etc.) | ⏳ interface ready — see [[KYC Verification]] |
