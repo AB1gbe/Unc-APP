@@ -12,6 +12,7 @@ import Celebrations from './Celebrate.jsx';
 import Icon from './Icon.jsx';
 import DeletePending from './DeletePending.jsx';
 import TermsAccept from './TermsAccept.jsx';
+import ColourSwitcher from './ColourSwitcher.jsx';
 
 
 export default function Layout() {
@@ -99,6 +100,7 @@ export default function Layout() {
       </main>
       <TabBar unread={unread} loggedIn={loggedIn} />
       <Celebrations />
+      <ColourSwitcher />
     </>
   );
 }

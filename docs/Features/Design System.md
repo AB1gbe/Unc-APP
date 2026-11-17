@@ -124,3 +124,12 @@ See [[ADR-078 Square corners]]: always `border-radius: var(--radius)` (2px) or `
 - **Logo:** a sky tile with a scarlet dot.
 - **Tagline:** the rotating word is sky blue with a scarlet underline (`.tagline-mark`).
 - **To change the colours again:** edit those tokens. Then edit the two hex values in `client/src/components/Logo.jsx` and `client/public/icons/logo-mark.svg`, and in `scripts/make-icons.mjs` (the full-square icon), and run `node scripts/make-icons.mjs` from the `Unc-APP` folder.
+
+## Colour switcher on the test site (session 105)
+- A floating **Colours** button (bottom corner, above the tab bar) lets you try options A–E from [[Colour Options 2026-11-17]] on every page. The choice is saved on that device only.
+- It shows only on the test site (`TEST_SITE=1`) and on your own computer (`npm start`), never on a real site.
+- Code:
+  - `client/src/palettes.js` (to add an option, copy one entry and change the colours);
+  - `client/src/components/ColourSwitcher.jsx`;
+  - `colourSwitcher` in `/api/meta`.
+- **Remove it before launch:** delete `<ColourSwitcher />` from `client/src/components/Layout.jsx`, or just remove `TEST_SITE`.

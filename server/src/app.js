@@ -103,7 +103,9 @@ export function createApp(db) {
     for (const a of sitemapAds.all()) urls.push(`<url><loc>${config.appUrl}/requests/${a.id}</loc><lastmod>${String(a.changed).slice(0, 10)}</lastmod></url>`);
     res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
   });
-  app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES, forsale: CATEGORIES }, jobTypes: JOB_TYPES }));
+  app.get('/api/meta', (_req, res) => res.json({ categories: CATEGORIES, currencies: CURRENCIES, sections: { housing: HOUSING_CATEGORIES, jobs: JOB_CATEGORIES, forsale: CATEGORIES }, jobTypes: JOB_TYPES,
+    // The colour switcher (session 105): test site and development only.
+    colourSwitcher: config.testSite || !config.isProd }));
   app.use('/api/auth', authRoutes(db));
   app.use('/api/kyc', kycRoutes(db));
   app.use('/api/listings', listingRoutes(db));

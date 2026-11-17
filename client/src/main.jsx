@@ -14,6 +14,9 @@ import '@fontsource-variable/plus-jakarta-sans';
 import '@fontsource/almarai/arabic-400.css';
 import '@fontsource/almarai/arabic-700.css';
 import '@fontsource/almarai/arabic-800.css';
+import { applyPalette, savedPalette } from './palettes.js';
+// A colour option picked on the test site (session 105), before the first paint.
+applyPalette(savedPalette());
 import './styles.css';
 
 registerServiceWorker();

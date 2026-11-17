@@ -1,0 +1,26 @@
+const fs = require('fs'); const { chromium, devices } = require('playwright');
+const [S, AD] = process.argv.slice(2);
+const P = {
+  A: { name: 'A · Navy & Gold', bg: '#faf8f3', s2: '#f1ede4', border: '#e6e0d4', text: '#0f1b2d', muted: '#6b6f78', brand: '#0b2545', soft: '#e8edf5', line: '#c7d3e6', sky: '#0b2545', accent: '#d9a21b', tile: '#0b2545', dot: '#e0a526' },
+  B: { name: 'B · Teal & Coral', bg: '#f7f4ee', s2: '#eee9df', border: '#e3dccf', text: '#1b2321', muted: '#68706d', brand: '#0f766e', soft: '#e3f2ef', line: '#b9ddd6', sky: '#0f766e', accent: '#f26b5b', tile: '#0f766e', dot: '#f26b5b' },
+  C: { name: 'C · Black & Electric Blue', bg: '#ffffff', s2: '#f2f3f5', border: '#e4e6ea', text: '#0a0a0a', muted: '#666b73', brand: '#2453ff', soft: '#eaf0ff', line: '#c6d4ff', sky: '#2453ff', accent: '#2453ff', tile: '#0a0a0a', dot: '#2453ff' },
+  D: { name: 'D · Indigo & Peach', bg: '#f8f7fc', s2: '#efedf7', border: '#e2dfef', text: '#16142b', muted: '#6c6a80', brand: '#4338ca', soft: '#ecebfb', line: '#cdc9f3', sky: '#4338ca', accent: '#ff8a5b', tile: '#4338ca', dot: '#ff8a5b' },
+  E: { name: 'E · Before: Blue & Yellow', bg: '#f5f6f8', s2: '#eef0f3', border: '#e1e4e8', text: '#16181d', muted: '#6b7280', brand: '#1f5fd6', soft: '#e8f0fd', line: '#c9dafb', sky: '#1f5fd6', accent: '#ffc928', tile: '#1f5fd6', dot: '#ffc928' },
+};
+const css = (p) => `:root{--bg:${p.bg};--surface-2:${p.s2};--border:${p.border};--text:${p.text};--muted:${p.muted};--brand:${p.brand};--brand-soft:${p.soft};--brand-line:${p.line};--sky:${p.sky};--scarlet:${p.accent};--accent:${p.accent};}.logo-mark rect{fill:${p.tile}!important}.logo-mark circle{fill:${p.dot}!important}`;
+(async () => {
+  const b = await chromium.launch();
+  for (const [k, p] of Object.entries(P)) {
+    const shots = [];
+    for (const [i, path] of [['home', '/'], ['ad', `/requests/${AD}`], ['list', '/for-sale']].entries()) {
+      const ctx = await b.newContext({ ...devices['iPhone 13'], deviceScaleFactor: 2 });
+      await ctx.addInitScript((c) => { document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.textContent = c; document.head.appendChild(s); }); }, css(p));
+      const pg = await ctx.newPage(); await pg.goto('http://localhost:4517' + path[1], { waitUntil: 'networkidle' }); await pg.waitForTimeout(400);
+      const f = `${S}/pal/${k}-${path[0]}.png`; await pg.screenshot({ path: f }); shots.push(f); await ctx.close();
+    }
+    const pg = await b.newPage({ viewport: { width: 1250, height: 900 } });
+    await pg.setContent(`<style>body{margin:0;padding:28px;background:${p.bg === '#ffffff' ? '#ececef' : '#e6e6ea'};font:700 28px system-ui}h1{margin:0 0 18px;font-size:30px;display:flex;align-items:center;gap:14px}i{width:30px;height:30px;border-radius:5px;border:1px solid #0002;display:inline-block}.r{display:flex;gap:22px}img{width:375px;border-radius:20px;box-shadow:0 3px 14px #0003}</style><h1>${p.name} ${[p.tile, p.bg, p.dot].map((c) => `<i style="background:${c}"></i>`).join('')}</h1><div class=r>${shots.map((f) => `<img src="data:image/png;base64,${fs.readFileSync(f).toString('base64')}">`).join('')}</div>`);
+    await pg.screenshot({ path: `${S}/pal/option-${k}.png`, fullPage: true }); await pg.close();
+  }
+  await b.close();
+})();

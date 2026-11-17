@@ -1392,4 +1392,13 @@ export default {
   "Confirm": "تأكيد",
   "Only selling your own things or looking for something? You can skip this: you confirm your phone when you post. The ID check is for housing and job ads. {skip}": "تبيع أغراضك الخاصة أو تبحث عن شيء فقط؟ يمكنك تخطي هذه الخطوة: ستؤكد رقم هاتفك عند النشر. التحقق من الهوية لإعلانات السكن والوظائف. {skip}",
   "Mobile number confirmed; no ID check": "رقم الهاتف مؤكَّد، دون تحقق من الهوية",
+  "Try colours": "جرّب الألوان",
+  "Test site only. Saved on this device.": "على الموقع التجريبي فقط. يُحفظ على هذا الجهاز.",
+  "Colours": "الألوان",
+  "Now: Sky & Scarlet": "الحالي: أزرق سماوي وأحمر",
+  "A Navy & Gold": "A كحلي وذهبي",
+  "B Teal & Coral": "B أخضر مزرق ومرجاني",
+  "C Black & Electric Blue": "C أسود وأزرق كهربائي",
+  "D Indigo & Peach": "D نيلي وخوخي",
+  "E Before: Blue & Yellow": "E السابق: أزرق وأصفر",
 };
